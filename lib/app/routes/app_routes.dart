@@ -26,4 +26,7 @@ abstract class Routes {
 
   //Radio Pop Goiaba
   static const RADIO = '/radio';
+
+  // Histórico
+  static const HISTORICO = '/historico';
 }
