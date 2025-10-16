@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/modules/external_modules/atividades_proex/ui/atividades_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/binding/carteirinha_digital_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/ui/carteirinha_digital_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/radio/bindings/radio_bindings.dart';
@@ -149,6 +150,13 @@ abstract class AppPages {
       name: Routes.RADIO,
       page: () => Radio(),
       bindings: [RadioBindings()],
+    ),
+
+    // Atividades PROEX
+    GetPage(
+      name: Routes.ATIVIDADES_PROEX,
+      page: () => AtividadesPage(),
+      bindings: [WebViewBindings()],
     ),
   ];
 }

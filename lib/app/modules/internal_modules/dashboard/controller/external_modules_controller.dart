@@ -40,6 +40,13 @@ class ExternalModulesController extends GetxController {
       url: '',
       interrogation: false,
     ),
+    ExternalModules(
+      iconSrc: 'assets/atividades_proex/icons/atividades-proex.svg', 
+      subtitle: 'Atividades PROEX',
+      page: Routes.ATIVIDADES_PROEX,
+      url: '',
+      interrogation: false,
+    )
   ];
 
   // TODO: parece redundante; melhor usar Get.toNamed direto?

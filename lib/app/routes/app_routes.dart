@@ -26,4 +26,7 @@ abstract class Routes {
 
   //Radio Pop Goiaba
   static const RADIO = '/radio';
+
+  //Atividades PROEX
+  static const ATIVIDADES_PROEX = '/atividades_proex';
 }

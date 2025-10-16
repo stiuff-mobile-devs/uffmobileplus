@@ -42,6 +42,7 @@ dependencies:
   radio_player: ^2.2.1
   marquee: ^2.3.0
   cached_network_image: ^3.4.1
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:
@@ -62,3 +63,4 @@ flutter:
     - assets/carteirinha_digital/images/
     - assets/carteirinha_digital/icons/
     - assets/radio/icons/radio.svg
+    - assets/atividades_proex/icons/
