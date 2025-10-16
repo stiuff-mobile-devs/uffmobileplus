@@ -72,20 +72,9 @@ class UserDataProvider {
         return "Nenhuma informação de usuário encontrada";
       }
 
-      UserData userData = UserData(
-        name: user.name,
-        nomesocial: user.nomesocial,
-        matricula: user.matricula,
-        iduff: user.iduff,
-        curso: user.curso,
-        fotoUrl: user.fotoUrl,
-        dataValidadeMatricula: user.dataValidadeMatricula,
-        textoQrCodeCarteirinha: textoQrCodeCarteirinha,
-        accessToken: user.accessToken,
-
-      );
-
-      await box.put(_userKey, userData);
+      // altera o campo diretamente e salva
+      user.textoQrCodeCarteirinha = textoQrCodeCarteirinha;
+      await user.save(); // persiste o objeto atualizado
       return textoQrCodeCarteirinha;
     } catch (e) {
       return "Erro ao atualizar status de login no Hive: $e";
