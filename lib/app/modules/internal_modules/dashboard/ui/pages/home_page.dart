@@ -143,7 +143,7 @@ class HomePage extends GetView<HomePageController> {
 
                         // Versão
                         Text(
-                          'Versão 6.2.0',
+                          'Versão 6.3.0',
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.5),
                             fontSize: 12,
