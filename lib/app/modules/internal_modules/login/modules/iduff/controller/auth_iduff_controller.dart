@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_umm_model.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_iduff_controller.dart';
@@ -18,7 +19,7 @@ class AuthIduffController extends GetxController {
   late final UserIduffController _userIduffController;
   RxBool isLoading = false.obs;
   late final bool isLogin;
-  final int _timeoutSeconds = 10;
+  final int _timeoutSeconds = 5;
 
   @override
   void onInit() {
@@ -161,11 +162,10 @@ class AuthIduffController extends GetxController {
   loginSuccessful() async {
     try {
       String? iduff = await _userIduffController.getIduff();
-      final userUmm = await _userUmmController.getUserData(iduff);
-      await _userUmmController.saveUserUmm(userUmm);
+      UserUmmModel userUmm = await _userUmmController.getUserData(iduff);
       await _userDataController.saveUserData(userUmm);
     } catch (e) {
-      loginFailed(ErrorMessage.erro005);
+      await loginFailed(ErrorMessage.erro005);
     }
 
     isLoading.value = false;
@@ -178,12 +178,12 @@ class AuthIduffController extends GetxController {
       final result = await _authIduffService.authenticate(Get.context);
 
       if (result.success) {
-        loginSuccessful();
+        await loginSuccessful();
       } else {
-        loginFailed(result.message);
+        await loginFailed(result.message);
       }
     } catch (e) {
-      loginFailed(
+      await loginFailed(
         "Erro desconhecido. Tente novamente mais tarde. Se o problema persistir, entre em contato com o suporte:",
       );
     }

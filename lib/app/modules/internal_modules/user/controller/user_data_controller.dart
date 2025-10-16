@@ -26,42 +26,51 @@ class UserDataController extends GetxController {
 
   Future<String> saveUserData(UserUmmModel userUmm) async {
     try {
-      final saciData = await getSaciData();
-      final textoQrCode = saciData[0];
-      final dataValidadeMatricula = saciData[1];
-      final iduff = userUmm.grad?.matriculas?[0].identificacao?.iduff ?? "";
-
-      final userData = UserData(
-        name:
-            userUmm.grad?.matriculas?[0].identificacao?.nomesocial ??
+      var saciData = await getSaciData();
+      String textoQrCode = await saciData[0] ?? '-';
+      String dataValidadeMatricula = await saciData[1] ?? '-';
+      String iduff = userUmm.grad?.matriculas?[0].identificacao?.iduff 
+      ?? await _userIduffController.getIduff()
+      ?? "-";
+      String name = userUmm.grad?.matriculas?[0].identificacao?.nomesocial ??
             userUmm.grad?.matriculas?[0].identificacao?.nome ??
-            "-",
-        nomesocial:
-            userUmm.grad?.matriculas?[0].identificacao?.nomesocial ?? "-",
-        matricula: userUmm.grad?.matriculas?[0].matricula ?? "-",
+            "-";
+      String nomeSocial = userUmm.grad?.matriculas?[0].identificacao?.nomesocial ?? "-";
+      String matricula = userUmm.grad?.matriculas?[0].matricula ?? "-";
+      String curso = userUmm.grad?.matriculas?[0].nomeCurso ?? "-";
+      String fotoUrl = await _userIduffController.getPhotoUrl() ?? "-";
+      String bond = userUmm
+          .activeBond
+          ?.objects
+          ?.outerObject?[1]
+          .innerObjects?[0]
+          .vinculacao
+          ?.vinculo ??
+          "-";
+      String bondId = userUmm
+          .activeBond
+          ?.objects
+          ?.outerObject?[1]
+          .innerObjects?[0]
+          .vinculacao
+          ?.id ??
+          "-";
+        var gdiGroups = await getGdiGroups(iduff);
+        String accessToken = await _auth.getAccessToken() ?? "";
+
+      final  userData = UserData(
+        name: name,
+        nomesocial: nomeSocial,
+        matricula: matricula,
         iduff: iduff,
-        curso: userUmm.grad?.matriculas?[0].nomeCurso ?? "-",
-        fotoUrl: await _userIduffController.getPhotoUrl(),
-        dataValidadeMatricula: dataValidadeMatricula ?? "-",
-        textoQrCodeCarteirinha: textoQrCode ?? "-",
-        bond:
-            userUmm
-                .activeBond
-                ?.objects
-                ?.outerObject?[1]
-                .innerObjects?[0]
-                .vinculacao
-                ?.vinculo ??
-            "-",
-        bondId: userUmm
-            .activeBond
-            ?.objects!
-            .outerObject![1]
-            .innerObjects![0]
-            .vinculacao!
-            .id,
-        gdiGroups: await getGdiGroups(iduff),
-        accessToken: await _auth.getAccessToken(),
+        curso: curso,
+        fotoUrl: fotoUrl,
+        dataValidadeMatricula: dataValidadeMatricula,
+        textoQrCodeCarteirinha: textoQrCode,
+        bond: bond,
+        bondId: bondId,
+        gdiGroups: gdiGroups,
+        accessToken: accessToken,
       );
       return await _userDataRepository.saveUserData(userData);
     } catch (e) {
