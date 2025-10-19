@@ -17,6 +17,7 @@ abstract class Routes {
   static const LEITOR_QRCODE = '/leitor_qrcode';
   static const RESULTADO_DETALHADO_PAGE = '/resultado_detalhado_page';
   static const VALIDAR_MANUALMENTE = '/validar_manualmente';
+  static const BANDEJAPP = '/cardapio';
 
   //Carteirinha Digital - Externo
   static const CARTEIRINHA_DIGITAL = '/carteirinha_digital';

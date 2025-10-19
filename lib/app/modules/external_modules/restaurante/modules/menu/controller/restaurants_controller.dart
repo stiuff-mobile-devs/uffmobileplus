@@ -1,14 +1,8 @@
 import 'dart:async';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:uffmobileplus/app/data/providers/firebase/firebase_analytics_service.dart';
-import 'package:uffmobileplus/app/data/providers/gdi/gdi_groups.dart';
-import 'package:uffmobileplus/app/data/repositories/restaurant_repository.dart';
-import 'package:uffmobileplus/app/data/providers/gdi/gdi_provider.dart';
-import 'package:uffmobileplus/app/data/repositories/user_repository.dart';
-import 'package:uffmobileplus/app/modules/restaurant/utils/campus_static_model.dart';
-
 import '../data/models/campus_model.dart';
+import '../data/repository/restaurant_repository.dart';
 
 class RestaurantsController extends GetxController {
   RestaurantsController();
@@ -33,10 +27,11 @@ class RestaurantsController extends GetxController {
   get stats => null;
 
   bool? isAdminModeEnabled() {
-    return gdiProvider
-                .isInGroup(GdiGroups.adminCardapioRestauranteUniversitario) &&
-            !isDebugActive ||
-        (isDebugActive && debugMode == 1);
+    // return gdiProvider
+    //             .isInGroup(GdiGroups.adminCardapioRestauranteUniversitario) &&
+    //         !isDebugActive ||
+    //     (isDebugActive && debugMode == 1);
+    return true;
   }
 
   @override
@@ -56,8 +51,8 @@ class RestaurantsController extends GetxController {
       latitude: -22.89874728234421,
       longitude: -43.13222613102928,
       colorId: LocationColor.orange,
-      iconImgPath: 'assets/modules/restaurant/img/gr.png',
-      panelImgPath: 'assets/modules/restaurant/img/gr-banner.png',
+      iconImgPath: 'assets/restaurant/img/gr.png',
+      panelImgPath: 'assets/restaurant/img/gr-banner.png',
     );
 
     Campus pv = Campus(
@@ -66,8 +61,8 @@ class RestaurantsController extends GetxController {
       latitude: -22.90532486896256,
       longitude: -43.13205992739933,
       colorId: LocationColor.green,
-      iconImgPath: 'assets/modules/restaurant/img/pv.png',
-      panelImgPath: 'assets/modules/restaurant/img/pv-banner.png',
+      iconImgPath: 'assets/restaurant/img/pv.png',
+      panelImgPath: 'assets/restaurant/img/pv-banner.png',
     );
 
     Campus re = Campus(
@@ -76,8 +71,8 @@ class RestaurantsController extends GetxController {
       latitude: -22.903100458336205,
       longitude: -43.11663976801507,
       colorId: LocationColor.red,
-      iconImgPath: 'assets/modules/restaurant/img/re.png',
-      panelImgPath: 'assets/modules/restaurant/img/re-banner.png',
+      iconImgPath: 'assets/restaurant/img/re.png',
+      panelImgPath: 'assets/restaurant/img/re-banner.png',
     );
 
     Campus ve = Campus(
@@ -86,8 +81,8 @@ class RestaurantsController extends GetxController {
       latitude: -22.90557897632478,
       longitude: -43.09826157388613,
       colorId: LocationColor.blue,
-      iconImgPath: 'assets/modules/restaurant/img/ve.png',
-      panelImgPath: 'assets/modules/restaurant/img/ve-banner.png',
+      iconImgPath: 'assets/restaurant/img/ve.png',
+      panelImgPath: 'assets/restaurant/img/ve-banner.png',
     );
 
     Campus hu = Campus(
@@ -96,8 +91,8 @@ class RestaurantsController extends GetxController {
       latitude: -22.895181826741158,
       longitude: -43.11204116153949,
       colorId: LocationColor.purple,
-      iconImgPath: 'assets/modules/restaurant/img/hu.png',
-      panelImgPath: 'assets/modules/restaurant/img/hu-banner.png',
+      iconImgPath: 'assets/restaurant/img/hu.png',
+      panelImgPath: 'assets/restaurant/img/hu-banner.png',
     );
 
     locations = [gr, pv, re, ve, hu];

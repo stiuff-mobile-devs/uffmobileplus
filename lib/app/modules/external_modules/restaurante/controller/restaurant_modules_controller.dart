@@ -15,6 +15,16 @@ class RestaurantModulesController extends GetxController {
       //availableFor: [ProfileTypes.student, ProfileTypes.professor, ProfileTypes.employee],
       //gdiGroups: null
     ),
+
+    RestaurantModules(
+      iconSrc: 'assets/icons/cardapio.svg',
+      subtitle: "Menu",
+      page: Routes.BANDEJAPP,
+      url: '',
+      interrogation: false,
+      //availableFor: [ProfileTypes.student, ProfileTypes.professor, ProfileTypes.employee],
+      //gdiGroups: null
+    ),
   ];
 
   void navigateTo(

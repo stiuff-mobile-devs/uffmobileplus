@@ -43,6 +43,10 @@ dependencies:
   marquee: ^2.3.0
   cached_network_image: ^3.4.1
   shared_preferences: ^2.5.3
+  calendar_date_picker2: ^2.0.1
+  flutter_widget_from_html_core: ^0.17.0
+  share_plus: ^12.0.0
+  image: ^4.5.4
 
 dev_dependencies:
   flutter_test:
@@ -63,3 +67,4 @@ flutter:
     - assets/carteirinha_digital/images/
     - assets/carteirinha_digital/icons/
     - assets/radio/icons/radio.svg
+    - assets/restaurant/img/

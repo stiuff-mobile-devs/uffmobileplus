@@ -1,20 +1,14 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/menu/ui/widgets/custom_polygon.dart';
-import 'package:uffmobileplus/app/modules/restaurant/meal_form_page.dart';
-import 'package:uffmobileplus/app/modules/restaurant/controllers/menu_controller.dart'
-    as menu;
-import 'package:uffmobileplus/app/modules/restaurant/controllers/restaurants_controller.dart';
-import 'package:uffmobileplus/app/modules/restaurant/utils/campus_static_model.dart';
-import 'package:uffmobileplus/app/modules/restaurant/widgets/custom_polygon.dart';
-import 'package:uffmobileplus/app/routes/app_pages.dart';
-import 'package:uffmobileplus/app/util/ui_components/custom_app_bar.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/menu/ui/widgets/menu_widget.dart';
+import '../../../../../../routes/app_routes.dart';
+import '../../../../../../utils/ui_components/custom_app_bar.dart';
+import '../controller/menu_controller.dart' as menu;
 import '../controller/restaurants_controller.dart';
 import '../data/models/campus_model.dart';
 import 'meal_form_page.dart';
-import 'widgets/menu_widget.dart';
 
 class MenuPage extends StatefulWidget {
   final Campus location;
@@ -28,7 +22,7 @@ class MenuPage extends StatefulWidget {
 }
 
 class _MenuPageState extends State<MenuPage> with TickerProviderStateMixin {
-  final menu.MenuController menuController = Get.put(menu.MenuController());
+  final menu.MenuController menuController = Get.find<menu.MenuController>();
 
   late AnimationController editAnimationController;
   late AnimationController deleteAnimationController;
@@ -214,7 +208,7 @@ class _MenuPageState extends State<MenuPage> with TickerProviderStateMixin {
                                                     style: const TextStyle(
                                                       color: Colors.white,
                                                       fontFamily: "Jost",
-                                                      fontSize: 20,
+                                                      fontSize: 16,
                                                     ),
                                                   ),
                                                 ),
@@ -230,7 +224,7 @@ class _MenuPageState extends State<MenuPage> with TickerProviderStateMixin {
                                                       style: const TextStyle(
                                                         color: Colors.white,
                                                         fontFamily: "Jost",
-                                                        fontSize: 20,
+                                                        fontSize: 16,
                                                       ),
                                                     ),
                                                   ),
@@ -537,7 +531,7 @@ class _MenuPageState extends State<MenuPage> with TickerProviderStateMixin {
     return GetBuilder<menu.MenuController>(
       builder: (controller) {
         return Scaffold(
-          backgroundColor: controller?.restaurantController.darkBlue,
+          backgroundColor: controller.restaurantController.darkBlue,
           appBar: customAppBar(
             (controller.restaurantController.isLoading ? '' : 'Refeições'),
             borderRadius: 0,
@@ -583,23 +577,23 @@ class _MenuPageState extends State<MenuPage> with TickerProviderStateMixin {
                   : const SizedBox.shrink(),
             ],
           ),
-          floatingActionButton: FloatingActionButton(
-            tooltip: 'Pagar Restaurante',
-            splashColor: Colors.white,
-            backgroundColor: controller.restaurantController.evenDarkerBlue,
-            onPressed: () {
-              Get.toNamed(
-                Routes.PAY_RESTAURANT,
-              );
-            },
-            child: SvgPicture.asset(
-              'assets/images/qr-code.svg',
-              width: 28,
-              height: 28,
-              color: Colors.white,
-              semanticsLabel: 'Pagar Restaurante',
-            ),
-          ),
+          // floatingActionButton: FloatingActionButton(
+          //   tooltip: 'Pagar Restaurante',
+          //   splashColor: Colors.white,
+          //   backgroundColor: controller.restaurantController.evenDarkerBlue,
+          //   onPressed: () {
+          //     Get.toNamed(
+          //       Routes.PAY_RESTAURANT,
+          //     );
+          //   },
+          //   child: SvgPicture.asset(
+          //     'assets/images/qr-code.svg',
+          //     width: 28,
+          //     height: 28,
+          //     color: Colors.white,
+          //     semanticsLabel: 'Pagar Restaurante',
+          //   ),
+          // ),
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerFloat,
         );

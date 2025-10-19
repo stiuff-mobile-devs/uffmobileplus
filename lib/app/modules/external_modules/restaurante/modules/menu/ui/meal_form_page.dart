@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:uffmobileplus/app/data/models/restaurant/meal_model.dart';
-import 'package:uffmobileplus/app/modules/restaurant/controllers/restaurants_controller.dart';
-import 'package:uffmobileplus/app/util/ui_components/custom_app_bar.dart';
-import 'package:uffmobileplus/app/routes/app_pages.dart';
+import '../../../../../../routes/app_routes.dart';
+import '../../../../../../utils/ui_components/custom_app_bar.dart';
+import '../controller/restaurants_controller.dart';
+import '../data/models/meal_model.dart';
 import 'widgets/meal_form_widget.dart';
 
 class MealFormPage extends StatefulWidget {

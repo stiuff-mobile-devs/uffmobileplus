@@ -346,11 +346,11 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const SizedBox(width: 25),
-                    _buildActionButton(
-                      Icons.history,
-                          () {},
-                      color: Colors.transparent,
-                    ),
+                    // _buildActionButton(
+                    //   Icons.history,
+                    //       () {},
+                    //   color: Colors.transparent,
+                    // ),
                     const SizedBox(width: 25),
                     _buildActionButton(
                       Icons.add_circle,
@@ -365,11 +365,11 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
                       isVisible: controller.isAdminModeEnabled() ?? false,
                     ),
                     const SizedBox(width: 25),
-                    _buildActionButton(
-                      Icons.email_outlined,
-                          () {},
-                      color: Colors.transparent,
-                    ),
+                    // _buildActionButton(
+                    //   Icons.email_outlined,
+                    //       () {},
+                    //   color: Colors.transparent,
+                    // ),
                     const SizedBox(width: 25),
                     // _buildActionButton(
                     //   Icons.map_outlined,

@@ -1,16 +1,13 @@
 import 'dart:async';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:uffmobileplus/app/data/models/restaurant/meal_model.dart';
-import 'package:uffmobileplus/app/data/models/restaurant/user_meal_model.dart';
-import 'package:uffmobileplus/app/data/providers/firebase/firebase_analytics_service.dart';
-import 'package:uffmobileplus/app/data/repositories/restaurant_repository.dart';
-import 'package:uffmobileplus/app/data/providers/gdi/gdi_provider.dart';
-import 'package:uffmobileplus/app/data/repositories/user_repository.dart';
-import 'package:uffmobileplus/app/modules/restaurant/meal_form_page.dart';
-import 'package:uffmobileplus/app/modules/restaurant/controllers/restaurants_controller.dart';
-import 'package:uffmobileplus/app/modules/restaurant/utils/campus_static_model.dart';
-import 'package:uffmobileplus/app/util/ui_components/custom_alert_dialog.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/menu/controller/restaurants_controller.dart';
+import '../../../../../../utils/ui_components/custom_alert_dialog.dart';
+import '../data/models/campus_model.dart';
+import '../data/models/meal_model.dart';
+import '../data/models/user_meal_model.dart';
+import '../data/repository/restaurant_repository.dart';
+import '../ui/meal_form_page.dart';
 
 class MenuController extends GetxController {
   MenuController();
@@ -18,9 +15,9 @@ class MenuController extends GetxController {
   RestaurantsController restaurantController =
       Get.find<RestaurantsController>();
   RestaurantRepository restaurantRepository = Get.find<RestaurantRepository>();
-  FirebaseAnalyticsService firebaseAnalyticsService = Get.find();
-  GdiProvider gdiProvider = Get.find<GdiProvider>();
-  UserRepository userRepository = Get.find<UserRepository>();
+  // FirebaseAnalyticsService firebaseAnalyticsService = Get.find();
+  // GdiProvider gdiProvider = Get.find<GdiProvider>();
+  // UserRepository userRepository = Get.find<UserRepository>();
 
   RxBool isBlurred = false.obs;
 
@@ -232,16 +229,16 @@ class MenuController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    firebaseAnalyticsService.logScreen("restaurant_menu", "restaurant_menu",
-        userRepository.getCurrentProfile().name);
+    // firebaseAnalyticsService.logScreen("restaurant_menu", "restaurant_menu",
+    //     userRepository.getCurrentProfile().name);
   }
 }
 
 class MenuListController extends GetxController {
   final RestaurantRepository restaurantProvider =
       Get.find<RestaurantRepository>();
-  final GdiProvider gdiProvider = Get.find<GdiProvider>();
-  final UserRepository userRepository = Get.find<UserRepository>();
+  // final GdiProvider gdiProvider = Get.find<GdiProvider>();
+  // final UserRepository userRepository = Get.find<UserRepository>();
 
   late final ScrollController scrollController = ScrollController();
   bool isScrolling = false;
@@ -387,31 +384,31 @@ class MenuListController extends GetxController {
 
   RxInt indexIsLoading = RxInt(-1);
   Future<void> handleTap(int index, MealModel meal) async {
-    if (userRepository.getIsLogged()) {
-      if (indexIsLoading.value != index) {
-        if (await showTapWarning(!MMController.checkAccepted(meal))) {
-          indexIsLoading.value = index;
-          if (MMController.checkAccepted(meal)) {
-            await restaurantProvider.unconfirm(meal);
-            MMController.fetchAcceptedMeals();
-          } else {
-            if (await restaurantProvider.confirm(meal) != 204) {
-              MMController.fetchAcceptedMeal(meal);
-            } else {
-              Get.snackbar(
-                'Erro',
-                'Não é possível confirmar a sua presença em duas refeições com data e turno equivalentes.',
-                snackPosition: SnackPosition.BOTTOM,
-                colorText: Colors.white,
-              );
-            }
-          }
-        }
-        Future.delayed(const Duration(milliseconds: 500), () {
-          indexIsLoading.value = -1;
-        });
-      }
-    }
+    // if (userRepository.getIsLogged()) {
+    //   if (indexIsLoading.value != index) {
+    //     if (await showTapWarning(!MMController.checkAccepted(meal))) {
+    //       indexIsLoading.value = index;
+    //       if (MMController.checkAccepted(meal)) {
+    //         await restaurantProvider.unconfirm(meal);
+    //         MMController.fetchAcceptedMeals();
+    //       } else {
+    //         if (await restaurantProvider.confirm(meal) != 204) {
+    //           MMController.fetchAcceptedMeal(meal);
+    //         } else {
+    //           Get.snackbar(
+    //             'Erro',
+    //             'Não é possível confirmar a sua presença em duas refeições com data e turno equivalentes.',
+    //             snackPosition: SnackPosition.BOTTOM,
+    //             colorText: Colors.white,
+    //           );
+    //         }
+    //       }
+    //     }
+    //     Future.delayed(const Duration(milliseconds: 500), () {
+    //       indexIsLoading.value = -1;
+    //     });
+    //   }
+    // }
   }
 
   Future<void> handleDragEnd(int index, MealModel meal) async {
