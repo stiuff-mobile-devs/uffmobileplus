@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:uffmobileplus/app/modules/external_modules/transcript/data/models/transcript_discipline.dart';
 
 part 'transcript_model.g.dart';
 
@@ -33,7 +34,7 @@ class Transcript {
   @HiveField(3)
   String? situacaoAluno;
   @HiveField(4)
-  List<Disciplinas>? disciplinas;
+  List<TranscriptDiscipline>? disciplinas;
 
   Transcript(
       {this.cr,
@@ -48,9 +49,9 @@ class Transcript {
     chTotal = json['ch_total'];
     situacaoAluno = json['situacao_aluno'];
     if (json['disciplinas'] != null) {
-      disciplinas = <Disciplinas>[];
+      disciplinas = <TranscriptDiscipline>[];
       json['disciplinas'].forEach((v) {
-        disciplinas!.add(Disciplinas.fromJson(v));
+        disciplinas!.add(TranscriptDiscipline.fromJson(v));
       });
     }
   }
@@ -68,66 +69,3 @@ class Transcript {
   }
 }
 
-@HiveType(typeId: 25)
-class Disciplinas {
-  @HiveField(0)
-  int? id;
-  @HiveField(1)
-  String? codigoDisciplina;
-  @HiveField(2)
-  int? cargahoraria;
-  @HiveField(3)
-  int? creditos;
-  @HiveField(4)
-  String? nome;
-  @HiveField(5)
-  String? frequencia;
-  @HiveField(6)
-  String? statusHistorico;
-  @HiveField(7)
-  String? nota;
-  @HiveField(8)
-  String? vs;
-  @HiveField(9)
-  int? anosemestre;
-
-  Disciplinas(
-      {this.id,
-        this.codigoDisciplina,
-        this.cargahoraria,
-        this.creditos,
-        this.nome,
-        this.frequencia,
-        this.statusHistorico,
-        this.nota,
-        this.vs,
-        this.anosemestre});
-
-  Disciplinas.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    codigoDisciplina = json['codigo_disciplina'];
-    cargahoraria = json['cargahoraria'];
-    creditos = json['creditos'];
-    nome = json['nome'];
-    frequencia = json['frequencia'];
-    statusHistorico = json['status_historico'];
-    nota = json['nota'];
-    vs = json['vs'];
-    anosemestre = json['anosemestre'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['codigo_disciplina'] = codigoDisciplina;
-    data['cargahoraria'] = cargahoraria;
-    data['creditos'] = creditos;
-    data['nome'] = nome;
-    data['frequencia'] = frequencia;
-    data['status_historico'] = statusHistorico;
-    data['nota'] = nota;
-    data['vs'] = vs;
-    data['anosemestre'] = anosemestre;
-    return data;
-  }
-}

@@ -1,4 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:uffmobileplus/app/modules/external_modules/transcript/data/models/transcript_discipline.dart';
 import 'package:uffmobileplus/app/modules/external_modules/transcript/data/models/transcript_model.dart';
 import 'package:uffmobileplus/app/modules/external_modules/study_plan/data/models/discipline_model.dart';
 import 'package:uffmobileplus/app/modules/external_modules/study_plan/data/models/study_plan_model.dart';
@@ -33,10 +34,9 @@ class HiveService {
       Hive.registerAdapter(WeekDayAdapter());
       Hive.registerAdapter(DisciplineAdapter());
       Hive.registerAdapter(StudyPlanModelAdapter());
-      // Transcript (Histórico)
       Hive.registerAdapter(TranscriptModelAdapter());
       Hive.registerAdapter(TranscriptAdapter());
-      Hive.registerAdapter(DisciplinasAdapter());
+      Hive.registerAdapter(TranscriptDisciplineAdapter());
     } catch (e, st) {
       print('Hive init/register adapters error: $e\n$st');
     }
