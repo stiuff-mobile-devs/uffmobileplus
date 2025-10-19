@@ -7,7 +7,7 @@ import '../data/models/campus_model.dart';
 import '../data/models/meal_model.dart';
 import '../data/models/user_meal_model.dart';
 import '../data/repository/restaurant_repository.dart';
-import '../ui/meal_form_page.dart';
+import '../ui/pages/meal_form_page.dart';
 
 class MenuController extends GetxController {
   MenuController();

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/menu/ui/widgets/custom_polygon.dart';
-import '../../../../../../routes/app_routes.dart';
-import '../../../../../../utils/ui_components/custom_alert_dialog.dart';
-import '../../../../../../utils/ui_components/custom_app_bar.dart';
-import '../../../../../../utils/ui_components/custom_progress_display.dart';
-import '../controller/restaurants_controller.dart';
+import '../../../../../../../routes/app_routes.dart';
+import '../../../../../../../utils/ui_components/custom_alert_dialog.dart';
+import '../../../../../../../utils/ui_components/custom_app_bar.dart';
+import '../../../../../../../utils/ui_components/custom_progress_display.dart';
+import '../../controller/restaurants_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../data/models/campus_model.dart';
+import '../../data/models/campus_model.dart';
 import 'meal_form_page.dart';
 import 'menu_page.dart';
 

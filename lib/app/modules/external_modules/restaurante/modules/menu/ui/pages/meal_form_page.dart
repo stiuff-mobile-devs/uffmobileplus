@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../../../../routes/app_routes.dart';
-import '../../../../../../utils/ui_components/custom_app_bar.dart';
-import '../controller/restaurants_controller.dart';
-import '../data/models/meal_model.dart';
-import 'widgets/meal_form_widget.dart';
+import '../../../../../../../routes/app_routes.dart';
+import '../../../../../../../utils/ui_components/custom_app_bar.dart';
+import '../../controller/restaurants_controller.dart';
+import '../../data/models/meal_model.dart';
+import '../widgets/meal_form_widget.dart';
 
 class MealFormPage extends StatefulWidget {
   final MealModel? predefinition;

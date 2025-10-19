@@ -6,7 +6,7 @@ import '../../controller/restaurants_controller.dart';
 import '../../data/models/campus_model.dart';
 import '../../data/models/meal_model.dart';
 import '../../data/repository/restaurant_repository.dart';
-import '../details_page.dart';
+import '../pages/details_page.dart';
 import 'custom_polygon.dart';
 
 class MenuWidget extends StatefulWidget {

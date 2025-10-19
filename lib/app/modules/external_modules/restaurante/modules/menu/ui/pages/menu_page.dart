@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/menu/ui/widgets/custom_polygon.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/menu/ui/widgets/menu_widget.dart';
-import '../../../../../../routes/app_routes.dart';
-import '../../../../../../utils/ui_components/custom_app_bar.dart';
-import '../controller/menu_controller.dart' as menu;
-import '../controller/restaurants_controller.dart';
-import '../data/models/campus_model.dart';
+import '../../../../../../../routes/app_routes.dart';
+import '../../../../../../../utils/ui_components/custom_app_bar.dart';
+import '../../controller/menu_controller.dart' as menu;
+import '../../controller/restaurants_controller.dart';
+import '../../data/models/campus_model.dart';
 import 'meal_form_page.dart';
 
 class MenuPage extends StatefulWidget {
