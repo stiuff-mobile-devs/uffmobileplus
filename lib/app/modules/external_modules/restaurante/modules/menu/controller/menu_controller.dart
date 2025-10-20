@@ -253,13 +253,12 @@ class MenuListController extends GetxController {
 
   String getDayOfWeek(int day) {
     List<String> diasDaSemana = [
-      'Segunda-feira',
-      'Terça-feira',
-      'Quarta-feira',
-      'Quinta-feira',
-      'Sexta-feira',
+      'Segunda',
+      'Terça',
+      'Quarta',
+      'Quinta',
+      'Sexta',
       'Sábado',
-      'Domingo'
     ];
     return diasDaSemana[day - 1];
   }
@@ -360,27 +359,27 @@ class MenuListController extends GetxController {
   }
 
   bool? shouldTap;
-  Future<bool> showTapWarning(bool toConfirm) async {
-    await customAlertDialog(
-      Get.context!,
-      title: toConfirm ? "Confirmar Presença" : "Desconfirmar Presença",
-      desc: toConfirm
-          ? "Você tem certeza de que deseja confirmar sua presença nesta refeição?\nA coleta dessa informação ajudará a equipe de nutricionistas a estimar a demanda no Restaurante Universitário."
-          : "Você tem certeza de que deseja remover sua confirmação de presença nesta refeição?",
-      onConfirm: () {
-        shouldTap = true;
-      },
-      onCancel: () {
-        shouldTap = false;
-      },
-      btnConfirmColor: Colors.green,
-      btnConfirmText: "Sim",
-      btnCancelText: "Não",
-      dismissOnTouchOutside: true,
-      dismissOnBackKeyPress: true,
-    ).show();
-    return shouldTap ?? false;
-  }
+  // Future<bool> showTapWarning(bool toConfirm) async {
+  //   await customAlertDialog(
+  //     Get.context!,
+  //     title: toConfirm ? "Confirmar Presença" : "Desconfirmar Presença",
+  //     desc: toConfirm
+  //         ? "Você tem certeza de que deseja confirmar sua presença nesta refeição?\nA coleta dessa informação ajudará a equipe de nutricionistas a estimar a demanda no Restaurante Universitário."
+  //         : "Você tem certeza de que deseja remover sua confirmação de presença nesta refeição?",
+  //     onConfirm: () {
+  //       shouldTap = true;
+  //     },
+  //     onCancel: () {
+  //       shouldTap = false;
+  //     },
+  //     btnConfirmColor: Colors.green,
+  //     btnConfirmText: "Sim",
+  //     btnCancelText: "Não",
+  //     dismissOnTouchOutside: true,
+  //     dismissOnBackKeyPress: true,
+  //   ).show();
+  //   return shouldTap ?? false;
+  // }
 
   RxInt indexIsLoading = RxInt(-1);
   Future<void> handleTap(int index, MealModel meal) async {

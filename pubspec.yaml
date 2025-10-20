@@ -68,3 +68,12 @@ flutter:
     - assets/carteirinha_digital/icons/
     - assets/radio/icons/radio.svg
     - assets/restaurant/img/
+    - assets/restaurant/
+  fonts:
+    - family: Jost
+      fonts:
+        - asset: assets/restaurant/fonts/Jost/static/Jost-Regular.ttf
+        - asset: assets/restaurant/fonts/Jost/static/Jost-Medium.ttf
+          weight: 300
+        - asset: assets/restaurant/fonts/Jost/static/Jost-Bold.ttf
+          weight: 500

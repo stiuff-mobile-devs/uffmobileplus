@@ -76,7 +76,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                         : menuListController.containerOpacityValues[index]),
                     child: Stack(
                       children: [
-                        _buildAcceptedStatus(index, meal),
+                        //_buildAcceptedStatus(index, meal),
                         Padding(
                           padding: const EdgeInsets.only(top: 20.0),
                           child: Stack(
@@ -412,64 +412,64 @@ class _MenuWidgetState extends State<MenuWidget> {
     );
   }
 
-  Widget _buildAcceptedStatus(int index, MealModel meal) {
-    return Obx(() {
-      return Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              // color: Colors.blue.withOpacity(0.3),
-            ),
-            width: 400,
-            height: 175 + 30,
-          ),
-          Positioned(
-            right: 10,
-            child: Container(
-              width: 170,
-              height: 20,
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(5), topRight: Radius.circular(5)),
-                color: (menuController.indexIsLoading.value == index)
-                    ? Colors.transparent
-                    : menuController.MMController.checkAccepted(meal)
-                        ? Colors.green.withOpacity(0.7)
-                        : Colors.red.withOpacity(0.7),
-                // color: Colors.blue.withOpacity(0.3),
-              ),
-              child: Center(
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 4.0, vertical: 0),
-                  child: (menuController.indexIsLoading.value == index)
-                      ? const Center(
-                          child: SizedBox(
-                            height: 15,
-                            width: 15,
-                            child: CircularProgressIndicator(
-                              color: Colors.amber,
-                            ),
-                          ),
-                        )
-                      : Text(
-                          menuController.MMController.checkAccepted(meal)
-                              ? 'PRESENÇA CONFIRMADA'
-                              : 'PRESENÇA NÃO CONFIRMADA',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'Jockey One',
-                          ),
-                        ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      );
-    });
-  }
+  // Widget _buildAcceptedStatus(int index, MealModel meal) {
+  //   return Obx(() {
+  //     return Stack(
+  //       children: [
+  //         Container(
+  //           decoration: BoxDecoration(
+  //             borderRadius: BorderRadius.circular(10),
+  //             // color: Colors.blue.withOpacity(0.3),
+  //           ),
+  //           width: 400,
+  //           height: 175 + 30,
+  //         ),
+  //         Positioned(
+  //           right: 10,
+  //           child: Container(
+  //             width: 170,
+  //             height: 20,
+  //             decoration: BoxDecoration(
+  //               borderRadius: const BorderRadius.only(
+  //                   topLeft: Radius.circular(5), topRight: Radius.circular(5)),
+  //               color: (menuController.indexIsLoading.value == index)
+  //                   ? Colors.transparent
+  //                   : menuController.MMController.checkAccepted(meal)
+  //                       ? Colors.green.withOpacity(0.7)
+  //                       : Colors.red.withOpacity(0.7),
+  //               // color: Colors.blue.withOpacity(0.3),
+  //             ),
+  //             child: Center(
+  //               child: Padding(
+  //                 padding:
+  //                     const EdgeInsets.symmetric(horizontal: 4.0, vertical: 0),
+  //                 child: (menuController.indexIsLoading.value == index)
+  //                     ? const Center(
+  //                         child: SizedBox(
+  //                           height: 15,
+  //                           width: 15,
+  //                           child: CircularProgressIndicator(
+  //                             color: Colors.amber,
+  //                           ),
+  //                         ),
+  //                       )
+  //                     : Text(
+  //                         menuController.MMController.checkAccepted(meal)
+  //                             ? 'PRESENÇA CONFIRMADA'
+  //                             : 'PRESENÇA NÃO CONFIRMADA',
+  //                         style: const TextStyle(
+  //                           color: Colors.white,
+  //                           fontFamily: 'Jockey One',
+  //                         ),
+  //                       ),
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     );
+  //   });
+  // }
 
   Widget _loadingOrEmpty(RestaurantsController restaurantsController,
       int howManyMealsToday, menu.MenuListController menuListController) {

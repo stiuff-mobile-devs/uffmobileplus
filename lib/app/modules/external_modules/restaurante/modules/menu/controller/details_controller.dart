@@ -247,7 +247,8 @@ class DetailsController extends GetxController {
     }
 
     ByteData data =
-        await rootBundle.load('assets/modules/restaurant/menu_template.png');
+        await rootBundle.load('assets/restaurant/menu_template.png');
+    debugPrint(data.toString());
     Uint8List bytes = data.buffer.asUint8List();
     img.Image? originalImage = img.decodeImage(bytes);
 

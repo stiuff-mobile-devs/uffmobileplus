@@ -17,7 +17,7 @@ class DetailsPage extends StatefulWidget {
 }
 
 class _DetailsPageState extends State<DetailsPage> {
-  final DetailsController detailsController = Get.put(DetailsController());
+  final DetailsController detailsController = Get.find<DetailsController>();
 
   final TransformationController _transformationController =
       TransformationController();
@@ -226,7 +226,7 @@ class _DetailsPageState extends State<DetailsPage> {
         return Scaffold(
           backgroundColor: detailsController.restaurantsController.darkBlue,
           appBar: customAppBar(
-            'Detalhes de Refeição',
+            'Detalhes da Refeição',
             borderRadius: 0,
             actions: [
               IconButton(
