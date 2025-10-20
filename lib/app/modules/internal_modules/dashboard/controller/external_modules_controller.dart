@@ -33,6 +33,7 @@ class ExternalModulesController extends GetxController {
       url: '',
       interrogation: false,
     ),
+
     ExternalModules(
       iconSrc: 'assets/radio/icons/radio.svg',
       subtitle: 'Radio Pop Goiaba', // TODO: traduzir
@@ -40,6 +41,14 @@ class ExternalModulesController extends GetxController {
       url: '',
       interrogation: false,
     ),
+
+    ExternalModules(
+      iconSrc: 'assets/icons/historico.svg',
+      subtitle: 'Histórico',
+      page: Routes.HISTORICO,
+      url: '',
+      interrogation: false
+    )
   ];
 
   // TODO: parece redundante; melhor usar Get.toNamed direto?
