@@ -253,11 +253,11 @@ class MenuListController extends GetxController {
 
   String getDayOfWeek(int day) {
     List<String> diasDaSemana = [
-      'Segunda',
-      'Terça',
-      'Quarta',
-      'Quinta',
-      'Sexta',
+      'Segunda-feira',
+      'Terça-feira',
+      'Quarta-feira',
+      'Quinta-feira',
+      'Sexta-feira',
       'Sábado',
     ];
     return diasDaSemana[day - 1];

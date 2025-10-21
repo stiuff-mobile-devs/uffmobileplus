@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/menu/ui/widgets/custom_polygon.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/menu/ui/widgets/menu_widget.dart';
 import '../../../../../../../routes/app_routes.dart';
+import '../../../../../../../utils/color_pallete.dart';
 import '../../../../../../../utils/ui_components/custom_app_bar.dart';
 import '../../controller/menu_controller.dart' as menu;
 import '../../controller/restaurants_controller.dart';
@@ -532,9 +533,20 @@ class _MenuPageState extends State<MenuPage> with TickerProviderStateMixin {
       builder: (controller) {
         return Scaffold(
           backgroundColor: controller.restaurantController.darkBlue,
-          appBar: customAppBar(
-            (controller.restaurantController.isLoading ? '' : 'Refeições'),
-            borderRadius: 0,
+// Replace the existing `appBar: customAppBar(...),` with this:
+          appBar: AppBar(
+            centerTitle: true,
+            elevation: 8,
+            foregroundColor: Colors.white,
+            title: const Text("Refeições"),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
+            ),
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                gradient: AppColors.appBarTopGradient(),
+              ),
+            ),
             actions: [
               IconButton(
                 onPressed: () {
@@ -546,7 +558,7 @@ class _MenuPageState extends State<MenuPage> with TickerProviderStateMixin {
                 onPressed: () {
                   Get.toNamed(Routes.WEB_VIEW, arguments: {
                     'url':
-                        'https://citsmart.uff.br/citsmart/pages/knowledgeBasePortal/knowledgeBasePortal.load#/knowledge/4060',
+                    'https://citsmart.uff.br/citsmart/pages/knowledgeBasePortal/knowledgeBasePortal.load#/knowledge/4060',
                     'title': 'restaurant'.tr,
                   });
                 },

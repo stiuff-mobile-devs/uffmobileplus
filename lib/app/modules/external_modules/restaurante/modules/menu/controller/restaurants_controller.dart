@@ -31,7 +31,7 @@ class RestaurantsController extends GetxController {
     //             .isInGroup(GdiGroups.adminCardapioRestauranteUniversitario) &&
     //         !isDebugActive ||
     //     (isDebugActive && debugMode == 1);
-    return true;
+    return false;
   }
 
   @override

@@ -70,6 +70,9 @@ flutter:
     - assets/restaurant/img/
     - assets/restaurant/
   fonts:
+    - family: Jockey One
+      fonts:
+        - asset: assets/restaurant/fonts/JockeyOne-Regular.ttf
     - family: Jost
       fonts:
         - asset: assets/restaurant/fonts/Jost/static/Jost-Regular.ttf

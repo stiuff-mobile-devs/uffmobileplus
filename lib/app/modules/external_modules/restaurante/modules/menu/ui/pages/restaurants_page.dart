@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/menu/ui/widgets/custom_polygon.dart';
 import '../../../../../../../routes/app_routes.dart';
+import '../../../../../../../utils/color_pallete.dart';
 import '../../../../../../../utils/ui_components/custom_alert_dialog.dart';
 import '../../../../../../../utils/ui_components/custom_app_bar.dart';
 import '../../../../../../../utils/ui_components/custom_progress_display.dart';
@@ -395,22 +396,20 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
           _showGdiFailureSign();
         }
         return Scaffold(
-          backgroundColor: restaurantsController.darkBlue,
-          appBar: customAppBar(
-            (restaurantsController.isLoading ? '' : 'Restaurantes'),
-            borderRadius: 0,
-            actions: [
-              IconButton(
-                onPressed: () {
-                  Get.toNamed(Routes.WEB_VIEW, arguments: {
-                    'url':
-                    'https://citsmart.uff.br/citsmart/pages/knowledgeBasePortal/knowledgeBasePortal.load#/knowledge/4060',
-                    'title': 'restaurant'.tr,
-                  });
-                },
-                icon: const Icon(Icons.question_mark),
+          backgroundColor: Colors.blueAccent,
+          appBar: AppBar(
+            centerTitle: true,
+            elevation: 8,
+            foregroundColor: Colors.white,
+            title: const Text("Restaurantes"),
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
+            ),
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                gradient: AppColors.appBarTopGradient(),
               ),
-            ],
+            ),
           ),
           body: restaurantsController.isLoading
               ? const Center(
@@ -419,6 +418,11 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
               ))
               : Stack(
             children: [
+              SizedBox.expand(
+                child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: AppColors.darkBlueToBlackGradient(),
+              ))),
               Align(
                 alignment: Alignment.topCenter,
                 child: SingleChildScrollView(
