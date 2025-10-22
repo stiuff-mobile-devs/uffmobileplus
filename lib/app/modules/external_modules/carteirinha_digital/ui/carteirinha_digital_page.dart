@@ -13,12 +13,30 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
   const CarteirinhaDigitalPage({super.key});
   @override
   Widget build(BuildContext context) {
+    Get.appendTranslations({
+      'pt_BR' : {
+        'carteirinha_digital' : 'Carteirinha Digital',
+        'documento' : 'Documento',
+        'matricula' : 'Matrícula', 
+        'validade' : 'Validade',
+        'curso' : 'Curso',
+        'validador_instrucao' : 'Valide o código gerado utilizando o aplicativo' 
+      },
+      'en_US' : {
+        'carteirinha_digital' : 'Digital ID Card',
+        'documento' : 'Document',
+        'matricula' : 'ID',
+        'validade' : 'Expiration Date',
+        'curso' : 'Course',
+        'validador_instrucao' : 'Validate the generated code by using the application'
+      }
+    });
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         elevation: 8,
         foregroundColor: Colors.white,
-        title: const Text("Carteirinha Digital"),
+        title: Text('carteirinha_digital'.tr),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -116,7 +134,7 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                             style: const TextStyle(color: Colors.white),
                           ),
                           Text(
-                            "Documento: ${controller.getUserIdUFF()}",
+                            '${'Documento'.tr}: ${controller.getUserIdUFF()}',
                             style: const TextStyle(color: Colors.white),
                           ),
                         ],
@@ -165,8 +183,8 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      const Text(
-                                        "Matricula",
+                                      Text(
+                                        'matricula'.tr,
                                         style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.bold,
@@ -186,7 +204,7 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "Validade",
+                                        'validade'.tr,
                                         style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.bold,
@@ -208,10 +226,10 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Row(
+                                    Row(
                                       children: [
                                         Text(
-                                          "Curso",
+                                          'curso'.tr,
                                           textAlign: TextAlign.left,
                                           style: TextStyle(
                                             fontSize: 15,
@@ -299,10 +317,10 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
         margin: const EdgeInsets.only(top: 20, bottom: 16),
         child: RichText(
           textAlign: TextAlign.center,
-          text: const TextSpan(
+          text: TextSpan(
             style: TextStyle(fontSize: 13.0, color: Colors.black),
             children: [
-              TextSpan(text: "Valide o código gerado utilizando o aplicativo"),
+              TextSpan(text: "validador_instrucao".tr),
               TextSpan(
                 text: " Validador Carteirinha UFF",
                 style: TextStyle(fontWeight: FontWeight.bold),

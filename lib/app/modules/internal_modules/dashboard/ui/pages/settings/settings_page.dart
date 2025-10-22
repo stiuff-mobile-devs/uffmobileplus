@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/settings_controller.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
-import 'package:uffmobileplus/app/utils/base_translation_keys.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -10,80 +9,116 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Get.appendTranslations({
+      'pt_BR' : {
+        'configuracoes' : 'Configurações',
+        'sobre' : 'Sobre',
+        'sobre_descricao' : 'Detalhes do aplicativo',
+        'ling_descricao' : 'Alterar idioma do aplicativo',
+        'sair' : 'Sair',
+        'sair_descricao' : 'Entrar como outro usuário'
+      },
+      'en_US' : {
+        'configuracoes' : 'Settings',
+        'sobre' : 'About',
+        'sobre_descricao' : 'Application details',
+        'ling_descricao' : 'Change App language',
+        'sair' : 'Logout',
+        'sair_descricao' : 'Log in as a different user'
+      },
+      'it_IT' : {
+        'configuracoes' : 'Impostazioni',
+        'sobre' : 'Informazioni',
+        'sobre_descricao' : 'Dettagli dell\'app',
+        'ling_descricao' :  'Cambia la lingua dell\'app',
+        'sair' :  'Esci',
+      }
+    });
     return Scaffold(
       body: GetBuilder<SettingsController>(
-        builder: (SettingsController controller) { return Container(
-        decoration: BoxDecoration(
-          gradient: AppColors.darkBlueToBlackGradient(),
-        ),
-        child: CustomScrollView(
-          slivers: [
-            _sliverAppBar(BaseTranslationKeys.settings.tr),
-            // TODO: substituir por SettingsItem
-            _settingsItem(
-              Icons.info_outline,
-              BaseTranslationKeys.about.tr, 
-              BaseTranslationKeys.aboutDescription.tr, 
-              onTap: () {
-                Get.toNamed(Routes.ABOUT);
-              },
+        builder: (SettingsController controller) {
+          return Container(
+            decoration: BoxDecoration(
+              gradient: AppColors.darkBlueToBlackGradient(),
             ),
-            SettingsItem(
-              icon: Icon(Icons.language, color: Colors.white),
-              main: DropdownButton<Locale>(
-                value: Get.locale,
-                dropdownColor: Colors.grey[800],
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+            child: CustomScrollView(
+              slivers: [
+                _sliverAppBar('configuracoes'.tr),
+                // TODO: substituir por SettingsItem
+                _settingsItem(
+                  Icons.info_outline,
+                  'sobre'.tr,
+                  'sobre_descricao'.tr,
+                  onTap: () {
+                    Get.toNamed(Routes.ABOUT);
+                  },
                 ),
-                underline: Container(), // Remove underline
-                // Ao suportar um novo idioma, adicionar novo par
-                // na lista abaixo
-                // TODO: extrair essa lista para algum outro lugar?
-                items:
-                    [
-                      {'locale': Locale('pt', 'BR'), 'display': 'Português (BR)'},
-                      {'locale': Locale('en', 'US'), 'display': 'English (US)'},
-                      {'locale': Locale('it', 'IT'), 'display': 'Italiano (IT)'},
-                    ].map((item) {
-                      Locale locale = item['locale'] as Locale;
-                      String displayString = item['display'] as String;
+                SettingsItem(
+                  icon: Icon(Icons.language, color: Colors.white),
+                  main: DropdownButton<Locale>(
+                    value: Get.locale,
+                    dropdownColor: Colors.grey[800],
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    underline: Container(), // Remove underline
+                    // Ao suportar um novo idioma, adicionar novo par
+                    // na lista abaixo
+                    // TODO: extrair essa lista para algum outro lugar?
+                    items:
+                        [
+                          {
+                            'locale': Locale('pt', 'BR'),
+                            'display': 'Português (BR)',
+                          },
+                          {
+                            'locale': Locale('en', 'US'),
+                            'display': 'English (US)',
+                          },
+                          {
+                            'locale': Locale('it', 'IT'),
+                            'display': 'Italiano (IT)',
+                          },
+                        ].map((item) {
+                          Locale locale = item['locale'] as Locale;
+                          String displayString = item['display'] as String;
 
-                      return DropdownMenuItem<Locale>(
-                        value: locale,
-                        child: Text(displayString)
-                      );
-                    }).toList(),
-                onChanged: (Locale? newValue) {
-                  if (newValue != null) Get.updateLocale(newValue);
-                },
-              ),
-              description: BaseTranslationKeys.langDescription.tr,
-              trailing: null, // No chevron needed since it's a dropdown
-            ),
-            // Botão de logout
-            SettingsItem(
-              icon: Icon(Icons.logout, color: Colors.white),
-              main: Text(
-                'Sair',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                          return DropdownMenuItem<Locale>(
+                            value: locale,
+                            child: Text(displayString),
+                          );
+                        }).toList(),
+                    onChanged: (Locale? newValue) {
+                      if (newValue != null) Get.updateLocale(newValue);
+                    },
+                  ),
+                  description: 'ling_descricao'.tr,
+                  trailing: null, // No chevron needed since it's a dropdown
                 ),
-              ),
-              description: 'Entrar como outro usuário.',
-              trailing: null,
-              onTap: () {
-                controller.logoutIduff();
-              },
+                // Botão de logout
+                SettingsItem(
+                  icon: Icon(Icons.logout, color: Colors.white),
+                  main: Text(
+                    'sair'.tr,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  description: 'sair_descricao'.tr,
+                  trailing: null,
+                  onTap: () {
+                    controller.logoutIduff();
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
-      );
-  },      ),
+          );
+        },
+      ),
     );
   }
 
