@@ -21,11 +21,13 @@ class CatracaOnlineController extends GetxController {
   RxBool isManualValidationBusy = false.obs;
   RxBool isOfflineMode = false.obs;
   RxString statusMessage = "Catraca Online".obs;
+  Rx<AreaModel> selectedArea = AreaModel().obs;
 
   late RxList<AreaModel> areas = <AreaModel>[].obs;
-  Rx<AreaModel> selectedArea = AreaModel().obs;
+
   late RxList<OperatorTransactionModel> operatorTransactions =
       <OperatorTransactionModel>[].obs;
+
   Rx<OperatorTransactionModel> selectedTransaction =
       OperatorTransactionModel().obs;
 
@@ -123,22 +125,27 @@ class CatracaOnlineController extends GetxController {
           String idUffValue = matches.isNotEmpty
               ? matches.last.group(1) ?? ""
               : "";
+          if (RegExp(r'^\d{11}$').hasMatch(idUffValue)) {
+            OperatorTransactionOffline operatorTransactionOffline =
+                OperatorTransactionOffline(
+                  id: DateTime.now().millisecondsSinceEpoch.toString(),
+                  idUffUser: idUffValue,
+                  idUffOperator: iduff,
+                  idCampus: selectedArea.value.id.toString(),
+                  campus: selectedArea.value.nome,
+                );
 
-          OperatorTransactionOffline operatorTransactionOffline =
-              OperatorTransactionOffline(
-                id: DateTime.now().millisecondsSinceEpoch.toString(),
-                idUffUser: idUffValue,
-                idUffOperator: iduff,
-                idCampus: selectedArea.value.id.toString(),
-                campus: selectedArea.value.nome,
-              );
-
-          await repository.saveOperatorTransactionsOffline(
-            operatorTransactionOffline,
-          );
-          transactionResultMessage = "Transação salva offline com sucesso!";
-          transactionUsername = idUffValue;
-          isTransactionValid = true;
+            await repository.saveOperatorTransactionsOffline(
+              operatorTransactionOffline,
+            );
+            transactionResultMessage = "Transação salva offline com sucesso!";
+            transactionUsername = idUffValue;
+            isTransactionValid = true;
+            isQrCodeValid = true;
+          } else {
+            isTransactionValid = false;
+            isQrCodeValid = false;
+          }
         }
       } catch (e) {
         debugPrint('Erro ao ler código QR offline: $e');

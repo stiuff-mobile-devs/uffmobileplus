@@ -95,7 +95,11 @@ class TransactionMessage extends StatelessWidget {
                 margin: EdgeInsets.symmetric(horizontal: 22, vertical: 12),
                 child: Text(
                   "Código Inválido",
-                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),
