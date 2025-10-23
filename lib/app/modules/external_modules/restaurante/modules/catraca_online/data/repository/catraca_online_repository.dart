@@ -1,5 +1,6 @@
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/area.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/operator_transaction.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/operator_transaction_offline.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/provider/catraca_online_provider.dart';
 
 class CatracaOnlineRepository {
@@ -35,5 +36,18 @@ class CatracaOnlineRepository {
       token,
       areaId,
     );
+  }
+
+  Future<String> saveOperatorTransactionsOffline(
+    OperatorTransactionOffline operatorTransactionOffline,
+  ) async {
+    return await catracaOnlineProvider.saveOperatorTransactionsOffline(
+      operatorTransactionOffline,
+    );
+  }
+
+  Future<List<OperatorTransactionOffline>>
+  getOperatorTransactionsOffline() async {
+    return await catracaOnlineProvider.getOperatorTransactionsOffline();
   }
 }

@@ -16,7 +16,7 @@ class ValidarPagamentoPage extends GetView<CatracaOnlineController> {
         centerTitle: true,
         elevation: 8,
         foregroundColor: Colors.white,
-        title: const Text("Catraca Online"),
+        title: Obx(() => Text(controller.statusMessage.value)),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -52,7 +52,7 @@ class ValidarPagamentoPage extends GetView<CatracaOnlineController> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                controller.selectedArea.first.nome ??
+                                controller.selectedArea.value.nome ??
                                     'Área não selecionada',
                                 style: TextStyle(
                                   color: Colors.blue[100],

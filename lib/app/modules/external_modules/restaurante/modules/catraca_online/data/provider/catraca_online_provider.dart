@@ -1,11 +1,16 @@
 import 'dart:convert';
 
+import 'package:hive/hive.dart';
 import 'package:uffmobileplus/app/config/secrets.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/area.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/operator_transaction.dart';
 import 'package:http/http.dart' as http;
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/operator_transaction_offline.dart';
 
 class CatracaOnlineProvider {
+  final String _collectionPath = "operator_transactions";
+  final String _userKey = "current_user";
+
   Future<List<AreaModel>> getAreas(String iduff, String token) async {
     try {
       var uri = Uri.https(
@@ -190,5 +195,27 @@ class CatracaOnlineProvider {
     }
 
     return {"valid": false, "message": "Erro na comunicação com o servidor"};
+  }
+
+  Future<String> saveOperatorTransactionsOffline(
+    OperatorTransactionOffline operatorTransactionOffline,
+  ) async {
+    try {
+      var box = await Hive.openBox<OperatorTransactionOffline>(_collectionPath);
+      await box.put(operatorTransactionOffline.id, operatorTransactionOffline);
+      return "success";
+    } catch (e) {
+      return "Erro ao salvar dados do usuário no Hive: $e";
+    }
+  }
+
+  Future<List<OperatorTransactionOffline>>
+  getOperatorTransactionsOffline() async {
+    try {
+      var box = await Hive.openBox<OperatorTransactionOffline>(_collectionPath);
+      return box.values.toList();
+    } catch (e) {
+      return [];
+    }
   }
 }
