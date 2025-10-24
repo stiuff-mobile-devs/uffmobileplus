@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:uffmobileplus/app/data/services/external_gdi_service.dart';
 import '../data/models/campus_model.dart';
 import '../data/repository/restaurant_repository.dart';
 
@@ -8,6 +9,7 @@ class RestaurantsController extends GetxController {
   RestaurantsController();
 
   RestaurantRepository restaurantRepository = Get.put(RestaurantRepository());
+  ExternalGDIService gdiService = Get.find<ExternalGDIService>();
 
   final evenDarkerBlue = const Color.fromRGBO(13, 19, 33, 1);
   final darkBlue = const Color.fromRGBO(26, 38, 64, 1.0);
@@ -31,7 +33,6 @@ class RestaurantsController extends GetxController {
     //             .isInGroup(GdiGroups.adminCardapioRestauranteUniversitario) &&
     //         !isDebugActive ||
     //     (isDebugActive && debugMode == 1);
-    return false;
   }
 
   @override
