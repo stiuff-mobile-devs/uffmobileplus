@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -9,6 +10,9 @@ class AuthGoogleService {
   final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
   final UserGoogleRepository _userRepository = UserGoogleRepository();
 
+  final FirebaseAuth _auth = FirebaseAuth.instanceFor(
+    app: Firebase.app('uffmobileplus'),
+  );
   AuthGoogleService();
 
   Future<UserGoogleModel?> signInGoogle() async {
@@ -19,9 +23,7 @@ class AuthGoogleService {
       idToken: b.idToken,
     );
     try {
-      var userCredential = await FirebaseAuth.instance.signInWithCredential(
-        authCredential,
-      );
+      var userCredential = await _auth.signInWithCredential(authCredential);
 
       return await _userRepository.createUserDoc(
         userCredential.user!.email!,
@@ -46,9 +48,7 @@ class AuthGoogleService {
       idToken: b.idToken,
     );
     try {
-      var userCredential = await FirebaseAuth.instance.signInWithCredential(
-        authCredential,
-      );
+      var userCredential = await _auth.signInWithCredential(authCredential);
       return await _userRepository.createUserDoc(
         userCredential.user!.email!,
         userCredential.user!.displayName!,
@@ -63,6 +63,6 @@ class AuthGoogleService {
 
   logoutGoogle() async {
     await _googleSignIn.signOut();
-    await FirebaseAuth.instance.signOut();
+    await _auth.signOut();
   }
 }
