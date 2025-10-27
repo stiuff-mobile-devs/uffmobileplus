@@ -87,7 +87,11 @@ class ValidarPagamentoPage extends GetView<CatracaOnlineController> {
                               top: 10,
                               bottom: 160,
                             ),
-                            child: controller.operatorTransactions.isEmpty
+                            child:
+                                controller.operatorTransactions.isEmpty &&
+                                    controller
+                                        .operatorTransactionsOffline
+                                        .isEmpty
                                 ? Container(
                                     alignment: Alignment.center,
                                     width: double.infinity,
@@ -106,6 +110,7 @@ class ValidarPagamentoPage extends GetView<CatracaOnlineController> {
                                   )
                                 : TransactionList(
                                     controller.operatorTransactions,
+                                    controller.operatorTransactionsOffline,
                                   ),
                           ),
                         ),

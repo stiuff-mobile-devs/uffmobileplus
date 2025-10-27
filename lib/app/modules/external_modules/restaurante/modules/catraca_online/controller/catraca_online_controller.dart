@@ -28,6 +28,9 @@ class CatracaOnlineController extends GetxController {
   late RxList<OperatorTransactionModel> operatorTransactions =
       <OperatorTransactionModel>[].obs;
 
+  late RxList<OperatorTransactionOffline> operatorTransactionsOffline =
+      <OperatorTransactionOffline>[].obs;
+
   Rx<OperatorTransactionModel> selectedTransaction =
       OperatorTransactionModel().obs;
 
@@ -84,6 +87,8 @@ class CatracaOnlineController extends GetxController {
       isOfflineMode.value = false;
       statusMessage.value = "Catraca Online";
     } catch (e) {
+      operatorTransactionsOffline.value = await repository
+          .getOperatorTransactionsOffline();
       isOfflineMode.value = true;
       statusMessage.value = "Catraca Offline";
     }
