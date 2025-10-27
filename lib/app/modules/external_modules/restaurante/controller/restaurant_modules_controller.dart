@@ -1,14 +1,31 @@
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
-import 'package:uffmobileplus/app/utils/base_translation_keys.dart';
 
+// TODO: refletir se as responsabilidades desse controller estão adequadas.
 class RestaurantModulesController extends GetxController {
   RestaurantModulesController();
+
+  @override
+  void onInit() {
+    // TODO: talvez seja melhor refatorar de modo que essa chamada fique fora do controller.
+    Get.appendTranslations({
+      'pt_BR' : {
+        'catraca_online' : 'Catraca Online',
+      },
+      'en_US' : {
+        'catraca_online' : 'Online Turnstile'
+      },
+      'it_IT' : {
+        'catraca_online' : 'Tornello Online'
+      }
+    });
+    super.onInit();
+  }
 
   List<RestaurantModules> restaurantModulesList = [
     RestaurantModules(
       iconSrc: 'assets/icons/validator_qr_code.svg',
-      subtitle: BaseTranslationKeys.onlineTurnstile,
+      subtitle: 'catraca_online'.tr,
       page: Routes.CATRACA_ONLINE,
       url: '',
       interrogation: false,

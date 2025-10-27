@@ -6,6 +6,20 @@ import 'package:uffmobileplus/app/utils/color_pallete.dart';
 class HomePage extends GetView<HomePageController> {
   @override
   Widget build(BuildContext context) {
+    Get.appendTranslations({
+      'pt_BR': {
+        'boas-vindas': 'Bem-vindo ao novo',
+        'em_desenvolvimento': 'Aplicativo em desenvolvimento',
+        'trab_constante': 'Estamos trabalhando constantemente para oferecer a melhor experiência possível. Aguarde as próximas atualizações!',
+        'versao': 'Versão 6.2.0'
+      },
+      'en_US': {
+        'boas-vindas' : 'Welcome to the new',
+        'em_desenvolvimento': 'App under development',
+        'trab_constante': 'We are constantly working to deliver the best possible experience. Look forward to the next updates!',
+        'versao': 'Version 6.2.0'
+      }
+    });
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -62,7 +76,7 @@ class HomePage extends GetView<HomePageController> {
 
                         // Título principal
                         Text(
-                          'Bem-vindo ao novo',
+                          'boas-vindas'.tr,
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.9),
                             fontSize: 28,
@@ -114,7 +128,7 @@ class HomePage extends GetView<HomePageController> {
                               ),
                               const SizedBox(height: 12),
                               Text(
-                                'Aplicativo em desenvolvimento',
+                                'em_desenvolvimento'.tr,
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.9),
                                   fontSize: 18,
@@ -124,7 +138,7 @@ class HomePage extends GetView<HomePageController> {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'Estamos trabalhando constantemente para oferecer a melhor experiência possível. Aguarde as próximas atualizações!',
+                                'trab_constante'.tr,
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.7),
                                   fontSize: 14,
@@ -143,7 +157,7 @@ class HomePage extends GetView<HomePageController> {
 
                         // Versão
                         Text(
-                          'Versão 6.3.0',
+                          'versao'.tr,
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.5),
                             fontSize: 12,

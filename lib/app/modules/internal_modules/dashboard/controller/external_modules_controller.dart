@@ -1,14 +1,36 @@
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
-import 'package:uffmobileplus/app/utils/base_translation_keys.dart';
 
 class ExternalModulesController extends GetxController {
   ExternalModulesController();
 
+  @override
+  void onInit() {
+    // TODO: talvez refatorar.
+    Get.appendTranslations({
+      'pt_BR' : {
+        'carteirinha_digital' : 'Carteirinha Digital',
+        'restaurante' : 'Restaurante',
+        'plano_estudos' : 'Plano de Estudos',
+        'radio_pop_goiaba' : 'Radio Pop Goiaba'
+      },
+      'en_US' : {
+        'carteirinha_digital' : 'Digital ID Card',
+        'restaurante' : 'Restaurant',
+        'plano_estudos' : 'Study Plan',
+        'radio_pop_goiaba' : 'Radio Pop Goiaba'
+      },
+      'it_IT' : {
+        'restaurante' : 'Ristorante'
+      }
+    });
+    super.onInit();
+  }
+
   List<ExternalModules> externalModulesList = [
     ExternalModules(
       iconSrc: 'assets/carteirinha_digital/icons/carteirinha.svg',
-      subtitle: 'Carteirinha Digital', // TODO: traduzir
+      subtitle: 'carteirinha_digital'.tr, 
       page: Routes.CARTEIRINHA_DIGITAL,
       url: '',
       interrogation: false,
@@ -18,7 +40,7 @@ class ExternalModulesController extends GetxController {
 
     ExternalModules(
       iconSrc: 'assets/icons/bandejapp.svg',
-      subtitle: BaseTranslationKeys.restaurant,
+      subtitle: 'restaurante'.tr,
       page: Routes.RESTAURANT_MODULES,
       url: '',
       interrogation: false,
@@ -28,7 +50,7 @@ class ExternalModulesController extends GetxController {
 
     ExternalModules(
       iconSrc: 'assets/icons/plano.svg',
-      subtitle: 'Plano de Estudos',
+      subtitle: 'plano_estudos'.tr,
       page: Routes.STUDY_PLAN,
       url: '',
       interrogation: false,
@@ -36,7 +58,7 @@ class ExternalModulesController extends GetxController {
 
     ExternalModules(
       iconSrc: 'assets/radio/icons/radio.svg',
-      subtitle: 'Radio Pop Goiaba', // TODO: traduzir
+      subtitle: 'radio_pop_goiaba'.tr, 
       page: Routes.RADIO,
       url: '',
       interrogation: false,

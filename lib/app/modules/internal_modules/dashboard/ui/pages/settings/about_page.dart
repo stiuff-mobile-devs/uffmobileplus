@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_state_manager/src/simple/get_state.dart';
-import 'package:get/get_utils/get_utils.dart';
+import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/about_controller.dart';
-import 'package:uffmobileplus/app/utils/base_translation_keys.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 
 class AboutPage extends StatelessWidget {
@@ -10,6 +8,26 @@ class AboutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Get.appendTranslations({
+      'pt_BR' : {
+        'titulo' : 'Sobre',
+        'nome_versao' : 'Nome da versão',
+        'codigo_versao' : 'Código da versão',
+        'dispositivo' : 'Dispositivo'
+      },
+      'en_US' : {
+        'titulo' : 'About',
+        'nome_versao' : 'Version name',
+        'codigo_versao' : 'Version code',
+        'dispositivo' : 'Device'
+      },
+      'it_IT' : {
+        'titulo' : 'Informazioni',
+        'nome_versao' : 'Versione',
+        'codigo_versao' : 'Codice build',
+        'dispositivo' : 'Dispositivo'
+      }
+    });
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -20,20 +38,20 @@ class AboutPage extends StatelessWidget {
           builder: (controller) {
             return CustomScrollView(
               slivers: [
-                _sliverAppBar(BaseTranslationKeys.aboutAppBarPageTitle.tr),
+                _sliverAppBar('titulo'.tr),
                 _aboutItemCard(
                   Icons.home,
-                  BaseTranslationKeys.versionName.tr, 
+                  'nome_versao'.tr,
                   controller.versionName,
                 ),
                 _aboutItemCard(
                   Icons.update,
-                  BaseTranslationKeys.versionCode.tr, 
+                  'codigo_versao'.tr,
                   controller.versionCode,
                 ),
                 _aboutItemCard(
                   Icons.phone_android,
-                  BaseTranslationKeys.device.tr,
+                  'dispositivo'.tr,
                   controller.device,
                 ),
               ],
