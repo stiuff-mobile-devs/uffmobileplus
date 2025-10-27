@@ -57,6 +57,8 @@ class CatracaOnlineController extends GetxController {
     isAreaBusy.value = true;
     token = await service.getAccessToken();
     try {
+      //Forçar error
+      throw Exception("Forçando modo offline para testes");
       areas.value = await repository.getAreas(iduff, token);
       isOfflineMode.value = false;
       statusMessage.value = "Catraca Online";
@@ -72,6 +74,8 @@ class CatracaOnlineController extends GetxController {
     isTransactionBusy.value = true;
     token = await service.getAccessToken();
     try {
+      //Forçar error
+      throw Exception("Forçando modo offline para testes");
       operatorTransactions.value = await repository.getOperatorTransactions(
         iduff,
         token!,
@@ -138,6 +142,10 @@ class CatracaOnlineController extends GetxController {
             await repository.saveOperatorTransactionsOffline(
               operatorTransactionOffline,
             );
+            await repository.saveOperatorTransactionToFirebase(
+              operatorTransactionOffline,
+            );
+
             transactionResultMessage = "Transação salva offline com sucesso!";
             transactionUsername = idUffValue;
             isTransactionValid = true;

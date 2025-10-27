@@ -50,4 +50,12 @@ class CatracaOnlineRepository {
   getOperatorTransactionsOffline() async {
     return await catracaOnlineProvider.getOperatorTransactionsOffline();
   }
+
+  Future<String> saveOperatorTransactionToFirebase(
+    OperatorTransactionOffline operatorTransactionOffline,
+  ) async {
+    return await catracaOnlineProvider.saveOperatorTransactionToFirebase(
+      operatorTransactionOffline,
+    );
+  }
 }
