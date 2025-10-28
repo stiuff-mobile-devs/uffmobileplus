@@ -14,11 +14,7 @@ class MealFormController extends GetxController {
   late menu.MenuController menuController;
 
   MealFormController() {
-    try {
-      menuController = Get.find<menu.MenuController>();
-    } catch (e) {
-      menuController = Get.put(menu.MenuController());
-    }
+    menuController = Get.find<menu.MenuController>();
   }
 
   RxList<String> selectedShifts = <String>[].obs;
