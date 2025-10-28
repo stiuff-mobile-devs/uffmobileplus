@@ -1,5 +1,6 @@
-import 'dart:async';
 
+import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:radio_player/radio_player.dart';
 
@@ -18,36 +19,40 @@ class RadioController extends GetxController {
   void onInit() {
     super.onInit();
 
-    // Set the initial radio station.
-    RadioPlayer.setStation(
-      title: 'Radio Player',
-      url: 'https://s37.maxcast.com.br:8450/live',
-    );
+    // Protege TODAS as chamadas de inicialização do plugin
+    if (!kIsWeb) {
+      // Set the initial radio station.
+      RadioPlayer.setStation(
+        title: 'Radio Player',
+        url: 'https://s37.maxcast.com.br:8450/live',
+      );
 
-    RadioPlayer.metadataStream.listen(
-      (metadata) {
-        this.metadata = metadata;
-      }
-    );
+      RadioPlayer.metadataStream.listen(
+        (metadata) {
+          this.metadata = metadata;
+        }
+      );
 
-    // Listen to playback state changes.
-    _playbackStateSubscription = RadioPlayer.playbackStateStream.listen(
-      (playbackState) {
-        this.playbackState = playbackState;
-      }
-    );
+      // Listen to playback state changes.
+      _playbackStateSubscription = RadioPlayer.playbackStateStream.listen(
+        (playbackState) {
+          this.playbackState = playbackState;
+        }
+      );
 
-    // Listen to metadata changes.
-    _metadataSubscription = RadioPlayer.metadataStream.listen(
-     (metadata) {
-       this.metadata = metadata;
-     }
-    );
+      // Listen to metadata changes.
+      _metadataSubscription = RadioPlayer.metadataStream.listen(
+       (metadata) {
+         this.metadata = metadata;
+       }
+      );
+    }
   }
 
   /// Disposes of stream subscriptions.
   @override
   void dispose() {
+    // Esta lógica de cancelamento é puramente Dart e funciona em todas as plataformas
     _playbackStateSubscription?.cancel();
     _metadataSubscription?.cancel();
     super.dispose();
@@ -55,17 +60,28 @@ class RadioController extends GetxController {
 
   @override
   void onClose() {
-    RadioPlayer.reset();
+    // Protege o comando do plugin, mas executa o `super` sempre
+    if (!kIsWeb) {
+      RadioPlayer.reset();
+    }
     super.onClose();
   }
 
   void toggleState() {
+    // 1. Lógica do GetX/UI: Atualiza o estado visualmente em todas as plataformas
     if (playbackState.value.isPlaying) {
       playbackState.value = PlaybackState.paused;
-      RadioPlayer.pause();
     } else {
       playbackState.value = PlaybackState.playing;
-      RadioPlayer.play();
+    }
+
+    // 2. Lógica do Plugin: Executa comandos de áudio SOMENTE no Mobile
+    if (!kIsWeb) {
+      if (playbackState.value.isPaused) {
+        RadioPlayer.pause();
+      } else {
+        RadioPlayer.play();
+      }
     }
   }
 

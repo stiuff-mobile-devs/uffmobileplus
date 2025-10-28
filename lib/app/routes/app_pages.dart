@@ -147,7 +147,7 @@ abstract class AppPages {
     // Radio
     GetPage(
       name: Routes.RADIO,
-      page: () => Radio(),
+      page: () => RadioPopGoiabaPage(),
       bindings: [RadioBindings()],
     ),
   ];
