@@ -29,7 +29,7 @@ class UserDataRepository {
     return await _userDataProvider.hasUserData();
   }
 
-  Future<String> updateQrData(String textoQrCodeCarteirinha) async{
+  Future<String> updateQrData(String textoQrCodeCarteirinha) async {
     return await _userDataProvider.updateQrData(textoQrCodeCarteirinha);
   }
 
