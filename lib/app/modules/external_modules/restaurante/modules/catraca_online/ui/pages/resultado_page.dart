@@ -15,7 +15,7 @@ class ResultadoPage extends GetView<CatracaOnlineController> {
         centerTitle: true,
         elevation: 8,
         foregroundColor: Colors.white,
-        title: const Text("Catraca Online"),
+        title: Obx(() => Text(controller.statusMessage.value)),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -40,7 +40,7 @@ class ResultadoPage extends GetView<CatracaOnlineController> {
                 child: Obx(() {
                   if (!controller.isNotFirstLoad.value) {
                     WidgetsBinding.instance.addPostFrameCallback((_) {
-                      controller.initialise();
+                      controller.loadingQrCodeData();
                     });
                     return const SizedBox.shrink();
                   } else {
@@ -52,6 +52,7 @@ class ResultadoPage extends GetView<CatracaOnlineController> {
                             gradient: AppColors.darkBlueToBlackGradient(),
                           ),
                           child: TransactionMessage(
+                            isOfflineMode: controller.isOfflineMode.value,
                             isQrCodeValid: controller.isQrCodeValid,
                             isTransactionValid: controller.isTransactionValid,
                             transactionResultMessage:
@@ -75,7 +76,7 @@ class ResultadoPage extends GetView<CatracaOnlineController> {
                                 ),
                               ),
                               onPressed: () {
-                                controller.initialise();
+                                controller.loadingQrCodeData();
                               },
                             ),
                           ),

@@ -35,7 +35,22 @@ android {
         create("release") {
             keyAlias = keystoreProperties.getProperty("keyAlias")
             keyPassword = keystoreProperties.getProperty("keyPassword")
-            storeFile = keystoreProperties.getProperty("storeFile")?.let { file("../$it") }
+            // Support both absolute and relative paths in key.properties:
+            // - If storeFile is absolute (starts with '/' or a Windows drive like C:\), use it directly
+            // - Otherwise treat it as relative to the android/ directory (original behavior)
+            val storeFileProp = keystoreProperties.getProperty("storeFile")
+            storeFile = storeFileProp?.let { prop ->
+                val trimmed = prop.trim()
+                // detect absolute unix path or Windows drive letter
+                val isAbsoluteUnix = trimmed.startsWith("/")
+                val isWindowsDrive = trimmed.length >= 2 && trimmed[1] == ':'
+                if (isAbsoluteUnix || isWindowsDrive) {
+                    file(trimmed)
+                } else {
+                    // original behavior expected the keystore in android/
+                    file("../$trimmed")
+                }
+            }
             storePassword = keystoreProperties.getProperty("storePassword")
         }
     }

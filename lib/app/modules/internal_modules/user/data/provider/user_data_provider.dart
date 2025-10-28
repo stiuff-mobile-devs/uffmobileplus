@@ -29,7 +29,7 @@ class UserDataProvider {
       var box = await Hive.openBox<UserData>(_collectionPath);
       return box.get(_userKey);
     } catch (e) {
-      throw Exception("Erro ao buscar dados do usuário do Hive: $e");
+      return null;
     }
   }
 
@@ -72,20 +72,9 @@ class UserDataProvider {
         return "Nenhuma informação de usuário encontrada";
       }
 
-      UserData userData = UserData(
-        name: user.name,
-        nomesocial: user.nomesocial,
-        matricula: user.matricula,
-        iduff: user.iduff,
-        curso: user.curso,
-        fotoUrl: user.fotoUrl,
-        dataValidadeMatricula: user.dataValidadeMatricula,
-        textoQrCodeCarteirinha: textoQrCodeCarteirinha,
-        accessToken: user.accessToken,
-
-      );
-
-      await box.put(_userKey, userData);
+      // altera o campo diretamente e salva
+      user.textoQrCodeCarteirinha = textoQrCodeCarteirinha;
+      await user.save(); // persiste o objeto atualizado
       return textoQrCodeCarteirinha;
     } catch (e) {
       return "Erro ao atualizar status de login no Hive: $e";
@@ -93,29 +82,22 @@ class UserDataProvider {
   }
 
   Future<List<GdiGroups>> getGdiGroups(String iduff, String token) async {
-    
     final path = '${Secrets.gdiGroupsPath}/$iduff${Secrets.gdiGroupsQuery}';
-    var uri = Uri.https(
-      Secrets.gdiGroupsHost,
-      path,
-    );
-    try{
+    var uri = Uri.https(Secrets.gdiGroupsHost, path);
+    try {
       final response = await http.get(
         uri,
-        headers:{
-          'Authorization': 'Bearer $token',
-        },
+        headers: {'Authorization': 'Bearer $token'},
       );
 
-      if (response.statusCode == 200){
+      if (response.statusCode == 200) {
         List<dynamic> jsonResponse = jsonDecode(response.body);
         return jsonResponse.map((group) => GdiGroups.fromJson(group)).toList();
       }
-    }
-    catch(e){
+    } catch (e) {
       debugPrint("Erro ao buscar grupos GDI: $e");
       return [];
     }
-    return []; 
+    return [];
   }
 }

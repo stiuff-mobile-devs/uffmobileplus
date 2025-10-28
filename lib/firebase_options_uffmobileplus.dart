@@ -14,7 +14,7 @@ import 'package:flutter/foundation.dart'
 ///   options: DefaultFirebaseOptions.currentPlatform,
 /// );
 /// ```
-class DefaultFirebaseOptions {
+class FirebaseOptionsUffmobileplus {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
       return web;
@@ -67,8 +67,10 @@ class DefaultFirebaseOptions {
     projectId: 'uff-mobile-plus',
     databaseURL: 'https://uff-mobile-plus.firebaseio.com',
     storageBucket: 'uff-mobile-plus.firebasestorage.app',
-    androidClientId: '222693628192-0aho0srg8evnbobvdb118ptmsjc5jacc.apps.googleusercontent.com',
-    iosClientId: '222693628192-jiakuaaa00i9o5ov8kfcmnopq24slr6h.apps.googleusercontent.com',
+    androidClientId:
+        '222693628192-0aho0srg8evnbobvdb118ptmsjc5jacc.apps.googleusercontent.com',
+    iosClientId:
+        '222693628192-jiakuaaa00i9o5ov8kfcmnopq24slr6h.apps.googleusercontent.com',
     iosBundleId: 'br.uff.uffmobileplus',
   );
 
@@ -79,8 +81,10 @@ class DefaultFirebaseOptions {
     projectId: 'uff-mobile-plus',
     databaseURL: 'https://uff-mobile-plus.firebaseio.com',
     storageBucket: 'uff-mobile-plus.firebasestorage.app',
-    androidClientId: '222693628192-0aho0srg8evnbobvdb118ptmsjc5jacc.apps.googleusercontent.com',
-    iosClientId: '222693628192-jiakuaaa00i9o5ov8kfcmnopq24slr6h.apps.googleusercontent.com',
+    androidClientId:
+        '222693628192-0aho0srg8evnbobvdb118ptmsjc5jacc.apps.googleusercontent.com',
+    iosClientId:
+        '222693628192-jiakuaaa00i9o5ov8kfcmnopq24slr6h.apps.googleusercontent.com',
     iosBundleId: 'br.uff.uffmobileplus',
   );
 

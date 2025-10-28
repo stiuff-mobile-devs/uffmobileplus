@@ -1,11 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:hive/hive.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_google_model.dart';
 
 enum UserRole { user }
 
 class UserGoogleProvider {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instanceFor(
+    app: Firebase.app('uffmobileplus'),
+  );
   final String _hiveBox = 'user_google_data';
   final String _hiveKey = 'current_user';
 

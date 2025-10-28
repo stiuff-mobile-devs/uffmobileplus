@@ -14,7 +14,7 @@ class CatracaOnlinePage extends GetView<CatracaOnlineController> {
         centerTitle: true,
         elevation: 8,
         foregroundColor: Colors.white,
-        title: const Text("Catraca Online"),
+        title: Obx(() => Text(controller.statusMessage.value)),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),

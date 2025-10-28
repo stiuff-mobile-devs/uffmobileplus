@@ -6,7 +6,7 @@ import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user
 class ExternalCatracaService extends GetxService {
   late UserDataController _userDataController;
   late UserData _userData;
-  final AuthIduffService _auth = Get.find<AuthIduffService>();
+  late final AuthIduffService _auth;
 
   bool isExpired = false;
 
@@ -16,6 +16,7 @@ class ExternalCatracaService extends GetxService {
 
   Future<void> initialize() async {
     _userDataController = Get.find<UserDataController>();
+    _auth = Get.find<AuthIduffService>();
     _userData = (await _userDataController.getUserData())!;
   }
 

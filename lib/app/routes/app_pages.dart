@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/binding/carteirinha_digital_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/ui/carteirinha_digital_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/transcript/binding/transcript_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/transcript/ui/transcript_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/radio/bindings/radio_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/radio/ui/radio_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/bindings/catraca_online_bindings.dart';
@@ -150,5 +152,11 @@ abstract class AppPages {
       page: () => RadioPopGoiabaPage(),
       bindings: [RadioBindings()],
     ),
+
+    GetPage(
+      name: Routes.HISTORICO,
+      page: () => TranscriptPage(),
+      bindings: [TranscriptBindings()]
+    )
   ];
 }

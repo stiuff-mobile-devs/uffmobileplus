@@ -6,6 +6,7 @@ class TransactionMessage extends StatelessWidget {
   final String transactionResultMessage;
   final String transactionUsername;
   final FloatingActionButton actionButton;
+  final bool isOfflineMode;
 
   const TransactionMessage({
     super.key,
@@ -14,6 +15,7 @@ class TransactionMessage extends StatelessWidget {
     required this.transactionResultMessage,
     required this.transactionUsername,
     required this.actionButton,
+    required this.isOfflineMode,
   });
 
   @override
@@ -46,15 +48,25 @@ class TransactionMessage extends StatelessWidget {
               isTransactionValid
                   ? Container(
                       margin: EdgeInsets.only(top: 24, left: 30, right: 30),
-                      child: Text(
-                        "Valor Debitado: R\$ $transactionResultMessage",
-                        style: TextStyle(
-                          fontStyle: FontStyle.italic,
-                          fontSize: 18,
-                          color: Colors.white,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
+                      child: isOfflineMode
+                          ? Text(
+                              "Transação realizada em modo offline.",
+                              style: TextStyle(
+                                fontStyle: FontStyle.italic,
+                                fontSize: 18,
+                                color: Colors.white,
+                              ),
+                              textAlign: TextAlign.center,
+                            )
+                          : Text(
+                              "Valor Debitado: R\$ $transactionResultMessage",
+                              style: TextStyle(
+                                fontStyle: FontStyle.italic,
+                                fontSize: 18,
+                                color: Colors.white,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
                     )
                   : Container(
                       margin: EdgeInsets.only(top: 24, left: 30, right: 30),
@@ -83,7 +95,11 @@ class TransactionMessage extends StatelessWidget {
                 margin: EdgeInsets.symmetric(horizontal: 22, vertical: 12),
                 child: Text(
                   "Código Inválido",
-                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),
