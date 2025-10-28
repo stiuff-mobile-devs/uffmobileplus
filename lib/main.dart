@@ -28,7 +28,7 @@ Future<void> main() async {
       debugShowCheckedModeBanner: true,
 
       title: "UFF Mobile Plus",
-      initialRoute: Routes.SPLASH,
+      initialRoute: Routes.RADIO,
       defaultTransition: Transition.fade,
       translations: International(),
       locale: Get.deviceLocale,
