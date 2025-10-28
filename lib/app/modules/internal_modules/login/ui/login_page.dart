@@ -149,8 +149,8 @@ class LoginPage extends GetView<LoginController> {
                                               ),
                                               _LoginOptionSquare(
                                                 text: 'GOV',
-                                                color: Colors.amber,
-                                                image: 'assets/icons/mini.png',
+                                                color: Colors.grey,
+                                                image: 'assets/icons/gov.png',
                                                 onTap:
                                                     () {}, //controller.loginGOV,
                                               ),

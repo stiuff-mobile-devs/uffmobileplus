@@ -11,13 +11,13 @@ class HomePage extends GetView<HomePageController> {
         'boas-vindas': 'Bem-vindo ao novo',
         'em_desenvolvimento': 'Aplicativo em desenvolvimento',
         'trab_constante': 'Estamos trabalhando constantemente para oferecer a melhor experiência possível. Aguarde as próximas atualizações!',
-        'versao': 'Versão 6.2.0'
+        'versao': 'Versão'
       },
       'en_US': {
         'boas-vindas' : 'Welcome to the new',
         'em_desenvolvimento': 'App under development',
         'trab_constante': 'We are constantly working to deliver the best possible experience. Look forward to the next updates!',
-        'versao': 'Version 6.2.0'
+        'versao': 'Version'
       }
     });
     return Scaffold(
@@ -157,7 +157,7 @@ class HomePage extends GetView<HomePageController> {
 
                         // Versão
                         Text(
-                          'versao'.tr,
+                          'versao'.tr + ' 6.4.0',
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.5),
                             fontSize: 12,
