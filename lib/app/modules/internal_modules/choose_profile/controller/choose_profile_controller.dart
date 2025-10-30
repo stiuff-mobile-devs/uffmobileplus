@@ -1,7 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/controller/auth_iduff_controller.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_umm_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_umm_model.dart';
+import 'package:uffmobileplus/app/routes/app_routes.dart';
+import 'package:uffmobileplus/app/utils/errors_mensages.dart';
 import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
 
 class ChooseProfileController extends GetxController {
@@ -9,6 +13,9 @@ class ChooseProfileController extends GetxController {
   ChooseProfileController();
 
   late final UserUmmController _userUmmController;
+  late final UserDataController _userDataController;
+  late final AuthIduffController _authIduffController;
+
   RxBool isBusy = false.obs;
   late final String? iduff;
   late UserUmmModel userUmm;
@@ -81,8 +88,21 @@ class ChooseProfileController extends GetxController {
      isBusy.value = false;
     }
 
-     List<InnerObject> activeBonds() {
+    List<InnerObject> activeBonds() {
     return userUmm.activeBond!.objects!.outerObject![1].innerObjects!;
   }
+
+  void saveUserDataBeforeChooseProfile(ProfileTypes profileType, String matricula) async {
+    isBusy.value = true;
+    
+
+    try {
+      await _userDataController.saveUserData(userUmm, matricula, profileType);
+    } catch (e) {
+      await _authIduffController.loginFailed(ErrorMessage.erro005);
+    }
+    isBusy.value = false;
+    Get.offAllNamed(Routes.HOME);
   }
   
+}

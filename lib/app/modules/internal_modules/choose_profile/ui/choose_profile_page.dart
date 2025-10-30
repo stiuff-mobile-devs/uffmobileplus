@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/choose_profile/controller/choose_profile_controller.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
+import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
 import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.dart';
 
 class ChooseProfilePage extends GetView<ChooseProfileController> {
@@ -87,14 +88,9 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
-                  print("Clicou no perfil de graduação $index");
-                  
-                 /* _.saveDataBeforeHandleTap(Routes.DASHBOARD, ProfileTypes.grad,
-                      reg:
-                          _.profilesModel!.grad!.matriculas![index].matricula!);
-                  _.handleTap(Routes.DASHBOARD, ProfileTypes.grad,
-                      reg:
-                          _.profilesModel!.grad!.matriculas![index].matricula!);*/
+                  String matricula =
+                      controller.userUmm.grad!.matriculas![index].matricula!;
+                  controller.saveUserDataBeforeChooseProfile(ProfileTypes.grad, matricula);
                 },
                 child: Container(
                   color: Colors.transparent,
@@ -158,13 +154,9 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
-                  /*
-                  // Save data before handling the tap
-                  _.saveDataBeforeHandleTap(Routes.DASHBOARD, ProfileTypes.pos,
-                      reg: _.profilesModel!.pos!.alunos![index].matricula!);
-                  _.handleTap(Routes.DASHBOARD, ProfileTypes.pos,
-                      reg: _.profilesModel!.pos!.alunos![index].matricula!);
-                      */
+                 controller.saveUserDataBeforeChooseProfile(
+                      ProfileTypes.pos,
+                      controller.userUmm.pos!.alunos![index].matricula!);
                 },
                 child: Container(
                   color: Colors.transparent,
@@ -230,11 +222,9 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
-                  /*
-                  _.saveDataBeforeHandleTap(
-                      Routes.DASHBOARD, ProfileTypes.employee);
-                  _.handleTap(Routes.DASHBOARD, ProfileTypes.employee);
-                  */
+                  controller.saveUserDataBeforeChooseProfile(
+                      ProfileTypes.employee,
+                      controller.activeBonds()[index].vinculacao!.matricula!);
                 },
                 child: Container(
                   color: Colors.transparent,
@@ -296,11 +286,9 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
-                  /*
-                  _.saveDataBeforeHandleTap(
-                      Routes.DASHBOARD, ProfileTypes.teacher);
-                  _.handleTap(Routes.DASHBOARD, ProfileTypes.teacher);
-                  */
+                  controller.saveUserDataBeforeChooseProfile(
+                      ProfileTypes.teacher,
+                      controller.activeBonds()[index].vinculacao!.matricula!);
                 },
                 child: Container(
                   color: Colors.transparent,
@@ -362,11 +350,9 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
-                  /*
-                  _.saveDataBeforeHandleTap(
-                      Routes.DASHBOARD, ProfileTypes.outsourced);
-                  _.handleTap(Routes.DASHBOARD, ProfileTypes.outsourced);
-                  */
+                 controller.saveUserDataBeforeChooseProfile(
+                      ProfileTypes.outsourced,
+                      controller.activeBonds()[index].vinculacao!.matricula!);
                 },
                 child: Container(
                   color: Colors.transparent,

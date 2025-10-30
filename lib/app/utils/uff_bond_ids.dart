@@ -7,3 +7,5 @@ class UffBondIds{
   static const String outsourced = '5';
   static const String employee = '4';
 }
+
+enum ProfileTypes { anonymous, grad, pos, teacher, employee, outsourced }
