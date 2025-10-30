@@ -160,16 +160,17 @@ class AuthIduffController extends GetxController {
   }
 
   loginSuccessful() async {
-    try {
-      String? iduff = await _userIduffController.getIduff();
-      UserUmmModel userUmm = await _userUmmController.getUserData(iduff);
+    String? iduff = await _userIduffController.getIduff();
+    //UserUmmModel userUmm = await _userUmmController.getUserData(iduff);
+    /*try {
+     
       await _userDataController.saveUserData(userUmm);
     } catch (e) {
       await loginFailed(ErrorMessage.erro005);
-    }
+    }*/
 
     isLoading.value = false;
-    Get.offAllNamed(Routes.HOME);
+    Get.offAllNamed(Routes.CHOOSE_PROFILE, arguments: iduff);
   }
 
   login() async {
