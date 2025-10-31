@@ -30,4 +30,7 @@ abstract class Routes {
 
   // Histórico
   static const HISTORICO = '/historico';
+
+  // Unitevê
+  static const UNITEVE = '/uniteve';
 }
