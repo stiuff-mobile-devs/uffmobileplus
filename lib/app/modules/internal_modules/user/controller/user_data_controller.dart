@@ -8,6 +8,7 @@ import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_umm_model.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
+import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
 
 class UserDataController extends GetxController {
   UserDataController();
@@ -24,37 +25,67 @@ class UserDataController extends GetxController {
     super.onInit();
   }
 
-  Future<String> saveUserData(UserUmmModel userUmm) async {
+  Future<String> saveUserData(UserUmmModel userUmm, String targetMatricula, ProfileTypes profileType) async {
     try {
       var saciData = await getSaciData();
+
       String textoQrCode = await saciData[0] ?? '-';
       String dataValidadeMatricula = await saciData[1] ?? '-';
+
       String iduff = userUmm.grad?.matriculas?[0].identificacao?.iduff 
       ?? await _userIduffController.getIduff()
       ?? "-";
-      String name = userUmm.grad?.matriculas?[0].identificacao?.nomesocial ??
-            userUmm.grad?.matriculas?[0].identificacao?.nome ??
-            "-";
-      String nomeSocial = userUmm.grad?.matriculas?[0].identificacao?.nomesocial ?? "-";
-      String matricula = userUmm.grad?.matriculas?[0].matricula ?? "-";
-      String curso = userUmm.grad?.matriculas?[0].nomeCurso ?? "-";
+
       String fotoUrl = await _userIduffController.getPhotoUrl() ?? "-";
+
+      late int? gradIndex;
+      late int? posIndex;
+      late String name;
+      late String curso;
+
+      int? bondIndex =
+          _findActiveBond(userUmm, targetMatricula);
+
+      if (profileType == ProfileTypes.grad){
+         gradIndex = _findActiveGrad(userUmm, targetMatricula);
+
+        name = userUmm.grad?.matriculas?[gradIndex ?? 0].identificacao?.nomesocial ??
+         userUmm.grad?.matriculas?[gradIndex ?? 0].identificacao?.nome ?? "-";
+
+        curso = userUmm.grad?.matriculas?[gradIndex ?? 0].nomeCurso ?? "-";
+
+      }
+      else if (profileType == ProfileTypes.pos){
+        posIndex = _findActivePos(userUmm, targetMatricula);
+        name = userUmm.pos?.alunos?[posIndex ?? 0].nome ?? "-";
+        curso = userUmm.pos?.alunos?[posIndex ?? 0].cursoNome ?? "-";
+      }
+
+     
+    if (name == "-"){
+        name = userUmm.activeBond?.objects?.outerObject?[0].usuario!.nome ?? "-";
+    }
+      String nomeSocial = userUmm.grad?.matriculas?[gradIndex ?? 0].identificacao?.nomesocial ?? "-";
+      String matricula = targetMatricula;
+       
       String bond = userUmm
           .activeBond
           ?.objects
           ?.outerObject?[1]
-          .innerObjects?[0]
+          .innerObjects?[bondIndex ?? 0]
           .vinculacao
           ?.vinculo ??
           "-";
+
       String bondId = userUmm
           .activeBond
           ?.objects
           ?.outerObject?[1]
-          .innerObjects?[0]
+          .innerObjects?[bondIndex ?? 0]
           .vinculacao
           ?.id ??
           "-";
+
         var gdiGroups = await getGdiGroups(iduff);
         String accessToken = await _auth.getAccessToken() ?? "";
 
@@ -128,5 +159,47 @@ class UserDataController extends GetxController {
       token,
     );
     return groups;
+  }
+
+  int? _findActiveBond(UserUmmModel userUmm, String targetMatricula) {
+    final bondsList = userUmm.activeBond?.objects?.outerObject?[1].innerObjects;
+    if (bondsList == null || bondsList.isEmpty) return null;
+
+    final idx = bondsList.indexWhere((io) {
+      final foundMatricula = io.vinculacao?.matricula ?? "";
+      return foundMatricula == targetMatricula;
+    });
+
+    if (idx == -1) return null;
+
+    return idx;
+  }
+
+  int? _findActiveGrad(UserUmmModel userUmm, String targetMatricula) {
+    final gradList = userUmm.grad?.matriculas;
+    if (gradList == null || gradList.isEmpty) return null;
+
+    final idx = gradList.indexWhere((matricula) {
+      final foundMatricula = matricula.matricula ?? "";
+      return foundMatricula == targetMatricula;
+    });
+
+    if (idx == -1) return null;
+
+    return idx;
+  }
+
+  int? _findActivePos(UserUmmModel userUmm, String targetMatricula) {
+    final posList = userUmm.pos?.alunos;
+    if (posList == null || posList.isEmpty) return null;
+
+    final idx = posList.indexWhere((aluno) {
+      final foundMatricula = aluno.matricula ?? "";
+      return foundMatricula == targetMatricula;
+    });
+
+    if (idx == -1) return null;
+
+    return idx;
   }
 }

@@ -2,14 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_umm_model.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_iduff_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_umm_controller.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
-import 'package:uffmobileplus/app/utils/errors_mensages.dart';
 
 class AuthIduffController extends GetxController {
   final AuthIduffService _authIduffService = Get.find<AuthIduffService>();
@@ -160,16 +158,9 @@ class AuthIduffController extends GetxController {
   }
 
   loginSuccessful() async {
-    try {
-      String? iduff = await _userIduffController.getIduff();
-      UserUmmModel userUmm = await _userUmmController.getUserData(iduff);
-      await _userDataController.saveUserData(userUmm);
-    } catch (e) {
-      await loginFailed(ErrorMessage.erro005);
-    }
-
+    String? iduff = await _userIduffController.getIduff();
     isLoading.value = false;
-    Get.offAllNamed(Routes.HOME);
+    Get.offAllNamed(Routes.CHOOSE_PROFILE, arguments: iduff);
   }
 
   login() async {
