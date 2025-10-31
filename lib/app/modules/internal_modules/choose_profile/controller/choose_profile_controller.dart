@@ -9,7 +9,6 @@ import 'package:uffmobileplus/app/utils/errors_mensages.dart';
 import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
 
 class ChooseProfileController extends GetxController {
-
   ChooseProfileController();
 
   late final UserUmmController _userUmmController;
@@ -26,24 +25,25 @@ class ChooseProfileController extends GetxController {
   late int teacherQtd = 0;
   late int employeeQtd = 0;
   late int outsourcedQtd = 0;
-   int totalProfileQtd = 0;
+  int totalProfileQtd = 0;
   String matricula = '';
 
-  
   @override
-  void onInit() async{
+  void onInit() async {
     iduff = Get.arguments;
     _userUmmController = Get.find<UserUmmController>();
+    _userDataController = Get.find<UserDataController>();
+    _authIduffController = Get.find<AuthIduffController>();
     super.onInit();
     fetchData();
   }
 
-   void fetchData() async {
+  void fetchData() async {
     isBusy.value = true;
     userUmm = await _userUmmController.getUserData(iduff);
 
     List<InnerObject> bonds =
-      userUmm.activeBond!.objects!.outerObject![1].innerObjects!;
+        userUmm.activeBond!.objects!.outerObject![1].innerObjects!;
 
     //Verifica se o usuario tem algum perfil de graduação
     if (userUmm.grad!.matriculas != null) {
@@ -82,19 +82,23 @@ class ChooseProfileController extends GetxController {
       );
     }*/
 
-    debugPrint("gradqtd: $gradQtd / posqtd: $posQtd / teacherQtd: $teacherQtd / employeeQtd: $employeeQtd / outsourcedQtd: $outsourcedQtd");
+    debugPrint(
+      "gradqtd: $gradQtd / posqtd: $posQtd / teacherQtd: $teacherQtd / employeeQtd: $employeeQtd / outsourcedQtd: $outsourcedQtd",
+    );
     totalProfileQtd =
         gradQtd + posQtd + teacherQtd + employeeQtd + outsourcedQtd;
-     isBusy.value = false;
-    }
+    isBusy.value = false;
+  }
 
-    List<InnerObject> activeBonds() {
+  List<InnerObject> activeBonds() {
     return userUmm.activeBond!.objects!.outerObject![1].innerObjects!;
   }
 
-  void saveUserDataBeforeChooseProfile(ProfileTypes profileType, String matricula) async {
+  void saveUserDataBeforeChooseProfile(
+    ProfileTypes profileType,
+    String matricula,
+  ) async {
     isBusy.value = true;
-    
 
     try {
       await _userDataController.saveUserData(userUmm, matricula, profileType);
@@ -104,5 +108,4 @@ class ChooseProfileController extends GetxController {
     isBusy.value = false;
     Get.offAllNamed(Routes.HOME);
   }
-  
 }

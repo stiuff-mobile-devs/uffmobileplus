@@ -9,16 +9,14 @@ import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.da
 class ChooseProfilePage extends GetView<ChooseProfileController> {
   const ChooseProfilePage({super.key});
 
-
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-    appBar: AppBar(
+      appBar: AppBar(
         centerTitle: true,
         elevation: 8,
         foregroundColor: Colors.white,
-        title: Text('Escolha seu Perfil',),
+        title: Text('Escolha seu Perfil'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -52,14 +50,12 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
                         if (controller.posQtd > 0) posAccordion(),
                         if (controller.employeeQtd > 0) employeeSelection(),
                         if (controller.teacherQtd > 0) teacherAccordion(),
-                        if (controller.outsourcedQtd > 0)
-                          outsourcedAccordion()
+                        if (controller.outsourcedQtd > 0) outsourcedAccordion(),
                       ],
-                    )
-                    ,
+                    ),
                   ],
                 ),
-            ),
+              ),
       ),
     );
   }
@@ -69,62 +65,63 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
       header: const Text(
         "Graduação",
         style: TextStyle(
-            fontWeight: FontWeight.w700, fontSize: 22, color: Colors.white),
+          fontWeight: FontWeight.w700,
+          fontSize: 22,
+          color: Colors.white,
+        ),
       ),
-      leftIcon: const Icon(
-        Icons.account_box,
-        color: Colors.white,
-      ),
+      leftIcon: const Icon(Icons.account_box, color: Colors.white),
       content: ListView.separated(
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          itemCount: 1, //_.gradQtd,
-          separatorBuilder: (context, index) => Divider(
-                thickness: 1.5,
-                color: AppColors.darkBlue(),
-              ),
-          itemBuilder: (context, index) {
-            return Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  String matricula =
-                      controller.userUmm.grad!.matriculas![index].matricula!;
-                  controller.saveUserDataBeforeChooseProfile(ProfileTypes.grad, matricula);
-                },
-                child: Container(
-                  color: Colors.transparent,
-                  width: double.infinity,
-                  padding: EdgeInsets.all(8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                                "${controller.userUmm.grad!.matriculas![index].nomeCurso}",
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold)),
-                            Text(
-                                "Status: ${controller.userUmm.grad!.matriculas![index].statusMatricula}"),
-                            Text(
-                                "Matrícula: ${controller.userUmm.grad!.matriculas![index].matricula}"),
-                          ],
-                        ),
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: controller.gradQtd,
+        separatorBuilder: (context, index) =>
+            Divider(thickness: 1.5, color: AppColors.darkBlue()),
+        itemBuilder: (context, index) {
+          return Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                String matricula =
+                    controller.userUmm.grad!.matriculas![index].matricula!;
+                controller.saveUserDataBeforeChooseProfile(
+                  ProfileTypes.grad,
+                  matricula,
+                );
+              },
+              child: Container(
+                color: Colors.transparent,
+                width: double.infinity,
+                padding: EdgeInsets.all(8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "${controller.userUmm.grad!.matriculas![index].nomeCurso}",
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            "Status: ${controller.userUmm.grad!.matriculas![index].statusMatricula}",
+                          ),
+                          Text(
+                            "Matrícula: ${controller.userUmm.grad!.matriculas![index].matricula}",
+                          ),
+                        ],
                       ),
-                      const Icon(
-                        Icons.arrow_circle_right_outlined,
-                        size: 22,
-                      )
-                    ],
-                  ),
+                    ),
+                    const Icon(Icons.arrow_circle_right_outlined, size: 22),
+                  ],
                 ),
               ),
-            );
-          }),
+            ),
+          );
+        },
+      ),
       headerBackgroundColor: AppColors.darkBlue(),
       contentBorderColor: AppColors.darkBlue(),
     );
@@ -135,64 +132,64 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
       header: const Text(
         "Pós-Graduação",
         style: TextStyle(
-            fontWeight: FontWeight.w700, fontSize: 22, color: Colors.white),
+          fontWeight: FontWeight.w700,
+          fontSize: 22,
+          color: Colors.white,
+        ),
       ),
-      leftIcon: const Icon(
-        Icons.account_box,
-        color: Colors.white,
-      ),
+      leftIcon: const Icon(Icons.account_box, color: Colors.white),
       content: ListView.separated(
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          itemCount: controller.posQtd,
-          separatorBuilder: (context, index) => Divider(
-                thickness: 1.5,
-                color: AppColors.darkBlue(),
-              ),
-          itemBuilder: (context, index) {
-            return Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                 controller.saveUserDataBeforeChooseProfile(
-                      ProfileTypes.pos,
-                      controller.userUmm.pos!.alunos![index].matricula!);
-                },
-                child: Container(
-                  color: Colors.transparent,
-                  width: double.infinity,
-                  padding: EdgeInsets.all(8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                                "${controller.userUmm.pos!.alunos![index].cursoNome}",
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold)),
-                            Text(
-                                "${controller.userUmm.pos!.alunos![index].descricao}"),
-                            Text(
-                                "Status: ${controller.userUmm.pos!.alunos![index].situacao}"),
-                            Text(
-                                "Matricula: ${controller.userUmm.pos!.alunos![index].matricula}"),
-                          ],
-                        ),
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: controller.posQtd,
+        separatorBuilder: (context, index) =>
+            Divider(thickness: 1.5, color: AppColors.darkBlue()),
+        itemBuilder: (context, index) {
+          return Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                controller.saveUserDataBeforeChooseProfile(
+                  ProfileTypes.pos,
+                  controller.userUmm.pos!.alunos![index].matricula!,
+                );
+              },
+              child: Container(
+                color: Colors.transparent,
+                width: double.infinity,
+                padding: EdgeInsets.all(8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "${controller.userUmm.pos!.alunos![index].cursoNome}",
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            "${controller.userUmm.pos!.alunos![index].descricao}",
+                          ),
+                          Text(
+                            "Status: ${controller.userUmm.pos!.alunos![index].situacao}",
+                          ),
+                          Text(
+                            "Matricula: ${controller.userUmm.pos!.alunos![index].matricula}",
+                          ),
+                        ],
                       ),
-                      const Icon(
-                        Icons.arrow_circle_right_outlined,
-                        size: 22,
-                      )
-                    ],
-                  ),
+                    ),
+                    const Icon(Icons.arrow_circle_right_outlined, size: 22),
+                  ],
                 ),
               ),
-            );
-          }),
+            ),
+          );
+        },
+      ),
       headerBackgroundColor: AppColors.darkBlue(),
       contentBorderColor: AppColors.darkBlue(),
     );
@@ -203,60 +200,58 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
       header: const Text(
         "Técnico Administrativo",
         style: TextStyle(
-            fontWeight: FontWeight.w700, fontSize: 22, color: Colors.white),
+          fontWeight: FontWeight.w700,
+          fontSize: 22,
+          color: Colors.white,
+        ),
       ),
-      leftIcon: const Icon(
-        Icons.account_box,
-        color: Colors.white,
-      ),
+      leftIcon: const Icon(Icons.account_box, color: Colors.white),
       content: ListView.separated(
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          itemCount: controller.employeeQtd,
-          separatorBuilder: (context, index) => Divider(
-                thickness: 1.5,
-                color: AppColors.darkBlue(),
-              ),
-          itemBuilder: (context, index) {
-            return Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  controller.saveUserDataBeforeChooseProfile(
-                      ProfileTypes.employee,
-                      controller.activeBonds()[index].vinculacao!.matricula!);
-                },
-                child: Container(
-                  color: Colors.transparent,
-                  width: double.infinity,
-                  padding: EdgeInsets.all(8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                                "${controller.activeBonds()[index].vinculacao!.vinculo}",
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold)),
-                            Text(
-                                "Matrícula: ${controller.activeBonds()[index].vinculacao!.matricula}"),
-                          ],
-                        ),
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: controller.employeeQtd,
+        separatorBuilder: (context, index) =>
+            Divider(thickness: 1.5, color: AppColors.darkBlue()),
+        itemBuilder: (context, index) {
+          return Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                controller.saveUserDataBeforeChooseProfile(
+                  ProfileTypes.employee,
+                  controller.activeBonds()[index].vinculacao!.matricula!,
+                );
+              },
+              child: Container(
+                color: Colors.transparent,
+                width: double.infinity,
+                padding: EdgeInsets.all(8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "${controller.activeBonds()[index].vinculacao!.vinculo}",
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            "Matrícula: ${controller.activeBonds()[index].vinculacao!.matricula}",
+                          ),
+                        ],
                       ),
-                      const Icon(
-                        Icons.arrow_circle_right_outlined,
-                        size: 22,
-                      )
-                    ],
-                  ),
+                    ),
+                    const Icon(Icons.arrow_circle_right_outlined, size: 22),
+                  ],
                 ),
               ),
-            );
-          }),
+            ),
+          );
+        },
+      ),
       headerBackgroundColor: AppColors.darkBlue(),
       contentBorderColor: AppColors.darkBlue(),
     );
@@ -267,60 +262,58 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
       header: const Text(
         "Docente",
         style: TextStyle(
-            fontWeight: FontWeight.w700, fontSize: 22, color: Colors.white),
+          fontWeight: FontWeight.w700,
+          fontSize: 22,
+          color: Colors.white,
+        ),
       ),
-      leftIcon: const Icon(
-        Icons.account_box,
-        color: Colors.white,
-      ),
+      leftIcon: const Icon(Icons.account_box, color: Colors.white),
       content: ListView.separated(
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          itemCount: controller.teacherQtd,
-          separatorBuilder: (context, index) => Divider(
-                thickness: 1.5,
-                color: AppColors.darkBlue(),
-              ),
-          itemBuilder: (context, index) {
-            return Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  controller.saveUserDataBeforeChooseProfile(
-                      ProfileTypes.teacher,
-                      controller.activeBonds()[index].vinculacao!.matricula!);
-                },
-                child: Container(
-                  color: Colors.transparent,
-                  width: double.infinity,
-                  padding: EdgeInsets.all(8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                                "${controller.activeBonds()[index].vinculacao!.vinculo}",
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold)),
-                            Text(
-                                "Matrícula: ${controller.activeBonds()[index].vinculacao!.matricula}"),
-                          ],
-                        ),
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: controller.teacherQtd,
+        separatorBuilder: (context, index) =>
+            Divider(thickness: 1.5, color: AppColors.darkBlue()),
+        itemBuilder: (context, index) {
+          return Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                controller.saveUserDataBeforeChooseProfile(
+                  ProfileTypes.teacher,
+                  controller.activeBonds()[index].vinculacao!.matricula!,
+                );
+              },
+              child: Container(
+                color: Colors.transparent,
+                width: double.infinity,
+                padding: EdgeInsets.all(8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "${controller.activeBonds()[index].vinculacao!.vinculo}",
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            "Matrícula: ${controller.activeBonds()[index].vinculacao!.matricula}",
+                          ),
+                        ],
                       ),
-                      const Icon(
-                        Icons.arrow_circle_right_outlined,
-                        size: 22,
-                      )
-                    ],
-                  ),
+                    ),
+                    const Icon(Icons.arrow_circle_right_outlined, size: 22),
+                  ],
                 ),
               ),
-            );
-          }),
+            ),
+          );
+        },
+      ),
       headerBackgroundColor: AppColors.darkBlue(),
       contentBorderColor: AppColors.darkBlue(),
     );
@@ -331,61 +324,57 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
       header: const Text(
         "Terceirizado",
         style: TextStyle(
-            fontWeight: FontWeight.w700, fontSize: 22, color: Colors.white),
+          fontWeight: FontWeight.w700,
+          fontSize: 22,
+          color: Colors.white,
+        ),
       ),
-      leftIcon: const Icon(
-        Icons.account_box,
-        color: Colors.white,
-      ),
+      leftIcon: const Icon(Icons.account_box, color: Colors.white),
       content: ListView.separated(
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          itemCount: controller.outsourcedQtd,
-          separatorBuilder: (context, index) => Divider(
-                thickness: 1.5,
-                color: AppColors.darkBlue(),
-              ),
-          itemBuilder: (context, index) {
-            return Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                 controller.saveUserDataBeforeChooseProfile(
-                      ProfileTypes.outsourced,
-                      controller.activeBonds()[index].vinculacao!.matricula!);
-                },
-                child: Container(
-                  color: Colors.transparent,
-                  width: double.infinity,
-                  padding: EdgeInsets.all(8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                                "${controller.activeBonds()[index].vinculacao!.vinculo}",
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold))
-                          ],
-                        ),
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: controller.outsourcedQtd,
+        separatorBuilder: (context, index) =>
+            Divider(thickness: 1.5, color: AppColors.darkBlue()),
+        itemBuilder: (context, index) {
+          return Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                controller.saveUserDataBeforeChooseProfile(
+                  ProfileTypes.outsourced,
+                  controller.activeBonds()[index].vinculacao!.matricula!,
+                );
+              },
+              child: Container(
+                color: Colors.transparent,
+                width: double.infinity,
+                padding: EdgeInsets.all(8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "${controller.activeBonds()[index].vinculacao!.vinculo}",
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
                       ),
-                      const Icon(
-                        Icons.arrow_circle_right_outlined,
-                        size: 22,
-                      )
-                    ],
-                  ),
+                    ),
+                    const Icon(Icons.arrow_circle_right_outlined, size: 22),
+                  ],
                 ),
               ),
-            );
-          }),
+            ),
+          );
+        },
+      ),
       headerBackgroundColor: AppColors.darkBlue(),
       contentBorderColor: AppColors.darkBlue(),
     );
   }
-
 }

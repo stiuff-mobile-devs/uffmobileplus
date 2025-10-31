@@ -151,14 +151,14 @@ abstract class AppPages {
     // Radio
     GetPage(
       name: Routes.RADIO,
-      page: () => Radio(), // TODO: trocar nome para RadioPage 
+      page: () => Radio(), // TODO: trocar nome para RadioPage
       bindings: [RadioBindings()],
     ),
 
     GetPage(
       name: Routes.HISTORICO,
       page: () => TranscriptPage(),
-      bindings: [TranscriptBindings()]
+      bindings: [TranscriptBindings()],
     ),
 
     GetPage(
