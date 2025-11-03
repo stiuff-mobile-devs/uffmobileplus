@@ -172,7 +172,7 @@ abstract class AppPages {
     GetPage(
       name: Routes.CHOOSE_PROFILE,
       page: () => ChooseProfilePage(),
-      bindings: [UserIduffBindings(), ChooseProfileBindings()],
+      bindings: [UserIduffBindings(), ChooseProfileBindings(), UserUmmBindings(),],
     ),
   ];
 }

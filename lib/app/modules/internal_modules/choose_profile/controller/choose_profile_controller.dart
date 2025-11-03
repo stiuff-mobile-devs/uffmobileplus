@@ -1,11 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/controller/auth_iduff_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_umm_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_umm_model.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
-import 'package:uffmobileplus/app/utils/errors_mensages.dart';
 import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
 
 class ChooseProfileController extends GetxController {
@@ -13,7 +11,6 @@ class ChooseProfileController extends GetxController {
 
   late final UserUmmController _userUmmController;
   late final UserDataController _userDataController;
-  late final AuthIduffController _authIduffController;
 
   RxBool isBusy = false.obs;
   late final String? iduff;
@@ -33,7 +30,6 @@ class ChooseProfileController extends GetxController {
     iduff = Get.arguments;
     _userUmmController = Get.find<UserUmmController>();
     _userDataController = Get.find<UserDataController>();
-    _authIduffController = Get.find<AuthIduffController>();
     super.onInit();
     fetchData();
   }
@@ -103,9 +99,12 @@ class ChooseProfileController extends GetxController {
     try {
       await _userDataController.saveUserData(userUmm, matricula, profileType);
     } catch (e) {
-      await _authIduffController.loginFailed(ErrorMessage.erro005);
     }
     isBusy.value = false;
     Get.offAllNamed(Routes.HOME);
+  }
+
+   goToCarteirinhaPage() {
+    Get.toNamed(Routes.CARTEIRINHA_DIGITAL);
   }
 }

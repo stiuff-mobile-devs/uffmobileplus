@@ -146,14 +146,14 @@ class LoginPage extends GetView<LoginController> {
                                                 onTap: () {
                                                   controller.loginAnonimous();
                                                 },
-                                              ),
+                                              ),/*
                                               _LoginOptionSquare(
                                                 text: 'GOV',
                                                 color: Colors.grey,
                                                 image: 'assets/icons/gov.png',
                                                 onTap:
                                                     () {}, //controller.loginGOV,
-                                              ),
+                                              ),*/
                                             ],
                                           ),
                                         ),

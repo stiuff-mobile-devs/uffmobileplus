@@ -97,6 +97,15 @@ class SettingsPage extends StatelessWidget {
                   description: 'ling_descricao'.tr,
                   trailing: null, // No chevron needed since it's a dropdown
                 ),
+                SettingsItem(
+                  icon: Icon(Icons.change_circle, color: Colors.white,),
+                   main: Text('Trocar Matricula', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),),
+                    description: 'Alterar a matrícula vinculada ao usuário atual',
+                    trailing: null,
+                    onTap: () {
+                      controller.changeMatricula();
+                    },
+                ),
                 // Botão de logout
                 SettingsItem(
                   icon: Icon(Icons.logout, color: Colors.white),

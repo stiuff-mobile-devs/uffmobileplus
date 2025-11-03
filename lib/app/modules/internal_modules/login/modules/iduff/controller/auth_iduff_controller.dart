@@ -5,15 +5,11 @@ import 'package:get/get.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_iduff_controller.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_umm_controller.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
 
 class AuthIduffController extends GetxController {
   final AuthIduffService _authIduffService = Get.find<AuthIduffService>();
 
-  late final UserUmmController _userUmmController;
-  late final UserDataController _userDataController;
   late final UserIduffController _userIduffController;
   RxBool isLoading = false.obs;
   late final bool isLogin;
@@ -21,8 +17,6 @@ class AuthIduffController extends GetxController {
 
   @override
   void onInit() {
-    _userUmmController = Get.find<UserUmmController>();
-    _userDataController = Get.find<UserDataController>();
     _userIduffController = Get.find<UserIduffController>();
     isLogin = Get.arguments as bool? ?? false;
     if (isLogin) {

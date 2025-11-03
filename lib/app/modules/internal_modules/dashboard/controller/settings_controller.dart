@@ -15,4 +15,9 @@ SettingsController();
     _userIduffController.deleteUserIduffModel();
     Get.offAllNamed(Routes.LOGIN);
   }
+
+  changeMatricula() async {
+    String? iduff = await _userIduffController.getIduff();
+    Get.offAllNamed(Routes.CHOOSE_PROFILE, arguments: iduff);
+  }
 }

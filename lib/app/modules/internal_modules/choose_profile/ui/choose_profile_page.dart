@@ -18,6 +18,7 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
         foregroundColor: Colors.white,
         title: Text('Escolha seu Perfil'),
         actions: [
+          IconButton(onPressed: controller.goToCarteirinhaPage, icon: const Icon(Icons.qr_code_2), tooltip: 'Carteirinha Digital',),
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Atualizar',
