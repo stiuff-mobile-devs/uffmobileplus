@@ -47,6 +47,8 @@ dependencies:
   flutter_widget_from_html_core: ^0.17.0
   share_plus: ^12.0.0
   image: ^4.5.4
+  googleapis: ^15.0.0
+  carousel_slider: ^5.1.1
 
 dev_dependencies:
   flutter_test:
