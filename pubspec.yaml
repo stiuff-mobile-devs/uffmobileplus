@@ -67,7 +67,8 @@ flutter:
     - assets/carteirinha_digital/
     - assets/carteirinha_digital/images/
     - assets/carteirinha_digital/icons/
-    - assets/radio/icons/radio.svg
+    - assets/radio/icons/
+    - assets/radio/images/
     - assets/restaurant/img/
     - assets/restaurant/
   fonts:
