@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -8,6 +10,10 @@ import '../../../../../../../data/services/external_menu_service.dart';
 import '../models/meal_model.dart';
 
 class MealResource {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instanceFor(
+    app: Firebase.app('cardapio_ru'),
+  );
+
   MealResource();
 
   final ExternalMenuService _menuService = Get.find<ExternalMenuService>();
@@ -113,6 +119,7 @@ class MealResource {
         'Authorization': 'Bearer $accessToken',
         },
       );
+      await _createMealOnFirestore(meal);
       return _processWriteResponse(response, "Refeição criada com sucesso.");
     } catch (e) {
       _logError('createMeal', e);
@@ -122,6 +129,14 @@ class MealResource {
     }
 
     return 0;
+  }
+
+  _createMealOnFirestore(MealModel meal) async {
+    try {
+      await _firestore.collection("meals").add(meal.toJson());
+    } catch (e) {
+      _logError('createMeal on Firebase', e);
+    }
   }
 
   Future<int> updateMeal(MealModel meal) async {

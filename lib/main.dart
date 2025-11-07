@@ -6,6 +6,7 @@ import 'package:uffmobileplus/app/routes/app_pages.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/translations.dart';
 import 'package:uffmobileplus/firebase_options_catracaoffline.dart';
+import 'package:uffmobileplus/firebase_options_cardapio_ru.dart';
 import 'package:uffmobileplus/firebase_options_uffmobileplus.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -18,6 +19,10 @@ Future<void> main() async {
   await Firebase.initializeApp(
     name: 'catracaoffline',
     options: FirebaseOptionsCatracaoffline.currentPlatform,
+  );
+  await Firebase.initializeApp(
+    name: 'cardapio_ru',
+    options: FirebaseOptionsCardapioRU.currentPlatform,
   );
 
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
