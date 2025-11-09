@@ -7,7 +7,6 @@ import 'package:uffmobileplus/app/config/secrets.dart';
 const uniteveChannelID = 'UCKEYaoGb16c-ZJZKxA2ND6A';
 
 class YoutubeService {
-  // TODO: Por que há duas chamadas?
   YoutubeService._instantiate();
   static final YoutubeService instance = YoutubeService._instantiate();
 
@@ -47,7 +46,6 @@ class YoutubeService {
     // youtube.PlaylistItemListResponse. Atenção: se a API retornar um erro
     // (status HTTP diferente de 2xx), o corpo pode conter um objeto de erro
     // em vez do recurso esperado.
-    // TODO: implementar tratamento de erros.
     var resource = youtube.PlaylistItemListResponse.fromJson(json.decode(response.body));
 
     // Retorna a lista de PlaylistItem (pode ser null se não houver itens).
@@ -82,7 +80,6 @@ class YoutubeService {
     );
 
     // Decodifica a resposta JSON para o modelo gerado ChannelSectionListResponse.
-    // TODO: não há aqui tratamento explícito de erros HTTP/JSON.
     var cs_response = youtube.ChannelSectionListResponse.fromJson(
       json.decode(response.body)
     );

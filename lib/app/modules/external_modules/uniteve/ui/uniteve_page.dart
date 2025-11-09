@@ -26,11 +26,12 @@ class UnitevePage extends GetView<UniteveController> {
           decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
         ),
       ),
-      body: SingleChildScrollView( // <- torna a tela rolável
+      body: SingleChildScrollView(
+        // <- torna a tela rolável
         child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            gradient: AppColors.darkBlueToBlackGradient()
+            gradient: AppColors.darkBlueToBlackGradient(),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -41,46 +42,57 @@ class UnitevePage extends GetView<UniteveController> {
                 alignment: Alignment.topLeft,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: SvgPicture.asset('assets/images/logo_uniteve.svg', width: 80),
+                  child: SvgPicture.asset(
+                    'assets/images/logo_uniteve.svg',
+                    width: 80,
+                  ),
                 ),
               ),
               const SizedBox(height: 8),
 
               // Lista reativa de playlists; rebuilda quando controller.playlists mudar
-              Obx(() => Column(
-                children: controller.playlists.map((p) => PlaylistCard(
-                  playlist: p, 
-                  controller: controller
-                )
-                ).toList()
-              )),
+              Obx(
+                () => Column(
+                  children: controller.playlists
+                      .map(
+                        (p) =>
+                            PlaylistCard(playlist: p, controller: controller),
+                      )
+                      .toList(),
+                ),
+              ),
 
               const SizedBox(height: 16),
-              FooterWidget()
+              FooterWidget(),
             ],
           ),
         ),
       ),
-
     );
   }
 }
 
-// TODO: ajustes estéticos
 class PlaylistCard extends StatelessWidget {
   final Playlist playlist;
   final UniteveController controller;
 
-  const PlaylistCard({super.key, required this.playlist, required this.controller});
+  const PlaylistCard({
+    super.key,
+    required this.playlist,
+    required this.controller,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final bool hasDescription = playlist.description != null && playlist.description != "";
+    final bool hasDescription =
+        playlist.description != null && playlist.description != "";
     return Column(
       children: [
         Card(
           shape: const ContinuousRectangleBorder(),
           color: Colors.transparent,
+          elevation: 0,
+          shadowColor: Colors.transparent,
           child: Column(
             children: [
               const SizedBox(height: 10),
@@ -91,12 +103,21 @@ class PlaylistCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       playlist.name ?? 'utv_loading'.tr,
-                      style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   IconButton(
-                    onPressed: hasDescription ? () => PlaylistInfoDialog.show(controller, playlist) : null,
-                    icon: Icon(Icons.info_outline, color: hasDescription ? Colors.white : Colors.grey),
+                    onPressed: hasDescription
+                        ? () => PlaylistInfoDialog.show(controller, playlist)
+                        : null,
+                    icon: Icon(
+                      Icons.info_outline,
+                      color: hasDescription ? Colors.white : Colors.grey,
+                    ),
                   ),
                 ],
               ),
@@ -108,7 +129,12 @@ class PlaylistCard extends StatelessWidget {
                   clipBehavior: Clip.antiAlias,
                 ),
                 items: playlist.hasFinishLoading
-                    ? playlist.videos!.map((el) => VideoCard(video: el, playlistID: playlist.id)).toList()
+                    ? playlist.videos!
+                          .map(
+                            (el) =>
+                                VideoCard(video: el, playlistID: playlist.id),
+                          )
+                          .toList()
                     : [const Center(child: CustomProgressDisplay())],
               ),
               const SizedBox(height: 20),
@@ -121,7 +147,6 @@ class PlaylistCard extends StatelessWidget {
   }
 }
 
-// TODO: ajustes estéticos
 class VideoCard extends StatelessWidget {
   final youtube.PlaylistItem video;
   final String playlistID;
@@ -130,9 +155,10 @@ class VideoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    youtube.Thumbnail? a = (video.snippet!.thumbnails!.standard
-        ?? video.snippet!.thumbnails!.high
-        ?? video.snippet!.thumbnails!.default_);
+    youtube.Thumbnail? a =
+        (video.snippet!.thumbnails!.standard ??
+        video.snippet!.thumbnails!.high ??
+        video.snippet!.thumbnails!.default_);
     String url = "";
     if (a != null) {
       url = a.url!;
@@ -148,18 +174,19 @@ class VideoCard extends StatelessWidget {
             image: DecorationImage(image: NetworkImage(url), fit: BoxFit.cover),
           ),
           child: Center(
-            child: Icon(Icons.play_arrow_rounded, color: Colors.grey[200], size: 64),
+            child: Icon(
+              Icons.play_arrow_rounded,
+              color: Colors.grey[200],
+              size: 64,
+            ),
           ),
         ),
         onTap: () async {
-          Uri uri = Uri.https(
-            "www.youtube.com",
-            "/watch",
-            {
-              "v": "${video.id}",
-              "list": playlistID,
-            },
-          );
+          //print("\n\nID DO VÍDEO: ${video.snippet?.resourceId?.videoId}\n\n");
+          Uri uri = Uri.https("www.youtube.com", "/watch", {
+            "v": "${video.snippet?.resourceId?.videoId}",
+            "list": playlistID,
+          });
           launchUrl(uri, mode: LaunchMode.externalApplication);
         },
       ),
@@ -167,7 +194,6 @@ class VideoCard extends StatelessWidget {
   }
 }
 
-// TODO: ajustes estéticos
 class PlaylistInfoDialog extends StatelessWidget {
   final Playlist playlist;
   const PlaylistInfoDialog({super.key, required this.playlist});
@@ -180,7 +206,10 @@ class PlaylistInfoDialog extends StatelessWidget {
       title: Center(
         child: Text(
           playlist.name ?? '',
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       content: Text(
@@ -204,28 +233,27 @@ class FooterWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Link(
-          uri: Uri.parse('https://pt-br.facebook.com/uniteveuff/'), 
+          uri: Uri.parse('https://pt-br.facebook.com/uniteveuff/'),
           builder: (_, link) => IconButton(
-            onPressed: link, 
-            icon: SvgPicture.asset('assets/icons/circle_facebook.svg')
-          )
+            onPressed: link,
+            icon: SvgPicture.asset('assets/icons/circle_facebook.svg'),
+          ),
         ),
         Link(
-          uri: Uri.parse('https://www.instagram.com/uniteveuff/'), 
+          uri: Uri.parse('https://www.instagram.com/uniteveuff/'),
           builder: (_, link) => IconButton(
-            onPressed: link, 
-            icon: SvgPicture.asset('assets/icons/circle_instagram.svg')
-          )
+            onPressed: link,
+            icon: SvgPicture.asset('assets/icons/circle_instagram.svg'),
+          ),
         ),
         Link(
-          uri: Uri.parse('https://www.youtube.com/user/uniteveuff'), 
+          uri: Uri.parse('https://www.youtube.com/user/uniteveuff'),
           builder: (_, link) => IconButton(
-            onPressed: link, 
-            icon: SvgPicture.asset('assets/icons/circle_youtube.svg')
-          )
-        )
+            onPressed: link,
+            icon: SvgPicture.asset('assets/icons/circle_youtube.svg'),
+          ),
+        ),
       ],
     );
   }
-
 }

@@ -2,7 +2,6 @@ import 'package:get/get.dart';
 import 'package:googleapis/youtube/v3.dart' as youtube;
 import 'package:uffmobileplus/app/modules/external_modules/uniteve/data/services/youtube_services.dart';
 
-// TODO: estar aqui ou em outro arquivo?
 class Playlist {
     String? name;
     String id;
@@ -25,7 +24,6 @@ class UniteveController extends GetxController {
         await fetchPlaylistListInfo(l);
     }
 
-    // TODO: escolher um nome melhor
     Future<List<String>> fetchPlaylistIdList() async {
         List<String> playlistIdList = await YoutubeService.instance.getChannelSectionPlaylists();
         gotPlaylists.value = true;
@@ -33,7 +31,6 @@ class UniteveController extends GetxController {
         return playlistIdList;
     }
 
-    // TODO: escolher um nome melhor
     fetchPlaylistListInfo(List<String> l) async {
         int m = DateTime.now().millisecondsSinceEpoch;
 
