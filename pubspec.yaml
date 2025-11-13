@@ -41,6 +41,7 @@ dependencies:
   http: ^1.5.0
   radio_player: ^2.2.1
   marquee: ^2.3.0
+  siri_wave: ^2.3.0
   cached_network_image: ^3.4.1
   shared_preferences: ^2.5.3
   calendar_date_picker2: ^2.0.1
