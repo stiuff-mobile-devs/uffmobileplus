@@ -34,7 +34,7 @@ class LeitorQrCodePage extends GetView<LeitorQrCodeController> {
         centerTitle: true,
         elevation: 8,
         foregroundColor: Colors.white,
-        title: const Text("Catraca Online"),
+        title: const Text("Catraca"),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
         ),
