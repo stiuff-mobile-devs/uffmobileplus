@@ -10,13 +10,13 @@ class RestaurantModulesController extends GetxController {
     // TODO: talvez seja melhor refatorar de modo que essa chamada fique fora do controller.
     Get.appendTranslations({
       'pt_BR' : {
-        'catraca_online' : 'Catraca Online',
+        'catraca_online' : 'Catraca',
       },
       'en_US' : {
-        'catraca_online' : 'Online Turnstile'
+        'catraca_online' : 'Turnstile'
       },
       'it_IT' : {
-        'catraca_online' : 'Tornello Online'
+        'catraca_online' : 'Tornello'
       }
     });
     super.onInit();
