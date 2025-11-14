@@ -9,34 +9,27 @@ class RestaurantModulesController extends GetxController {
   void onInit() {
     // TODO: talvez seja melhor refatorar de modo que essa chamada fique fora do controller.
     Get.appendTranslations({
-      'pt_BR' : {
-        'catraca_online' : 'Catraca',
-      },
-      'en_US' : {
-        'catraca_online' : 'Turnstile'
-      },
-      'it_IT' : {
-        'catraca_online' : 'Tornello'
-      }
+      'pt_BR': {'catraca_online': 'Catraca'},
+      'en_US': {'catraca_online': 'Turnstile'},
+      'it_IT': {'catraca_online': 'Tornello'},
     });
     super.onInit();
   }
 
   List<RestaurantModules> restaurantModulesList = [
     RestaurantModules(
-      iconSrc: 'assets/icons/validator_qr_code.svg',
-      subtitle: 'catraca_online'.tr,
-      page: Routes.CATRACA_ONLINE,
+      iconSrc: 'assets/icons/cardapio.svg',
+      subtitle: "Menu",
+      page: Routes.BANDEJAPP,
       url: '',
       interrogation: false,
       //availableFor: [ProfileTypes.student, ProfileTypes.professor, ProfileTypes.employee],
       //gdiGroups: null
     ),
-
     RestaurantModules(
-      iconSrc: 'assets/icons/cardapio.svg',
-      subtitle: "Menu",
-      page: Routes.BANDEJAPP,
+      iconSrc: 'assets/icons/validator_qr_code.svg',
+      subtitle: 'catraca_online'.tr,
+      page: Routes.CATRACA_ONLINE,
       url: '',
       interrogation: false,
       //availableFor: [ProfileTypes.student, ProfileTypes.professor, ProfileTypes.employee],
