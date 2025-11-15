@@ -31,4 +31,7 @@ abstract class Routes {
 
   // Histórico
   static const HISTORICO = '/historico';
+
+  // Periódicos
+  static const PAPERS = '/periodicos';
 }

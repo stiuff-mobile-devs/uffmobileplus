@@ -12,13 +12,15 @@ class ExternalModulesController extends GetxController {
         'carteirinha_digital' : 'Carteirinha Digital',
         'restaurante' : 'Restaurante',
         'plano_estudos' : 'Plano de Estudos',
-        'radio_pop_goiaba' : 'Radio Pop Goiaba'
+        'radio_pop_goiaba' : 'Radio Pop Goiaba',
+        'periodicos' : 'Periódicos',
       },
       'en_US' : {
         'carteirinha_digital' : 'Digital ID Card',
         'restaurante' : 'Restaurant',
         'plano_estudos' : 'Study Plan',
-        'radio_pop_goiaba' : 'Radio Pop Goiaba'
+        'radio_pop_goiaba' : 'Radio Pop Goiaba',
+        'periodicos' : 'Papers',
       },
       'it_IT' : {
         'restaurante' : 'Ristorante'
@@ -66,9 +68,17 @@ class ExternalModulesController extends GetxController {
 
     ExternalModules(
       iconSrc: 'assets/icons/historico.svg',
-      subtitle: 'Histórico',
+      subtitle: 'Histórico', // TODO: traduzir
       page: Routes.HISTORICO,
       url: '',
+      interrogation: false
+    ),
+
+    ExternalModules(
+      iconSrc: 'assets/papers/icons/pesquisas.svg',
+      subtitle: 'periodicos'.tr,
+      page: Routes.PAPERS,
+      url: '', 
       interrogation: false
     )
   ];

@@ -28,11 +28,11 @@ class WebViewPageController extends GetxController {
   @override
   void onInit() {
    /* firebaseAnalyticsService.logScreen(
-        "webview", url, userRepository.getCurrentProfile().name);
+        "webview", url, userRepository.getCurrentProfile().name);*/
     wvc
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..loadRequest(Uri.parse(url));
-    super.onInit();*/
+    super.onInit();
   }
 
   void closeWebView() {
