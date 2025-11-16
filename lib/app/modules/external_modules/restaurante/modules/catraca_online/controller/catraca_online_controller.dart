@@ -20,7 +20,7 @@ class CatracaOnlineController extends GetxController {
   RxBool isDetailResultBusy = false.obs;
   RxBool isManualValidationBusy = false.obs;
   RxBool isOfflineMode = false.obs;
-  RxString statusMessage = "Catraca".obs;
+  RxString statusMessage = "Catraca Online".obs;
   Rx<AreaModel> selectedArea = AreaModel().obs;
 
   late RxList<AreaModel> areas = <AreaModel>[].obs;
@@ -64,11 +64,11 @@ class CatracaOnlineController extends GetxController {
       throw Exception("Forçando modo offline para testes");
       areas.value = await repository.getAreas(iduff, token);
       isOfflineMode.value = false;
-      statusMessage.value = "Catraca";
+      statusMessage.value = "Catraca Online";
     } catch (e) {
       areas.value = await getOffLineAreas();
       isOfflineMode.value = true;
-      statusMessage.value = "Catraca";
+      statusMessage.value = "Catraca Offline";
     }
     isAreaBusy.value = false;
   }
@@ -85,12 +85,12 @@ class CatracaOnlineController extends GetxController {
         selectedArea.value.id.toString(),
       );
       isOfflineMode.value = false;
-      statusMessage.value = "Catraca";
+      statusMessage.value = "Catraca Online";
     } catch (e) {
       operatorTransactionsOffline.value = await repository
           .getOperatorTransactionsOffline();
       isOfflineMode.value = true;
-      statusMessage.value = "Catraca";
+      statusMessage.value = "Catraca Offline";
     }
 
     isTransactionBusy.value = false;
@@ -112,7 +112,7 @@ class CatracaOnlineController extends GetxController {
     isOfflineMode.value = true; //TODO: So para testar o modo offline
 
     if (isOfflineMode.value) {
-      statusMessage.value = "Catraca";
+      statusMessage.value = "Catraca Offline";
 
       try {
         String? qrCodeScanRes = await _scanQRCode();
@@ -165,7 +165,7 @@ class CatracaOnlineController extends GetxController {
       }
       isReadQRCodeBusy.value = false;
     } else {
-      statusMessage.value = "Catraca";
+      statusMessage.value = "Catraca Online";
       try {
         String? qrCodeScanRes = await _scanQRCode();
 
