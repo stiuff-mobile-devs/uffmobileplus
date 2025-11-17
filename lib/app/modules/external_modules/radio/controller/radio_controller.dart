@@ -1,7 +1,8 @@
 import 'dart:async';
-
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:radio_player/radio_player.dart';
+import 'package:siri_wave/siri_wave.dart';
 
 class RadioController extends GetxController {
   final Rx<PlaybackState> playbackState = PlaybackState.paused.obs;
@@ -13,6 +14,14 @@ class RadioController extends GetxController {
   StreamSubscription? _playbackStateSubscription;
   StreamSubscription? _metadataSubscription;
 
+  final IOS9SiriWaveformController siriController = IOS9SiriWaveformController(
+    amplitude: 1.0,
+    speed: 0.20,
+    color1: Colors.cyanAccent.withValues(),
+    color2: Colors.blueAccent.withValues(),
+    color3: Colors.white.withValues(),
+  );
+
   // Initializes the plugin and starts listening to streams.
   @override
   void onInit() {
@@ -23,6 +32,8 @@ class RadioController extends GetxController {
       title: 'Radio Player',
       url: 'https://s37.maxcast.com.br:8450/live',
     );
+
+    RadioPlayer.pause();
 
     RadioPlayer.metadataStream.listen(
       (metadata) {

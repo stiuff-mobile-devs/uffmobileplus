@@ -42,3 +42,15 @@ Future<void> main() async {
     ),
   );
 }
+
+/*git branch
+   85  git branch -a
+   86  git switch testing 
+   87  git branch
+   88  git pull
+   89  git switch -C feat/icones-radio-pop
+   90  git branch
+   91  git status
+   92  git push
+   93  git push --set-upstream origin feat/icones-radio-pop
+*/
