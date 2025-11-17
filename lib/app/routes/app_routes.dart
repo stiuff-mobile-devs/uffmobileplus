@@ -34,4 +34,6 @@ abstract class Routes {
 
   // Unitevê
   static const UNITEVE = '/uniteve';
+  static const UNITEVE_HISTORIA = '/uniteve-historia';
+  static const UNITEVE_CONTATO = '/uniteve-contato';
 }

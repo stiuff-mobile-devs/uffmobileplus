@@ -16,6 +16,8 @@ import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/m
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/menu/ui/pages/restaurants_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/ui/restaurant_modules_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/uniteve/bindings/uniteve_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/uniteve/ui/uniteve_contato_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/uniteve/ui/uniteve_historia_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/uniteve/ui/uniteve_page.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/choose_profile/bindings/choose_profile_bindings.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/choose_profile/ui/choose_profile_page.dart';
@@ -184,6 +186,16 @@ abstract class AppPages {
     GetPage(
       name: Routes.UNITEVE,
       page: () => UnitevePage(),
+      bindings: [UniteveBindings()],
+    ),
+    GetPage(
+      name: Routes.UNITEVE_HISTORIA,
+      page: () => UniteveHistoriaPage(),
+      bindings: [UniteveBindings()],
+    ),
+    GetPage(
+      name: Routes.UNITEVE_CONTATO,
+      page: () => UniteveContatoPage(),
       bindings: [UniteveBindings()],
     ),
   ];

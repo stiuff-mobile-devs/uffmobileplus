@@ -25,6 +25,33 @@ class UnitevePage extends GetView<UniteveController> {
         flexibleSpace: Container(
           decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
         ),
+        actions: <Widget>[
+          PopupMenuTheme(
+            data: PopupMenuThemeData(
+              color: Colors.black.withOpacity(0.25),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadiusGeometry.circular(12),
+              ),
+            ),
+            child: PopupMenuButton<String>(
+              icon: Icon(Icons.more_vert),
+              onSelected: (value) {
+                if (value == 'historia') controller.historia();
+                if (value == 'contato') controller.contato();
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'historia',
+                  child: Text('História', style: TextStyle(color: Colors.white),),
+                ),
+                PopupMenuItem(
+                  value: 'contato',
+                  child: Text('Contato', style: TextStyle(color: Colors.white),),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         // <- torna a tela rolável

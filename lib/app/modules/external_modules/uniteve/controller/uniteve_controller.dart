@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:googleapis/youtube/v3.dart' as youtube;
 import 'package:uffmobileplus/app/modules/external_modules/uniteve/data/services/youtube_services.dart';
+import 'package:uffmobileplus/app/routes/app_routes.dart';
 
 class Playlist {
     String? name;
@@ -57,4 +58,7 @@ class UniteveController extends GetxController {
             playlists.sort((a, b) => b.miliseconds.compareTo(a.miliseconds));
         }
     }
+
+    void historia() => Get.toNamed(Routes.UNITEVE_HISTORIA);
+    void contato() => Get.toNamed(Routes.UNITEVE_CONTATO);
 }
