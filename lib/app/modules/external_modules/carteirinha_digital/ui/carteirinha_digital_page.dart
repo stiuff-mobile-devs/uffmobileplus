@@ -13,24 +13,7 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
   const CarteirinhaDigitalPage({super.key});
   @override
   Widget build(BuildContext context) {
-    Get.appendTranslations({
-      'pt_BR' : {
-        'carteirinha_digital' : 'Carteirinha Digital',
-        'documento' : 'Documento',
-        'matricula' : 'Matrícula', 
-        'validade' : 'Validade',
-        'curso' : 'Curso',
-        'validador_instrucao' : 'Valide o código gerado utilizando o aplicativo' 
-      },
-      'en_US' : {
-        'carteirinha_digital' : 'Digital ID Card',
-        'documento' : 'Document',
-        'matricula' : 'ID',
-        'validade' : 'Expiration Date',
-        'curso' : 'Course',
-        'validador_instrucao' : 'Validate the generated code by using the application'
-      }
-    });
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,

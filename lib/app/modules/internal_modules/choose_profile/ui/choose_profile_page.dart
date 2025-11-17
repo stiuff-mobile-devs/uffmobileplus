@@ -16,12 +16,16 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
         centerTitle: true,
         elevation: 8,
         foregroundColor: Colors.white,
-        title: Text('Escolha seu Perfil'),
+        title: Text('escolha_perfil'.tr),
         actions: [
-          IconButton(onPressed: controller.goToCarteirinhaPage, icon: const Icon(Icons.qr_code_2), tooltip: 'Carteirinha Digital',),
+          IconButton(
+            onPressed: controller.goToCarteirinhaPage,
+            icon: const Icon(Icons.qr_code_2),
+            tooltip: 'carteirinha_digital'.tr,
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: 'Atualizar',
+            tooltip: 'atualizar'.tr,
             onPressed: () {
               controller.fetchData();
             },
@@ -63,8 +67,8 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
 
   AccordionSection gradAccordion() {
     return AccordionSection(
-      header: const Text(
-        "Graduação",
+      header: Text(
+        'graduacao'.tr,
         style: TextStyle(
           fontWeight: FontWeight.w700,
           fontSize: 22,
@@ -107,10 +111,10 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            "Status: ${controller.userUmm.grad!.matriculas![index].statusMatricula}",
+                            "${'status'.tr}: ${controller.userUmm.grad!.matriculas![index].statusMatricula}",
                           ),
                           Text(
-                            "Matrícula: ${controller.userUmm.grad!.matriculas![index].matricula}",
+                            "${'matrícula'.tr}: ${controller.userUmm.grad!.matriculas![index].matricula}",
                           ),
                         ],
                       ),
@@ -130,8 +134,8 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
 
   AccordionSection posAccordion() {
     return AccordionSection(
-      header: const Text(
-        "Pós-Graduação",
+      header: Text(
+        "pos_graduacao".tr,
         style: TextStyle(
           fontWeight: FontWeight.w700,
           fontSize: 22,
@@ -175,10 +179,10 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
                             "${controller.userUmm.pos!.alunos![index].descricao}",
                           ),
                           Text(
-                            "Status: ${controller.userUmm.pos!.alunos![index].situacao}",
+                            "${'status'.tr}: ${controller.userUmm.pos!.alunos![index].situacao}",
                           ),
                           Text(
-                            "Matricula: ${controller.userUmm.pos!.alunos![index].matricula}",
+                            "${'matricula'.tr}: ${controller.userUmm.pos!.alunos![index].matricula}",
                           ),
                         ],
                       ),
@@ -198,8 +202,8 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
 
   AccordionSection employeeSelection() {
     return AccordionSection(
-      header: const Text(
-        "Técnico Administrativo",
+      header: Text(
+        "tecnico_administrativo".tr,
         style: TextStyle(
           fontWeight: FontWeight.w700,
           fontSize: 22,
@@ -240,7 +244,7 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            "Matrícula: ${controller.activeBonds()[index].vinculacao!.matricula}",
+                            "${'matricula'.tr}: ${controller.activeBonds()[index].vinculacao!.matricula}",
                           ),
                         ],
                       ),
@@ -260,8 +264,8 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
 
   AccordionSection teacherAccordion() {
     return AccordionSection(
-      header: const Text(
-        "Docente",
+      header: Text(
+        'docente'.tr,
         style: TextStyle(
           fontWeight: FontWeight.w700,
           fontSize: 22,
@@ -302,7 +306,7 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            "Matrícula: ${controller.activeBonds()[index].vinculacao!.matricula}",
+                            "${'matricula'.tr}: ${controller.activeBonds()[index].vinculacao!.matricula}",
                           ),
                         ],
                       ),
@@ -322,8 +326,8 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
 
   AccordionSection outsourcedAccordion() {
     return AccordionSection(
-      header: const Text(
-        "Terceirizado",
+      header: Text(
+        'terceirizado'.tr,
         style: TextStyle(
           fontWeight: FontWeight.w700,
           fontSize: 22,

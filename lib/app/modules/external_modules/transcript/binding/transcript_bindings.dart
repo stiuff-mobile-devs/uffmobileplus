@@ -6,6 +6,20 @@ class TranscriptBindings implements Bindings {
   @override
   void dependencies() {
     Get.lazyPut<TranscriptController>(() => TranscriptController());
-    Get.put<ExternalTranscriptService>(ExternalTranscriptService(), permanent: true);
+    Get.put<ExternalTranscriptService>(
+      ExternalTranscriptService(),
+      permanent: true,
+    );
+
+    Get.appendTranslations({
+      'pt_BR' : {
+        'historico' : 'Histórico',
+        'semestre' : 'Semestre',
+        'disciplinas' : 'disciplinas',
+        'semestre_vazio' : 'Semestre vazio',
+        'codigo' : 'Código',
+        'nota' : 'Nota'
+      }
+    });
   }
 }

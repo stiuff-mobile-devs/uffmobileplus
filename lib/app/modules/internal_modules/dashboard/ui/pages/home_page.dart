@@ -6,20 +6,6 @@ import 'package:uffmobileplus/app/utils/color_pallete.dart';
 class HomePage extends GetView<HomePageController> {
   @override
   Widget build(BuildContext context) {
-    Get.appendTranslations({
-      'pt_BR': {
-        'boas-vindas': 'Bem-vindo ao novo',
-        'em_desenvolvimento': 'Aplicativo em desenvolvimento',
-        'trab_constante': 'Estamos trabalhando constantemente para oferecer a melhor experiência possível. Aguarde as próximas atualizações!',
-        'versao': 'Versão'
-      },
-      'en_US': {
-        'boas-vindas' : 'Welcome to the new',
-        'em_desenvolvimento': 'App under development',
-        'trab_constante': 'We are constantly working to deliver the best possible experience. Look forward to the next updates!',
-        'versao': 'Version'
-      }
-    });
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,

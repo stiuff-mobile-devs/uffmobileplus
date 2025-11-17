@@ -21,8 +21,6 @@ class Radio extends StatelessWidget {
           slivers: [
             SliverAppBar(
               foregroundColor: Colors.white,
-              // TODO: traduzir?
-              // TODO: essa string deveria vir de outro lugar?
               title: Text("Radio Pop Goiaba"),
               centerTitle: true,
               elevation: 8,

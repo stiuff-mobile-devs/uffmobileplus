@@ -9,17 +9,6 @@ class RestaurantModulesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Get.appendTranslations({
-      'pt_BR' : {
-        'title' : 'Restaurante Universitário',
-      },
-      'en_US' : {
-        'title' : 'University Cafeteria'
-      },
-      'it_IT' : {
-        'title' : 'Mensa Universitaria'
-      }
-    });
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(

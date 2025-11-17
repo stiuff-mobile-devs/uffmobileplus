@@ -7,5 +7,25 @@ class StudyPlanBindings implements Bindings {
   void dependencies() {
     Get.put<ExternalStudyPlanService>(ExternalStudyPlanService(), permanent: true);
     Get.put<StudyPlanController>(StudyPlanController());
+    Get.appendTranslations({
+      'pt_BR': {
+        'plano_estudos': 'Plano de Estudos',
+        'turma': 'Turma',
+        'codigo': 'Código',
+        'horario': 'Horário',
+        'as': 'às',
+        'status': 'Status',
+      },
+      'en_US': {
+        'turma': 'Class',
+        'codigo': 'Code',
+        'horario': 'Schedule',
+        'as': 'to',
+        'status': 'Status',
+      },
+      'it_IT': {
+        
+      },
+    });
   }
 }

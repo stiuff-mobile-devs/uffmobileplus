@@ -13,7 +13,7 @@ class TranscriptPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
-        title: const Text("Histórico"),
+        title: Text("historico".tr),
         centerTitle: true,
         elevation: 8,
         shape: const RoundedRectangleBorder(
@@ -89,12 +89,12 @@ class SemesterExpansionPanelList extends GetView<TranscriptController> {
           return ExpansionPanel(
             canTapOnHeader: true,
             headerBuilder: (_, _) => ListTile(
-              title: Text('Semestre ${_formatYearSemester(semester)}'),
-              subtitle: Text('${disciplines.length} disciplinas'),
+              title: Text("${'semestre'.tr} ${_formatYearSemester(semester)}"),
+              subtitle: Text('${disciplines.length} ${'disciplinas'.tr}'),
             ),
             body: Column(
               children: disciplines.isEmpty
-                  ? const [ListTile(title: Text('Semestre vazio'))]
+                  ? [ListTile(title: Text('semestre_vazio'.tr))]
                   : disciplines.map((d) {
                       return Column(
                         children: [
@@ -125,13 +125,13 @@ class TranscriptDisciplineCard extends StatelessWidget {
       dense: true,
       title: Text(discipline.nome ?? discipline.codigoDisciplina ?? '—'),
       subtitle: Text(
-        'Código: ${discipline.codigoDisciplina ?? '-'} • CH: ${discipline.cargahoraria ?? '-'}',
+        '${'codigo'.tr}: ${discipline.codigoDisciplina ?? '-'} • CH: ${discipline.cargahoraria ?? '-'}',
       ),
       trailing: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text('Nota: ${discipline.nota ?? '-'}'),
+          Text('${'nota'.tr}: ${discipline.nota ?? '-'}'),
           Text(
             discipline.statusHistorico ?? '',
             style: const TextStyle(fontSize: 12, color: Colors.grey),
