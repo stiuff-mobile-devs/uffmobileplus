@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/controller/catraca_online_controller.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.dart';
 
 class ValidarManualmentePage extends GetView<CatracaOnlineController> {
+  final TextEditingController cpfController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,44 +38,54 @@ class ValidarManualmentePage extends GetView<CatracaOnlineController> {
                   gradient: AppColors.darkBlueToBlackGradient(),
                 ),
                 child: Center(
-                  child: Container(
-                    margin: const EdgeInsets.all(24),
-                    padding: const EdgeInsets.all(32),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 8,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          Icons.construction,
-                          size: 64,
-                          color: Colors.orange,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Funcionalidade em Desenvolvimento',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey[800],
+                        TextFormField(
+                          controller: cpfController,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: 'CPF',
+                            hintText: '000.000.000-00',
+                            border: OutlineInputBorder(),
+                            filled: true,
+                            fillColor: Colors.white,
                           ),
-                          textAlign: TextAlign.center,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(11),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        ElevatedButton(
+                          onPressed: () async {
+                            final cpf = cpfController.text.trim();
+                            final isValid = await controller.cpfIsValid(cpf);
+                            if (isValid) {
+                              // Lógica para CPF válido
+                              await controller.saveCpfValidationTransaction(cpf);
+                            } else {
+                              // Lógica para CPF inválido
+                              Get.snackbar(
+                             'O CPF informado é inválido.',
+                             'Por favor, verifique e tente novamente.',
+                             backgroundColor: Colors.redAccent,
+                             colorText: Colors.white,
+                              snackPosition: SnackPosition.TOP,
+                            );
+                            }
+                            
+                          },
+                          child: const Text('Validar'),
                         ),
                       ],
                     ),
                   ),
                 ),
               ),
-      ),
+    ),
     );
   }
 }

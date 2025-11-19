@@ -83,14 +83,6 @@ class ExternalModulesController extends GetxController {
     ),
 
     ExternalModules(
-      iconSrc: 'assets/papers/icons/pesquisas.svg',
-      subtitle: 'periodicos'.tr,
-      page: Routes.PAPERS,
-      url: '', 
-      interrogation: false
-    ),
-
-    ExternalModules(
       iconSrc: 'assets/icons/uniteve.svg', 
       subtitle: 'Unitevê', // TODO: traduzir
       page: Routes.UNITEVE,

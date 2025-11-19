@@ -1,3 +1,4 @@
+import 'package:all_validations_br/all_validations_br.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/data/services/external_catraca_service.dart';
@@ -225,5 +226,38 @@ class CatracaOnlineController extends GetxController {
       AreaModel(id: 14, nome: 'R.U. Reitoria'),
       AreaModel(id: 17, nome: 'Coluni'),
     ];
+  }
+
+  Future<bool> cpfIsValid(String cpf) async {
+    return await Future.value(AllValidations.isCpf(cpf));
+  }
+
+  Future<void> saveCpfValidationTransaction(String cpf) async {
+    OperatorTransactionOffline operatorTransactionOffline =
+        OperatorTransactionOffline(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      idUffUser: cpf,
+      idUffOperator: iduff,
+      idCampus: selectedArea.value.id.toString(),
+      campus: selectedArea.value.nome,
+    );
+
+    await repository.saveOperatorTransactionsOffline(
+      operatorTransactionOffline,
+    );
+    await repository.saveOperatorTransactionToFirebase(
+      operatorTransactionOffline,
+    );
+      await repository.saveOperatorTransactionsOffline(
+              operatorTransactionOffline,
+            );
+            await repository.saveOperatorTransactionToFirebase(
+              operatorTransactionOffline,
+            );
+
+            transactionResultMessage = "Transação salva offline com sucesso!";
+            transactionUsername = cpf;
+            isTransactionValid = true;
+            isQrCodeValid = true;
   }
 }
