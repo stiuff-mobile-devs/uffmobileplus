@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/binding/carteirinha_digital_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/ui/carteirinha_digital_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/bindings/restaurante_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/papers/bindings/papers_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/papers/ui/papers_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/transcript/binding/transcript_bindings.dart';
@@ -95,6 +96,7 @@ abstract class AppPages {
     GetPage(
       name: Routes.RESTAURANT_MODULES,
       page: () => RestaurantModulesPage(),
+      bindings: [RestauranteBindings()]
     ),
 
     GetPage(

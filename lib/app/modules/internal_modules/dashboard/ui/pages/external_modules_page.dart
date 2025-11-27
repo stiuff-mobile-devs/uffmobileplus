@@ -10,17 +10,6 @@ class ExternalModulesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Get.appendTranslations({
-      'pt_BR' : {
-        'servicos' : 'Serviços',
-      },
-      'en_US' : {
-        'servicos' : 'Services',
-      },
-      'it_IT' : {
-        'servicos' : 'Servizi'
-      }
-    });
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(

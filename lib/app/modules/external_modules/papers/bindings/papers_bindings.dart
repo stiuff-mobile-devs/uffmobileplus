@@ -5,16 +5,5 @@ class PeriodicosBindings implements Bindings {
   @override
   void dependencies() {
     Get.lazyPut<PapersController>(() => PapersController());
-    
-    Get.appendTranslations({
-      'pt_BR' : {
-        'periodicos' : 'Periódicos',
-        'escolha' : 'Escolha uma das opções abaixo'
-      },
-      'en_US' : {
-        'periodicos' : 'Papers',
-        'escolha' : 'Choose one of the options below'
-      }
-    });
   }
 }

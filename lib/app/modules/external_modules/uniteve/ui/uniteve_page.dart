@@ -42,11 +42,11 @@ class UnitevePage extends GetView<UniteveController> {
               itemBuilder: (context) => [
                 PopupMenuItem(
                   value: 'historia',
-                  child: Text('História', style: TextStyle(color: Colors.white),),
+                  child: Text('historia'.tr, style: TextStyle(color: Colors.white),),
                 ),
                 PopupMenuItem(
                   value: 'contato',
-                  child: Text('Contato', style: TextStyle(color: Colors.white),),
+                  child: Text('contato'.tr, style: TextStyle(color: Colors.white),),
                 ),
               ],
             ),

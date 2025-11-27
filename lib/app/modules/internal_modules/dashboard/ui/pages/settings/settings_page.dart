@@ -9,31 +9,6 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Get.appendTranslations({
-      'pt_BR' : {
-        'configuracoes' : 'Configurações',
-        'sobre' : 'Sobre',
-        'sobre_descricao' : 'Detalhes do aplicativo',
-        'ling_descricao' : 'Alterar idioma do aplicativo',
-        'sair' : 'Sair',
-        'sair_descricao' : 'Entrar como outro usuário'
-      },
-      'en_US' : {
-        'configuracoes' : 'Settings',
-        'sobre' : 'About',
-        'sobre_descricao' : 'Application details',
-        'ling_descricao' : 'Change App language',
-        'sair' : 'Logout',
-        'sair_descricao' : 'Log in as a different user'
-      },
-      'it_IT' : {
-        'configuracoes' : 'Impostazioni',
-        'sobre' : 'Informazioni',
-        'sobre_descricao' : 'Dettagli dell\'app',
-        'ling_descricao' :  'Cambia la lingua dell\'app',
-        'sair' :  'Esci',
-      }
-    });
     return Scaffold(
       body: GetBuilder<SettingsController>(
         builder: (SettingsController controller) {

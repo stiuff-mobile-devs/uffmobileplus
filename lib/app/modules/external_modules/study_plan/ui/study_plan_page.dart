@@ -7,31 +7,11 @@ import '../../../../utils/color_pallete.dart';
 import '../../../../utils/ui_components/custom_progress_display.dart';
 import '../controller/study_plan_controller.dart';
 
-class StudyPlanPage extends StatelessWidget {
+class StudyPlanPage extends GetView<StudyPlanController> {
   const StudyPlanPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    Get.appendTranslations({
-      'pt_BR': {
-        'plano_estudos': 'Plano de Estudos',
-        'turma': 'Turma',
-        'codigo': 'Código',
-        'horario': 'Horário',
-        'as': 'às',
-        'status': 'Status',
-      },
-      'en_US': {
-        'turma': 'Class',
-        'codigo': 'Code',
-        'horario': 'Schedule',
-        'as': 'to',
-        'status': 'Status',
-      },
-      'it_IT': {
-        
-      },
-    });
     return GetBuilder<StudyPlanController>(
       init: StudyPlanController(),
       builder: (controller) => Scaffold(
