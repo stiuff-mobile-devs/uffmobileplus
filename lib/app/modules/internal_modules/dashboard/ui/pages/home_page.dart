@@ -50,13 +50,13 @@ class HomePage extends GetView<HomePageController> {
                 ),
                 child: Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(24.0),
+                    padding: EdgeInsets.all((MediaQuery.sizeOf(context).width)*0.05),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         // Ícone de boas-vindas
                         Container(
-                          padding: const EdgeInsets.all(20),
+                          padding: EdgeInsets.all((MediaQuery.sizeOf(context).width)*0.05),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: Colors.white.withOpacity(0.1),

@@ -77,6 +77,7 @@ class RestaurantModulesPage extends StatelessWidget {
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 3,
+                              childAspectRatio: 0.9,
                             ),
                       ),
                     ),
