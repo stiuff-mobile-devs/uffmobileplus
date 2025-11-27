@@ -184,7 +184,7 @@ class ExternalModulesPage extends StatelessWidget {
 
         // Layout do serviço: ícone + texto
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             // Container para efeito
             iconVisualEffect(
