@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:uffmobileplus/app/data/services/hive_service.dart';
 import 'package:uffmobileplus/app/routes/app_pages.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
-import 'package:uffmobileplus/app/utils/translations.dart';
+import 'package:uffmobileplus/app/utils/translations/app_translations.dart';
 import 'package:uffmobileplus/firebase_options_catracaoffline.dart';
 import 'package:uffmobileplus/firebase_options_cardapio_ru.dart';
 import 'package:uffmobileplus/firebase_options_uffmobileplus.dart';
@@ -35,7 +35,7 @@ Future<void> main() async {
       title: "UFF Mobile Plus",
       initialRoute: Routes.SPLASH,
       defaultTransition: Transition.fade,
-      translations: International(),
+      translations: AppTranslation(),
       locale: Get.deviceLocale,
       fallbackLocale: Locale('pt', 'BR'),
       getPages: AppPages.pages,

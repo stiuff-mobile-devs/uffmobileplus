@@ -50,7 +50,7 @@ class LoginPage extends GetView<LoginController> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Tooltip(
-                        message: "QR Code Carteirinha",
+                        message: "qr_code_carteirinha".tr,
                         child: InkWell(
                           onTap: controller.goToCarteirinhaPage,
                           borderRadius: BorderRadius.circular(8),
@@ -106,7 +106,7 @@ class LoginPage extends GetView<LoginController> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Text(
-                                          'escolha_entrada'.tr,
+                                          'escolha_método_login'.tr,
                                           style: TextStyle(
                                             fontFamily: 'Passion One',
                                             fontSize: 24,

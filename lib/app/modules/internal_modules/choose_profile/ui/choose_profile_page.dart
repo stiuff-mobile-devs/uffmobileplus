@@ -114,7 +114,7 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
                             "${'status'.tr}: ${controller.userUmm.grad!.matriculas![index].statusMatricula}",
                           ),
                           Text(
-                            "${'matrícula'.tr}: ${controller.userUmm.grad!.matriculas![index].matricula}",
+                            "${'matricula'.tr}: ${controller.userUmm.grad!.matriculas![index].matricula}",
                           ),
                         ],
                       ),
