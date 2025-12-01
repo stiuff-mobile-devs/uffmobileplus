@@ -17,7 +17,6 @@ class CatracaOnlineController extends GetxController {
   RxBool isAreaBusy = false.obs;
   RxBool isTransactionBusy = false.obs;
   RxBool isReadQRCodeBusy = false.obs;
-  RxBool isNotFirstLoad = false.obs;
   RxBool isDetailResultBusy = false.obs;
   RxBool isManualValidationBusy = false.obs;
   RxBool isOfflineMode = false.obs;
@@ -61,8 +60,6 @@ class CatracaOnlineController extends GetxController {
     isAreaBusy.value = true;
     token = await service.getAccessToken();
     try {
-      //Forçar error
-      throw Exception("Forçando modo offline para testes");
       areas.value = await repository.getAreas(iduff, token);
       isOfflineMode.value = false;
       statusMessage.value = "Catraca Online";
@@ -77,23 +74,25 @@ class CatracaOnlineController extends GetxController {
   Future<void> fetchOperatorTransactions() async {
     isTransactionBusy.value = true;
     token = await service.getAccessToken();
-    try {
-      //Forçar error
-      throw Exception("Forçando modo offline para testes");
-      operatorTransactions.value = await repository.getOperatorTransactions(
-        iduff,
-        token!,
-        selectedArea.value.id.toString(),
-      );
-      isOfflineMode.value = false;
-      statusMessage.value = "Catraca Online";
-    } catch (e) {
-      operatorTransactionsOffline.value = await repository
-          .getOperatorTransactionsOffline();
-      isOfflineMode.value = true;
-      statusMessage.value = "Catraca Offline";
-    }
 
+    if (isOfflineMode.value) {
+      try {
+        operatorTransactionsOffline.value = await repository
+            .getOperatorTransactionsOffline();
+      } catch (e) {
+        debugPrint('Erro ao buscar transações offline: $e');
+      }
+    } else {
+      try {
+        operatorTransactions.value = await repository.getOperatorTransactions(
+          iduff,
+          token!,
+          selectedArea.value.id.toString(),
+        );
+      } catch (e) {
+        debugPrint('Erro ao buscar transações online: $e');
+      }
+    }
     isTransactionBusy.value = false;
   }
 
@@ -103,33 +102,67 @@ class CatracaOnlineController extends GetxController {
     Get.toNamed(Routes.VALIDAR_PAGAMENTO);
   }
 
-  void readCode() {
+  void readCode() async {
+    await loadingQrCodeData();
+    isTransactionBusy.value = false;
     Get.toNamed(Routes.RESULTADO_PAGE);
   }
 
-  void loadingQrCodeData() async {
+  Future<String> loadingQrCodeData() async {
     isReadQRCodeBusy.value = true;
-    isNotFirstLoad.value = true;
-    isOfflineMode.value = true; //TODO: So para testar o modo offline
+    try {
+      isTransactionBusy.value = true;
+      String? qrCodeScanRes = await _scanQRCode();
 
-    if (isOfflineMode.value) {
-      statusMessage.value = "Catraca Offline";
+      if (qrCodeScanRes == null || qrCodeScanRes == "-1") {
+        isReadQRCodeBusy.value = false;
+        Get.back();
+        return '';
+      }
 
-      try {
-        String? qrCodeScanRes = await _scanQRCode();
+      RegExp expCarteirinhaDital = RegExp(r"iduff=([0-9]+)");
+      RegExpMatch? matchCarteirinhaDigital = expCarteirinhaDital.firstMatch(
+        qrCodeScanRes,
+      );
 
-        if (qrCodeScanRes == null || qrCodeScanRes == "-1") {
-          isReadQRCodeBusy.value = false;
-          Get.back();
-          return;
+      RegExp expCarteirinhaPagamento = RegExp(
+        "^ididentificacao_iduff=([0-9]|[A-z])*&hash=([0-9]|[a-z]){40}\$",
+      );
+      String? matchCarteirinhaPagamento = expCarteirinhaPagamento.stringMatch(
+        qrCodeScanRes,
+      );
+
+      if (matchCarteirinhaPagamento == qrCodeScanRes) {
+        try {
+          statusMessage.value = "Catraca Online";
+          isOfflineMode.value = false;
+          token = await service.getAccessToken();
+          Map responseMessage = await repository.validatePayment(
+            qrCodeScanRes,
+            iduff,
+            token!,
+            selectedArea.value.id.toString(),
+          );
+          transactionResultMessage = responseMessage["message"];
+          isTransactionValid = responseMessage["valid"];
+
+          if (responseMessage["name"] != null) {
+            transactionUsername = responseMessage["name"];
+          } else {
+            transactionUsername = "";
+          }
+          isQrCodeValid = true;
+        } catch (e) {
+          debugPrint('Erro ao validar pagamento online: $e');
+          isTransactionValid = false;
+          isQrCodeValid = false;
+          statusMessage.value = "Catraca Offline";
+          isOfflineMode.value = true;
         }
-
-        RegExp exp2 = RegExp(r"iduff=([0-9]+)");
-
-        RegExpMatch? regMatch2 = exp2.firstMatch(qrCodeScanRes);
-
-        if (regMatch2 != null) {
-          String fullMatch = qrCodeScanRes;
+      } else if (matchCarteirinhaDigital != null) {
+        try {
+          statusMessage.value = "Catraca Offline";
+          isOfflineMode.value = true;
           RegExp expIdUff = RegExp(r"iduff=([0-9]+)");
           Iterable<RegExpMatch> matches = expIdUff.allMatches(qrCodeScanRes);
           String idUffValue = matches.isNotEmpty
@@ -160,48 +193,20 @@ class CatracaOnlineController extends GetxController {
             isTransactionValid = false;
             isQrCodeValid = false;
           }
+        } catch (e) {
+          debugPrint('Erro ao validar pagamento offline: $e');
+          isTransactionValid = false;
+          isQrCodeValid = false;
         }
-      } catch (e) {
-        debugPrint('Erro ao ler código QR offline: $e');
+      } else {
+        isTransactionValid = false;
+        isQrCodeValid = true;
       }
-      isReadQRCodeBusy.value = false;
-    } else {
-      statusMessage.value = "Catraca Online";
-      try {
-        String? qrCodeScanRes = await _scanQRCode();
-
-        if (qrCodeScanRes == null || qrCodeScanRes == "-1") {
-          Get.back();
-        } else {
-          RegExp exp = RegExp(
-            "^ididentificacao_iduff=([0-9]|[A-z])*&hash=([0-9]|[a-z]){40}\$",
-          );
-
-          String? match = exp.stringMatch(qrCodeScanRes);
-
-          if (match == qrCodeScanRes) {
-            Map responseMessage = await repository.validatePayment(
-              qrCodeScanRes,
-              iduff,
-              token!,
-              selectedArea.value.id.toString(),
-            );
-            transactionResultMessage = responseMessage["message"];
-            isTransactionValid = responseMessage["valid"];
-
-            if (responseMessage["name"] != null) {
-              transactionUsername = responseMessage["name"];
-            } else {
-              transactionUsername = "";
-            }
-            isQrCodeValid = true;
-          } else {
-            isQrCodeValid = false;
-          }
-        }
-      } catch (e) {}
+    } catch (e) {
+      debugPrint('Erro ao ler código QR offline: $e');
     }
     isReadQRCodeBusy.value = false;
+    return '';
   }
 
   Future<String?> _scanQRCode() async {
@@ -235,12 +240,12 @@ class CatracaOnlineController extends GetxController {
   Future<void> saveCpfValidationTransaction(String cpf) async {
     OperatorTransactionOffline operatorTransactionOffline =
         OperatorTransactionOffline(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      idUffUser: cpf,
-      idUffOperator: iduff,
-      idCampus: selectedArea.value.id.toString(),
-      campus: selectedArea.value.nome,
-    );
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          idUffUser: cpf,
+          idUffOperator: iduff,
+          idCampus: selectedArea.value.id.toString(),
+          campus: selectedArea.value.nome,
+        );
 
     await repository.saveOperatorTransactionsOffline(
       operatorTransactionOffline,
@@ -248,16 +253,20 @@ class CatracaOnlineController extends GetxController {
     await repository.saveOperatorTransactionToFirebase(
       operatorTransactionOffline,
     );
-      await repository.saveOperatorTransactionsOffline(
-              operatorTransactionOffline,
-            );
-            await repository.saveOperatorTransactionToFirebase(
-              operatorTransactionOffline,
-            );
 
-            transactionResultMessage = "Transação salva offline com sucesso!";
-            transactionUsername = cpf;
-            isTransactionValid = true;
-            isQrCodeValid = true;
+    transactionResultMessage = "Transação salva offline com sucesso!";
+    transactionUsername = cpf;
+    isTransactionValid = true;
+    isQrCodeValid = true;
+  }
+
+  void manualValidation() {
+    isOfflineMode.value = true;
+    statusMessage.value = "Catraca Offline";
+    Get.toNamed(Routes.VALIDAR_MANUALMENTE);
+  }
+
+  void getResultPage() {
+    Get.toNamed(Routes.RESULTADO_PAGE);
   }
 }

@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/controller/catraca_online_controller.dart';
+import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.dart';
 
 class ValidarManualmentePage extends GetView<CatracaOnlineController> {
   final TextEditingController cpfController = TextEditingController();
+
+  ValidarManualmentePage({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,13 +18,6 @@ class ValidarManualmentePage extends GetView<CatracaOnlineController> {
         elevation: 8,
         foregroundColor: Colors.white,
         title: Obx(() => Text(controller.statusMessage.value)),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Atualizar',
-            onPressed: () {},
-          ),
-        ],
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
         ),
@@ -65,18 +61,43 @@ class ValidarManualmentePage extends GetView<CatracaOnlineController> {
                             final isValid = await controller.cpfIsValid(cpf);
                             if (isValid) {
                               // Lógica para CPF válido
-                              await controller.saveCpfValidationTransaction(cpf);
+                              await controller.saveCpfValidationTransaction(
+                                cpf,
+                              );
+                              controller.getResultPage();
                             } else {
                               // Lógica para CPF inválido
-                              Get.snackbar(
-                             'O CPF informado é inválido.',
-                             'Por favor, verifique e tente novamente.',
-                             backgroundColor: Colors.redAccent,
-                             colorText: Colors.white,
-                              snackPosition: SnackPosition.TOP,
-                            );
+                              final messengerContext = Get.context ?? context;
+                              final snack = SnackBar(
+                                content: const Text(
+                                  'O CPF informado é inválido. Por favor, verifique e tente novamente.',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                backgroundColor: Colors.redAccent,
+                                behavior: SnackBarBehavior.floating,
+                              );
+
+                              try {
+                                ScaffoldMessenger.of(
+                                  messengerContext,
+                                ).showSnackBar(snack);
+                              } catch (_) {
+                                // Fallback: schedule for next frame and try with Get.snackbar
+                                WidgetsBinding.instance.addPostFrameCallback((
+                                  _,
+                                ) {
+                                  if (Get.overlayContext != null) {
+                                    Get.snackbar(
+                                      'O CPF informado é inválido.',
+                                      'Por favor, verifique e tente novamente.',
+                                      backgroundColor: Colors.redAccent,
+                                      colorText: Colors.white,
+                                      snackPosition: SnackPosition.TOP,
+                                    );
+                                  }
+                                });
+                              }
                             }
-                            
                           },
                           child: const Text('Validar'),
                         ),
@@ -85,7 +106,7 @@ class ValidarManualmentePage extends GetView<CatracaOnlineController> {
                   ),
                 ),
               ),
-    ),
+      ),
     );
   }
 }

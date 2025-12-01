@@ -238,7 +238,7 @@ class CatracaOnlineProvider {
       await docRef.set(data, SetOptions(merge: true));
       return "success";
     } catch (e) {
-      return "Erro ao salvar no Firebase: $e";
+      throw Exception("Erro ao salvar no Firebase: $e");
     }
   }
 }

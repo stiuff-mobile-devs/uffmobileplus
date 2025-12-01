@@ -63,11 +63,11 @@ class TransactionList extends StatelessWidget {
                           ),
                         ),
 
-                        Icon(
+                        /*Icon(
                           Icons.keyboard_arrow_right,
                           color: Colors.white,
                           size: 20.0,
-                        ),
+                        ),*/
                       ],
                     ),
                   ),

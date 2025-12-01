@@ -125,7 +125,7 @@ class ValidarPagamentoPage extends GetView<CatracaOnlineController> {
                           children: [
                             GestureDetector(
                               onTap: () {
-                                Get.toNamed(Routes.VALIDAR_MANUALMENTE);
+                                controller.manualValidation();
                               },
                               child: Text(
                                 "Liberar Manualmente ",
