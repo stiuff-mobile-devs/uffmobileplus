@@ -23,7 +23,7 @@ class LockDevelopModePage extends StatelessWidget {
                 Routes.WEB_VIEW,
                 arguments: {
                   'url': Secrets.helpUrl,
-                  'title': 'Modo Desenvolvedor',
+                  'title': 'modo_desenvolvedor'.tr,
                 },
               );
             },
@@ -53,10 +53,10 @@ class LockDevelopModePage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20),
                   child: Text(
-                    "DESATIVE O MODO DESENVOLVEDOR PARA ABRIR O APLICATIVO!",
+                    'desativar_modo_desenvolvedor'.tr,
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -91,23 +91,22 @@ class LockDevelopModePage extends StatelessWidget {
                             break;
                           default:
                             Get.snackbar(
-                              'Erro',
-                              'Plataforma não suportada',
+                              'erro'.tr,
+                              'plataforma_nao_suportada'.tr,
                               backgroundColor: Colors.red,
                               colorText: Colors.white,
                             );
                         }
                       } catch (e) {
                         Get.snackbar(
-                          'Erro',
-                          'Não foi possível abrir as configurações',
+                          'erro'.tr,
+                          'nao_foi_possivel_abrir_as_configuracoes'.tr,
                           backgroundColor: Colors.red,
                           colorText: Colors.white,
                         );
                       }
                     }
                   },
-                  child: const Text('Configurações'),
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.black,
@@ -120,6 +119,7 @@ class LockDevelopModePage extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  child: Text('configuracoes'.tr),
                 ),
               ],
             ),

@@ -5,7 +5,7 @@ import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/c
 class CarteirinhaDigitalBindings implements Bindings {
 @override
 void dependencies() {
-  Get.lazyPut<ExternalCarteirinhaService>(() => ExternalCarteirinhaService());
-  Get.lazyPut<CarteirinhaDigitalController>(() => CarteirinhaDigitalController());
+    Get.lazyPut<ExternalCarteirinhaService>(() => ExternalCarteirinhaService());  
+    Get.lazyPut<CarteirinhaDigitalController>(() => CarteirinhaDigitalController());  
   }
 }

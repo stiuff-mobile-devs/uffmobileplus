@@ -50,12 +50,12 @@ class LoginPage extends GetView<LoginController> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Tooltip(
-                        message: "QR Code Carteirinha",
+                        message: "qr_code_carteirinha".tr,
                         child: InkWell(
                           onTap: controller.goToCarteirinhaPage,
                           borderRadius: BorderRadius.circular(8),
                           child: Row(
-                            children: const [
+                            children: [
                               Icon(
                                 Icons.qr_code_2,
                                 color: Colors.white,
@@ -63,7 +63,7 @@ class LoginPage extends GetView<LoginController> {
                               ),
                               SizedBox(width: 8),
                               Text(
-                                'Carteirinha digital',
+                                'carteirinha_digital'.tr,
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
@@ -88,7 +88,7 @@ class LoginPage extends GetView<LoginController> {
                         children: [
                           // Botão único "Entrar"
                           _LoginButton(
-                            text: 'Entrar',
+                            text: 'entrar'.tr,
                             icon: Icons.login,
                             onTap: () {
                               showModalBottomSheet(
@@ -105,8 +105,8 @@ class LoginPage extends GetView<LoginController> {
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        const Text(
-                                          'Escolha uma forma de entrada',
+                                        Text(
+                                          'escolha_método_login'.tr,
                                           style: TextStyle(
                                             fontFamily: 'Passion One',
                                             fontSize: 24,
@@ -138,7 +138,7 @@ class LoginPage extends GetView<LoginController> {
                                                 onTap: controller.loginGoogle,
                                               ),
                                               _LoginOptionSquare(
-                                                text: 'Sem Login',
+                                                text: 'sem_login'.tr,
                                                 color: Colors.green,
                                                 image:
                                                     'assets/icons/no-login-icon.svg',

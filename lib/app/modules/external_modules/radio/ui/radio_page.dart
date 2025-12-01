@@ -21,9 +21,7 @@ class Radio extends GetView<RadioController> {
           slivers: [
             SliverAppBar(
               foregroundColor: Colors.white,
-              // TODO: traduzir?
-              // TODO: essa string deveria vir de outro lugar?
-              title: Text("Radio Pop Goiaba"),
+              title: Text('radio_name'.tr),
               centerTitle: true,
               elevation: 8,
               shape: const RoundedRectangleBorder(
@@ -145,7 +143,7 @@ class About extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text(
-                'Sobre',
+                'sobre'.tr,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24.0,
@@ -155,7 +153,7 @@ class About extends StatelessWidget {
             ],
           ),
           Text(
-            'A Rádio Pop Goiaba/UFF, é um projeto de extensão da Universidade Fluminense, vinculada ao NUFEP - Núcleo Fluminense de Estudos e Pesquisas da UFF que é coordenado pelo professor Roberto Kant de Lima.',
+            'radio_description'.tr,
             style: TextStyle(
               color: Colors.white,
               fontSize: 16.0,

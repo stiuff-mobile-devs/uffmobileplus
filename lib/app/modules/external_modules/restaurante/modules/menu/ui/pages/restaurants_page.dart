@@ -194,8 +194,8 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     onPressed: null, // Botão agora não faz nada
-                    child: const Text(
-                      'Ver Refeições',
+                    child: Text(
+                      'ver_refeicoes'.tr,
                       style: TextStyle(
                         color: Colors.white,
                         fontFamily: 'Jockey One',
@@ -401,7 +401,7 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
             centerTitle: true,
             elevation: 8,
             foregroundColor: Colors.white,
-            title: const Text("Restaurantes"),
+            title: Text('restaurantes'.tr),
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
             ),
