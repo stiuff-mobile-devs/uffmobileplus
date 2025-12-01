@@ -269,4 +269,12 @@ class CatracaOnlineController extends GetxController {
   void getResultPage() {
     Get.toNamed(Routes.RESULTADO_PAGE);
   }
+
+  void toggleMode() {
+    isOfflineMode.value = !isOfflineMode.value;
+    statusMessage.value = isOfflineMode.value
+        ? "Catraca Offline"
+        : "Catraca Online";
+    fetchOperatorTransactions();
+  }
 }
