@@ -36,13 +36,17 @@ class HomePage extends GetView<HomePageController> {
                 ),
                 child: Center(
                   child: Padding(
-                    padding: EdgeInsets.all((MediaQuery.sizeOf(context).width)*0.05),
+                    padding: EdgeInsets.all(
+                      (MediaQuery.sizeOf(context).width) * 0.05,
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         // Ícone de boas-vindas
                         Container(
-                          padding: EdgeInsets.all((MediaQuery.sizeOf(context).width)*0.05),
+                          padding: EdgeInsets.all(
+                            (MediaQuery.sizeOf(context).width) * 0.05,
+                          ),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: Colors.white.withOpacity(0.1),
@@ -143,7 +147,7 @@ class HomePage extends GetView<HomePageController> {
 
                         // Versão
                         Text(
-                          'versao'.tr + ' 6.4.0',
+                          'versao'.tr + ' 6.6.1',
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.5),
                             fontSize: 12,
