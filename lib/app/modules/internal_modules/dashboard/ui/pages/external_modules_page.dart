@@ -67,6 +67,7 @@ class ExternalModulesPage extends StatelessWidget {
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 3,
+                              childAspectRatio: 0.79,
                             ),
                       ),
                     ),
@@ -172,7 +173,7 @@ class ExternalModulesPage extends StatelessWidget {
 
         // Layout do serviço: ícone + texto
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             // Container para efeito
             iconVisualEffect(
@@ -183,7 +184,7 @@ class ExternalModulesPage extends StatelessWidget {
                 color: Colors.white,
               ),
             ),
-            const SizedBox(height: 10), // Espaçamento
+            SizedBox(height: 10), // Espaçamento
             // Título/subtítulo do serviço
             Align(
               alignment: Alignment.center,
