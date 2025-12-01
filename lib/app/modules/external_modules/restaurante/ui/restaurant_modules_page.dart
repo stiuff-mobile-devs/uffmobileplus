@@ -9,17 +9,6 @@ class RestaurantModulesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Get.appendTranslations({
-      'pt_BR' : {
-        'title' : 'Restaurante Universitário',
-      },
-      'en_US' : {
-        'title' : 'University Cafeteria'
-      },
-      'it_IT' : {
-        'title' : 'Mensa Universitaria'
-      }
-    });
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -35,7 +24,7 @@ class RestaurantModulesPage extends StatelessWidget {
                     // AppBar que se comporta como uma sliver (pode ser expandida/colapsada)
                     SliverAppBar(
                       foregroundColor: Colors.white,
-                      title: Text('title'.tr),
+                      title: Text('restaurante_universitario'.tr),
                       centerTitle: true,
                       elevation: 8, // Sombra da AppBar
 
@@ -77,6 +66,7 @@ class RestaurantModulesPage extends StatelessWidget {
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 3,
+                              childAspectRatio: 0.9,
                             ),
                       ),
                     ),

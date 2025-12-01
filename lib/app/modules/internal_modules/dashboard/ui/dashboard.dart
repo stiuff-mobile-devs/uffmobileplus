@@ -12,23 +12,6 @@ class Dashboard extends GetView<DashboardController> {
 
   @override
   Widget build(BuildContext context) {
-    Get.appendTranslations({
-      'pt_BR' : {
-        'atalhos' : 'Atalhos',
-        'servicos' : 'Serviços',
-        'configuracoes' : 'Configurações'
-      },
-      'en_US' : {
-        'atalhos' : 'Shortcuts',
-        'servicos' : 'Services',
-        'configuracoes' : 'Settings' 
-      },
-      'it_IT' : {
-        'atalhos' : 'Scorciatoie',
-        'servicoes' : 'Servizi',
-        'configuracoes' : 'Impostazioni'
-      }
-    });
     return Scaffold(
       body: PersistentTabView(
         context,

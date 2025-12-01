@@ -7,5 +7,13 @@ class LoginBindings extends Bindings {
   void dependencies() {
     Get.put<AuthIduffService>(AuthIduffService(), permanent: true);
     Get.lazyPut<LoginController>(() => LoginController());
+    Get.appendTranslations({
+      'pt_BR' : {
+        'carteirinha_digital' : 'Carteirinha Digital',
+        'entrar' : 'Entrar',
+        'escolha_entrada' : 'Escolha uma forma parar entrar',
+        'sem_login' : 'Sem Login'
+      }
+    });
   }
 }

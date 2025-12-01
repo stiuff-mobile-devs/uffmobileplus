@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:uffmobileplus/app/data/services/hive_service.dart';
 import 'package:uffmobileplus/app/routes/app_pages.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
-import 'package:uffmobileplus/app/utils/translations.dart';
+import 'package:uffmobileplus/app/utils/translations/app_translations.dart';
 import 'package:uffmobileplus/firebase_options_catracaoffline.dart';
 import 'package:uffmobileplus/firebase_options_cardapio_ru.dart';
 import 'package:uffmobileplus/firebase_options_uffmobileplus.dart';
@@ -35,7 +35,7 @@ Future<void> main() async {
       title: "UFF Mobile Plus",
       initialRoute: Routes.SPLASH,
       defaultTransition: Transition.fade,
-      translations: International(),
+      translations: AppTranslation(),
       locale: Get.deviceLocale,
       fallbackLocale: Locale('pt', 'BR'),
       getPages: AppPages.pages,
@@ -43,14 +43,3 @@ Future<void> main() async {
   );
 }
 
-/*git branch
-   85  git branch -a
-   86  git switch testing 
-   87  git branch
-   88  git pull
-   89  git switch -C feat/icones-radio-pop
-   90  git branch
-   91  git status
-   92  git push
-   93  git push --set-upstream origin feat/icones-radio-pop
-*/

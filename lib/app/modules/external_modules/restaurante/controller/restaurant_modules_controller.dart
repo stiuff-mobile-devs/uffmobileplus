@@ -1,25 +1,13 @@
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 
-// TODO: refletir se as responsabilidades desse controller estão adequadas.
 class RestaurantModulesController extends GetxController {
   RestaurantModulesController();
-
-  @override
-  void onInit() {
-    // TODO: talvez seja melhor refatorar de modo que essa chamada fique fora do controller.
-    Get.appendTranslations({
-      'pt_BR': {'catraca_online': 'Catraca'},
-      'en_US': {'catraca_online': 'Turnstile'},
-      'it_IT': {'catraca_online': 'Tornello'},
-    });
-    super.onInit();
-  }
 
   List<RestaurantModules> restaurantModulesList = [
     RestaurantModules(
       iconSrc: 'assets/icons/cardapio.svg',
-      subtitle: "Menu",
+      subtitle: 'menu'.tr,
       page: Routes.BANDEJAPP,
       url: '',
       interrogation: false,

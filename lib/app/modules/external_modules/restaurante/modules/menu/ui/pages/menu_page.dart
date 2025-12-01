@@ -205,7 +205,7 @@ class _MenuPageState extends State<MenuPage> with TickerProviderStateMixin {
                                               children: [
                                                 Flexible(
                                                   child: Text(
-                                                    "Horário de Almoço:\n${Campus.getSchedule(Campus.getSigla(location.name))[0].substring(11, 16)} às ${Campus.getSchedule(Campus.getSigla(location.name))[1].substring(11, 16)}",
+                                                    '${'horario_do_almoço'.tr}:\n${Campus.getSchedule(Campus.getSigla(location.name))[0].substring(11, 16)}' ' ${'as'.tr} ' '${Campus.getSchedule(Campus.getSigla(location.name))[1].substring(11, 16)}',
                                                     style: const TextStyle(
                                                       color: Colors.white,
                                                       fontFamily: "Jost",
@@ -221,7 +221,7 @@ class _MenuPageState extends State<MenuPage> with TickerProviderStateMixin {
                                                         'pv')
                                                   Flexible(
                                                     child: Text(
-                                                      "Horário de Jantar:\n${Campus.getSchedule(Campus.getSigla(location.name))[2].substring(11, 16)} às ${Campus.getSchedule(Campus.getSigla(location.name))[3].substring(11, 16)}",
+                                                      '${'horario_do_jantar'.tr}:\n${Campus.getSchedule(Campus.getSigla(location.name))[2].substring(11, 16)} ${'as'.tr} ${Campus.getSchedule(Campus.getSigla(location.name))[3].substring(11, 16)}',
                                                       style: const TextStyle(
                                                         color: Colors.white,
                                                         fontFamily: "Jost",
@@ -249,7 +249,7 @@ class _MenuPageState extends State<MenuPage> with TickerProviderStateMixin {
                                         color: Colors.black.withOpacity(0.6),
                                         borderRadius: BorderRadius.circular(5),
                                       ),
-                                      child: const Padding(
+                                      child: Padding(
                                         padding: EdgeInsets.only(
                                             bottom: 2.0,
                                             top: 2.0,
@@ -261,7 +261,7 @@ class _MenuPageState extends State<MenuPage> with TickerProviderStateMixin {
                                                 CrossAxisAlignment.center,
                                             children: [
                                               Text(
-                                                'Ver Horários',
+                                                'ver_horarios'.tr,
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                   fontFamily: "Jost",
@@ -355,8 +355,8 @@ class _MenuPageState extends State<MenuPage> with TickerProviderStateMixin {
                                 child: Text(
                                   (Campus.isActive(
                                           Campus.getSigla(location.name))
-                                      ? 'Aberto'
-                                      : 'Fechado'),
+                                      ? 'aberto'.tr
+                                      : 'fechado'.tr),
                                   style: TextStyle(
                                     color: (Campus.isActive(
                                             Campus.getSigla(location.name)))
@@ -538,7 +538,7 @@ class _MenuPageState extends State<MenuPage> with TickerProviderStateMixin {
             centerTitle: true,
             elevation: 8,
             foregroundColor: Colors.white,
-            title: const Text("Refeições"),
+            title: Text('refeicoes'.tr),
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
             ),

@@ -230,7 +230,7 @@ class _DetailsPageState extends State<DetailsPage> {
             centerTitle: true,
             elevation: 8,
             foregroundColor: Colors.white,
-            title: const Text("Detalhes da Refeição"),
+            title: Text("detalhes_refeicao".tr),
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
             ),

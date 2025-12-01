@@ -6,20 +6,6 @@ import 'package:uffmobileplus/app/utils/color_pallete.dart';
 class HomePage extends GetView<HomePageController> {
   @override
   Widget build(BuildContext context) {
-    Get.appendTranslations({
-      'pt_BR': {
-        'boas-vindas': 'Bem-vindo ao novo',
-        'em_desenvolvimento': 'Aplicativo em desenvolvimento',
-        'trab_constante': 'Estamos trabalhando constantemente para oferecer a melhor experiência possível. Aguarde as próximas atualizações!',
-        'versao': 'Versão'
-      },
-      'en_US': {
-        'boas-vindas' : 'Welcome to the new',
-        'em_desenvolvimento': 'App under development',
-        'trab_constante': 'We are constantly working to deliver the best possible experience. Look forward to the next updates!',
-        'versao': 'Version'
-      }
-    });
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -29,7 +15,7 @@ class HomePage extends GetView<HomePageController> {
         actions: [
           IconButton(
             icon: const Icon(Icons.question_mark),
-            tooltip: 'Ajuda',
+            tooltip: 'ajuda'.tr,
             onPressed: () {},
           ),
         ],
@@ -50,13 +36,13 @@ class HomePage extends GetView<HomePageController> {
                 ),
                 child: Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(24.0),
+                    padding: EdgeInsets.all((MediaQuery.sizeOf(context).width)*0.05),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         // Ícone de boas-vindas
                         Container(
-                          padding: const EdgeInsets.all(20),
+                          padding: EdgeInsets.all((MediaQuery.sizeOf(context).width)*0.05),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: Colors.white.withOpacity(0.1),

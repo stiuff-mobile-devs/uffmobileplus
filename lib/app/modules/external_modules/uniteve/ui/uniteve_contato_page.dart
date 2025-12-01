@@ -40,7 +40,7 @@ class UniteveContatoPage extends GetView<UniteveController> {
                   color: Colors.white,
                 ),
                 title: Text(
-                        'Telefone',
+                        'telefone'.tr,
                         style: TextStyle(
                           fontSize: 24.0,
                           color: Colors.white,
@@ -63,7 +63,7 @@ class UniteveContatoPage extends GetView<UniteveController> {
                   color: Colors.white,
                 ),
                 title: Text(
-                        'Email',
+                        'email'.tr,
                         style: TextStyle(
                           fontSize: 24.0,
                           color: Colors.white,
@@ -86,7 +86,7 @@ class UniteveContatoPage extends GetView<UniteveController> {
                   color: Colors.white,
                 ),
                 title: Text(
-                        'Endereço',
+                        'endereco'.tr,
                         style: TextStyle(
                           fontSize: 24.0,
                           color: Colors.white,
