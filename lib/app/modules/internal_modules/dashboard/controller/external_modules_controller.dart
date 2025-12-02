@@ -67,14 +67,6 @@ class ExternalModulesController extends GetxController {
     ),
 
     ExternalModules(
-      iconSrc: 'assets/icons/historico.svg',
-      subtitle: 'Histórico', // TODO: traduzir // TODO: traduzir
-      page: Routes.HISTORICO,
-      url: '',
-      interrogation: false
-    ),
-
-    ExternalModules(
       iconSrc: 'assets/papers/icons/pesquisas.svg',
       subtitle: 'periodicos'.tr,
       page: Routes.PAPERS,
