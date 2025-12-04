@@ -52,8 +52,7 @@ class CatracaOnlineProvider {
         }
       }
     } catch (e) {
-      // Log do erro se necessário
-      print('Erro ao buscar áreas: $e');
+      throw Exception('Erro ao buscar áreas: $e');
     }
 
     return []; // Retorna lista vazia em vez de exception
@@ -239,6 +238,16 @@ class CatracaOnlineProvider {
       return "success";
     } catch (e) {
       throw Exception("Erro ao salvar no Firebase: $e");
+    }
+  }
+
+  Future<String> deleteOperatorTransactionOffline(String id) async {
+    try {
+      var box = await Hive.openBox<OperatorTransactionOffline>(_collectionPath);
+      await box.delete(id);
+      return "success";
+    } catch (e) {
+      return "Erro ao deletar transação offline: $e";
     }
   }
 }

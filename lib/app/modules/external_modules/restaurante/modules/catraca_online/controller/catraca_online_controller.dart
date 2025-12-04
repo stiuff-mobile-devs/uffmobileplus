@@ -7,6 +7,7 @@ import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/c
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/operator_transaction_offline.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/repository/catraca_online_repository.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
+import 'dart:async';
 
 class CatracaOnlineController extends GetxController {
   CatracaOnlineController();
@@ -41,6 +42,7 @@ class CatracaOnlineController extends GetxController {
   bool isQrCodeValid = true;
   String transactionResultMessage = "";
   String transactionUsername = "";
+  Timer? _syncTimer;
 
   @override
   void onInit() {
@@ -52,7 +54,8 @@ class CatracaOnlineController extends GetxController {
     service = Get.find<ExternalCatracaService>();
     await service.initialize();
     iduff = service.getUserIdUFF();
-    fetchAreas();
+    await fetchAreas();
+    startOfflineSync();
     update();
   }
 
@@ -191,17 +194,6 @@ class CatracaOnlineController extends GetxController {
             bool saveOperatorTransactionsOffline = false;
             bool saveOperatorTransactionToFirebase = false;
 
-            // Salvando no banco local
-            try {
-              await repository.saveOperatorTransactionsOffline(
-                operatorTransactionOffline,
-              );
-              saveOperatorTransactionsOffline = true;
-            } catch (e) {
-              saveOperatorTransactionsOffline = false;
-              debugPrint('Erro ao salvar transação offline: $e');
-            }
-
             // Salvando no Firebase
             try {
               await repository
@@ -211,6 +203,16 @@ class CatracaOnlineController extends GetxController {
             } catch (e) {
               debugPrint('Erro ao salvar transação no Firebase: $e');
               saveOperatorTransactionToFirebase = false;
+              // Salvando no banco local
+              try {
+                await repository.saveOperatorTransactionsOffline(
+                  operatorTransactionOffline,
+                );
+                saveOperatorTransactionsOffline = true;
+              } catch (e) {
+                saveOperatorTransactionsOffline = false;
+                debugPrint('Erro ao salvar transação offline: $e');
+              }
             }
 
             if (saveOperatorTransactionsOffline ||
@@ -297,16 +299,6 @@ class CatracaOnlineController extends GetxController {
 
     bool saveOperatorTransactionsOffline = false;
     bool saveOperatorTransactionToFirebase = false;
-    // Salvando no banco local
-    try {
-      await repository.saveOperatorTransactionsOffline(
-        operatorTransactionOffline,
-      );
-      saveOperatorTransactionsOffline = true;
-    } catch (e) {
-      saveOperatorTransactionsOffline = false;
-      debugPrint('Erro ao salvar transação offline: $e');
-    }
 
     // Salvando no Firebase
     try {
@@ -317,6 +309,16 @@ class CatracaOnlineController extends GetxController {
     } catch (e) {
       debugPrint('Erro ao salvar transação no Firebase: $e');
       saveOperatorTransactionToFirebase = false;
+      // Salvando no banco local
+      try {
+        await repository.saveOperatorTransactionsOffline(
+          operatorTransactionOffline,
+        );
+        saveOperatorTransactionsOffline = true;
+      } catch (e) {
+        saveOperatorTransactionsOffline = false;
+        debugPrint('Erro ao salvar transação offline: $e');
+      }
     }
 
     if (saveOperatorTransactionsOffline || saveOperatorTransactionToFirebase) {
@@ -349,5 +351,49 @@ class CatracaOnlineController extends GetxController {
         ? "Catraca Offline"
         : "Catraca Online";
     fetchOperatorTransactions();
+  }
+
+  /// Inicia checagem periódica (30s) para enviar transações locais ao Firebase.
+  void startOfflineSync() {
+    _syncTimer?.cancel();
+    _syncTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      _syncOfflineTransactions();
+    });
+  }
+
+  /// Para a checagem periódica.
+  void stopOfflineSync() {
+    _syncTimer?.cancel();
+    _syncTimer = null;
+  }
+
+  /// Tenta enviar transações salvas no Hive ao Firebase (timeout 5s).
+  /// Ao enviar com sucesso, remove a transação local.
+  Future<void> _syncOfflineTransactions() async {
+    try {
+      final pending = await repository
+          .getOperatorTransactionsOffline(); // retorna List<OperatorTransactionOffline>
+      if (pending.isEmpty) return;
+
+      for (final tx in pending) {
+        try {
+          await repository
+              .saveOperatorTransactionToFirebase(tx)
+              .timeout(const Duration(seconds: 5));
+          // remover local após sucesso no Firebase
+          try {
+            // Ajuste o nome do método de delete conforme implementação do repositório.
+            await repository.deleteOperatorTransactionOffline(tx.id);
+          } catch (e) {
+            debugPrint('Erro ao apagar transação local: $e');
+          }
+        } catch (e) {
+          debugPrint('Erro ao enviar transação ao Firebase: $e');
+          // se falhar, mantém no Hive para tentar novamente na próxima execução
+        }
+      }
+    } catch (e) {
+      debugPrint('Erro na sincronização offline: $e');
+    }
   }
 }
