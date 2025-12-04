@@ -62,4 +62,9 @@ class CatracaOnlineRepository {
   Future<String> deleteOperatorTransactionOffline(String id) async {
     return await catracaOnlineProvider.deleteOperatorTransactionOffline(id);
   }
+
+  Future<List<OperatorTransactionOffline>>
+  getOperatorTransactionsFromFirebase() async {
+    return await catracaOnlineProvider.getOperatorTransactionsFromFirebase();
+  }
 }

@@ -32,6 +32,9 @@ class CatracaOnlineController extends GetxController {
   late RxList<OperatorTransactionOffline> operatorTransactionsOffline =
       <OperatorTransactionOffline>[].obs;
 
+  late RxList<OperatorTransactionOffline> operatorTransactionsFromFirebase =
+      <OperatorTransactionOffline>[].obs;
+
   Rx<OperatorTransactionModel> selectedTransaction =
       OperatorTransactionModel().obs;
 
@@ -78,24 +81,30 @@ class CatracaOnlineController extends GetxController {
     isTransactionBusy.value = true;
     token = await service.getAccessToken();
 
-    if (isOfflineMode.value) {
-      try {
-        operatorTransactionsOffline.value = await repository
-            .getOperatorTransactionsOffline();
-      } catch (e) {
-        debugPrint('Erro ao buscar transações offline: $e');
-      }
-    } else {
-      try {
-        operatorTransactions.value = await repository.getOperatorTransactions(
-          iduff,
-          token!,
-          selectedArea.value.id.toString(),
-        );
-      } catch (e) {
-        debugPrint('Erro ao buscar transações online: $e');
-      }
+    try {
+      operatorTransactionsOffline.value = await repository
+          .getOperatorTransactionsOffline();
+    } catch (e) {
+      debugPrint('Erro ao buscar transações offline: $e');
     }
+
+    try {
+      operatorTransactionsFromFirebase.value = await repository
+          .getOperatorTransactionsFromFirebase();
+    } catch (e) {
+      debugPrint('Erro ao buscar transações offline do firebase: $e');
+    }
+
+    try {
+      operatorTransactions.value = await repository.getOperatorTransactions(
+        iduff,
+        token!,
+        selectedArea.value.id.toString(),
+      );
+    } catch (e) {
+      debugPrint('Erro ao buscar transações online: $e');
+    }
+
     isTransactionBusy.value = false;
   }
 

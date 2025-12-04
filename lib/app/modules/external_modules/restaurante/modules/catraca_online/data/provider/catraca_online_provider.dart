@@ -224,6 +224,33 @@ class CatracaOnlineProvider {
     }
   }
 
+  Future<List<OperatorTransactionOffline>>
+  getOperatorTransactionsFromFirebase() async {
+    try {
+      final snapshot = await _firestore
+          .collection(_collectionPathFirebase)
+          .get();
+      return snapshot.docs
+          .map((doc) {
+            try {
+              final data = doc.data();
+              return OperatorTransactionOffline.fromJson(
+                Map<String, dynamic>.from(data),
+              );
+            } catch (e) {
+              // ignora documentos com formato inválido
+              return null;
+            }
+          })
+          .where((t) => t != null)
+          .cast<OperatorTransactionOffline>()
+          .toList();
+    } catch (e) {
+      // Em caso de erro, retorna lista vazia
+      return [];
+    }
+  }
+
   Future<String> saveOperatorTransactionToFirebase(
     OperatorTransactionOffline operatorTransactionOffline,
   ) async {
