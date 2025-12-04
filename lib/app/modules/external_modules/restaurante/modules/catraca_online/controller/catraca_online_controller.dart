@@ -366,7 +366,7 @@ class CatracaOnlineController extends GetxController {
   void startOfflineSync() {
     _syncTimer?.cancel();
     _syncTimer = Timer.periodic(const Duration(seconds: 30), (_) {
-      _syncOfflineTransactions();
+      syncOfflineTransactions();
     });
   }
 
@@ -378,7 +378,7 @@ class CatracaOnlineController extends GetxController {
 
   /// Tenta enviar transações salvas no Hive ao Firebase (timeout 5s).
   /// Ao enviar com sucesso, remove a transação local.
-  Future<void> _syncOfflineTransactions() async {
+  Future<void> syncOfflineTransactions() async {
     try {
       final pending = await repository
           .getOperatorTransactionsOffline(); // retorna List<OperatorTransactionOffline>

@@ -18,10 +18,10 @@ class ValidarPagamentoPage extends GetView<CatracaOnlineController> {
         title: Obx(() => Text(controller.statusMessage.value)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.change_circle_rounded),
-            tooltip: 'Alterar modo',
+            icon: const Icon(Icons.sync),
+            tooltip: 'Sincronizar offline',
             onPressed: () {
-              controller.toggleMode();
+              controller.syncOfflineTransactions();
             },
           ),
           IconButton(
