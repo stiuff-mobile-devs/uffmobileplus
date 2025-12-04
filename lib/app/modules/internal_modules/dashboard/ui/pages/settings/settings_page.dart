@@ -73,13 +73,36 @@ class SettingsPage extends StatelessWidget {
                   trailing: null, // No chevron needed since it's a dropdown
                 ),
                 SettingsItem(
-                  icon: Icon(Icons.change_circle, color: Colors.white,),
-                   main: Text('Trocar Matricula', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),),
-                    description: 'Alterar a matrícula vinculada ao usuário atual',
-                    trailing: null,
-                    onTap: () {
-                      controller.changeMatricula();
-                    },
+                  icon: Icon(Icons.change_circle, color: Colors.white),
+                  main: Text(
+                    'Trocar Matricula',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  description: 'Alterar a matrícula vinculada ao usuário atual',
+                  trailing: null,
+                  onTap: () {
+                    controller.changeMatricula();
+                  },
+                ),
+                SettingsItem(
+                  icon: Icon(Icons.add, color: Colors.white),
+                  main: Text(
+                    'Nova Autenticação'.tr,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  description: 'Acrescentar uma nova autenticação'.tr,
+                  trailing: null,
+                  onTap: () {
+                    controller.newAuthentication();
+                  },
                 ),
                 // Botão de logout
                 SettingsItem(

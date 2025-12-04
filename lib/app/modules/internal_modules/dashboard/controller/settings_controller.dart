@@ -3,16 +3,20 @@ import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 
 class SettingsController extends GetxController {
-
-SettingsController();
+  SettingsController();
   late final UserIduffController _userIduffController;
   @override
   onInit() {
     _userIduffController = Get.find<UserIduffController>();
     super.onInit();
   }
-  logoutIduff(){
+
+  logoutIduff() {
     _userIduffController.deleteUserIduffModel();
+    Get.offAllNamed(Routes.LOGIN);
+  }
+
+  newAuthentication() {
     Get.offAllNamed(Routes.LOGIN);
   }
 
