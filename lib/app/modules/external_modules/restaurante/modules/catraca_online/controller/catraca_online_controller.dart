@@ -108,8 +108,9 @@ class CatracaOnlineController extends GetxController {
     Get.toNamed(Routes.RESULTADO_PAGE);
   }
 
-  Future<String> loadingQrCodeData() async {
+  Future<void> loadingQrCodeData() async {
     isReadQRCodeBusy.value = true;
+
     try {
       isTransactionBusy.value = true;
       String? qrCodeScanRes = await _scanQRCode();
@@ -117,14 +118,16 @@ class CatracaOnlineController extends GetxController {
       if (qrCodeScanRes == null || qrCodeScanRes == "-1") {
         isReadQRCodeBusy.value = false;
         Get.back();
-        return '';
+        return;
       }
 
+      // Carteirinha Digital
       RegExp expCarteirinhaDital = RegExp(r"iduff=([0-9]+)");
       RegExpMatch? matchCarteirinhaDigital = expCarteirinhaDital.firstMatch(
         qrCodeScanRes,
       );
 
+      // Carteirinha de Pagamento
       RegExp expCarteirinhaPagamento = RegExp(
         "^ididentificacao_iduff=([0-9]|[A-z])*&hash=([0-9]|[a-z]){40}\$",
       );
@@ -132,26 +135,29 @@ class CatracaOnlineController extends GetxController {
         qrCodeScanRes,
       );
 
+      // Validar pagamento online
       if (matchCarteirinhaPagamento == qrCodeScanRes) {
         try {
           statusMessage.value = "Catraca Online";
           isOfflineMode.value = false;
           token = await service.getAccessToken();
+
           Map responseMessage = await repository.validatePayment(
             qrCodeScanRes,
             iduff,
             token!,
             selectedArea.value.id.toString(),
           );
+
           transactionResultMessage = responseMessage["message"];
           isTransactionValid = responseMessage["valid"];
+          isQrCodeValid = true;
 
           if (responseMessage["name"] != null) {
             transactionUsername = responseMessage["name"];
           } else {
             transactionUsername = "";
           }
-          isQrCodeValid = true;
         } catch (e) {
           debugPrint('Erro ao validar pagamento online: $e');
           isTransactionValid = false;
@@ -159,15 +165,19 @@ class CatracaOnlineController extends GetxController {
           statusMessage.value = "Catraca Offline";
           isOfflineMode.value = true;
         }
-      } else if (matchCarteirinhaDigital != null) {
+      }
+      // Validar pagamento offline
+      else if (matchCarteirinhaDigital != null) {
         try {
           statusMessage.value = "Catraca Offline";
           isOfflineMode.value = true;
+
           RegExp expIdUff = RegExp(r"iduff=([0-9]+)");
           Iterable<RegExpMatch> matches = expIdUff.allMatches(qrCodeScanRes);
           String idUffValue = matches.isNotEmpty
               ? matches.last.group(1) ?? ""
               : "";
+
           if (RegExp(r'^\d{11}$').hasMatch(idUffValue)) {
             OperatorTransactionOffline operatorTransactionOffline =
                 OperatorTransactionOffline(
@@ -178,35 +188,73 @@ class CatracaOnlineController extends GetxController {
                   campus: selectedArea.value.nome,
                 );
 
-            await repository.saveOperatorTransactionsOffline(
-              operatorTransactionOffline,
-            );
-            await repository.saveOperatorTransactionToFirebase(
-              operatorTransactionOffline,
-            );
+            bool saveOperatorTransactionsOffline = false;
+            bool saveOperatorTransactionToFirebase = false;
 
-            transactionResultMessage = "Transação salva offline com sucesso!";
-            transactionUsername = idUffValue;
-            isTransactionValid = true;
-            isQrCodeValid = true;
+            // Salvando no banco local
+            try {
+              await repository.saveOperatorTransactionsOffline(
+                operatorTransactionOffline,
+              );
+              saveOperatorTransactionsOffline = true;
+            } catch (e) {
+              saveOperatorTransactionsOffline = false;
+              debugPrint('Erro ao salvar transação offline: $e');
+            }
+
+            // Salvando no Firebase
+            try {
+              await repository
+                  .saveOperatorTransactionToFirebase(operatorTransactionOffline)
+                  .timeout(const Duration(seconds: 5));
+              saveOperatorTransactionToFirebase = true;
+            } catch (e) {
+              debugPrint('Erro ao salvar transação no Firebase: $e');
+              saveOperatorTransactionToFirebase = false;
+            }
+
+            if (saveOperatorTransactionsOffline ||
+                saveOperatorTransactionToFirebase) {
+              transactionResultMessage =
+                  "Transação salva em modo OFFLINE com sucesso!";
+              transactionUsername = idUffValue;
+              isTransactionValid = true;
+              isQrCodeValid = true;
+            } else {
+              transactionResultMessage =
+                  "Falha ao salvar a transação offline. Erro Interno.";
+              isTransactionValid = false;
+              isQrCodeValid = false;
+              transactionUsername = idUffValue;
+            }
           } else {
             isTransactionValid = false;
             isQrCodeValid = false;
+            transactionResultMessage = "Código QR inválido.";
+            transactionUsername = "";
           }
         } catch (e) {
           debugPrint('Erro ao validar pagamento offline: $e');
           isTransactionValid = false;
           isQrCodeValid = false;
+          transactionResultMessage = "Erro ao validar pagamento offline.";
+          transactionUsername = "";
         }
       } else {
         isTransactionValid = false;
-        isQrCodeValid = true;
+        isQrCodeValid = false;
+        transactionResultMessage = "Código QR inválido.";
+        transactionUsername = '';
       }
     } catch (e) {
       debugPrint('Erro ao ler código QR offline: $e');
+      isTransactionValid = false;
+      isQrCodeValid = false;
+      transactionResultMessage = "Erro ao ler código QR offline.";
+      transactionUsername = "";
     }
     isReadQRCodeBusy.value = false;
-    return '';
+    return;
   }
 
   Future<String?> _scanQRCode() async {
@@ -247,17 +295,42 @@ class CatracaOnlineController extends GetxController {
           campus: selectedArea.value.nome,
         );
 
-    await repository.saveOperatorTransactionsOffline(
-      operatorTransactionOffline,
-    );
-    await repository.saveOperatorTransactionToFirebase(
-      operatorTransactionOffline,
-    );
+    bool saveOperatorTransactionsOffline = false;
+    bool saveOperatorTransactionToFirebase = false;
+    // Salvando no banco local
+    try {
+      await repository.saveOperatorTransactionsOffline(
+        operatorTransactionOffline,
+      );
+      saveOperatorTransactionsOffline = true;
+    } catch (e) {
+      saveOperatorTransactionsOffline = false;
+      debugPrint('Erro ao salvar transação offline: $e');
+    }
 
-    transactionResultMessage = "Transação salva offline com sucesso!";
-    transactionUsername = cpf;
-    isTransactionValid = true;
-    isQrCodeValid = true;
+    // Salvando no Firebase
+    try {
+      await repository
+          .saveOperatorTransactionToFirebase(operatorTransactionOffline)
+          .timeout(const Duration(seconds: 5));
+      saveOperatorTransactionToFirebase = true;
+    } catch (e) {
+      debugPrint('Erro ao salvar transação no Firebase: $e');
+      saveOperatorTransactionToFirebase = false;
+    }
+
+    if (saveOperatorTransactionsOffline || saveOperatorTransactionToFirebase) {
+      transactionResultMessage = "Transação salva em modo OFFLINE com sucesso!";
+      transactionUsername = cpf;
+      isTransactionValid = true;
+      isQrCodeValid = true;
+    } else {
+      transactionResultMessage =
+          "Falha ao salvar a transação offline. Erro Interno.";
+      isTransactionValid = false;
+      isQrCodeValid = false;
+      transactionUsername = cpf;
+    }
   }
 
   void manualValidation() {
