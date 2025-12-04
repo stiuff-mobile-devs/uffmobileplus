@@ -24,6 +24,11 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
             tooltip: 'carteirinha_digital'.tr,
           ),
           IconButton(
+            onPressed: controller.goToCatracaOnlinePage,
+            icon: const Icon(Icons.qr_code_scanner),
+            tooltip: 'catraca'.tr,
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'atualizar'.tr,
             onPressed: () {

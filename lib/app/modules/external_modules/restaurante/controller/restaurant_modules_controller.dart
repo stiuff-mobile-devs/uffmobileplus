@@ -16,7 +16,7 @@ class RestaurantModulesController extends GetxController {
     ),
     RestaurantModules(
       iconSrc: 'assets/icons/validator_qr_code.svg',
-      subtitle: 'catraca_online'.tr,
+      subtitle: 'Catraca'.tr,
       page: Routes.CATRACA_ONLINE,
       url: '',
       interrogation: false,

@@ -98,13 +98,16 @@ class ChooseProfileController extends GetxController {
 
     try {
       await _userDataController.saveUserData(userUmm, matricula, profileType);
-    } catch (e) {
-    }
+    } catch (e) {}
     isBusy.value = false;
     Get.offAllNamed(Routes.HOME);
   }
 
-   goToCarteirinhaPage() {
+  goToCarteirinhaPage() {
     Get.toNamed(Routes.CARTEIRINHA_DIGITAL);
+  }
+
+  goToCatracaOnlinePage() {
+    Get.toNamed(Routes.CATRACA_ONLINE);
   }
 }

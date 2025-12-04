@@ -35,4 +35,8 @@ class LoginController extends GetxController {
   loginAnonimous() {
     Get.offAllNamed(Routes.HOME);
   }
+
+  goToCatracaOnlinePage() {
+    Get.toNamed(Routes.CATRACA_ONLINE);
+  }
 }

@@ -74,6 +74,33 @@ class LoginPage extends GetView<LoginController> {
                           ),
                         ),
                       ),
+                      SizedBox(width: 40),
+
+                      Tooltip(
+                        message: "qr_code_catraca".tr,
+                        child: InkWell(
+                          onTap: controller.goToCatracaOnlinePage,
+                          borderRadius: BorderRadius.circular(8),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.qr_code_scanner,
+                                color: Colors.white,
+                                size: 36,
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                'Catraca'.tr,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -146,14 +173,14 @@ class LoginPage extends GetView<LoginController> {
                                                 onTap: () {
                                                   controller.loginAnonimous();
                                                 },
-                                              ),/*
+                                              ) /*
                                               _LoginOptionSquare(
                                                 text: 'GOV',
                                                 color: Colors.grey,
                                                 image: 'assets/icons/gov.png',
                                                 onTap:
                                                     () {}, //controller.loginGOV,
-                                              ),*/
+                                              ),*/,
                                             ],
                                           ),
                                         ),

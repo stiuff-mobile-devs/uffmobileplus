@@ -8,13 +8,13 @@ import 'package:uffmobileplus/app/modules/external_modules/transcript/binding/tr
 import 'package:uffmobileplus/app/modules/external_modules/transcript/ui/transcript_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/radio/bindings/radio_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/radio/ui/radio_page.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/bindings/catraca_online_bindings.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/ui/catraca_online_page.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/ui/pages/resultado_detalhado_page.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/ui/pages/resultado_page.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/ui/pages/validar_manualmente_page.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/ui/pages/validar_pagamento_page.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/utils/leitor_qr_code.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/bindings/catraca_online_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/ui/catraca_online_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/ui/pages/resultado_detalhado_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/ui/pages/resultado_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/ui/pages/validar_manualmente_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/ui/pages/validar_pagamento_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/utils/leitor_qr_code.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/menu/bindings/menu_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/menu/ui/pages/restaurants_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/ui/restaurant_modules_page.dart';
@@ -96,7 +96,7 @@ abstract class AppPages {
     GetPage(
       name: Routes.RESTAURANT_MODULES,
       page: () => RestaurantModulesPage(),
-      bindings: [RestauranteBindings()]
+      bindings: [RestauranteBindings()],
     ),
 
     GetPage(
@@ -206,7 +206,7 @@ abstract class AppPages {
     GetPage(
       name: Routes.PAPERS,
       page: () => PapersPage(),
-      bindings: [PeriodicosBindings()] 
-    )
+      bindings: [PeriodicosBindings()],
+    ),
   ];
 }
