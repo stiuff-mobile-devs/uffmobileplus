@@ -31,12 +31,6 @@ Future<void> main() async {
 
   runApp(
     GetMaterialApp(
-      initialBinding: BindingsBuilder(() {
-        Get.put<ExternalModulesServices>(
-          ExternalModulesServices(),
-          permanent: true,
-        );
-      }),
       debugShowCheckedModeBanner: true,
 
       title: "UFF Mobile Plus",

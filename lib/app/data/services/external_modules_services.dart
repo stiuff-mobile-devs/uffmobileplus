@@ -12,6 +12,10 @@ class ExternalModulesServices extends GetxService {
     isExpired = true;
   }
 
+  ExternalModulesServices() {
+    initialize();
+  }
+
   Future<void> initialize() async {
     _userDataController = Get.find<UserDataController>();
     _userData = (await _userDataController.getUserData())!;

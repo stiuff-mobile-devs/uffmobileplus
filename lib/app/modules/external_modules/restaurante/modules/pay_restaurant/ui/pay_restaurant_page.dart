@@ -6,6 +6,8 @@ import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.dart';
 
 class PayRestaurantPage extends GetView<PayRestaurantController> {
+  const PayRestaurantPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,13 +16,6 @@ class PayRestaurantPage extends GetView<PayRestaurantController> {
         elevation: 8,
         foregroundColor: Colors.white,
         title: Text("Pagar Restaurante"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Atualizar',
-            onPressed: () {},
-          ),
-        ],
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
         ),

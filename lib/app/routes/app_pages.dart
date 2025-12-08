@@ -5,6 +5,7 @@ import 'package:uffmobileplus/app/modules/external_modules/restaurante/bindings/
 import 'package:uffmobileplus/app/modules/external_modules/papers/bindings/papers_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/papers/ui/papers_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/bindings/pay_restaurant_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/ui/pages/pay_help_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/ui/pay_restaurant_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/transcript/binding/transcript_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/transcript/ui/transcript_page.dart';
@@ -142,11 +143,17 @@ abstract class AppPages {
       page: () => RestaurantsPage(),
       bindings: [MenuBindings()],
     ),
-
+    // Pay Restaurant
     GetPage(
       name: Routes.PAY_RESTAURANT,
       page: () => PayRestaurantPage(),
-      bindings: [PayRestaurantBindings(), UserDataBindings()],
+      bindings: [UserDataBindings(), PayRestaurantBindings()],
+    ),
+
+    GetPage(
+      name: Routes.PAY_RESTAURANT_HELP,
+      page: () => PayHelpPage(),
+      bindings: [PayRestaurantBindings()],
     ),
 
     GetPage(name: Routes.SETTINGS, page: () => SettingsPage()),

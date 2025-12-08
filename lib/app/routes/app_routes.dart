@@ -20,6 +20,8 @@ abstract class Routes {
   static const VALIDAR_MANUALMENTE = '/validar_manualmente';
   static const BANDEJAPP = '/cardapio';
   static const PAY_RESTAURANT = '/pay_restaurant';
+  static const PAY_RESTAURANT_TICKET = '/restaurante/pay_restaurant/ticket';
+  static const PAY_RESTAURANT_HELP = '/restaurante/pay_restaurant/help';
 
   //Carteirinha Digital - Externo
   static const CARTEIRINHA_DIGITAL = '/carteirinha_digital';
