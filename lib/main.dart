@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/data/services/hive_service.dart';
 import 'package:uffmobileplus/app/routes/app_pages.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
@@ -30,6 +31,12 @@ Future<void> main() async {
 
   runApp(
     GetMaterialApp(
+      initialBinding: BindingsBuilder(() {
+        Get.put<ExternalModulesServices>(
+          ExternalModulesServices(),
+          permanent: true,
+        );
+      }),
       debugShowCheckedModeBanner: true,
 
       title: "UFF Mobile Plus",
@@ -42,4 +49,3 @@ Future<void> main() async {
     ),
   );
 }
-

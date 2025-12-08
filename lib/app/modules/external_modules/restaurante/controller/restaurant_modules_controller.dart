@@ -23,6 +23,15 @@ class RestaurantModulesController extends GetxController {
       //availableFor: [ProfileTypes.student, ProfileTypes.professor, ProfileTypes.employee],
       //gdiGroups: null
     ),
+    RestaurantModules(
+      iconSrc: 'assets/restaurant/icons/qr-code.svg',
+      subtitle: 'Pagar Restaurante'.tr,
+      page: Routes.PAY_RESTAURANT,
+      url: '',
+      interrogation: false,
+      //availableFor: [ProfileTypes.student, ProfileTypes.professor, ProfileTypes.employee],
+      //gdiGroups: null
+    ),
   ];
 
   void navigateTo(
