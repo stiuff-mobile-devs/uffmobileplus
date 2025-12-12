@@ -20,8 +20,9 @@ class ExternalModulesServices extends GetxService {
 
   Future<void> initialize() async {
     _userDataController = Get.find<UserDataController>();
-    _userData = (await _userDataController.getUserData())!;
     _auth = Get.find<AuthIduffService>();
+
+    _userData = (await _userDataController.getUserData())!;
   }
 
   String? getUserName() {

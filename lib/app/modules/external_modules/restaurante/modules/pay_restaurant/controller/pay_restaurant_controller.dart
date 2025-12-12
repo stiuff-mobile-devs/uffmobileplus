@@ -1,4 +1,5 @@
-import 'package:flutter/widgets.dart';
+import 'dart:async';
+
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/data/repository/pay_restaurant_repository.dart';
@@ -12,6 +13,8 @@ class PayRestaurantController extends GetxController {
 
   RxBool isLoading = false.obs;
   RxBool isPaymentProcessing = false.obs;
+  RxBool isExpired = false.obs;
+  RxInt remainingTime = 0.obs;
 
   late ExternalModulesServices externalModulesServices;
 
@@ -19,6 +22,7 @@ class PayRestaurantController extends GetxController {
   String userIdUFF = "";
   String userImageUrl = "";
   String currentBalance = "";
+  Map<String, dynamic> paymentCode = {};
 
   @override
   onInit() {
@@ -42,8 +46,10 @@ class PayRestaurantController extends GetxController {
         await externalModulesServices.getAccessToken() ?? "";
 
     try {
-      Map<String, dynamic> paymentCode = await payRestaurantRepository
-          .getPaymentCode(userIdUFF, userAcessToken);
+      paymentCode = await payRestaurantRepository.getPaymentCode(
+        userIdUFF,
+        userAcessToken,
+      );
     } catch (e) {
       print(e);
       if (e is Exception && e.toString().isNotEmpty) {
@@ -54,8 +60,35 @@ class PayRestaurantController extends GetxController {
       } else {
         await MessageDialogs.showErrorDialog(Get.context);
       }
+    } finally {
+      isPaymentProcessing.value = false;
     }
+    if (paymentCode.isNotEmpty) {
+      qrCodeTimer();
+      isLoading.value = false;
+      Get.toNamed(Routes.PAY_RESTAURANT_TICKET);
+    }
+  }
 
-    isPaymentProcessing.value = false;
+  void qrCodeTimer() {
+    late Timer expirationTimer;
+    isExpired.value = false;
+
+    final validity = paymentCode["validade"];
+    remainingTime.value = validity is int ? validity : 0;
+
+    expirationTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (remainingTime.value < 1) {
+        timer.cancel();
+        isExpired.value = true;
+      } else {
+        remainingTime.value = remainingTime.value - 1;
+      }
+    });
+  }
+
+  void refresh() {
+    isLoading.value = true;
+    goToPaymentTicket();
   }
 }

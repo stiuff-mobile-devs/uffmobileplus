@@ -6,6 +6,7 @@ import 'package:uffmobileplus/app/modules/external_modules/papers/bindings/paper
 import 'package:uffmobileplus/app/modules/external_modules/papers/ui/papers_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/bindings/pay_restaurant_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/ui/pages/pay_help_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/ui/pages/pay_ticket_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/ui/pay_restaurant_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/transcript/binding/transcript_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/transcript/ui/transcript_page.dart';
@@ -153,6 +154,12 @@ abstract class AppPages {
     GetPage(
       name: Routes.PAY_RESTAURANT_HELP,
       page: () => PayHelpPage(),
+      bindings: [PayRestaurantBindings()],
+    ),
+
+    GetPage(
+      name: Routes.PAY_RESTAURANT_TICKET,
+      page: () => PayTicketPage(),
       bindings: [PayRestaurantBindings()],
     ),
 
