@@ -1,9 +1,14 @@
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/data/repository/pay_restaurant_repository.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/utils/message_dialogs.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 
 class PayRestaurantController extends GetxController {
   PayRestaurantController();
+
+  PayRestaurantRepository payRestaurantRepository = PayRestaurantRepository();
 
   RxBool isLoading = false.obs;
   RxBool isPaymentProcessing = false.obs;
@@ -31,33 +36,26 @@ class PayRestaurantController extends GetxController {
     Get.toNamed(Routes.PAY_RESTAURANT_HELP);
   }
 
-  void goToPaymentTicket() {
-     
+  Future<void> goToPaymentTicket() async {
     isPaymentProcessing.value = true;
-      try {
-        Map<String, dynamic> paymentCode = await sctmService.getPaymentCode(
-            sharedUser.idUff!, sharedUser.accessToken!);
-        await Navigator.of(context).push(
-          MaterialPageRoute(
-              builder: (context) => PaymentTicketScreen(paymentCode)),
+    String userAcessToken =
+        await externalModulesServices.getAccessToken() ?? "";
+
+    try {
+      Map<String, dynamic> paymentCode = await payRestaurantRepository
+          .getPaymentCode(userIdUFF, userAcessToken);
+    } catch (e) {
+      print(e);
+      if (e is Exception && e.toString().isNotEmpty) {
+        await MessageDialogs.showErrorDialog(
+          Get.context,
+          message: e.toString(),
         );
-      } catch (e) {
-        // if (e.message != null && e.message is String)
-        //   await MessageDialogs.showErrorDialog(context, message: e.message);
-        // else
-        //   await MessageDialogs.showErrorDialog(context);
-        print(e);
-        if (e is Exception && e.toString().isNotEmpty) {
-          await MessageDialogs.showErrorDialog(context, message: e.toString());
-        } else {
-          await MessageDialogs.showErrorDialog(context);
-        }
-        Navigator.pop(context);
+      } else {
+        await MessageDialogs.showErrorDialog(Get.context);
       }
-   
-  
+    }
+
     isPaymentProcessing.value = false;
-   
   }
-  
 }
