@@ -2,10 +2,10 @@ import 'package:all_validations_br/all_validations_br.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/data/services/external_catraca_service.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/area.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/operator_transaction.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/operator_transaction_offline.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/repository/catraca_online_repository.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/area.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/operator_transaction.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/operator_transaction_offline.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/repository/catraca_online_repository.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'dart:async';
 

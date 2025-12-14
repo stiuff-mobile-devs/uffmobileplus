@@ -24,6 +24,12 @@ class ExternalModulesController extends GetxController {
       },
       'it_IT' : {
         'restaurante' : 'Ristorante'
+      },
+      'pt_BR' : {
+        'monitora_uff' : 'Monitora UFF',
+      },
+      'en_US' : {
+        'monitora_uff' : 'Monitora UFF',
       }
     });
     super.onInit();
@@ -86,6 +92,14 @@ class ExternalModulesController extends GetxController {
       iconSrc: 'assets/icons/uniteve.svg', 
       subtitle: 'Unitevê', // TODO: traduzir
       page: Routes.UNITEVE,
+      url: '',
+      interrogation: false
+    ),
+
+    ExternalModules(
+      iconSrc: 'assets/icons/monitora_uff.png',
+      subtitle: 'monitora_uff'.tr,
+      page: Routes.MONITORA_UFF,
       url: '',
       interrogation: false
     ),

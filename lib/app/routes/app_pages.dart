@@ -39,6 +39,8 @@ import 'package:uffmobileplus/app/modules/internal_modules/user/bindings/user_da
 import 'package:uffmobileplus/app/modules/internal_modules/user/bindings/user_iduff_bindings.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/bindings/user_umm_bindings.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/web_view/bindings/webview_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/bindings/monitora_uff_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/ui/monitora_uff_page.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/ui/dashboard.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/ui/login_page.dart';
@@ -207,6 +209,12 @@ abstract class AppPages {
       name: Routes.PAPERS,
       page: () => PapersPage(),
       bindings: [PeriodicosBindings()],
+    ),
+
+    GetPage(
+      name: Routes.MONITORA_UFF,
+      page: () => MonitoraUffPage(),
+      bindings: [MonitoraUffBindings()],
     ),
   ];
 }

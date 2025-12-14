@@ -8,10 +8,14 @@ import 'package:uffmobileplus/app/utils/translations/app_translations.dart';
 import 'package:uffmobileplus/firebase_options_catracaoffline.dart';
 import 'package:uffmobileplus/firebase_options_cardapio_ru.dart';
 import 'package:uffmobileplus/firebase_options_uffmobileplus.dart';
+import 'package:uffmobileplus/firebase_options_tracking.dart';
+
+import 'package:uffmobileplus/app/data/services/location_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await LocationService().initializeService();
   await Firebase.initializeApp(
     name: 'uffmobileplus',
     options: FirebaseOptionsUffmobileplus.currentPlatform,
@@ -24,9 +28,14 @@ Future<void> main() async {
     name: 'cardapio_ru',
     options: FirebaseOptionsCardapioRU.currentPlatform,
   );
+  await Firebase.initializeApp(
+    name: 'tracking',
+    options: FirebaseOptionsTracking.currentPlatform,
+  );
 
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   await HiveService.init();
+
 
   runApp(
     GetMaterialApp(

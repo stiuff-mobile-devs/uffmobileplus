@@ -39,4 +39,7 @@ abstract class Routes {
   static const UNITEVE = '/uniteve';
   static const UNITEVE_HISTORIA = '/uniteve-historia';
   static const UNITEVE_CONTATO = '/uniteve-contato';
+
+  // Monitora UFF
+  static const MONITORA_UFF = '/monitora_uff';
 }

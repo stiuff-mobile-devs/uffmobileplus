@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/controller/catraca_online_controller.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/utils/transaction_message.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/controller/catraca_online_controller.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/utils/transaction_message.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.dart';
 
