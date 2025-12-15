@@ -27,7 +27,7 @@ class PayTicketPage extends GetView<PayRestaurantController> {
       ),
 
       body: Obx(
-        () => controller.isLoading.value
+        () => controller.isPaymentProcessing.value
             ? Center(child: CustomProgressDisplay())
             : Container(
                 decoration: BoxDecoration(

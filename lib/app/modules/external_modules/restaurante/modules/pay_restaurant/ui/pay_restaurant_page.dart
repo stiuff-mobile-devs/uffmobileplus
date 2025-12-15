@@ -22,10 +22,19 @@ class PayRestaurantPage extends GetView<PayRestaurantController> {
         flexibleSpace: Container(
           decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Atualizar',
+            onPressed: () {
+              controller.onInit();
+            },
+          ),
+        ],
       ),
 
       body: Obx(
-        () => controller.isPaymentProcessing.value
+        () => controller.isLoading.value
             ? Center(child: CustomProgressDisplay())
             : Container(
                 decoration: BoxDecoration(
@@ -56,7 +65,7 @@ class PayRestaurantPage extends GetView<PayRestaurantController> {
                           ),
                         ),
                         Text(
-                          "R\$ ${controller.currentBalance}",
+                          "R\$ ${controller.currentBalance.value}",
                           style: TextStyle(
                             fontSize: 18.0,
                             color: Colors.blue[100],

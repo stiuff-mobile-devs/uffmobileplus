@@ -21,7 +21,7 @@ class PayRestaurantController extends GetxController {
   String userName = "";
   String userIdUFF = "";
   String userImageUrl = "";
-  String currentBalance = "";
+  RxString currentBalance = "".obs;
   Map<String, dynamic> paymentCode = {};
 
   @override
@@ -33,6 +33,8 @@ class PayRestaurantController extends GetxController {
     userIdUFF = externalModulesServices.getUserIdUFF();
     userImageUrl = externalModulesServices.getUserPhotoUrl();
 
+    getUserBalance();
+
     super.onInit();
   }
 
@@ -42,6 +44,7 @@ class PayRestaurantController extends GetxController {
 
   Future<void> goToPaymentTicket() async {
     isPaymentProcessing.value = true;
+    isLoading.value = true;
     String userAcessToken =
         await externalModulesServices.getAccessToken() ?? "";
 
@@ -62,6 +65,7 @@ class PayRestaurantController extends GetxController {
       }
     } finally {
       isPaymentProcessing.value = false;
+      isLoading.value = false;
     }
     if (paymentCode.isNotEmpty) {
       qrCodeTimer();
@@ -90,5 +94,22 @@ class PayRestaurantController extends GetxController {
   void refresh() {
     isLoading.value = true;
     goToPaymentTicket();
+  }
+
+  void getUserBalance() async {
+    isLoading.value = true;
+    String userAcessToken =
+        await externalModulesServices.getAccessToken() ?? "";
+
+    try {
+      var userBalance = await Future.wait([
+        payRestaurantRepository.getUserBalance(userIdUFF, userAcessToken),
+      ]);
+      currentBalance.value = userBalance[0].currentBalance ?? "Erro";
+    } catch (e) {
+      currentBalance.value = "Erro";
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

@@ -23,7 +23,7 @@ class PayHelpPage extends GetView<PayRestaurantController> {
         ),
       ),
       body: Obx(
-        () => controller.isPaymentProcessing.value
+        () => controller.isLoading.value
             ? Center(child: CustomProgressDisplay())
             : Container(
                 padding: EdgeInsets.all(16),
