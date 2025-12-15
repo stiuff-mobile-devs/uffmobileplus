@@ -148,7 +148,11 @@ abstract class AppPages {
     GetPage(
       name: Routes.PAY_RESTAURANT,
       page: () => PayRestaurantPage(),
-      bindings: [UserDataBindings(), PayRestaurantBindings()],
+      bindings: [
+        UserDataBindings(),
+        AuthIduffBindings(),
+        PayRestaurantBindings(),
+      ],
     ),
 
     GetPage(

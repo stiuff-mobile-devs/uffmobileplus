@@ -52,6 +52,7 @@ dependencies:
   googleapis: ^15.0.0
   carousel_slider: ^5.1.1
   all_validations_br: ^3.2.3
+  equatable: ^2.0.7
 
 dev_dependencies:
   flutter_test:

@@ -6,7 +6,7 @@ import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user
 class ExternalModulesServices extends GetxService {
   late UserDataController _userDataController;
   late UserData _userData;
-  late final AuthIduffService _auth;
+  late AuthIduffService _auth;
 
   bool isExpired = false;
 

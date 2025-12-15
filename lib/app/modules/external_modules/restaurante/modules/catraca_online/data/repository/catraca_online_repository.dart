@@ -1,3 +1,4 @@
+import 'package:uffmobileplus/app/data/services/sctm_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/area.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/operator_transaction.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/operator_transaction_offline.dart';
@@ -7,9 +8,10 @@ class CatracaOnlineRepository {
   CatracaOnlineRepository();
 
   CatracaOnlineProvider catracaOnlineProvider = CatracaOnlineProvider();
+  SctmService sctmService = SctmService();
 
   Future<List<AreaModel>> getAreas(iduff, token) async {
-    return await catracaOnlineProvider.getAreas(iduff, token);
+    return await sctmService.getAreas(iduff, token);
   }
 
   Future<List<OperatorTransactionModel>> getOperatorTransactions(
@@ -17,11 +19,7 @@ class CatracaOnlineRepository {
     String token,
     String areaId,
   ) async {
-    return await catracaOnlineProvider.getOperatorTransactions(
-      iduff,
-      token,
-      areaId,
-    );
+    return await sctmService.getOperatorTransactions(iduff, token, areaId);
   }
 
   Future<Map<String, dynamic>> validatePayment(
@@ -30,12 +28,7 @@ class CatracaOnlineRepository {
     String token,
     String areaId,
   ) async {
-    return await catracaOnlineProvider.validatePayment(
-      paymentCode,
-      iduff,
-      token,
-      areaId,
-    );
+    return await sctmService.validatePayment(paymentCode, iduff, token, areaId);
   }
 
   Future<String> saveOperatorTransactionsOffline(
