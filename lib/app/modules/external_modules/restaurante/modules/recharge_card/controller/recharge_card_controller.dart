@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/utils/message_dialogs.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/recharge_card/data/repository/recharge_card_repository.dart';
+import 'package:uffmobileplus/app/routes/app_routes.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class RechargeCardController extends GetxController {
   RechargeCardController();
@@ -72,6 +74,7 @@ class RechargeCardController extends GetxController {
   }
 
   void goToPayment() async {
+    isLoading.value = true;
     String userAcessToken =
         await externalModulesServices.getAccessToken() ?? "";
     try {
@@ -84,6 +87,20 @@ class RechargeCardController extends GetxController {
       print(e);
       print(stackTrace);
       await MessageDialogs.showErrorDialog(Get.context);
+    } finally {
+      isLoading.value = false;
+    }
+    Get.toNamed(Routes.RECHARGE_CARD_PAY);
+  }
+
+  void launchPaymentUrl(String url, BuildContext context) async {
+    final uri = Uri.parse(url);
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      Navigator.pop(context);
+    } else {
+      throw 'Could not launch $url';
     }
   }
 }

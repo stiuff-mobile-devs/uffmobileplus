@@ -23,6 +23,7 @@ abstract class Routes {
   static const PAY_RESTAURANT_TICKET = '/restaurante/pay_restaurant/ticket';
   static const PAY_RESTAURANT_HELP = '/restaurante/pay_restaurant/help';
   static const RECHARGE_CARD = '/recharge_card';
+  static const RECHARGE_CARD_PAY = '/recharge_card/pay';
 
   //Carteirinha Digital - Externo
   static const CARTEIRINHA_DIGITAL = '/carteirinha_digital';
