@@ -271,4 +271,39 @@ class SctmService {
       throw Exception('Failed to get UserBalance');
     }
   }
+
+  Future<String> getPaymentUrl(
+    String value,
+    String idUff,
+    String accessToken,
+  ) async {
+    int centsValue = int.parse(value.replaceAll(',', ''));
+
+    Map<String, String> parameters = {
+      "iduff_usuario": idUff,
+      "token": accessToken,
+      "valor": centsValue.toString(),
+    };
+
+    var uri = Uri.https(
+      Secrets.getPaymentUrlHost,
+      Secrets.getPaymentUrlPath,
+      parameters,
+    );
+
+    http.Response response = await http.post(uri);
+
+    Map<String, dynamic> responseMap = json.decode(response.body);
+
+    if (response.statusCode == 200) {
+      if (responseMap["content"] != null &&
+          responseMap["content"]["url"] != null) {
+        return responseMap["content"]["url"];
+      } else {
+        throw Exception('Failed to get Pending User');
+      }
+    } else {
+      throw Exception('Failed to get Pending User');
+    }
+  }
 }

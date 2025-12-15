@@ -32,6 +32,16 @@ class RestaurantModulesController extends GetxController {
       //availableFor: [ProfileTypes.student, ProfileTypes.professor, ProfileTypes.employee],
       //gdiGroups: null
     ),
+
+    RestaurantModules(
+      iconSrc: 'assets/restaurant/icons/recarga.svg',
+      subtitle: 'Recarregar Cartão'.tr,
+      page: Routes.RECHARGE_CARD,
+      url: '',
+      interrogation: false,
+      //availableFor: [ProfileTypes.student, ProfileTypes.professor, ProfileTypes.employee],
+      //gdiGroups: null
+    ),
   ];
 
   void navigateTo(

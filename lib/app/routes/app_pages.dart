@@ -8,6 +8,8 @@ import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/p
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/ui/pages/pay_help_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/ui/pages/pay_ticket_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/ui/pay_restaurant_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/recharge_card/bindings/recharge_card_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/recharge_card/ui/recharge_card_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/transcript/binding/transcript_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/transcript/ui/transcript_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/radio/bindings/radio_bindings.dart';
@@ -144,6 +146,7 @@ abstract class AppPages {
       page: () => RestaurantsPage(),
       bindings: [MenuBindings()],
     ),
+
     // Pay Restaurant
     GetPage(
       name: Routes.PAY_RESTAURANT,
@@ -165,6 +168,16 @@ abstract class AppPages {
       name: Routes.PAY_RESTAURANT_TICKET,
       page: () => PayTicketPage(),
       bindings: [PayRestaurantBindings()],
+    ),
+
+    GetPage(
+      name: Routes.RECHARGE_CARD,
+      page: () => RechargeCardPage(),
+      bindings: [
+        UserDataBindings(),
+        AuthIduffBindings(),
+        RechargeCardBindings(),
+      ],
     ),
 
     GetPage(name: Routes.SETTINGS, page: () => SettingsPage()),
