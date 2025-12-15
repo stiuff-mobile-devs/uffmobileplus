@@ -137,7 +137,7 @@ class PayTicketPage extends GetView<PayRestaurantController> {
                           alignment: Alignment.bottomCenter,
                           child: GestureDetector(
                             onTap: () {
-                              //model.refresh(context);
+                              controller.refresh();
                             },
                             child: Container(
                               margin: EdgeInsets.only(bottom: 30.0),
