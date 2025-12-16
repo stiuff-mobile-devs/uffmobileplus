@@ -29,10 +29,10 @@ Future<void> main() async {
     name: 'cardapio_ru',
     options: FirebaseOptionsCardapioRU.currentPlatform,
   );
-  /*await Firebase.initializeApp(
+  await Firebase.initializeApp(
     name: 'tracking',
     options: FirebaseOptionsTracking.currentPlatform,
-  );*/
+  );
 
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   await HiveService.init();
