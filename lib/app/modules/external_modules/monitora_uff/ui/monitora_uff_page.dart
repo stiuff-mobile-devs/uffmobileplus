@@ -11,6 +11,18 @@ class MonitoraUffPage extends GetView<MonitoraUffController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        elevation: 8,
+        foregroundColor: Colors.white,
+        title: Text("Monitora UFF"),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
+        ),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
+        ),
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: AppColors.darkBlueToBlackGradient(),
@@ -30,15 +42,6 @@ class MonitoraUffPage extends GetView<MonitoraUffController> {
               ),
               child: Column(
                 children: [
-                   Text(
-                      'Monitora UFF',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 15),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
