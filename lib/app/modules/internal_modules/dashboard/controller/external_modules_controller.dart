@@ -97,7 +97,7 @@ class ExternalModulesController extends GetxController {
     ),
 
     ExternalModules(
-      iconSrc: 'assets/icons/monitora_uff.png',
+      iconSrc: 'assets/icons/monitora_uff.svg',
       subtitle: 'monitora_uff'.tr,
       page: Routes.MONITORA_UFF,
       url: '',
