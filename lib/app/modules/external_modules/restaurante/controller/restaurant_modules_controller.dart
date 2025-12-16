@@ -42,6 +42,15 @@ class RestaurantModulesController extends GetxController {
       //availableFor: [ProfileTypes.student, ProfileTypes.professor, ProfileTypes.employee],
       //gdiGroups: null
     ),
+    RestaurantModules(
+      iconSrc: 'assets/restaurant/icons/saldo-extrato.svg',
+      subtitle: 'Saldo e Extrato'.tr,
+      page: Routes.BALANCE_STATEMENT,
+      url: '',
+      interrogation: false,
+      //availableFor: [ProfileTypes.student, ProfileTypes.professor, ProfileTypes.employee],
+      //gdiGroups: null
+    ),
   ];
 
   void navigateTo(

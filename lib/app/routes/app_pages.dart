@@ -4,6 +4,8 @@ import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/u
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/bindings/restaurante_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/papers/bindings/papers_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/papers/ui/papers_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/balance_statement/bindings/balance_statement_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/balance_statement/ui/balance_statement_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/bindings/pay_restaurant_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/ui/pages/pay_help_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/ui/pages/pay_ticket_page.dart';
@@ -187,6 +189,13 @@ abstract class AppPages {
       name: Routes.RECHARGE_CARD_PAY,
       page: () => RechargeCardPay(),
       bindings: [RechargeCardBindings()],
+    ),
+
+    GetPage(
+      name: Routes.BALANCE_STATEMENT,
+      page: () => BalanceStatementPage(),
+      bindings: [UserDataBindings(),
+        AuthIduffBindings(),BalanceStatementBindings()],
     ),
 
     GetPage(name: Routes.SETTINGS, page: () => SettingsPage()),

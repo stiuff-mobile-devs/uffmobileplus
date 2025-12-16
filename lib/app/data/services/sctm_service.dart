@@ -306,4 +306,27 @@ class SctmService {
       throw Exception('Failed to get Pending User');
     }
   }
+
+Future<bool> refreshPayments(String idUff, String accessToken) async {
+    try {
+      var uri = Uri.https(
+        Secrets.refreshPaymentsHost,
+        Secrets.refreshPaymentsPath,
+        {"iduff_usuario": idUff, "token": accessToken},
+      );
+
+      http.Response response = await http.post(uri);
+      var responseDecoded = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        if (responseDecoded["content"] != null &&
+            responseDecoded["content"]["atualizado"] != null) {
+          return responseDecoded["content"]["atualizado"];
+        }
+      }
+    } catch (e) {}
+    return false;
+  }
+
+   
 }
