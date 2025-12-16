@@ -177,12 +177,19 @@ class ExternalModulesPage extends StatelessWidget {
           children: [
             // Container para efeito
             iconVisualEffect(
-              child: SvgPicture.asset(
-                externalModule.iconSrc,
-                width: 50,
-                height: 50,
-                color: Colors.white,
-              ),
+              child: externalModule.iconSrc.endsWith('.svg')
+                  ? SvgPicture.asset(
+                      externalModule.iconSrc,
+                      width: 50,
+                      height: 50,
+                      color: Colors.white,
+                    )
+                  : Image.asset(
+                      externalModule.iconSrc,
+                      width: 65,
+                      height: 65,
+                      color: Colors.white,
+                    ),
             ),
             SizedBox(height: 10), // Espaçamento
             // Título/subtítulo do serviço
