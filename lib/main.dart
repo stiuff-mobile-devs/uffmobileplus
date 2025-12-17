@@ -17,22 +17,51 @@ import 'package:firebase_core/firebase_core.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await LocationService().initializeService();
-  await Firebase.initializeApp(
-    name: 'uffmobileplus',
-    options: FirebaseOptionsUffmobileplus.currentPlatform,
-  );
-  await Firebase.initializeApp(
-    name: 'catracaoffline',
-    options: FirebaseOptionsCatracaoffline.currentPlatform,
-  );
-  await Firebase.initializeApp(
-    name: 'cardapio_ru',
-    options: FirebaseOptionsCardapioRU.currentPlatform,
-  );
-  await Firebase.initializeApp(
-    name: 'tracking',
-    options: FirebaseOptionsTracking.currentPlatform,
-  );
+  try {
+    if (Firebase.apps.isEmpty) {
+      await Firebase.initializeApp(
+        name: 'uffmobileplus',
+        options: FirebaseOptionsUffmobileplus.currentPlatform,
+      );
+    } else {
+        // If default app exists, we might want to use it or check if others are initialized?
+        // But here we are initializing named apps.
+        // Let's just wrap each in try-catch independently.
+        await Firebase.initializeApp(
+            name: 'uffmobileplus',
+            options: FirebaseOptionsUffmobileplus.currentPlatform,
+        );
+    }
+  } catch (e) {
+      print("Error initializing uffmobileplus: $e");
+  }
+
+  try {
+    await Firebase.initializeApp(
+        name: 'catracaoffline',
+        options: FirebaseOptionsCatracaoffline.currentPlatform,
+    );
+  } catch (e) {
+      print("Error initializing catracaoffline: $e");
+  }
+
+  try {
+    await Firebase.initializeApp(
+        name: 'cardapio_ru',
+        options: FirebaseOptionsCardapioRU.currentPlatform,
+    );
+  } catch (e) {
+      print("Error initializing cardapio_ru: $e");
+  }
+
+  try {
+    await Firebase.initializeApp(
+        name: 'tracking',
+        options: FirebaseOptionsTracking.currentPlatform,
+    );
+  } catch (e) {
+      print("Error initializing tracking: $e");
+  }
 
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   await HiveService.init();

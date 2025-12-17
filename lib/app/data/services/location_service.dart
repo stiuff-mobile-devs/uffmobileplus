@@ -18,12 +18,12 @@ class LocationService {
   Future<void> initializeService() async {
     final service = FlutterBackgroundService();
 
-    // Notification Setup
+    // Configuração da Notificação
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
       notificationChannelId, // id
-      'Location Tracking', // title
-      description: 'This channel is used for location tracking notifications.', // description
-      importance: Importance.low, // importance must be at low or higher level
+      'Location Tracking', // título
+      description: 'Este canal é usado para notificações de rastreamento de localização.', // descrição
+      importance: Importance.low, // a importância deve ser baixa ou superior
     );
 
     final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -36,26 +36,26 @@ class LocationService {
 
     await service.configure(
       androidConfiguration: AndroidConfiguration(
-        // this will be executed when app is in foreground or background in separated isolate
+        // isso será executado quando o app estiver em primeiro ou segundo plano em um isolate separado
         onStart: onStart,
 
-        // auto start service
+        // iniciar serviço automaticamente
         autoStart: false, 
         isForegroundMode: true,
 
-        notificationChannelId: notificationChannelId, // this must match with notification channel you created above.
+        notificationChannelId: notificationChannelId, // isso deve coincidir com o canal de notificação criado acima.
         initialNotificationTitle: 'Monitora UFF',
         initialNotificationContent: 'Initializing...',
         foregroundServiceNotificationId: notificationId,
       ),
       iosConfiguration: IosConfiguration(
-        // auto start service
+        // iniciar serviço automaticamente
         autoStart: false,
 
-        // this will be executed when app is in foreground in separated isolate
+        // isso será executado quando o app estiver em primeiro plano em um isolate separado
         onForeground: onStart,
 
-        // you have to enable background fetch capability on xcode project
+        // você tem que habilitar o recurso de 'background fetch' no projeto xcode
         onBackground: onIosBackground,
       ),
     );
@@ -71,17 +71,17 @@ Future<bool> onIosBackground(ServiceInstance service) async {
 
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
-  // Only available for flutter 3.0.0 and later
+  // Disponível apenas para flutter 3.0.0 e posteriores
   DartPluginRegistrant.ensureInitialized();
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  // Initialize FLNP to handle actions in the background isolate
+  // Inicializar FLNP para lidar com ações no isolate de segundo plano
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings('@mipmap/ic_launcher');
 
-  // Initialize Firebase in background isolate
+  // Inicializar Firebase no isolate de segundo plano
   try {
     await Firebase.initializeApp(
       name: 'tracking',
@@ -95,7 +95,7 @@ void onStart(ServiceInstance service) async {
   await flutterLocalNotificationsPlugin.initialize(
     const InitializationSettings(android: initializationSettingsAndroid),
     onDidReceiveNotificationResponse: (NotificationResponse response) {
-       // Handle payload (body tap) or actionId (button tap)
+       // Tratar payload (toque no corpo) ou actionId (toque no botão)
        if (response.payload == 'disable_tracking' || response.actionId == 'disable_tracking') {
            service.invoke('stopTracking');
        } else if (response.payload == 'enable_tracking' || response.actionId == 'enable_tracking') {
@@ -109,91 +109,26 @@ void onStart(ServiceInstance service) async {
     service.stopSelf();
   });
   
-  // Manage state
+  // Gerenciar estado
   bool isTracking = false;
 
   StreamSubscription<Position>? positionStream;
   Timer? uploadTimer;
   Position? currentPosition;
 
-  // Helper to safely get or initialize the Firebase App
-  Future<FirebaseApp> _getTrackingApp() async {
-      try {
-          return Firebase.app('tracking');
-      } catch (e) {
-          // If not found, try to initialize
-          return await Firebase.initializeApp(
-              name: 'tracking',
-              options: FirebaseOptionsTracking.currentPlatform,
-          );
-      }
-  }
-
-  // Helper to update notification
-  Future<void> updateNotification(bool tracking) async {
-      await flutterLocalNotificationsPlugin.show(
-        LocationService.notificationId,
-        'Monitora UFF',
-        tracking ? 'Tracking Active' : 'Tracking Paused',
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            LocationService.notificationChannelId,
-            'Location Tracking',
-            icon: '@mipmap/ic_launcher',
-            ongoing: true, // Required to keep service alive in FG
-            actions: [
-               if (tracking)
-                 const AndroidNotificationAction('disable_tracking', 'Disable', showsUserInterface: false, cancelNotification: false)
-               else
-                 const AndroidNotificationAction('enable_tracking', 'Enable', showsUserInterface: false, cancelNotification: false)
-            ],
-          ),
-        ),
-        payload: tracking ? 'disable_tracking' : 'enable_tracking', // Payload for tap
-      );
-  }
-
-  // Helper to upload location
-  Future<void> _uploadLocation(String deviceId, Position position) async {
-       try {
-           final FirebaseApp app = await _getTrackingApp();
-           final FirebaseFirestore firestore = FirebaseFirestore.instanceFor(app: app);
-           
-           // 1. Add to history (existing logic)
-           await firestore.collection('locations').add({
-             'latitude': position.latitude,
-             'longitude': position.longitude,
-             'timestamp': FieldValue.serverTimestamp(),
-             'deviceId': deviceId, 
-           });
-
-           // 2. Update live location (new logic)
-           await firestore.collection('live_locations').doc(deviceId).set({
-               'latitude': position.latitude,
-               'longitude': position.longitude,
-               'timestamp': FieldValue.serverTimestamp(),
-               'deviceId': deviceId,
-               'isMonitored': true,
-           }, SetOptions(merge: true));
-
-           print('LocationService: Location uploaded for $deviceId: ${position.latitude}, ${position.longitude}');
-       } catch (e) {
-           print('LocationService: Error uploading location: $e');
-       }
-  }
 
   service.on('startTracking').listen((event) async {
       if(isTracking) return;
       isTracking = true;
-      await updateNotification(true);
+      await updateNotification(flutterLocalNotificationsPlugin, true);
 
-      // Get Device ID
+      // Obter ID do Dispositivo
       String deviceId = 'unknown_device';
       final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
       try {
         if (Platform.isAndroid) {
           AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-          deviceId = androidInfo.id; // Unique ID on Android
+          deviceId = androidInfo.id; // ID Único no Android
         } else if (Platform.isIOS) {
           IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
           deviceId = iosInfo.identifierForVendor ?? 'unknown_ios';
@@ -204,7 +139,7 @@ void onStart(ServiceInstance service) async {
       }
       print('LocationService: Using Device ID: $deviceId');
 
-      // Immediate status update to Firestore (Status ONLY)
+      // Atualização imediata de status no Firestore (APENAS Status)
       try {
            final FirebaseApp app = await _getTrackingApp();
            final FirebaseFirestore firestore = FirebaseFirestore.instanceFor(app: app);
@@ -220,12 +155,35 @@ void onStart(ServiceInstance service) async {
 
       bool isFirstLocation = true; // Flag for first location
 
-      // Start Geolocation Stream for UI updates
+      // Iniciar Stream de Geolocalização para atualizações de UI
+      LocationSettings locationSettings;
+      if (Platform.isAndroid) {
+        locationSettings = AndroidSettings(
+          accuracy: LocationAccuracy.bestForNavigation,
+          distanceFilter: 15, // Distância mínima (metros)
+          // forceLocationManager: true, // Removed to use FusedLocationProvider for better stability
+          intervalDuration: const Duration(seconds: 5), // Tempo mínimo entre atualizações
+        );
+      } else if (Platform.isIOS || Platform.isMacOS) {
+        locationSettings = AppleSettings(
+          accuracy: LocationAccuracy.high,
+          activityType: ActivityType.fitness,
+          distanceFilter: 15,
+          pauseLocationUpdatesAutomatically: true,
+        );
+      } else {
+        locationSettings = const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          distanceFilter: 15,
+        );
+      }
+
       positionStream = Geolocator.getPositionStream(
-          locationSettings: const LocationSettings(
-              accuracy: LocationAccuracy.high, distanceFilter: 10))
+          locationSettings: locationSettings)
           .listen((Position? position) {
         if (position != null) {
+          
+
           currentPosition = position;
           service.invoke(
             'updateLocation',
@@ -242,7 +200,7 @@ void onStart(ServiceInstance service) async {
         }
       });
 
-      // Start Periodic Upload Timer (every 30 seconds)
+      // Iniciar Timer de Envio Periódico (a cada 30 segundos)
       uploadTimer = Timer.periodic(const Duration(seconds: 30), (timer) async {
           if (currentPosition != null) {
              await _uploadLocation(deviceId, currentPosition!);
@@ -278,17 +236,83 @@ void onStart(ServiceInstance service) async {
        isTracking = false;
        positionStream?.cancel();
        uploadTimer?.cancel();
-       await updateNotification(false);
+       await updateNotification(flutterLocalNotificationsPlugin, false);
        service.invoke('trackingStatus', {'isTracking': false});
   });
+
+  service.on('requestUpdate').listen((event) {
+      service.invoke('trackingStatus', {'isTracking': isTracking});
+      if (currentPosition != null && isTracking) {
+          service.invoke(
+            'updateLocation',
+            {
+              'lat': currentPosition!.latitude,
+              'lng': currentPosition!.longitude,
+            },
+          );
+      }
+  });
   
-  // Initial State
-  await updateNotification(false);
+  // Estado Inicial
+  await updateNotification(flutterLocalNotificationsPlugin, false);
+}
+
+// Helper para atualizar a notificação
+Future<void> updateNotification(FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin, bool tracking) async {
+  await flutterLocalNotificationsPlugin.show(
+    LocationService.notificationId,
+    'Monitora UFF',
+    tracking ? 'Tracking Active' : 'Tracking Paused',
+    NotificationDetails(
+      android: AndroidNotificationDetails(
+        LocationService.notificationChannelId,
+        'Location Tracking',
+        icon: '@mipmap/ic_launcher',
+        ongoing: true, // Necessário para manter o serviço ativo em primeiro plano
+        actions: [
+           if (tracking)
+             const AndroidNotificationAction('disable_tracking', 'Disable', showsUserInterface: false, cancelNotification: false)
+           else
+             const AndroidNotificationAction('enable_tracking', 'Enable', showsUserInterface: false, cancelNotification: false)
+        ],
+      ),
+    ),
+    payload: tracking ? 'disable_tracking' : 'enable_tracking', // Payload para o toque
+  );
+}
+
+// Helper para enviar a localização
+Future<void> _uploadLocation(String deviceId, Position position) async {
+  try {
+    final FirebaseApp app = await _getTrackingApp();
+    final FirebaseFirestore firestore = FirebaseFirestore.instanceFor(app: app);
+    
+    // 1. Adicionar ao histórico
+    await firestore.collection('locations').add({
+      'latitude': position.latitude,
+      'longitude': position.longitude,
+      'timestamp': FieldValue.serverTimestamp(),
+      'deviceId': deviceId, 
+    });
+
+    // 2. Atualizar localização em tempo real
+    await firestore.collection('live_locations').doc(deviceId).set({
+      'latitude': position.latitude,
+      'longitude': position.longitude,
+      'timestamp': FieldValue.serverTimestamp(),
+      'deviceId': deviceId,
+      'isMonitored': true,
+    }, SetOptions(merge: true));
+
+    print('LocationService: Location uploaded for $deviceId: ${position.latitude}, ${position.longitude}');
+  } catch (e) {
+    print('LocationService: Error uploading location: $e');
+  }
 }
 
 @pragma('vm:entry-point')
 void notificationTapBackground(NotificationResponse notificationResponse) {
-  // Initialize plugins if needed
+  // Inicializar plugins se necessário
   DartPluginRegistrant.ensureInitialized();
   
   final service = FlutterBackgroundService();
@@ -296,5 +320,18 @@ void notificationTapBackground(NotificationResponse notificationResponse) {
      service.invoke('stopTracking');
   } else if (notificationResponse.actionId == 'enable_tracking') {
      service.invoke('startTracking');
+  }
+}
+
+// Helper para obter ou inicializar o Firebase App com segurança
+Future<FirebaseApp> _getTrackingApp() async {
+  try {
+    return Firebase.app('tracking');
+  } catch (e) {
+    // Se não encontrado, tentar inicializar
+    return await Firebase.initializeApp(
+      name: 'tracking',
+      options: FirebaseOptionsTracking.currentPlatform,
+    );
   }
 }
