@@ -18,63 +18,61 @@ class ExternalModulesPage extends StatelessWidget {
         child: GetBuilder<ExternalModulesController>(
           init: ExternalModulesController(),
           builder: (controller) {
-            return Builder(
-              builder: (context) {
-                return CustomScrollView(
-                  slivers: [
-                    // AppBar que se comporta como uma sliver (pode ser expandida/colapsada)
-                    SliverAppBar(
-                      foregroundColor: Colors.white,
-                      title: Text('servicos'.tr),
-                      centerTitle: true,
-                      elevation: 8, // Sombra da AppBar
+            return Obx(() {
+              return CustomScrollView(
+                slivers: [
+                  // AppBar que se comporta como uma sliver (pode ser expandida/colapsada)
+                  SliverAppBar(
+                    foregroundColor: Colors.white,
+                    title: Text('servicos'.tr),
+                    centerTitle: true,
+                    elevation: 8, // Sombra da AppBar
 
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(
-                          bottom: Radius.circular(10),
-                        ),
-                      ),
-                      flexibleSpace: Container(
-                        decoration: BoxDecoration(
-                          gradient: AppColors.appBarTopGradient(),
-                        ),
-                      ),
-
-                      // Botão de ajuda/documentação
-                      actions: <Widget>[
-                        IconButton(
-                          onPressed: () {},
-                          icon: const Icon(Icons.question_mark),
-                        ),
-                      ],
-                    ),
-
-                    // Padding ao redor da grade de serviços
-                    SliverPadding(
-                      padding: const EdgeInsets.all(20),
-
-                      // Grade de serviços
-                      sliver: SliverGrid(
-                        delegate: SliverChildBuilderDelegate((context, index) {
-                          return externalModulesWidget(
-                            controller.externalModulesList[index],
-                            controller,
-                            context,
-                          );
-                        }, childCount: controller.externalModulesList.length),
-
-                        // Define grade com 3 colunas fixas
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              childAspectRatio: 0.79,
-                            ),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        bottom: Radius.circular(10),
                       ),
                     ),
-                  ],
-                );
-              },
-            );
+                    flexibleSpace: Container(
+                      decoration: BoxDecoration(
+                        gradient: AppColors.appBarTopGradient(),
+                      ),
+                    ),
+
+                    // Botão de ajuda/documentação
+                    actions: <Widget>[
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.question_mark),
+                      ),
+                    ],
+                  ),
+
+                  // Padding ao redor da grade de serviços
+                  SliverPadding(
+                    padding: const EdgeInsets.all(20),
+
+                    // Grade de serviços
+                    sliver: SliverGrid(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        return externalModulesWidget(
+                          controller.externalModulesList[index],
+                          controller,
+                          context,
+                        );
+                      }, childCount: controller.externalModulesList.length),
+
+                      // Define grade com 3 colunas fixas
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            childAspectRatio: 0.79,
+                          ),
+                    ),
+                  ),
+                ],
+              );
+            });
           },
         ),
       ),

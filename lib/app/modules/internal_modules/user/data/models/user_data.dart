@@ -1,11 +1,9 @@
-
 import 'package:hive/hive.dart';
+import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
 part 'user_data.g.dart';
-
 
 @HiveType(typeId: 18)
 class UserData extends HiveObject {
-  
   @HiveField(0)
   String? name;
 
@@ -42,6 +40,9 @@ class UserData extends HiveObject {
   @HiveField(11)
   List<GdiGroups>? gdiGroups;
 
+  @HiveField(12)
+  ProfileTypes? profileType;
+
   UserData({
     this.name,
     this.nomesocial,
@@ -54,10 +55,9 @@ class UserData extends HiveObject {
     this.textoQrCodeCarteirinha,
     this.accessToken,
     this.bondId,
-    this.gdiGroups
-  }
-  );
-
+    this.gdiGroups,
+    this.profileType,
+  });
 
   factory UserData.fromJson(Map<String, dynamic> json) {
     return UserData(
@@ -74,8 +74,13 @@ class UserData extends HiveObject {
       bondId: json['bondId'] as String?,
       gdiGroups: json['gdiGroups'] != null
           ? (json['gdiGroups'] as List)
-              .map((group) => GdiGroups.fromJson(group))
-              .toList()
+                .map((group) => GdiGroups.fromJson(group))
+                .toList()
+          : null,
+      profileType: json['profileType'] != null
+          ? ProfileTypes.values.firstWhere(
+              (e) => e.toString() == 'ProfileTypes.${json['profileType']}',
+            )
           : null,
     );
   }
@@ -93,10 +98,10 @@ class UserData extends HiveObject {
       'textoQrCodeCarteirinha': textoQrCodeCarteirinha,
       'accessToken': accessToken,
       'bondId': bondId,
-      'gdiGroups': gdiGroups?.map((group) => {
-        'gid': group.gid,
-        'descricao': group.description,
-      }).toList(),
+      'gdiGroups': gdiGroups
+          ?.map((group) => {'gid': group.gid, 'descricao': group.description})
+          .toList(),
+      'profileType': profileType?.toString().split('.').last,
     };
   }
 }
