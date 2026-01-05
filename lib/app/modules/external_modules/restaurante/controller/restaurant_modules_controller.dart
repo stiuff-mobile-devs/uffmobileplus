@@ -1,36 +1,48 @@
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
+import 'package:uffmobileplus/app/utils/gdi_groups.dart';
+import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
 
 class RestaurantModulesController extends GetxController {
   RestaurantModulesController();
 
-  List<RestaurantModules> restaurantModulesList = [
+  late UserDataController _userDataController;
+  late UserData _usermodel;
+
+  @override
+  Future<void> onInit() async {
+    super.onInit();
+
+    _userDataController = Get.find<UserDataController>();
+    _usermodel = (await _userDataController.getUserData())!;
+
+    await filterButtonList(
+      _usermodel.profileType!,
+      _usermodel.gdiGroups ?? <GdiGroups>[],
+    );
+  }
+
+  final RxList<RestaurantModules> restaurantModulesList = RxList([
     RestaurantModules(
       iconSrc: 'assets/icons/cardapio.svg',
       subtitle: 'menu'.tr,
       page: Routes.BANDEJAPP,
       url: '',
       interrogation: false,
-      //availableFor: [ProfileTypes.student, ProfileTypes.professor, ProfileTypes.employee],
-      //gdiGroups: null
+      availableFor: everyoneLogged,
+      gdiGroups: null,
     ),
-    RestaurantModules(
-      iconSrc: 'assets/icons/validator_qr_code.svg',
-      subtitle: 'Catraca'.tr,
-      page: Routes.CATRACA_ONLINE,
-      url: '',
-      interrogation: false,
-      //availableFor: [ProfileTypes.student, ProfileTypes.professor, ProfileTypes.employee],
-      //gdiGroups: null
-    ),
+
     RestaurantModules(
       iconSrc: 'assets/restaurant/icons/qr-code.svg',
       subtitle: 'Pagar Restaurante'.tr,
       page: Routes.PAY_RESTAURANT,
       url: '',
       interrogation: false,
-      //availableFor: [ProfileTypes.student, ProfileTypes.professor, ProfileTypes.employee],
-      //gdiGroups: null
+      availableFor: everyoneLogged,
+      gdiGroups: null,
     ),
 
     RestaurantModules(
@@ -39,8 +51,8 @@ class RestaurantModulesController extends GetxController {
       page: Routes.RECHARGE_CARD,
       url: '',
       interrogation: false,
-      //availableFor: [ProfileTypes.student, ProfileTypes.professor, ProfileTypes.employee],
-      //gdiGroups: null
+      availableFor: everyoneLogged,
+      gdiGroups: null,
     ),
     RestaurantModules(
       iconSrc: 'assets/restaurant/icons/saldo-extrato.svg',
@@ -48,10 +60,25 @@ class RestaurantModulesController extends GetxController {
       page: Routes.BALANCE_STATEMENT,
       url: '',
       interrogation: false,
-      //availableFor: [ProfileTypes.student, ProfileTypes.professor, ProfileTypes.employee],
-      //gdiGroups: null
+      availableFor: everyoneLogged,
+      gdiGroups: null,
     ),
-  ];
+
+    RestaurantModules(
+      iconSrc: 'assets/icons/validator_qr_code.svg',
+      subtitle: 'Catraca'.tr,
+      page: Routes.CATRACA_ONLINE,
+      url: '',
+      interrogation: false,
+      availableFor: everyoneLogged,
+      gdiGroups: [
+        GdiGroups(
+          GdiGroupsEnum.controladoresDeAcesso.id,
+          'Controladores de Acesso',
+        ),
+      ],
+    ),
+  ]);
 
   void navigateTo(
     String route, {
@@ -68,24 +95,44 @@ class RestaurantModulesController extends GetxController {
       },
     );
   }
+
+  Future<void> filterButtonList(
+    ProfileTypes currentProfile,
+    List<GdiGroups> currentGdiGroups,
+  ) async {
+    restaurantModulesList.removeWhere((button) {
+      final hasProfile = button.availableFor.contains(currentProfile);
+      if (!hasProfile) return true;
+
+      if (button.gdiGroups == null) return false;
+
+      final hasGroupMatch = button.gdiGroups!.any(
+        (btnGroup) =>
+            currentGdiGroups.any((userGroup) => userGroup.gid == btnGroup.gid),
+      );
+
+      return !hasGroupMatch;
+    });
+    restaurantModulesList.refresh();
+  }
 }
 
 class RestaurantModules {
-  //final List<ProfileTypes> availableFor;
+  final List<ProfileTypes> availableFor;
   final String iconSrc;
   final String subtitle;
   final String page;
   final String? url;
   final bool? interrogation;
-  //final List<GdiGroups>? gdiGroups;
+  final List<GdiGroups>? gdiGroups;
 
   const RestaurantModules({
-    //required this.availableFor,
+    required this.availableFor,
     required this.iconSrc,
     required this.subtitle,
     required this.page,
     this.url,
     this.interrogation,
-    //this.gdiGroups})
+    required this.gdiGroups,
   });
 }

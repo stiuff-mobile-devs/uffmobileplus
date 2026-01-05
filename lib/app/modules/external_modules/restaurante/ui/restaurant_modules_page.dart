@@ -17,63 +17,61 @@ class RestaurantModulesPage extends StatelessWidget {
         child: GetBuilder<RestaurantModulesController>(
           init: RestaurantModulesController(),
           builder: (controller) {
-            return Builder(
-              builder: (context) {
-                return CustomScrollView(
-                  slivers: [
-                    // AppBar que se comporta como uma sliver (pode ser expandida/colapsada)
-                    SliverAppBar(
-                      foregroundColor: Colors.white,
-                      title: Text('restaurante_universitario'.tr),
-                      centerTitle: true,
-                      elevation: 8, // Sombra da AppBar
+            return Obx(() {
+              return CustomScrollView(
+                slivers: [
+                  // AppBar que se comporta como uma sliver (pode ser expandida/colapsada)
+                  SliverAppBar(
+                    foregroundColor: Colors.white,
+                    title: Text('restaurante_universitario'.tr),
+                    centerTitle: true,
+                    elevation: 8, // Sombra da AppBar
 
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.vertical(
-                          bottom: Radius.circular(10),
-                        ),
-                      ),
-                      flexibleSpace: Container(
-                        decoration: BoxDecoration(
-                          gradient: AppColors.appBarTopGradient(),
-                        ),
-                      ),
-
-                      // Botão de ajuda/documentação
-                      actions: <Widget>[
-                        IconButton(
-                          onPressed: () {},
-                          icon: const Icon(Icons.question_mark),
-                        ),
-                      ],
-                    ),
-
-                    // Padding ao redor da grade de serviços
-                    SliverPadding(
-                      padding: const EdgeInsets.all(20),
-
-                      // Grade de serviços
-                      sliver: SliverGrid(
-                        delegate: SliverChildBuilderDelegate((context, index) {
-                          return restaurantModulesWidget(
-                            controller.restaurantModulesList[index],
-                            controller,
-                            context,
-                          );
-                        }, childCount: controller.restaurantModulesList.length),
-
-                        // Define grade com 3 colunas fixas
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              childAspectRatio: 0.9,
-                            ),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        bottom: Radius.circular(10),
                       ),
                     ),
-                  ],
-                );
-              },
-            );
+                    flexibleSpace: Container(
+                      decoration: BoxDecoration(
+                        gradient: AppColors.appBarTopGradient(),
+                      ),
+                    ),
+
+                    // Botão de ajuda/documentação
+                    actions: <Widget>[
+                      IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.question_mark),
+                      ),
+                    ],
+                  ),
+
+                  // Padding ao redor da grade de serviços
+                  SliverPadding(
+                    padding: const EdgeInsets.all(20),
+
+                    // Grade de serviços
+                    sliver: SliverGrid(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        return restaurantModulesWidget(
+                          controller.restaurantModulesList[index],
+                          controller,
+                          context,
+                        );
+                      }, childCount: controller.restaurantModulesList.length),
+
+                      // Define grade com 3 colunas fixas
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            childAspectRatio: 0.9,
+                          ),
+                    ),
+                  ),
+                ],
+              );
+            });
           },
         ),
       ),

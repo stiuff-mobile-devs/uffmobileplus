@@ -94,6 +94,8 @@ class ExternalModulesController extends GetxController {
 
   @override
   Future<void> onInit() async {
+    super.onInit();
+
     _userDataController = Get.find<UserDataController>();
     _usermodel = (await _userDataController.getUserData())!;
 
@@ -122,7 +124,6 @@ class ExternalModulesController extends GetxController {
       'pt_BR': {'monitora_uff': 'Monitora UFF'},
       'en_US': {'monitora_uff': 'Monitora UFF'},
     });
-    super.onInit();
   }
 
   // TODO: parece redundante; melhor usar Get.toNamed direto?
