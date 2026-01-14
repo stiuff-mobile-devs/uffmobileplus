@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/binding/carteirinha_digital_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/ui/carteirinha_digital_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/repositorio_institucional/bindings/repositorio_institucional_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/repositorio_institucional/ui/repositorio_institucional_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/bindings/restaurante_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/papers/bindings/papers_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/papers/ui/papers_page.dart';
@@ -189,6 +191,12 @@ abstract class AppPages {
       name: Routes.RECHARGE_CARD_PAY,
       page: () => RechargeCardPay(),
       bindings: [RechargeCardBindings()],
+    ),
+
+    GetPage(
+      name: Routes.REPOSITORIO_INSTITUCIONAL,
+      page: () => RepositorioInstitucionalPage(),
+      bindings: [RepositorioInstitucionalBindings()],
     ),
 
     GetPage(

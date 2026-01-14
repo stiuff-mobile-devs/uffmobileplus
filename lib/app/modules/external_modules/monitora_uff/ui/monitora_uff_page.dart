@@ -73,9 +73,8 @@ class MonitoraUffPage extends GetView<MonitoraUffController> {
                  // Updating options usually doesn't move map after init.
                  // We can use the MapController in the controller logic, but for init we need a value.
                  // Niterói coordinates: -22.896620, -43.123793 (approx)
-                 final center = controller.currentPosition.value ?? LatLng(-22.8966, -43.1238);
-                 
-                 return FlutterMap(
+                  final center = controller.currentPosition.value ?? LatLng(-22.8966, -43.1238); 
+                return FlutterMap(
                     mapController: controller.mapController,
                     options: MapOptions(
                       // If we have a position, use it as initial center. 
