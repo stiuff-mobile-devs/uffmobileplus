@@ -16,10 +16,10 @@ class RepositorioInstitucionalPage extends GetView<RepositorioInstitucionalContr
         foregroundColor: Colors.white,
         title: Text('repositorio_institucional'.tr),
         flexibleSpace: Container(
-          decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
-        ),
+        decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
       ),
-
+    ),
+    backgroundColor: AppColors.lightBlue(),
     body: WebViewWidget(controller: controller.webController),
     );
   }
