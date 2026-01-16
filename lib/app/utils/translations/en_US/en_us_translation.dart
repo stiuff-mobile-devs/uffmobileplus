@@ -102,4 +102,7 @@ final Map<String, String> enUS = {
 
   // Catraca
   'catraca_online': 'Turnstile',
+
+  // Internacional
+  'internacional' : 'International'
 };

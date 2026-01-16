@@ -97,4 +97,7 @@ final Map<String, String> ptBR = {
   'refeicoes' : 'Refeições',
   'ver_refeicoes' : 'Ver Refeições',
   'restaurantes' : 'Restaurantes',
+
+  // Internacional
+  'internacional' : 'Internacional',
 };
