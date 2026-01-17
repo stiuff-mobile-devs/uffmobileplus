@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/binding/carteirinha_digital_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/ui/carteirinha_digital_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/central_de_atendimento/bindings/central_de_atendimento_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/central_de_atendimento/ui/central_de_atendimento_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/bindings/restaurante_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/papers/bindings/papers_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/papers/ui/papers_page.dart';
@@ -270,6 +272,11 @@ abstract class AppPages {
       name: Routes.MONITORA_UFF,
       page: () => MonitoraUffPage(),
       bindings: [MonitoraUffBindings()],
+    ),
+    GetPage(
+      name: Routes.CENTRAL_DE_ATENDIMENTO,
+      page: () => CentralDeAtendimentoPage(), 
+      bindings: [CentralDeAtendimentoBindings()],
     ),
   ];
 }

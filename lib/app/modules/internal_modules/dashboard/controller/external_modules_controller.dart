@@ -90,6 +90,16 @@ class ExternalModulesController extends GetxController {
       availableFor: everyoneLogged,
       gdiGroups: null,
     ),
+
+    ExternalModules(
+      iconSrc: 'assets/icons/atendimento.svg',
+      subtitle: 'central_de_atendimento'.tr,
+      page: Routes.CENTRAL_DE_ATENDIMENTO,
+      url: '',
+      interrogation: false,
+      availableFor: everyoneLogged,
+      gdiGroups: null,
+    ),
   ]);
 
   @override

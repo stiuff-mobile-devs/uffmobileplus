@@ -48,4 +48,7 @@ abstract class Routes {
 
   // Monitora UFF
   static const MONITORA_UFF = '/monitora_uff';
+
+  // Central de Atendimento
+  static const CENTRAL_DE_ATENDIMENTO = '/central_de_atendimento';
 }
