@@ -4,6 +4,9 @@ import 'package:uffmobileplus/app/modules/external_modules/central_de_atendiment
 class CentralDeAtendimentoBindings implements Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<CentralDeAtendimentoController>(() => CentralDeAtendimentoController());
-    }
+    Get.put<CentralDeAtendimentoController>(
+      CentralDeAtendimentoController(), 
+      permanent: true
+    );
+  }
 }
