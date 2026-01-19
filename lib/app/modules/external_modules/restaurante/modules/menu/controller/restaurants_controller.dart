@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:uffmobileplus/app/data/services/external_menu_service.dart';
+import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/utils/gdi_groups.dart';
 import '../data/models/campus_model.dart';
 import '../data/repository/restaurant_repository.dart';
@@ -10,7 +10,7 @@ class RestaurantsController extends GetxController {
   RestaurantsController();
 
   RestaurantRepository restaurantRepository = Get.put(RestaurantRepository());
-  ExternalMenuService menuService = Get.find<ExternalMenuService>();
+  ExternalModulesServices menuService = Get.find<ExternalModulesServices>();
 
   final evenDarkerBlue = const Color.fromRGBO(13, 19, 33, 1);
   final darkBlue = const Color.fromRGBO(26, 38, 64, 1.0);
@@ -30,9 +30,11 @@ class RestaurantsController extends GetxController {
   get stats => null;
 
   bool? isAdminModeEnabled() {
-    return menuService
-        .isInGroup(GdiGroupsEnum.adminCardapioRestauranteUniversitario) &&
-            !isDebugActive || (isDebugActive && debugMode == 1);
+    return menuService.isInGroup(
+              GdiGroupsEnum.adminCardapioRestauranteUniversitario,
+            ) &&
+            !isDebugActive ||
+        (isDebugActive && debugMode == 1);
   }
 
   @override
@@ -101,10 +103,12 @@ class RestaurantsController extends GetxController {
   }
 
   Future<T?> fetchWithRetries<T>(
-      BuildContext context, Future<T?> Function() fetchFunction,
-      {int retries = 5,
-      int delayMilliseconds = 100,
-      bool showTimeout = true}) async {
+    BuildContext context,
+    Future<T?> Function() fetchFunction, {
+    int retries = 5,
+    int delayMilliseconds = 100,
+    bool showTimeout = true,
+  }) async {
     isFetchLoading = 1;
     for (int i = 0; i < retries; i++) {
       final result = await fetchFunction();

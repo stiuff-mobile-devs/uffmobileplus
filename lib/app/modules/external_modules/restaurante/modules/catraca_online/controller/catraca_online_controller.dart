@@ -1,7 +1,7 @@
 import 'package:all_validations_br/all_validations_br.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:uffmobileplus/app/data/services/external_catraca_service.dart';
+import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/area.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/operator_transaction.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/operator_transaction_offline.dart';
@@ -12,7 +12,7 @@ import 'dart:async';
 class CatracaOnlineController extends GetxController {
   CatracaOnlineController();
 
-  late ExternalCatracaService service;
+  late ExternalModulesServices service;
   CatracaOnlineRepository repository = CatracaOnlineRepository();
 
   RxBool isAreaBusy = false.obs;
@@ -54,7 +54,7 @@ class CatracaOnlineController extends GetxController {
   }
 
   Future<void> _initAsync() async {
-    service = Get.find<ExternalCatracaService>();
+    service = Get.find<ExternalModulesServices>();
     await service.initialize();
     iduff = service.getUserIdUFF();
     await fetchAreas();

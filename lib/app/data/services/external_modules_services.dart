@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
+import 'package:uffmobileplus/app/utils/gdi_groups.dart';
 
 class ExternalModulesServices extends GetxService {
   late UserDataController _userDataController;
@@ -63,5 +64,24 @@ class ExternalModulesServices extends GetxService {
 
   Future<String?> getAccessToken() {
     return _auth.getAccessToken();
+  }
+
+  String getUserBondId() {
+    return _userData.bondId ?? "";
+  }
+
+  List<GdiGroups>? getUserGdiGroups() {
+    return _userData.gdiGroups;
+  }
+
+  bool isInGroup(GdiGroupsEnum gdiGroup) {
+    final groupsList = getUserGdiGroups();
+    if (groupsList == null) return false;
+    for (var group in groupsList) {
+      if (group.gid! == gdiGroup.id) {
+        return true;
+      }
+    }
+    return false;
   }
 }
