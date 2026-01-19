@@ -23,7 +23,7 @@ class ExternalModulesServices extends GetxService {
     _userDataController = Get.find<UserDataController>();
     _auth = Get.find<AuthIduffService>();
 
-    _userData = (await _userDataController.getUserData())!;
+    _userData = (await _userDataController.getUserData()) ?? UserData();
   }
 
   String? getUserName() {

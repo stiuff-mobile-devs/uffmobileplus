@@ -27,7 +27,7 @@ class ExternalModulesController extends GetxController {
       page: Routes.RESTAURANT_MODULES,
       url: '',
       interrogation: false,
-      availableFor: everyoneLogged,
+      availableFor: everyone,
       gdiGroups: null,
     ),
 
@@ -127,10 +127,10 @@ class ExternalModulesController extends GetxController {
     super.onInit();
 
     _userDataController = Get.find<UserDataController>();
-    _usermodel = (await _userDataController.getUserData())!;
+    _usermodel = (await _userDataController.getUserData()) ?? UserData();
 
     await filterButtonList(
-      _usermodel.profileType!,
+      _usermodel.profileType ?? ProfileTypes.anonymous,
       _usermodel.gdiGroups ?? <GdiGroups>[],
     );
 
