@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/binding/carteirinha_digital_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/ui/carteirinha_digital_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/internacional/bindings/internacional_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/internacional/ui/internacional_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/central_de_atendimento/bindings/central_de_atendimento_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/central_de_atendimento/ui/central_de_atendimento_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/bindings/restaurante_bindings.dart';
@@ -196,8 +198,11 @@ abstract class AppPages {
     GetPage(
       name: Routes.BALANCE_STATEMENT,
       page: () => BalanceStatementPage(),
-      bindings: [UserDataBindings(),
-        AuthIduffBindings(),BalanceStatementBindings()],
+      bindings: [
+        UserDataBindings(),
+        AuthIduffBindings(),
+        BalanceStatementBindings(),
+      ],
     ),
 
     GetPage(name: Routes.SETTINGS, page: () => SettingsPage()),
@@ -273,9 +278,15 @@ abstract class AppPages {
       page: () => MonitoraUffPage(),
       bindings: [MonitoraUffBindings()],
     ),
+
+    GetPage(
+      name: Routes.INTERNACIONAL,
+      page: () => InternacionalPage(),
+      bindings: [InternacionalBindings()],
+    ),
     GetPage(
       name: Routes.CENTRAL_DE_ATENDIMENTO,
-      page: () => CentralDeAtendimentoPage(), 
+      page: () => CentralDeAtendimentoPage(),
       bindings: [CentralDeAtendimentoBindings()],
     ),
   ];

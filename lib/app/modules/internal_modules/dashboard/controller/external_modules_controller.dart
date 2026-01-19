@@ -92,6 +92,16 @@ class ExternalModulesController extends GetxController {
     ),
 
     ExternalModules(
+      iconSrc: 'assets/icons/internacional.svg',
+      subtitle: 'internacional'.tr,
+      page: Routes.INTERNACIONAL,
+      url: '',
+      interrogation: false,
+      availableFor: everyoneLogged,
+      gdiGroups: null,
+    ),
+
+    ExternalModules(
       iconSrc: 'assets/icons/atendimento.svg',
       subtitle: 'central_de_atendimento'.tr,
       page: Routes.CENTRAL_DE_ATENDIMENTO,
