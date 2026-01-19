@@ -51,7 +51,12 @@ class MonitoraUffPage extends GetView<MonitoraUffController> {
                           point: controller.currentPosition.value!,
                           width: 80,
                           height: 80,
-                          child: Icon(Icons.location_pin, color: Colors.red, size: 40),
+                          child: GestureDetector(
+                            onTap: () {
+                              controller.showMarkerInfo(controller.myDeviceId ?? "Unknown Device");
+                            },
+                            child: Icon(Icons.location_pin, color: Colors.red, size: 40),
+                          ),
                         ),
                     ],
                   ),

@@ -106,12 +106,36 @@ class MonitoraUffController extends GetxController {
                           point: LatLng(lat, lng),
                           width: 80,
                           height: 80,
-                          child: Icon(Icons.location_pin, color: Colors.blueAccent, size: 40),
+                          child: GestureDetector(
+                            onTap: () {
+                              if (deviceId != null) {
+                                showMarkerInfo(deviceId);
+                              }
+                            },
+                            child: Icon(Icons.location_pin, color: Colors.blueAccent, size: 40),
+                          ),
                       ),
                   );
               }
           }
       });
+  }
+
+  void showMarkerInfo(String deviceId) {
+    Get.defaultDialog(
+      title: "Device Info",
+      content: Column(
+        children: [
+          Text("Device ID:"),
+          SizedBox(height: 5),
+          Text(deviceId, style: TextStyle(fontWeight: FontWeight.bold)),
+        ],
+      ),
+      textConfirm: "OK",
+      confirmTextColor: Colors.white,
+      onConfirm: () => Get.back(),
+    );
+
   }
 
   void toggleGathering(bool value) async {
