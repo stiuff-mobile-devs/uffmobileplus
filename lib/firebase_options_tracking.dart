@@ -15,39 +15,6 @@ import 'package:flutter/foundation.dart'
 /// );
 /// ```
 class FirebaseOptionsTracking {
-  static FirebaseOptions get currentPlatform {
-    if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
-    }
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return android;
-      case TargetPlatform.iOS:
-        return ios;
-      case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
-      case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
-      case TargetPlatform.linux:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for linux - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
-      default:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions are not supported for this platform.',
-        );
-    }
-  }
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBo8L5bV9yU0Dwd-_WcCQV203ntDI0TeY8',
@@ -57,14 +24,10 @@ class FirebaseOptionsTracking {
     storageBucket: 'umplus-monitora-uff.firebasestorage.app',
   );
 
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCf2jW-IKU_EOYVCRW_AZb0Nlbi4oLW-Kw',
-    appId: '1:937934866022:ios:a9889e2b776a3cc8a14fa7',
-    messagingSenderId: '937934866022',
-    projectId: 'umplus-monitora-uff',
-    storageBucket: 'umplus-monitora-uff.firebasestorage.app',
-    iosBundleId: 'br.uff.uffmobileplus',
-  );
+  static FirebaseOptions get currentPlatform {
+    return android;
+  }
+
 
   // Caso necessário adicione suporte para mais plataformas aqui usando como base os anteriores (android e ios).
 }

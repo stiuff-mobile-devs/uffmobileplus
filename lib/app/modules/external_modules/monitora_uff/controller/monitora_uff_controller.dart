@@ -11,15 +11,12 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 
 class MonitoraUffController extends GetxController {
-  final RxBool isGathering = false.obs;
-  final RxString coordinates = 'Lat: -, Long: -'.obs;
-  
-  final Rx<LatLng?> currentPosition = Rx<LatLng?>(null);
-  final MapController mapController = MapController();
-  final RxList<Marker> remoteMarkers = <Marker>[].obs;
-  String? myDeviceId;
-
-  StreamSubscription? _serviceSubscription; // Listen to service updates
+  final RxBool isGathering = false.obs; // Determina se usuário está sendo monitorado
+  final Rx<LatLng?> currentPosition = Rx<LatLng?>(null); // Coordenadas do usuário
+  final MapController mapController = MapController(); // Controlador do mapa
+  final RxList<Marker> remoteMarkers = <Marker>[].obs; // Marcadores de usuários remotos
+  String? myDeviceId; // ID do dispositivo do usuário
+  StreamSubscription? _serviceSubscription; // Ouvir atualizações do serviço
 
   @override
   void onInit() {
@@ -28,8 +25,6 @@ class MonitoraUffController extends GetxController {
     _connectToService();
     _listenToRemoteLocations();
   }
-
-
 
   @override
   void onClose() {
@@ -40,15 +35,13 @@ class MonitoraUffController extends GetxController {
   void _connectToService() {
     final service = FlutterBackgroundService();
     
-    // Listen for updates from the service
     _serviceSubscription = service.on('updateLocation').listen((event) {
+        // Note: curto circuito para evitar null
         if (event != null && event['lat'] != null && event['lng'] != null) {
             double lat = event['lat'];
             double lng = event['lng'];
             
-            coordinates.value = 'Lat: ${lat.toStringAsFixed(4)}, Long: ${lng.toStringAsFixed(4)}';
             currentPosition.value = LatLng(lat, lng);
-            // mapController.move(LatLng(lat, lng), 15); // Optional follow
         }
     });
 
@@ -57,13 +50,15 @@ class MonitoraUffController extends GetxController {
             isGathering.value = event['isTracking'];
             if (isGathering.value == false) {
                 currentPosition.value = null;
-                coordinates.value = 'Lat: -, Long: -';
             }
         }
     });
 
     service.isRunning().then((running) {
         isGathering.value = running;
+        if (running) {
+             service.invoke('requestUpdate');
+        }
     });
   }
 
@@ -83,12 +78,12 @@ class MonitoraUffController extends GetxController {
   }
 
   void _listenToRemoteLocations() {
-      // Use the default app instance or ensure we are using the correct one if named.
-      // Since LocationService uses 'tracking' app, we should probably check if main app uses default or tracking.
-      // Usually main app uses default. Let's assume we can access the 'tracking' app if initialized or default.
-      // Ideally, the main app should initialize Firebase. If it's initialized, we can access it.
-      // If 'tracking' app is only in background isolate, we might need to seek safety.
-      // But typically we use default instance in UI. Let's try default first.
+      // Use a instância padrão do app ou garanta que estamos usando a correta se nomeada.
+      // Como o LocationService usa o app 'tracking', devemos verificar se o app principal usa o padrão ou tracking.
+      // Geralmente o app principal usa o padrão. Vamos assumir que podemos acessar o app 'tracking' se inicializado ou padrão.
+      // Idealmente, o app principal deve inicializar o Firebase. Se estiver inicializado, podemos acessá-lo.
+      // Se o app 'tracking' estiver apenas no isolate de segundo plano, podemos precisar buscar segurança.
+      // Mas tipicamente usamos a instância padrão na UI. Vamos tentar o padrão primeiro.
       
       FirebaseFirestore.instance.collection('live_locations').snapshots().listen((snapshot) {
           remoteMarkers.clear();
@@ -96,11 +91,8 @@ class MonitoraUffController extends GetxController {
               final data = doc.data();
               final String? deviceId = data['deviceId'];
               final bool? isMonitored = data['isMonitored'];
-
-              // Debug Print
-              print('Controller: Me: $myDeviceId | Remote: $deviceId | isMonitored: $isMonitored | hasLoc: ${data['latitude'] != null}');
-
-              // Skip if it is me
+              
+              // Pular se for eu mesmo
               if (deviceId == myDeviceId) continue;
 
               if (isMonitored != true) continue;
@@ -130,53 +122,47 @@ class MonitoraUffController extends GetxController {
           isGathering.value = false;
           return;
       }
-      // Ensure service is running before invoking
+      // Garantir que o serviço está rodando antes de invocar
       if (!(await service.isRunning())) {
         await service.startService();
-        // Wait for the background isolate to initialize and register listeners
+        // Aguardar o isolate de segundo plano inicializar e registrar ouvintes
         await Future.delayed(const Duration(seconds: 2));
       }
       service.invoke('startTracking');
     } else {
+      currentPosition.value = null; // Immediate UI update
       service.invoke('stopTracking');
-      // Optionally stop the service entirely if we want to clear notification
-      // service.invoke('stopService'); 
+      // Opcionalmente parar o serviço completamente se quisermos limpar a notificação
+      service.invoke('stopService'); 
     }
     isGathering.value = value;
   }
 
+  // Esta função é responsável por verificar se o serviço de localização está habilitado e solicitar permissão ao usuário se necessário.
   Future<bool> _handlePermission() async {
     bool serviceEnabled;
     LocationPermission permission;
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the 
-      // App to enable the location services.
       return false;
     }
 
+    // Verifica se tem permissão
+    // se não tiver, solicita permissão
+    // e se o usuário negar, retorna false.
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale 
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
         return false;
       }
     }
     
     if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately. 
       return false;
     } 
 
     return true;
   }
-
-  // Removed direct Geolocator streams as they are now in the service
 }
