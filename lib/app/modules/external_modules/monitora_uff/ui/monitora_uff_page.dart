@@ -27,6 +27,7 @@ class MonitoraUffPage extends GetView<MonitoraUffController> {
         children: [
           // Área do Mapa (Fundo)
           Obx(() {
+             // Centraliza o mapa na localização atual do usuário ou em Niterói se não houver localização
              final center = controller.currentPosition.value ?? LatLng(-22.8966, -43.1238);
              
              return FlutterMap(
@@ -34,24 +35,26 @@ class MonitoraUffPage extends GetView<MonitoraUffController> {
                 options: MapOptions(
                   initialCenter: center, 
                   initialZoom: 15.0,
-                ),
+                ),  
                 children: [
                   TileLayer(
                     urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                     userAgentPackageName: 'br.uff.uffmobileplus',
                   ),
-                    MarkerLayer(
-                      markers: [
-                        ...controller.remoteMarkers,
-                        if (controller.currentPosition.value != null)
-                          Marker(
-                            point: controller.currentPosition.value!,
-                            width: 80,
-                            height: 80,
-                            child: Icon(Icons.location_pin, color: Colors.red, size: 40),
-                          ),
-                      ],
-                    ),
+                  MarkerLayer(
+                    markers: [
+                      // Marcadores de outros usuários remotos
+                      ...controller.remoteMarkers,
+                      // Marcador do próprio usuário
+                      if (controller.currentPosition.value != null)
+                        Marker(
+                          point: controller.currentPosition.value!,
+                          width: 80,
+                          height: 80,
+                          child: Icon(Icons.location_pin, color: Colors.red, size: 40),
+                        ),
+                    ],
+                  ),
                 ],
               );
           }),

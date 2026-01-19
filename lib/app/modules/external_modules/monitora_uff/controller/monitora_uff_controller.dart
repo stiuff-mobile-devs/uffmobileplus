@@ -11,11 +11,11 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 
 class MonitoraUffController extends GetxController {
-  final RxBool isGathering = false.obs;
-  final Rx<LatLng?> currentPosition = Rx<LatLng?>(null);
-  final MapController mapController = MapController();
-  final RxList<Marker> remoteMarkers = <Marker>[].obs;
-  String? myDeviceId;
+  final RxBool isGathering = false.obs; // Determina se usuário está sendo monitorado
+  final Rx<LatLng?> currentPosition = Rx<LatLng?>(null); // Coordenadas do usuário
+  final MapController mapController = MapController(); // Controlador do mapa
+  final RxList<Marker> remoteMarkers = <Marker>[].obs; // Marcadores de usuários remotos
+  String? myDeviceId; // ID do dispositivo do usuário
   StreamSubscription? _serviceSubscription; // Ouvir atualizações do serviço
 
   @override
@@ -25,8 +25,6 @@ class MonitoraUffController extends GetxController {
     _connectToService();
     _listenToRemoteLocations();
   }
-
-
 
   @override
   void onClose() {

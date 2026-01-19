@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/data/services/hive_service.dart';
 import 'package:uffmobileplus/app/routes/app_pages.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
@@ -11,7 +10,7 @@ import 'package:uffmobileplus/firebase_options_cardapio_ru.dart';
 import 'package:uffmobileplus/firebase_options_uffmobileplus.dart';
 import 'package:uffmobileplus/firebase_options_tracking.dart';
 
-import 'package:uffmobileplus/app/data/services/location_service.dart';
+import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/data/services/location_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 Future<void> main() async {
@@ -24,9 +23,6 @@ Future<void> main() async {
         options: FirebaseOptionsUffmobileplus.currentPlatform,
       );
     } else {
-        // If default app exists, we might want to use it or check if others are initialized?
-        // But here we are initializing named apps.
-        // Let's just wrap each in try-catch independently.
         await Firebase.initializeApp(
             name: 'uffmobileplus',
             options: FirebaseOptionsUffmobileplus.currentPlatform,
