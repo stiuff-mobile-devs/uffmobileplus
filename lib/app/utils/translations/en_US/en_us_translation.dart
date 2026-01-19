@@ -106,6 +106,9 @@ final Map<String, String> enUS = {
   // Catraca
   'catraca_online': 'Turnstile',
 
+  // Repositório Institucional
+  'repositorio_institucional': "Institutional Repository",
+
   // Internacional
   'internacional': 'International',
 

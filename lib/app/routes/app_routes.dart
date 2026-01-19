@@ -49,6 +49,9 @@ abstract class Routes {
   // Monitora UFF
   static const MONITORA_UFF = '/monitora_uff';
 
+  // Repositorio Institucional
+  static const REPOSITORIO_INSTITUCIONAL = '/repositorio-institucional';
+
   // Internacional
   static const INTERNACIONAL = '/internacional';
 

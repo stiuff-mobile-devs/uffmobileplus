@@ -103,6 +103,9 @@ final Map<String, String> ptBR = {
   'ver_refeicoes': 'Ver Refeições',
   'restaurantes': 'Restaurantes',
 
+  // Repositório Institucional
+  'repositorio_institucional': 'Repositório Institucional',
+
   // Internacional
   'internacional': 'Internacional',
 
