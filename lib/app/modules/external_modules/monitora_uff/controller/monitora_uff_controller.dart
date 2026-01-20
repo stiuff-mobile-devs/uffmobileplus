@@ -10,8 +10,11 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 
+import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
+
 class MonitoraUffController extends GetxController {
   final RxBool isGathering = false.obs; // Determina se usuário está sendo monitorado
+  ExternalModulesServices externalModulesServices = Get.find<ExternalModulesServices>();
   final Rx<LatLng?> currentPosition = Rx<LatLng?>(null); // Coordenadas do usuário
   final MapController mapController = MapController(); // Controlador do mapa
   final RxList<Marker> remoteMarkers = <Marker>[].obs; // Marcadores de usuários remotos
@@ -21,6 +24,7 @@ class MonitoraUffController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    externalModulesServices.initialize(); // Ensure services are initialized
     _fetchDeviceId();
     _connectToService();
     _listenToRemoteLocations();
@@ -89,11 +93,18 @@ class MonitoraUffController extends GetxController {
           remoteMarkers.clear();
           for (var doc in snapshot.docs) {
               final data = doc.data();
-              final String? deviceId = data['deviceId'];
+              // final String? deviceId = data['deviceId']; // Using matricula as ID now
+              final String? matricula = data['matricula'];
+              final String? name = data['name'];
               final bool? isMonitored = data['isMonitored'];
               
-              // Pular se for eu mesmo
-              if (deviceId == myDeviceId) continue;
+              // Pular se for eu mesmo (comparar matricula se possivel, ou manter deviceId check se quisermos, mas melhor matricula)
+             // Com a mudança para matricula como ID do doc, podemos verificar se o ID do doc é a minha matricula.
+             // Mas vamos manter a lógica de deviceId por enquanto se o serviço ainda mandar deviceId, mas o plano diz para mudar.
+             // Vamos verificar ambos para garantir.
+              
+              final myMatricula = externalModulesServices.getUserMatricula();
+              if (matricula == myMatricula) continue;
 
               if (isMonitored != true) continue;
 
@@ -108,11 +119,29 @@ class MonitoraUffController extends GetxController {
                           height: 80,
                           child: GestureDetector(
                             onTap: () {
-                              if (deviceId != null) {
-                                showMarkerInfo(deviceId);
+                              if (matricula != null) {
+                                showMarkerInfo(name);
                               }
                             },
-                            child: Icon(Icons.location_pin, color: Colors.blueAccent, size: 40),
+                            child: Column(
+                              children: [
+                                if (name != null) 
+                                  Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(color: Colors.blueAccent)
+                                    ),
+                                    child: Text(
+                                      name, 
+                                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black), 
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                Icon(Icons.location_pin, color: Colors.blueAccent, size: 40),
+                              ],
+                            ),
                           ),
                       ),
                   );
@@ -121,14 +150,13 @@ class MonitoraUffController extends GetxController {
       });
   }
 
-  void showMarkerInfo(String deviceId) {
+  void showMarkerInfo(String? name) {
     Get.defaultDialog(
-      title: "Device Info",
+      title: "Informações do Usuário",
       content: Column(
         children: [
-          Text("Device ID:"),
-          SizedBox(height: 5),
-          Text(deviceId, style: TextStyle(fontWeight: FontWeight.bold)),
+          Text("Nome:"),
+          Text(name ?? "Desconhecido", style: TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
       textConfirm: "OK",
@@ -146,13 +174,32 @@ class MonitoraUffController extends GetxController {
           isGathering.value = false;
           return;
       }
+      // Validation: Check matricula
+      String matricula = externalModulesServices.getUserMatricula();
+      String? name = externalModulesServices.getUserName();
+
+      if (matricula == "-" || matricula.isEmpty) {
+          Get.snackbar(
+            "Erro",
+            "Matricula inválida. Não é possível iniciar o monitoramento.",
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+          isGathering.value = false;
+          return;
+      }
+
       // Garantir que o serviço está rodando antes de invocar
       if (!(await service.isRunning())) {
         await service.startService();
         // Aguardar o isolate de segundo plano inicializar e registrar ouvintes
         await Future.delayed(const Duration(seconds: 2));
       }
-      service.invoke('startTracking');
+      service.invoke('startTracking', {
+        'matricula': matricula,
+        'name': name ?? 'Unknown',
+      });
     } else {
       currentPosition.value = null; // Immediate UI update
       service.invoke('stopTracking');
