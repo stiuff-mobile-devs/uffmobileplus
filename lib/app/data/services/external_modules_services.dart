@@ -6,7 +6,7 @@ import 'package:uffmobileplus/app/utils/gdi_groups.dart';
 
 class ExternalModulesServices extends GetxService {
   late UserDataController _userDataController;
-  late UserData _userData;
+  UserData _userData = UserData();
   late AuthIduffService _auth;
 
   bool isExpired = false;

@@ -216,6 +216,13 @@ class MonitoraUffController extends GetxController {
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
+      Get.snackbar(
+        "Serviço de Localização Desativado",
+        "Por favor, ative o GPS para iniciar o monitoramento.",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
       return false;
     }
 
