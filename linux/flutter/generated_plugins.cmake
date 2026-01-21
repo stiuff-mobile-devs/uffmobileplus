@@ -3,7 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  rive_native
+  rive_common
   url_launcher_linux
 )
 

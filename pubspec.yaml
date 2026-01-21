@@ -38,7 +38,7 @@ dependencies:
   qr_flutter: ^4.1.0
   intl: ^0.20.2
   mobile_scanner: ^7.1.2
-  rive: ^0.14.1
+  rive: 0.13.20
   http: ^1.5.0
   radio_player: ^2.2.1
   marquee: ^2.3.0
