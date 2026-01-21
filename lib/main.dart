@@ -18,8 +18,6 @@ Future<void> main() async {
   await HiveService.init();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
-  Get.put<ExternalModulesServices>(ExternalModulesServices(), permanent: true);
-
   runApp(
     GetMaterialApp(
       debugShowCheckedModeBanner: true,
