@@ -7,8 +7,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:uffmobileplus/firebase_options_tracking.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'dart:io';
+
+// Neste arquivo: funções sem @pragma('vm:entry-point') são helpers
+// funções com @pragma('vm:entry-point') são executadas em um isolate separado
 
 @pragma('vm:entry-point')
 class LocationService {
@@ -115,40 +117,30 @@ void onStart(ServiceInstance service) async {
   StreamSubscription<Position>? positionStream;
   Timer? uploadTimer;
   Position? currentPosition;
-  String? currentMatricula; // Store matricula
+  String? currentIdUFF; // Store iduff
   String? currentName; // Store name
 
 
-  service.on('startTracking').listen((event) async {
+      service.on('startTracking').listen((event) async {
       if(isTracking) return;
       
       if (event != null) {
-        currentMatricula = event['matricula'];
+        currentIdUFF = event['iduff'];
         currentName = event['name'];
-        print('LocationService: Received user info: $currentName ($currentMatricula)');
+        print('LocationService: Received user info: $currentName ($currentIdUFF)');
       }
 
+      if (currentIdUFF == null || currentIdUFF!.isEmpty) {
+        print('LocationService: ERROR - Missing iduff. Cannot start tracking.');
+        return;
+      }
+      
+      String trackingId = currentIdUFF!;
+      
       isTracking = true;
       await updateNotification(flutterLocalNotificationsPlugin, true);
 
-      // Obter ID do Dispositivo (mantido como fallback ou info adicional)
-      String deviceId = 'unknown_device';
-      final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-      try {
-        if (Platform.isAndroid) {
-          AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-          deviceId = androidInfo.id; 
-        } else if (Platform.isIOS) {
-          IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-          deviceId = iosInfo.identifierForVendor ?? 'unknown_ios';
-        }
-      } catch (e) {
-        print('LocationService: Error getting device info: $e');
-        deviceId = 'error_${DateTime.now().millisecondsSinceEpoch}';
-      }
       
-      // Use Matricula as the primary validation/ID if available
-      String trackingId = currentMatricula ?? deviceId;
       print('LocationService: Using Tracking ID: $trackingId');
 
       // Atualização imediata de status no Firestore (APENAS Status)
@@ -158,8 +150,7 @@ void onStart(ServiceInstance service) async {
            await firestore.collection('live_locations').doc(trackingId).set({
                'isMonitored': true,
                'timestamp': FieldValue.serverTimestamp(),
-               'deviceId': deviceId, // Keep physical device ID for reference
-               'matricula': currentMatricula,
+               'iduff': currentIdUFF,
                'name': currentName,
            }, SetOptions(merge: true));
            print('LocationService: Marked as monitored immediately for $trackingId');
@@ -208,7 +199,7 @@ void onStart(ServiceInstance service) async {
           );
           
           if (isFirstLocation) {
-              _uploadLocation(trackingId, deviceId, currentMatricula, currentName, position);
+              _uploadLocation(trackingId, currentIdUFF, currentName, position);
               isFirstLocation = false;
           }
         }
@@ -217,7 +208,7 @@ void onStart(ServiceInstance service) async {
       // Iniciar Timer de Envio Periódico (a cada 30 segundos)
       uploadTimer = Timer.periodic(const Duration(seconds: 30), (timer) async {
           if (currentPosition != null) {
-             await _uploadLocation(trackingId, deviceId, currentMatricula, currentName, currentPosition!);
+             await _uploadLocation(trackingId, currentIdUFF, currentName, currentPosition!);
           }
       });
        
@@ -225,35 +216,22 @@ void onStart(ServiceInstance service) async {
   });
 
   service.on('stopTracking').listen((event) async {
-       try {
-           final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-           String deviceId = 'unknown_device';
-            if (Platform.isAndroid) {
-              AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-              deviceId = androidInfo.id;
-            } else if (Platform.isIOS) {
-              IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-              deviceId = iosInfo.identifierForVendor ?? 'unknown_ios';
-            }
-           
-           // If we have a stored matricula, use it. Otherwise, we might have a problem if the service restarted?
-           // Ideally we should persist it, but for now rely on memory. 
-           // If memory lost (service restart), we might fail to update the correct doc if it was matricula-based.
-           // However, stopTracking usually comes from UI which might re-send data? No, it's just a signal.
-           // Let's use the local 'currentMatricula' if available.
-           
-           String trackingId = currentMatricula ?? deviceId;
+           String trackingId = currentIdUFF ?? 'unknown';
+           if (trackingId == 'unknown') {
+              print('LocationService: Error - No tracking ID found during stopTracking');
+           }
 
-           final FirebaseApp app = await _getTrackingApp();
-           final FirebaseFirestore firestore = FirebaseFirestore.instanceFor(app: app);
-           await firestore.collection('live_locations').doc(trackingId).set({
-               'isMonitored': false,
-               'timestamp': FieldValue.serverTimestamp(),
-           }, SetOptions(merge: true));
-           print('LocationService: Marked as not monitored for $trackingId');
-       } catch (e) {
-           print('LocationService: Error marking as not monitored: $e');
-       }
+           try {
+             final FirebaseApp app = await _getTrackingApp();
+             final FirebaseFirestore firestore = FirebaseFirestore.instanceFor(app: app);
+             await firestore.collection('live_locations').doc(trackingId).set({
+                 'isMonitored': false,
+                 'timestamp': FieldValue.serverTimestamp(),
+             }, SetOptions(merge: true));
+             print('LocationService: Marked as not monitored for $trackingId');
+           } catch (e) {
+             print('LocationService: Error marking as not monitored: $e');
+           }
 
        isTracking = false;
        positionStream?.cancel();
@@ -304,7 +282,7 @@ Future<void> updateNotification(FlutterLocalNotificationsPlugin flutterLocalNoti
 }
 
 // Helper para enviar a localização
-Future<void> _uploadLocation(String trackingId, String physicalDeviceId, String? matricula, String? name, Position position) async {
+Future<void> _uploadLocation(String trackingId, String? iduff, String? name, Position position) async {
   try {
     final FirebaseApp app = await _getTrackingApp();
     final FirebaseFirestore firestore = FirebaseFirestore.instanceFor(app: app);
@@ -314,8 +292,7 @@ Future<void> _uploadLocation(String trackingId, String physicalDeviceId, String?
       'latitude': position.latitude,
       'longitude': position.longitude,
       'timestamp': FieldValue.serverTimestamp(),
-      'deviceId': physicalDeviceId, // Historical record keeps physical device ID
-      'matricula': matricula,
+      'iduff': iduff,
       'name': name,
       'trackingId': trackingId,
     });
@@ -325,8 +302,7 @@ Future<void> _uploadLocation(String trackingId, String physicalDeviceId, String?
       'latitude': position.latitude,
       'longitude': position.longitude,
       'timestamp': FieldValue.serverTimestamp(),
-      'deviceId': physicalDeviceId,
-      'matricula': matricula,
+      'iduff': iduff,
       'name': name,     
       'isMonitored': true,
     }, SetOptions(merge: true));
