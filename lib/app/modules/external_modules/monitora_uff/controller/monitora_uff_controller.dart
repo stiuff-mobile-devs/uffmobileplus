@@ -78,7 +78,7 @@ class MonitoraUffController extends GetxController {
           for (var doc in snapshot.docs) {
               final data = doc.data();
               // final String? deviceId = data['deviceId']; // Using matricula as ID now
-              // final String? matricula = data['matricula']; // Deprecated
+              // final String? matricula = data['matricula']; // Deprecate`d
               final String? iduff = data['iduff'];
               final String? name = data['name'];
               final bool? isMonitored = data['isMonitored'];

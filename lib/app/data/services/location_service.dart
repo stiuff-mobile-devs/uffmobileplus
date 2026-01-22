@@ -97,12 +97,7 @@ void onStart(ServiceInstance service) async {
   await flutterLocalNotificationsPlugin.initialize(
     const InitializationSettings(android: initializationSettingsAndroid),
     onDidReceiveNotificationResponse: (NotificationResponse response) {
-       // Tratar payload (toque no corpo) ou actionId (toque no botão)
-       if (response.payload == 'disable_tracking' || response.actionId == 'disable_tracking') {
-           service.invoke('stopTracking');
-       } else if (response.payload == 'enable_tracking' || response.actionId == 'enable_tracking') {
-           service.invoke('startTracking');
-       }
+       // Tapping the notification opens the app (default behavior), no custom logic needed.
     },
     onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
   );
@@ -138,7 +133,7 @@ void onStart(ServiceInstance service) async {
       String trackingId = currentIdUFF!;
       
       isTracking = true;
-      await updateNotification(flutterLocalNotificationsPlugin, true);
+      await updateNotification(flutterLocalNotificationsPlugin);
 
       
       print('LocationService: Using Tracking ID: $trackingId');
@@ -236,7 +231,7 @@ void onStart(ServiceInstance service) async {
        isTracking = false;
        positionStream?.cancel();
        uploadTimer?.cancel();
-       await updateNotification(flutterLocalNotificationsPlugin, false);
+       await updateNotification(flutterLocalNotificationsPlugin);
        service.invoke('trackingStatus', {'isTracking': false});
   });
 
@@ -254,30 +249,23 @@ void onStart(ServiceInstance service) async {
   });
   
   // Estado Inicial
-  await updateNotification(flutterLocalNotificationsPlugin, false);
+  await updateNotification(flutterLocalNotificationsPlugin);
 }
 
 // Helper para atualizar a notificação
-Future<void> updateNotification(FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin, bool tracking) async {
+Future<void> updateNotification(FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin) async {
   await flutterLocalNotificationsPlugin.show(
     LocationService.notificationId,
     'Monitora UFF',
-    tracking ? 'Tracking Active' : 'Tracking Paused',
-    NotificationDetails(
+    'Sua posição está sendo monitorada',
+    const NotificationDetails(
       android: AndroidNotificationDetails(
         LocationService.notificationChannelId,
         'Location Tracking',
         icon: '@mipmap/ic_launcher',
-        ongoing: true, // Necessário para manter o serviço ativo em primeiro plano
-        actions: [
-           if (tracking)
-             const AndroidNotificationAction('disable_tracking', 'Disable', showsUserInterface: false, cancelNotification: false)
-           else
-             const AndroidNotificationAction('enable_tracking', 'Enable', showsUserInterface: false, cancelNotification: false)
-        ],
+        ongoing: true,
       ),
     ),
-    payload: tracking ? 'disable_tracking' : 'enable_tracking', // Payload para o toque
   );
 }
 
@@ -317,13 +305,6 @@ Future<void> _uploadLocation(String trackingId, String? iduff, String? name, Pos
 void notificationTapBackground(NotificationResponse notificationResponse) {
   // Inicializar plugins se necessário
   DartPluginRegistrant.ensureInitialized();
-  
-  final service = FlutterBackgroundService();
-  if (notificationResponse.actionId == 'disable_tracking') {
-     service.invoke('stopTracking');
-  } else if (notificationResponse.actionId == 'enable_tracking') {
-     service.invoke('startTracking');
-  }
 }
 
 // Helper para obter ou inicializar o Firebase App com segurança
