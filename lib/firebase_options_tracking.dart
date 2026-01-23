@@ -51,7 +51,7 @@ class FirebaseOptionsTracking {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBo8L5bV9yU0Dwd-_WcCQV203ntDI0TeY8',
-    appId: '1:937934866022:android:7e182790ca3be982a14fa7',
+    appId: '1:937934866022:android:ae8b7d04863d0fb7a14fa7',
     messagingSenderId: '937934866022',
     projectId: 'umplus-monitora-uff',
     storageBucket: 'umplus-monitora-uff.firebasestorage.app',
@@ -59,29 +59,28 @@ class FirebaseOptionsTracking {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyCf2jW-IKU_EOYVCRW_AZb0Nlbi4oLW-Kw',
-    appId: '1:937934866022:ios:f8301bd208d52456a14fa7',
+    appId: '1:937934866022:ios:cb06fb881844f8e9a14fa7',
     messagingSenderId: '937934866022',
     projectId: 'umplus-monitora-uff',
     storageBucket: 'umplus-monitora-uff.firebasestorage.app',
-    iosBundleId: 'com.example.autoagent',
+    iosBundleId: 'br.uff.sti.uffmobileplus',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyCf2jW-IKU_EOYVCRW_AZb0Nlbi4oLW-Kw',
-    appId: '1:937934866022:ios:f8301bd208d52456a14fa7',
+    appId: '1:937934866022:ios:a9889e2b776a3cc8a14fa7',
     messagingSenderId: '937934866022',
     projectId: 'umplus-monitora-uff',
     storageBucket: 'umplus-monitora-uff.firebasestorage.app',
-    iosBundleId: 'com.example.autoagent',
+    iosBundleId: 'br.uff.uffmobileplus',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
     apiKey: 'AIzaSyAB8cRFyshAmgipsbW5UjuDr9rNCr8kZhg',
-    appId: '1:937934866022:web:97b2e911396a5e7ca14fa7',
+    appId: '1:937934866022:web:24949ee88ff7dee2a14fa7',
     messagingSenderId: '937934866022',
     projectId: 'umplus-monitora-uff',
     authDomain: 'umplus-monitora-uff.firebaseapp.com',
     storageBucket: 'umplus-monitora-uff.firebasestorage.app',
   );
-
 }
