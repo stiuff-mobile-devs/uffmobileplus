@@ -109,6 +109,22 @@ final Map<String, String> ptBR = {
   // Internacional
   'internacional': 'Internacional',
 
+  //SOS
+  'sos': 'SOS',
+  'sos_descricao': 'Envie um alerta de emergência com sua localização atual',
+  'sos_sucesso_envio': 'SOS Enviado com Sucesso!', 
+  'sos_falha_envio': 'Falha ao enviar SOS',
+  'botao_emergencia': 'Botão de Emergência',
+  'sos_enviando': 'Localizando e Enviando...',
+  'atencao': 'Atenção',
+  'gps_desligado': 'GPS Desligado',
+  'gps_desligado_msg': 'O serviço de localização está desativado. Ative-o para usar o SOS.',
+  'permissao_negada': 'Permissão Negada',
+  'permissao_negada_msg': 'O SOS precisa da sua localização para enviar ajuda.',
+  'permissao_bloqueada': 'Permissão Bloqueada',
+  'permissao_bloqueada_msg': 'O acesso à localização está bloqueado nas configurações.',
+  'voltar': 'Voltar',
+  
   // Central de atendimento
   'central_de_atendimento': 'Central de Atendimento',
 };
