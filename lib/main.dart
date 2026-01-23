@@ -13,7 +13,7 @@ import 'package:uffmobileplus/app/data/services/location_service.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await LocationService().initializeService();
+  await LocationService().init();
   await FirebaseService.init();
   await HiveService.init();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);

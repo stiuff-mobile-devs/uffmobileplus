@@ -8,26 +8,80 @@ import 'package:flutter/foundation.dart'
 ///
 /// Example:
 /// ```dart
-/// import 'firebase_options_tracking.dart';
+/// import 'firebase_options.dart';
 /// // ...
 /// await Firebase.initializeApp(
 ///   options: DefaultFirebaseOptions.currentPlatform,
 /// );
 /// ```
 class FirebaseOptionsTracking {
+  static FirebaseOptions get currentPlatform {
+    if (kIsWeb) {
+      return web;
+    }
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return android;
+      case TargetPlatform.iOS:
+        return ios;
+      case TargetPlatform.macOS:
+        return macos;
+      case TargetPlatform.windows:
+        return windows;
+      case TargetPlatform.linux:
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for linux - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
+      default:
+        throw UnsupportedError(
+          'DefaultFirebaseOptions are not supported for this platform.',
+        );
+    }
+  }
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyAB8cRFyshAmgipsbW5UjuDr9rNCr8kZhg',
+    appId: '1:937934866022:web:39a0048b024878fba14fa7',
+    messagingSenderId: '937934866022',
+    projectId: 'umplus-monitora-uff',
+    authDomain: 'umplus-monitora-uff.firebaseapp.com',
+    storageBucket: 'umplus-monitora-uff.firebasestorage.app',
+  );
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBo8L5bV9yU0Dwd-_WcCQV203ntDI0TeY8',
-    appId: '1:937934866022:android:ae8b7d04863d0fb7a14fa7',
+    appId: '1:937934866022:android:7e182790ca3be982a14fa7',
     messagingSenderId: '937934866022',
     projectId: 'umplus-monitora-uff',
     storageBucket: 'umplus-monitora-uff.firebasestorage.app',
   );
 
-  static FirebaseOptions get currentPlatform {
-    return android;
-  }
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyCf2jW-IKU_EOYVCRW_AZb0Nlbi4oLW-Kw',
+    appId: '1:937934866022:ios:f8301bd208d52456a14fa7',
+    messagingSenderId: '937934866022',
+    projectId: 'umplus-monitora-uff',
+    storageBucket: 'umplus-monitora-uff.firebasestorage.app',
+    iosBundleId: 'com.example.autoagent',
+  );
 
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyCf2jW-IKU_EOYVCRW_AZb0Nlbi4oLW-Kw',
+    appId: '1:937934866022:ios:f8301bd208d52456a14fa7',
+    messagingSenderId: '937934866022',
+    projectId: 'umplus-monitora-uff',
+    storageBucket: 'umplus-monitora-uff.firebasestorage.app',
+    iosBundleId: 'com.example.autoagent',
+  );
 
-  // Caso necessário adicione suporte para mais plataformas aqui usando como base os anteriores (android e ios).
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyAB8cRFyshAmgipsbW5UjuDr9rNCr8kZhg',
+    appId: '1:937934866022:web:97b2e911396a5e7ca14fa7',
+    messagingSenderId: '937934866022',
+    projectId: 'umplus-monitora-uff',
+    authDomain: 'umplus-monitora-uff.firebaseapp.com',
+    storageBucket: 'umplus-monitora-uff.firebasestorage.app',
+  );
+
 }
