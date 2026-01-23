@@ -11,7 +11,7 @@ class AuthGoogleService {
   final UserGoogleRepository _userRepository = UserGoogleRepository();
 
   final FirebaseAuth _auth = FirebaseAuth.instanceFor(
-    app: Firebase.app('uffmobileplus'),
+    app: Firebase.app(),
   );
   AuthGoogleService();
 

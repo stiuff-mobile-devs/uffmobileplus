@@ -13,11 +13,16 @@ import 'dart:io';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 
 class MonitoraUffController extends GetxController {
-  final RxBool isGathering = false.obs; // Determina se usuário está sendo monitorado
-  ExternalModulesServices externalModulesServices = Get.find<ExternalModulesServices>();
-  final Rx<LatLng?> currentPosition = Rx<LatLng?>(null); // Coordenadas do usuário
+  final RxBool isGathering =
+      false.obs; // Determina se usuário está sendo monitorado
+  ExternalModulesServices externalModulesServices =
+      Get.find<ExternalModulesServices>();
+  final Rx<LatLng?> currentPosition = Rx<LatLng?>(
+    null,
+  ); // Coordenadas do usuário
   final MapController mapController = MapController(); // Controlador do mapa
-  final RxList<Marker> remoteMarkers = <Marker>[].obs; // Marcadores de usuários remotos
+  final RxList<Marker> remoteMarkers =
+      <Marker>[].obs; // Marcadores de usuários remotos
   String? myDeviceId; // ID do dispositivo do usuário
   StreamSubscription? _serviceSubscription; // Ouvir atualizações do serviço
 
@@ -27,7 +32,11 @@ class MonitoraUffController extends GetxController {
     externalModulesServices.initialize(); // Ensure services are initialized
     _fetchDeviceId();
     _connectToService();
-    _listenToRemoteLocations();
+
+    // Aguarda um pouco para garantir que Firebase foi inicializado
+    Future.delayed(Duration(milliseconds: 500), () {
+      _listenToRemoteLocations();
+    });
   }
 
   @override
@@ -38,31 +47,31 @@ class MonitoraUffController extends GetxController {
 
   void _connectToService() {
     final service = FlutterBackgroundService();
-    
+
     _serviceSubscription = service.on('updateLocation').listen((event) {
-        // Note: curto circuito para evitar null
-        if (event != null && event['lat'] != null && event['lng'] != null) {
-            double lat = event['lat'];
-            double lng = event['lng'];
-            
-            currentPosition.value = LatLng(lat, lng);
-        }
+      // Note: curto circuito para evitar null
+      if (event != null && event['lat'] != null && event['lng'] != null) {
+        double lat = event['lat'];
+        double lng = event['lng'];
+
+        currentPosition.value = LatLng(lat, lng);
+      }
     });
 
     service.on('trackingStatus').listen((event) {
-        if (event != null && event['isTracking'] != null) {
-            isGathering.value = event['isTracking'];
-            if (isGathering.value == false) {
-                currentPosition.value = null;
-            }
+      if (event != null && event['isTracking'] != null) {
+        isGathering.value = event['isTracking'];
+        if (isGathering.value == false) {
+          currentPosition.value = null;
         }
+      }
     });
 
     service.isRunning().then((running) {
-        isGathering.value = running;
-        if (running) {
-             service.invoke('requestUpdate');
-        }
+      isGathering.value = running;
+      if (running) {
+        service.invoke('requestUpdate');
+      }
     });
   }
 
@@ -70,11 +79,11 @@ class MonitoraUffController extends GetxController {
     final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     try {
       if (Platform.isAndroid) {
-          AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-          myDeviceId = androidInfo.id;
+        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+        myDeviceId = androidInfo.id;
       } else if (Platform.isIOS) {
-          IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-          myDeviceId = iosInfo.identifierForVendor;
+        IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+        myDeviceId = iosInfo.identifierForVendor;
       }
     } catch (e) {
       print('Controller: Error getting device ID: $e');
@@ -82,72 +91,82 @@ class MonitoraUffController extends GetxController {
   }
 
   void _listenToRemoteLocations() {
-      // Use a instância padrão do app ou garanta que estamos usando a correta se nomeada.
-      // Como o LocationService usa o app 'tracking', devemos verificar se o app principal usa o padrão ou tracking.
-      // Geralmente o app principal usa o padrão. Vamos assumir que podemos acessar o app 'tracking' se inicializado ou padrão.
-      // Idealmente, o app principal deve inicializar o Firebase. Se estiver inicializado, podemos acessá-lo.
-      // Se o app 'tracking' estiver apenas no isolate de segundo plano, podemos precisar buscar segurança.
-      // Mas tipicamente usamos a instância padrão na UI. Vamos tentar o padrão primeiro.
-      
-      FirebaseFirestore.instance.collection('live_locations').snapshots().listen((snapshot) {
-          remoteMarkers.clear();
-          for (var doc in snapshot.docs) {
-              final data = doc.data();
-              // final String? deviceId = data['deviceId']; // Using matricula as ID now
-              final String? matricula = data['matricula'];
-              final String? name = data['name'];
-              final bool? isMonitored = data['isMonitored'];
-              
-              // Pular se for eu mesmo (comparar matricula se possivel, ou manter deviceId check se quisermos, mas melhor matricula)
-             // Com a mudança para matricula como ID do doc, podemos verificar se o ID do doc é a minha matricula.
-             // Mas vamos manter a lógica de deviceId por enquanto se o serviço ainda mandar deviceId, mas o plano diz para mudar.
-             // Vamos verificar ambos para garantir.
-              
-              final myMatricula = externalModulesServices.getUserMatricula();
-              if (matricula == myMatricula) continue;
+    try {
+      FirebaseFirestore.instance
+          .collection('live_locations')
+          .snapshots()
+          .listen(
+            (snapshot) {
+              remoteMarkers.clear();
+              for (var doc in snapshot.docs) {
+                final data = doc.data();
+                final String? matricula = data['matricula'];
+                final String? name = data['name'];
+                final bool? isMonitored = data['isMonitored'];
 
-              if (isMonitored != true) continue;
+                final myMatricula = externalModulesServices.getUserMatricula();
+                if (matricula == myMatricula) continue;
 
-              final double? lat = data['latitude'];
-              final double? lng = data['longitude'];
+                if (isMonitored != true) continue;
 
-              if (lat != null && lng != null) {
+                final double? lat = data['latitude'];
+                final double? lng = data['longitude'];
+
+                if (lat != null && lng != null) {
                   remoteMarkers.add(
-                      Marker(
-                          point: LatLng(lat, lng),
-                          width: 80,
-                          height: 80,
-                          child: GestureDetector(
-                            onTap: () {
-                              if (matricula != null) {
-                                showMarkerInfo(name);
-                              }
-                            },
-                            child: Column(
-                              children: [
-                                if (name != null) 
-                                  Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(4),
-                                      border: Border.all(color: Colors.blueAccent)
-                                    ),
-                                    child: Text(
-                                      name, 
-                                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black), 
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
+                    Marker(
+                      point: LatLng(lat, lng),
+                      width: 80,
+                      height: 80,
+                      child: GestureDetector(
+                        onTap: () {
+                          if (matricula != null) {
+                            showMarkerInfo(name);
+                          }
+                        },
+                        child: Column(
+                          children: [
+                            if (name != null)
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(color: Colors.blueAccent),
+                                ),
+                                child: Text(
+                                  name,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
                                   ),
-                                Icon(Icons.location_pin, color: Colors.blueAccent, size: 40),
-                              ],
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            Icon(
+                              Icons.location_pin,
+                              color: Colors.blueAccent,
+                              size: 40,
                             ),
-                          ),
+                          ],
+                        ),
                       ),
+                    ),
                   );
+                }
               }
-          }
-      });
+            },
+            onError: (e) {
+              print('Erro ao ouvir live_locations: $e');
+            },
+          );
+    } catch (e) {
+      print('Erro ao iniciar _listenToRemoteLocations: $e');
+    }
   }
 
   void showMarkerInfo(String? name) {
@@ -156,14 +175,16 @@ class MonitoraUffController extends GetxController {
       content: Column(
         children: [
           Text("Nome:"),
-          Text(name ?? "Desconhecido", style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(
+            name ?? "Desconhecido",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
         ],
       ),
       textConfirm: "OK",
       confirmTextColor: Colors.white,
       onConfirm: () => Get.back(),
     );
-
   }
 
   void toggleGathering(bool value) async {
@@ -171,23 +192,23 @@ class MonitoraUffController extends GetxController {
     if (value) {
       bool hasPermission = await _handlePermission();
       if (!hasPermission) {
-          isGathering.value = false;
-          return;
+        isGathering.value = false;
+        return;
       }
       // Validation: Check matricula
       String matricula = externalModulesServices.getUserMatricula();
       String? name = externalModulesServices.getUserName();
 
       if (matricula == "-" || matricula.isEmpty) {
-          Get.snackbar(
-            "Erro",
-            "Matricula inválida. Não é possível iniciar o monitoramento.",
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
-            snackPosition: SnackPosition.BOTTOM,
-          );
-          isGathering.value = false;
-          return;
+        Get.snackbar(
+          "Erro",
+          "Matricula inválida. Não é possível iniciar o monitoramento.",
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        isGathering.value = false;
+        return;
       }
 
       // Garantir que o serviço está rodando antes de invocar
@@ -204,7 +225,7 @@ class MonitoraUffController extends GetxController {
       currentPosition.value = null; // Immediate UI update
       service.invoke('stopTracking');
       // Opcionalmente parar o serviço completamente se quisermos limpar a notificação
-      service.invoke('stopService'); 
+      service.invoke('stopService');
     }
     isGathering.value = value;
   }
@@ -229,10 +250,10 @@ class MonitoraUffController extends GetxController {
         return false;
       }
     }
-    
+
     if (permission == LocationPermission.deniedForever) {
       return false;
-    } 
+    }
 
     return true;
   }
