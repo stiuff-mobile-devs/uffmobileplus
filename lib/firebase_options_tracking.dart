@@ -15,7 +15,6 @@ import 'package:flutter/foundation.dart'
 /// );
 /// ```
 class FirebaseOptionsTracking {
-
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBo8L5bV9yU0Dwd-_WcCQV203ntDI0TeY8',
     appId: '1:937934866022:android:ae8b7d04863d0fb7a14fa7',
@@ -24,10 +23,21 @@ class FirebaseOptionsTracking {
     storageBucket: 'umplus-monitora-uff.firebasestorage.app',
   );
 
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyBo8L5bV9yU0Dwd-_WcCQV203ntDI0TeY8',
+    appId: '1:937934866022:ios:5c7b7d04863d0fb7a14fa7',
+    messagingSenderId: '937934866022',
+    projectId: 'umplus-monitora-uff',
+    storageBucket: 'umplus-monitora-uff.firebasestorage.app',
+    iosBundleId: 'br.uff.sti.uffmobileplus',
+  );
+
   static FirebaseOptions get currentPlatform {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      return ios;
+    }
     return android;
   }
-
 
   // Caso necessário adicione suporte para mais plataformas aqui usando como base os anteriores (android e ios).
 }

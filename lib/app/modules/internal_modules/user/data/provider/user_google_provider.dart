@@ -7,7 +7,7 @@ enum UserRole { user }
 
 class UserGoogleProvider {
   final FirebaseFirestore _firestore = FirebaseFirestore.instanceFor(
-    app: Firebase.app('uffmobileplus'),
+    app: Firebase.app(),
   );
   final String _hiveBox = 'user_google_data';
   final String _hiveKey = 'current_user';
