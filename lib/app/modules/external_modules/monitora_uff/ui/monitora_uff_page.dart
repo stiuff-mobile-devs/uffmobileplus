@@ -3,117 +3,111 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/monitora_uff_controller.dart';
-import 'package:uffmobileplus/app/utils/color_pallete.dart';
 
-class MonitoraUffPage extends GetView<MonitoraUffController> {
-  const MonitoraUffPage({super.key});
+class MonitoraUFFPage extends GetView<MonitoraUffController> {
+  const MonitoraUFFPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: const Text('Monitora UFF'),
         centerTitle: true,
-        elevation: 8,
-        foregroundColor: Colors.white,
-        title: Text("Monitora UFF"),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
-        ),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
-        ),
+        elevation: 0,
       ),
-      body: Stack(
-        children: [
-          // Área do Mapa (Fundo)
-          Obx(() {
-             // Centraliza o mapa na localização atual do usuário ou em Niterói se não houver localização
-             final center = controller.currentPosition.value ?? LatLng(-22.8966, -43.1238);
-             
-             return FlutterMap(
+      body: Obx(
+        // Se não possui posição ainda => indica carregamento
+        // Senão mostra o mapa
+        () => controller.position.value == null
+            ? const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text('Obtendo localização...'),
+                  ],
+                ),
+              )
+            : FlutterMap(
                 mapController: controller.mapController,
                 options: MapOptions(
-                  initialCenter: center, 
+                  initialCenter: LatLng(
+                    controller.position.value!.latitude,
+                    controller.position.value!.longitude,
+                  ),
                   initialZoom: 15.0,
-                ),  
+                  interactionOptions: const InteractionOptions(
+                    flags: InteractiveFlag.all,
+                  ),
+                ),
                 children: [
                   TileLayer(
-                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName: 'br.uff.uffmobileplus',
+                    urlTemplate:
+                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    userAgentPackageName: 'com.example.autoagent',
                   ),
                   MarkerLayer(
                     markers: [
-                      // Marcadores de outros usuários remotos
-                      ...controller.remoteMarkers,
-                      // Marcador do próprio usuário
-                      if (controller.currentPosition.value != null)
+                      // Marcador da posição atual
+                      if (controller.position.value != null)
                         Marker(
-                          point: controller.currentPosition.value!,
+                          point: LatLng(
+                            controller.position.value!.latitude,
+                            controller.position.value!.longitude,
+                          ),
                           width: 80,
                           height: 80,
-                          child: GestureDetector(
-                            onTap: () {
-                              controller.showMarkerInfo(
-                                controller.externalModulesServices.getUserName(),
-                              );
-                            },
-                            child: Icon(Icons.location_pin, color: Colors.red, size: 40),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 12,
+                                height: 12,
+                                decoration: BoxDecoration(
+                                  color: Colors.blue,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 2,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.blue.withValues(alpha: 0.5),
+                                      blurRadius: 8,
+                                      spreadRadius: 2,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
+                      
+                      // Marcadores dos usuários buscados
+                      ...controller.userLocations
+                          .where((u) => u.lat != null && u.long != null)
+                          .map(
+                            (u) => Marker(
+                              point: LatLng(u.lat!, u.long!),
+                              width: 80,
+                              height: 80,
+                              child: const Icon(
+                                Icons.location_on,
+                                color: Colors.red,
+                                size: 40,
+                              ),
+                            ),
+                          ),
                     ],
                   ),
                 ],
-              );
-          }),
-
-          // Controles Flutuantes (Primeiro Plano)
-          Positioned(
-            top: 20,
-            left: 20,
-            right: 20,
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 10,
-                      offset: Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Monitoramento:', 
-                          style: TextStyle(
-                            color: Colors.black87, 
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16
-                          )
-                        ),
-                        SizedBox(width: 10),
-                        Obx(() => Switch(
-                          value: controller.isGathering.value,
-                          onChanged: controller.toggleGathering,
-                          activeColor: Colors.green,
-                        )),
-                      ],
-                    ),
-                  ],
-                ),
               ),
-            ),
-          ),
-        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: controller.centerMapOnCurrentLocation,
+        tooltip: 'Centralize no meu local',
+        child: const Icon(Icons.my_location),
       ),
     );
   }
