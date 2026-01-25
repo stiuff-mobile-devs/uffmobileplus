@@ -3,6 +3,9 @@ import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/modules/external_modules/sos/data/repository/sos_repository.dart';
+import 'package:uffmobileplus/app/utils/color_pallete.dart';
+import 'package:uffmobileplus/app/utils/ui_components/custom_alert_dialog.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 
 class SosController extends GetxController {
   final ExternalModulesServices _externalModulesServices =
@@ -72,32 +75,27 @@ class SosController extends GetxController {
     String titulo,
     String mensagem, {
     bool abrirConfiguracoes = false,
+    DialogType tipo = DialogType.warning,
   }) {
-    Get.dialog(
-      AlertDialog(
-        title: Text(titulo),
-        content: Text(mensagem),
-        actions: [
-          if (abrirConfiguracoes)
-            TextButton(
-              onPressed: () {
-                Get.back();
-                Geolocator.openAppSettings();
-                Get.back();
-              },
-              child: Text("configuracoes".tr),
-            ),
-          TextButton(
-            onPressed: () {
-              Get.back();
-              Get.back();
-            },
-            child: Text("voltar".tr),
-          ),
-        ],
-      ),
-      barrierDismissible: false,
-    );
+    if (Get.context == null) return;
+
+    customAlertDialog(
+      Get.context!,
+      title: titulo,
+      desc: mensagem,
+      dialogType: tipo,
+      dismissOnBackKeyPress: false,
+      dismissOnTouchOutside: false,
+      autoDismiss: true,
+      btnConfirmText: abrirConfiguracoes ? "configuracoes".tr : "voltar".tr,
+      btnConfirmColor: AppColors.darkBlue(),
+      onConfirm: () {
+        if (abrirConfiguracoes) {
+          Geolocator.openAppSettings();
+        }
+        Get.back();
+      },
+    ).show();
   }
 
   Future<void> sendSos() async {
