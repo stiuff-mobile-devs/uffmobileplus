@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:get/get_state_manager/src/simple/get_view.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/monitora_uff_controller.dart';
+import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_location_model.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 
 class MonitoraUFFPage extends GetView<MonitoraUffController> {
@@ -12,7 +15,7 @@ class MonitoraUFFPage extends GetView<MonitoraUffController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Monitora UFF'), 
+        title: const Text('Monitora UFF'),
         centerTitle: true,
         elevation: 8,
         foregroundColor: Colors.white,
@@ -26,13 +29,10 @@ class MonitoraUFFPage extends GetView<MonitoraUffController> {
           initialCenter: LatLng(
             // posição do dispositivo se possível ou coordenadas de Niteró c.c.
             controller.position.value?.latitude ?? -22.8807,
-            controller.position.value?.longitude ?? -43.1014
-          )
+            controller.position.value?.longitude ?? -43.1014,
+          ),
         ),
-        children: [
-          mapa(),
-          firebaseMarkers(),
-        ],
+        children: [mapa(), firebaseMarkers()],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: controller.centerMapOnCurrentLocation,
@@ -55,11 +55,21 @@ class MonitoraUFFPage extends GetView<MonitoraUffController> {
             .map(
               (user) => Marker(
                 point: LatLng(user.lat, user.lng),
-                child: Icon(Icons.location_pin, color: Colors.red, size: 50),
+                child: GestureDetector(
+                  onTap: () => Get.dialog(popUp(user)),
+                  child: Icon(Icons.location_pin, color: Colors.red, size: 50),
+                ),
               ),
             )
             .toList(),
       ),
+    );
+  }
+
+  Widget popUp(UserLocationModel user) {
+    return AlertDialog(
+      title: Text("Usuário"),
+      content: Text(user.id)
     );
   }
 }

@@ -11,7 +11,8 @@ class FirebaseProvider {
 
     // 2. Referenciar a coleção e adicionar dados
     try {
-      await firestore.collection('locations').doc(userLocation.id).set({
+      await firestore.collection('locations').doc().set({
+        'id': userLocation.id,
         'lat': userLocation.lat,
         'lng': userLocation.lng,
         'timestamp': userLocation.timestamp,
@@ -21,28 +22,6 @@ class FirebaseProvider {
       throw Exception("Erro ao adicionar dados: $e");
     }
   }
-
-  //Future<List<UserLocationModel>> buscarTodos() async {
-  //  FirebaseFirestore firestore = FirebaseFirestore.instance;
-  //
-  //  try {
-  //    QuerySnapshot snapshot = await firestore.collection('locations').get();
-  //
-  //    // Para debugar
-  //    for (var doc in snapshot.docs) {
-  //      print(doc.data());
-  //    }
-  //    
-  //    return snapshot.docs
-  //        .map(
-  //          (doc) =>
-  //              UserLocationModel.fromJson(doc.data() as Map<String, dynamic>),
-  //        )
-  //        .toList();
-  //  } catch (e) {
-  //    throw Exception("Erro ao buscar dados: $e");
-  //  }
-  //}
 
   Stream<List<UserLocationModel>> getAllUsers() {
     return collectionRef.snapshots().map((QuerySnapshot query) {
