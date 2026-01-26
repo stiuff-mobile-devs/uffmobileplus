@@ -14,10 +14,17 @@ class MonitoraUffController extends GetxController {
   Rx<Position?> get position => locationService.position;
 
   void centerMapOnCurrentLocation() {
-    mapController.move(
-      LatLng(position.value!.latitude, position.value!.longitude),
-      15.0,
-    );
+    final pos = position.value;
+    if (pos == null) return;
+    
+    try {
+      mapController.move(
+        LatLng(pos.latitude, pos.longitude),
+        15.0,
+      );
+    } catch (e) {
+      print('Error moving map: $e');
+    }
   }
 
   @override

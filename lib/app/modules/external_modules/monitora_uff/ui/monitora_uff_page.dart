@@ -21,6 +21,7 @@ class MonitoraUFFPage extends GetView<MonitoraUffController> {
         ),
       ),
       body: FlutterMap(
+        mapController: controller.mapController,
         options: MapOptions(
           initialCenter: LatLng(
             // posição do dispositivo se possível ou coordenadas de Niteró c.c.
