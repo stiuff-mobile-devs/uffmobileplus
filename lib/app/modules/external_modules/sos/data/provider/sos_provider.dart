@@ -9,8 +9,7 @@ class SosProvider {
     double lat,
     double lng,
   ) async {
-    //final Uri url = Uri.parse(Secrets.sosApiUrl);
-    final Uri url = Uri.parse('https://sos.uffmobile.com.br/api/alerta');
+    final Uri url = Uri.parse(Secrets.sosApiUrl);
 
     final body = jsonEncode({
       "nome": nome,
