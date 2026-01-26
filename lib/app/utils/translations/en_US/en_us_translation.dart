@@ -77,6 +77,22 @@ final Map<String, String> enUS = {
   // Uniteve Page
   'historia': 'History',
   'contato': 'Contact',
+  //SOS
+  'sos': 'SOS',
+  'sos_descricao': 'Send an emergency alert with your current location',
+  'sos_sucesso_envio': 'SOS sent successfully!',
+  'sos_falha_envio': 'Failed to send SOS',
+  'botao_emergencia': 'Emergency Button',
+  'sos_enviando': 'Locating and Sending...',
+  
+  'atencao': 'Attention',
+  'gps_desligado': 'GPS Disabled',
+  'gps_desligado_msg': 'Location services are disabled. Please enable them to use SOS.',
+  'permissao_negada': 'Permission Denied',
+  'permissao_negada_msg': 'SOS needs your location to send help.',
+  'permissao_bloqueada': 'Permission Blocked',
+  'permissao_bloqueada_msg': 'Location access is blocked in settings.',
+  'voltar': 'Back',
 
   // Uniteve contact / info
   'telefone': 'Phone',

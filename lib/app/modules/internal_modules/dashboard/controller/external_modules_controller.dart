@@ -110,7 +110,15 @@ class ExternalModulesController extends GetxController {
       availableFor: everyoneLogged,
       gdiGroups: null,
     ),
-
+    ExternalModules(
+      iconSrc: 'assets/icons/sos.svg',
+      subtitle: 'sos'.tr,
+      page: Routes.SOS,
+      url: '',
+      interrogation: false,
+      availableFor: everyoneLogged,
+      gdiGroups: null,
+    ),
     ExternalModules(
       iconSrc: 'assets/icons/atendimento.svg',
       subtitle: 'central_de_atendimento'.tr,

@@ -9,7 +9,7 @@ abstract class Routes {
   static const SETTINGS = '/settings';
   static const ABOUT = '/about';
   static const CHOOSE_PROFILE = '/choose_profile';
-
+  
   //Restaurante - Externo
   static const RESTAURANT_MODULES = '/restaurant_modules';
   static const CATRACA_ONLINE = '/catraca_online';
@@ -25,7 +25,7 @@ abstract class Routes {
   static const RECHARGE_CARD = '/recharge_card';
   static const RECHARGE_CARD_PAY = '/recharge_card/pay';
   static const BALANCE_STATEMENT = '/balance_statement';
-
+  static const SOS = '/sos';
   //Carteirinha Digital - Externo
   static const CARTEIRINHA_DIGITAL = '/carteirinha_digital';
 

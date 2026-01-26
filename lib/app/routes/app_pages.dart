@@ -62,6 +62,8 @@ import 'package:uffmobileplus/app/modules/internal_modules/login/ui/login_page.d
 import 'package:uffmobileplus/app/modules/internal_modules/splash/ui/splash_page.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/lock_develop_mode/ui/lock_develop_mode_page.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/web_view/ui/webview_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/sos/ui/sos_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/sos/bindings/sos_binding.dart';
 
 abstract class AppPages {
   static final pages = [
@@ -235,7 +237,11 @@ abstract class AppPages {
       page: () => StudyPlanPage(),
       bindings: [StudyPlanBindings()],
     ),
-
+    GetPage(
+      name: Routes.SOS,
+      page: () => SosPage(),
+      binding: SosBinding(),
+    ),
     // Radio
     GetPage(
       name: Routes.RADIO,
