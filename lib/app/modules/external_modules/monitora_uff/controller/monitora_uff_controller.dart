@@ -7,35 +7,34 @@ import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/data/pro
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_location_model.dart';
 
 class MonitoraUffController extends GetxController {
+  Rx<Position?> currentLocation = Rx<Position?>(null);
+  RxList<UserLocationModel> firebaseUsers = <UserLocationModel>[].obs;
   late final MapController mapController;
   late LocationService locationService;
-  final FirebaseProvider _firebaseProvider = FirebaseProvider();
-  final RxList<UserLocationModel> userLocations = <UserLocationModel>[].obs;
-
   Rx<Position?> get position => locationService.position;
+
+  void centerMapOnCurrentLocation() {
+    mapController.move(
+      LatLng(position.value!.latitude, position.value!.longitude),
+      15.0,
+    );
+  }
 
   @override
   void onInit() {
-    super.onInit();
+    // Getx irá automaticamente atualizar 'firebaseUsers' sempre que os
+    // documentos forem atualizados na nuvem
+    firebaseUsers.bindStream(FirebaseProvider().getAllUsers());
     locationService = Get.find<LocationService>();
     locationService.init();
     mapController = MapController();
-    fetchUserLocations();
+
+    super.onInit();
   }
 
-  Future<void> fetchUserLocations() async {
-    try {
-      final locations = await _firebaseProvider.buscarTodos();
-      userLocations.assignAll(locations);
-    } catch (e) {
-      print("Error fetching user locations: $e");
-    }
-  }
-
-  void centerMapOnCurrentLocation() {
-    if (position != null) {
-      mapController.move(LatLng(position.value!.latitude, position.value!.longitude), 15.0);
-    }
+  @override
+  void onReady() {
+    super.onReady();
   }
 
   @override

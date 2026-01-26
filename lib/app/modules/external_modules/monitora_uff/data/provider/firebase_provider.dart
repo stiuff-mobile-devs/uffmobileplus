@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_location_model.dart';
 
 class FirebaseProvider {
+  final CollectionReference collectionRef = FirebaseFirestore.instance
+    .collection('locations');
+
   Future<void> adicionarDados(UserLocationModel userLocation) async {
     // 1. Instanciar o Firestore
     FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -10,7 +13,7 @@ class FirebaseProvider {
     try {
       await firestore.collection('locations').doc(userLocation.id).set({
         'lat': userLocation.lat,
-        'lng': userLocation.long,
+        'lng': userLocation.lng,
         'timestamp': userLocation.timestamp,
       });
       print("Dados adicionados com sucesso!");
@@ -19,25 +22,35 @@ class FirebaseProvider {
     }
   }
 
-  Future<List<UserLocationModel>> buscarTodos() async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
+  //Future<List<UserLocationModel>> buscarTodos() async {
+  //  FirebaseFirestore firestore = FirebaseFirestore.instance;
+  //
+  //  try {
+  //    QuerySnapshot snapshot = await firestore.collection('locations').get();
+  //
+  //    // Para debugar
+  //    for (var doc in snapshot.docs) {
+  //      print(doc.data());
+  //    }
+  //    
+  //    return snapshot.docs
+  //        .map(
+  //          (doc) =>
+  //              UserLocationModel.fromJson(doc.data() as Map<String, dynamic>),
+  //        )
+  //        .toList();
+  //  } catch (e) {
+  //    throw Exception("Erro ao buscar dados: $e");
+  //  }
+  //}
 
-    try {
-      QuerySnapshot snapshot = await firestore.collection('locations').get();
-
-      // Para debugar
-      for (var doc in snapshot.docs) {
-        print(doc.data());
+  Stream<List<UserLocationModel>> getAllUsers() {
+    return collectionRef.snapshots().map((QuerySnapshot query) {
+      List<UserLocationModel> users = [];
+      for (var doc in query.docs) {
+        users.add(UserLocationModel.fromJson(doc.data() as Map<String, dynamic>));
       }
-      
-      return snapshot.docs
-          .map(
-            (doc) =>
-                UserLocationModel.fromJson(doc.data() as Map<String, dynamic>),
-          )
-          .toList();
-    } catch (e) {
-      throw Exception("Erro ao buscar dados: $e");
-    }
+      return users;
+    });
   }
 }

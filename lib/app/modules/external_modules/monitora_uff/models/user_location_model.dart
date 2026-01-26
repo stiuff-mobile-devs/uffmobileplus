@@ -1,28 +1,30 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserLocationModel {
-  double? lat;
-  double? long;
-  DateTime? timestamp;
-  String? id;
+  String id;
+  double lat;
+  double lng;
+  DateTime timestamp;
 
-  UserLocationModel({this.lat, this.long, this.timestamp, this.id});
+  UserLocationModel({
+    required this.id,
+    required this.lat,
+    required this.lng,
+    required this.timestamp,
+  });
 
-  UserLocationModel.fromJson(Map<String, dynamic> json) {
-    lat = json['lat'];
-    long = json['long'];
-    timestamp = (json['timestamp'] as Timestamp).toDate();
-    id = json['id'];
-  }
+  UserLocationModel.fromJson(Map<String, dynamic> json)
+    : id = json['id'].toString(),
+      lat = (json['lat'] as num).toDouble(),
+      lng = (json['lng'] as num).toDouble(),
+      timestamp = (json['timestamp'] as Timestamp).toDate();
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['lat'] = lat;
-    data['long'] = long;
-    data['timestamp'] = timestamp != null
-        ? Timestamp.fromDate(timestamp!)
-        : null;
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
+    data['lat'] = lat;
+    data['lng'] = lng;
+    data['timestamp'] = timestamp;
     return data;
   }
 }

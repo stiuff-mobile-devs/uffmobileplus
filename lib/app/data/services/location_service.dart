@@ -145,7 +145,7 @@ class LocationService extends GetxService {
     return UserLocationModel(
       id: deviceId ?? 'unknown_device',
       lat: position.value?.latitude ?? 0.0,
-      long: position.value?.longitude ?? 0.0,
+      lng: position.value?.longitude ?? 0.0,
       timestamp: DateTime.now(),
     );
   }
