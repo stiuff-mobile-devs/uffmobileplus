@@ -65,9 +65,7 @@ class LocationService extends GetxService {
 
   Future<void> _fetchCurrentLocation() async {
     try {
-      position.value = await Geolocator.getCurrentPosition(
-        timeLimit: Duration(seconds: 10),
-      );
+      position.value = await Geolocator.getCurrentPosition();
 
       startTracking();
 

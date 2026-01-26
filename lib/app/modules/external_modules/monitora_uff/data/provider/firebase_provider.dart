@@ -11,7 +11,7 @@ class FirebaseProvider {
 
     // 2. Referenciar a coleção e adicionar dados
     try {
-      await firestore.collection('locations').doc().set({
+      await firestore.collection('locations').doc(userLocation.id).set({
         'id': userLocation.id,
         'lat': userLocation.lat,
         'lng': userLocation.lng,
