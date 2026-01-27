@@ -89,19 +89,20 @@ class SettingsPage extends StatelessWidget {
                   },
                 ),
                 SettingsItem(
-                  icon: Icon(Icons.add, color: Colors.white),
+                  icon: Icon(Icons.link, color: Colors.white),
                   main: Text(
-                    'Nova Autenticação'.tr,
+                    'Minhas Vinculações'.tr,
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  description: 'Acrescentar uma nova autenticação'.tr,
+                  description: 'Ver minhas autenticações ativas'.tr,
                   trailing: null,
-                  onTap: () {
-                    controller.newAuthentication();
+                  onTap: () async {
+                    await controller.reloadBondStates();
+                    _showBondsDialog(context, controller);
                   },
                 ),
                 // Botão de logout
@@ -184,6 +185,78 @@ class SettingsPage extends StatelessWidget {
       ),
     );
   }
+
+  void _showBondsDialog(BuildContext context, SettingsController controller) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.black.withOpacity(0.9),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Minhas Vinculações',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 24),
+                  GetBuilder<SettingsController>(
+                    builder: (ctrl) {
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _BondStatusCard(
+                            name: 'IdUFF',
+                            hasActiveIduffBond:
+                                controller.hasActiveIduffBondObs,
+                            color: Colors.blueAccent,
+                            onTap: () => controller.handleIduffBondTap(),
+                          ),
+                          SizedBox(height: 16),
+                          _BondStatusCard(
+                            name: 'Google',
+                            hasActiveIduffBond:
+                                controller.hasActiveGoogleBondObs,
+                            color: Colors.redAccent,
+                            onTap: () => controller.handleGoogleBondTap(),
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                  SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 12,
+                      ),
+                    ),
+                    child: Text(
+                      'Fechar',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
 
 class SettingsItem extends StatelessWidget {
@@ -220,6 +293,67 @@ class SettingsItem extends StatelessWidget {
           ),
           trailing: trailing,
           onTap: onTap,
+        ),
+      ),
+    );
+  }
+}
+
+class _BondStatusCard extends StatelessWidget {
+  final String name;
+  final RxBool hasActiveIduffBond;
+  final Color color;
+  final VoidCallback? onTap;
+
+  const _BondStatusCard({
+    required this.name,
+    required this.hasActiveIduffBond,
+    required this.color,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(
+      () => GestureDetector(
+        onTap: onTap,
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: hasActiveIduffBond.value ? color : Colors.grey,
+              width: 2,
+            ),
+            borderRadius: BorderRadius.circular(12),
+            color: Colors.black.withOpacity(0.5),
+          ),
+          padding: EdgeInsets.all(16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                name,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: hasActiveIduffBond.value ? color : Colors.grey,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  hasActiveIduffBond.value ? 'Ativo' : 'Inativo',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

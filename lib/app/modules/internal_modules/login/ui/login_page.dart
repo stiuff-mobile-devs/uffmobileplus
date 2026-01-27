@@ -154,19 +154,33 @@ class LoginPage extends GetView<LoginController> {
                                             mainAxisSpacing: 18,
                                             crossAxisSpacing: 18,
                                             children: [
-                                              _LoginOptionSquare(
-                                                text: 'IdUFF',
-                                                color: Colors.blueAccent,
-                                                image:
-                                                    'assets/images/uff_background2.png',
-                                                onTap: controller.loginIDUFF,
+                                              Obx(
+                                                () => _LoginOptionSquare(
+                                                  text: 'IdUFF',
+                                                  color:
+                                                      controller
+                                                          .hasActiveIduffBondObs
+                                                          .value
+                                                      ? Colors.blueAccent
+                                                      : Colors.grey,
+                                                  image:
+                                                      'assets/images/uff_background2.png',
+                                                  onTap: controller.loginIDUFF,
+                                                ),
                                               ),
-                                              _LoginOptionSquare(
-                                                text: 'Google',
-                                                color: Colors.redAccent,
-                                                image:
-                                                    'assets/icons/google-icon.svg',
-                                                onTap: controller.loginGoogle,
+                                              Obx(
+                                                () => _LoginOptionSquare(
+                                                  text: 'Google',
+                                                  color:
+                                                      controller
+                                                          .hasActiveGoogleBondObs
+                                                          .value
+                                                      ? Colors.redAccent
+                                                      : Colors.grey,
+                                                  image:
+                                                      'assets/icons/google-icon.svg',
+                                                  onTap: controller.loginGoogle,
+                                                ),
                                               ),
                                               _LoginOptionSquare(
                                                 text: 'sem_login'.tr,

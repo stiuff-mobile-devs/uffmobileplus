@@ -108,7 +108,13 @@ abstract class AppPages {
     GetPage(
       name: Routes.HOME,
       page: () => Dashboard(),
-      bindings: [DashboardBinding(), UserIduffBindings()],
+      bindings: [
+        DashboardBinding(),
+        UserIduffBindings(),
+        LoginBindings(),
+        AuthGoogleBindings(),
+        UserDataBindings(),
+      ],
     ),
 
     //Restaurante
@@ -237,11 +243,7 @@ abstract class AppPages {
       page: () => StudyPlanPage(),
       bindings: [StudyPlanBindings()],
     ),
-    GetPage(
-      name: Routes.SOS,
-      page: () => SosPage(),
-      binding: SosBinding(),
-    ),
+    GetPage(name: Routes.SOS, page: () => SosPage(), binding: SosBinding()),
     // Radio
     GetPage(
       name: Routes.RADIO,
