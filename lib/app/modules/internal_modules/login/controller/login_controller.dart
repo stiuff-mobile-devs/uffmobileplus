@@ -46,7 +46,7 @@ class LoginController extends GetxController {
   }
 
   loginGoogle() {
-    // _loginGoogleController.loginGoogle();
+    _loginGoogleController.loginGoogle();
   }
 
   goToCarteirinhaPage() {
