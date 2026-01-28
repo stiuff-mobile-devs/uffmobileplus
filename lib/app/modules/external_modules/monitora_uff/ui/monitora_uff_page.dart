@@ -69,7 +69,7 @@ class MonitoraUFFPage extends GetView<MonitoraUffController> {
   Widget popUp(UserLocationModel user) {
     return AlertDialog(
       title: Text("Usuário"),
-      content: Text(user.id)
+      content: Text(user.nome ?? 'Usuário desconhecido')
     );
   }
 }

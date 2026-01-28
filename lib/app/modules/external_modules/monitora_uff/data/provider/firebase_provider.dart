@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_location_model.dart';
 
 class FirebaseProvider {
@@ -22,8 +23,12 @@ class FirebaseProvider {
         'lat': userLocation.lat,
         'lng': userLocation.lng,
         'timestamp': userLocation.timestamp,
+        'iduff': userLocation.iduff,
+        'nome': userLocation.nome,
       });
-      print("Dados adicionados com sucesso!");
+      if (kDebugMode) {
+        print("Dados adicionados com sucesso!");
+      }
     } catch (e) {
       throw Exception("Erro ao adicionar dados: $e");
     }

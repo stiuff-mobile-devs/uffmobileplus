@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:uffmobileplus/app/data/services/device_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_location_model.dart';
+import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 
 class LocationService extends GetxService {
   LocationPermission? permission;
@@ -14,6 +15,7 @@ class LocationService extends GetxService {
   Timer? _locationTimer;
   bool _isTracking = false;
   String? deviceId;
+  ExternalModulesServices externalModulesServices = ExternalModulesServices();
 
   Future<LocationService> init() async {
     await Future.delayed(Duration(milliseconds: 500));
@@ -145,6 +147,8 @@ class LocationService extends GetxService {
       lat: position.value?.latitude ?? 0.0,
       lng: position.value?.longitude ?? 0.0,
       timestamp: DateTime.now(),
+      nome: externalModulesServices.getUserName(),
+      iduff: externalModulesServices.getUserIdUFF(),
     );
   }
 }
