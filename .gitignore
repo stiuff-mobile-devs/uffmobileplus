@@ -234,3 +234,7 @@ CREDENTIALS.md
 
 # Application secrets and sensitive configuration
 lib/app/config/secrets.dart
+
+# Firebase
+google-services.json
+GoogleService-Info.plist
