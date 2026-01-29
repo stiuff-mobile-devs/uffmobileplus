@@ -32,7 +32,7 @@ class MonitoraUFFPage extends GetView<MonitoraUffController> {
             controller.position.value?.longitude ?? -43.1014,
           ),
         ),
-        children: [mapa(), firebaseMarkers()],
+        children: [mapa(), firebaseMarkers(), toggleButton()],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: controller.centerMapOnCurrentLocation,
@@ -69,7 +69,28 @@ class MonitoraUFFPage extends GetView<MonitoraUffController> {
   Widget popUp(UserLocationModel user) {
     return AlertDialog(
       title: Text("Usuário"),
-      content: Text(user.nome ?? 'Usuário desconhecido')
+      content: Text(user.nome ?? 'Usuário desconhecido'),
+    );
+  }
+
+  Widget toggleButton() {
+    return Positioned(
+      top: 16,
+      right: 16,
+      child: Obx(
+        () => FloatingActionButton(
+          onPressed: controller.toggleTracking,
+          backgroundColor: controller.isTrackingEnabled.value
+              ? Colors.green
+              : Colors.red,
+          child: Icon(
+            controller.isTrackingEnabled.value
+                ? Icons.location_on
+                : Icons.location_off,
+            color: Colors.white,
+          ),
+        ),
+      ),
     );
   }
 }

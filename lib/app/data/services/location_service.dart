@@ -95,10 +95,14 @@ class LocationService extends GetxService {
   }
 
   /// Para o rastreamento
-  void stopTracking() {
+  Future<void> stopTracking() async {
     if (_isTracking) {
       _locationTimer?.cancel();
       _isTracking = false;
+      await FirebaseProvider().updateIsTracked(
+      deviceId ?? 'unkown_device', // TODO: melhorar
+      false,
+    );
       print('Rastreamento parado');
       Get.snackbar('Info', 'Rastreamento parado');
     }
@@ -136,12 +140,13 @@ class LocationService extends GetxService {
   }
 
   @override
-  void onClose() {
+  Future<void> onClose() async {
     stopTracking();
     super.onClose();
   }
 
   UserLocationModel _createUserLocationModel() {
+    // TODO: melhorar
     return UserLocationModel(
       id: deviceId ?? 'unknown_device',
       lat: position.value?.latitude ?? 0.0,
@@ -149,6 +154,7 @@ class LocationService extends GetxService {
       timestamp: DateTime.now(),
       nome: externalModulesServices.getUserName(),
       iduff: externalModulesServices.getUserIdUFF(),
+      isTracked: _isTracking,
     );
   }
 }

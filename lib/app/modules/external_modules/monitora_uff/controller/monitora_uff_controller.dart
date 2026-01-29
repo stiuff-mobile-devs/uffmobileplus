@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
@@ -12,18 +13,18 @@ class MonitoraUffController extends GetxController {
   late final MapController mapController;
   late LocationService locationService;
   Rx<Position?> get position => locationService.position;
+  RxBool isTrackingEnabled = RxBool(true);
 
   void centerMapOnCurrentLocation() {
     final pos = position.value;
     if (pos == null) return;
-    
+
     try {
-      mapController.move(
-        LatLng(pos.latitude, pos.longitude),
-        15.0,
-      );
+      mapController.move(LatLng(pos.latitude, pos.longitude), 15.0);
     } catch (e) {
-      print('Error moving map: $e');
+      if (kDebugMode) {
+        print('Error moving map: $e');
+      }
     }
   }
 
@@ -35,6 +36,7 @@ class MonitoraUffController extends GetxController {
     locationService = Get.find<LocationService>();
     locationService.init();
     mapController = MapController();
+    //isTrackingEnabled = locationService.isTracking as RxBool;
 
     super.onInit();
   }
@@ -48,5 +50,15 @@ class MonitoraUffController extends GetxController {
   void onClose() {
     mapController.dispose();
     super.onClose();
+  }
+
+  Future<void> toggleTracking() async {
+    if (isTrackingEnabled.value) {
+      locationService.stopTracking();
+    } else {
+      locationService.startTracking();
+    }
+    // TODO: por ser uma variável reativa, talvez essa linha seja desnecessária
+    isTrackingEnabled.value = !isTrackingEnabled.value;
   }
 }

@@ -7,6 +7,7 @@ class UserLocationModel {
   double lat;
   double lng;
   DateTime timestamp;
+  bool isTracked;
 
   UserLocationModel({
     required this.id,
@@ -15,6 +16,7 @@ class UserLocationModel {
     required this.timestamp,
     this.iduff,
     this.nome,
+    required this.isTracked,
   });
 
   UserLocationModel.fromJson(Map<String, dynamic> json)
@@ -23,7 +25,8 @@ class UserLocationModel {
       nome = json['nome']?.toString(),
       lat = (json['lat'] as num).toDouble(),
       lng = (json['lng'] as num).toDouble(),
-      timestamp = (json['timestamp'] as Timestamp).toDate();
+      timestamp = (json['timestamp'] as Timestamp).toDate(),
+      isTracked = json['isTracked'] as bool;
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
@@ -33,6 +36,7 @@ class UserLocationModel {
     data['lat'] = lat;
     data['lng'] = lng;
     data['timestamp'] = timestamp;
+    data['isTracked'] = isTracked;
     return data;
   }
 }
