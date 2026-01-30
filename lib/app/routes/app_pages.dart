@@ -1,4 +1,6 @@
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/modules/external_modules/ead/bindings/ead_binding.dart';
+import 'package:uffmobileplus/app/modules/external_modules/ead/ui/ead_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/binding/carteirinha_digital_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/ui/carteirinha_digital_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/bindings/restaurante_bindings.dart';
@@ -262,5 +264,14 @@ abstract class AppPages {
       page: () => MonitoraUffPage(),
       bindings: [MonitoraUffBindings()],
     ),
+
+        // EAD
+
+    GetPage(
+  name: Routes.EAD,
+  page: () => EadPage(),
+  binding: EadBinding(),
+),
+
   ];
 }

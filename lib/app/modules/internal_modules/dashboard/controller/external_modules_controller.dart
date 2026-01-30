@@ -103,6 +103,14 @@ class ExternalModulesController extends GetxController {
       url: '',
       interrogation: false
     ),
+
+    ExternalModules(
+  iconSrc: 'assets/icons/ead.svg',
+  subtitle: 'ead'.tr,
+  page: Routes.EAD,
+  url: '',
+  interrogation: false,
+),
   ];
 
   // TODO: parece redundante; melhor usar Get.toNamed direto?

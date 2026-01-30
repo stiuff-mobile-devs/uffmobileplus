@@ -9,7 +9,8 @@ abstract class Routes {
   static const SETTINGS = '/settings';
   static const ABOUT = '/about';
   static const CHOOSE_PROFILE = '/choose_profile';
-
+  static const EAD = '/ead';
+  
   //Restaurante - Externo
   static const RESTAURANT_MODULES = '/restaurant_modules';
   static const CATRACA_ONLINE = '/catraca_online';
