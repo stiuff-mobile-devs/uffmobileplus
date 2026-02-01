@@ -2,10 +2,11 @@ import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
+import 'package:uffmobileplus/app/utils/gdi_groups.dart';
 
 class ExternalModulesServices extends GetxService {
   late UserDataController _userDataController;
-  late UserData _userData;
+  UserData _userData = UserData();
   late AuthIduffService _auth;
 
   bool isExpired = false;
@@ -22,7 +23,7 @@ class ExternalModulesServices extends GetxService {
     _userDataController = Get.find<UserDataController>();
     _auth = Get.find<AuthIduffService>();
 
-    _userData = (await _userDataController.getUserData())!;
+    _userData = (await _userDataController.getUserData()) ?? UserData();
   }
 
   String? getUserName() {
@@ -63,5 +64,24 @@ class ExternalModulesServices extends GetxService {
 
   Future<String?> getAccessToken() {
     return _auth.getAccessToken();
+  }
+
+  String getUserBondId() {
+    return _userData.bondId ?? "";
+  }
+
+  List<GdiGroups>? getUserGdiGroups() {
+    return _userData.gdiGroups;
+  }
+
+  bool isInGroup(GdiGroupsEnum gdiGroup) {
+    final groupsList = getUserGdiGroups();
+    if (groupsList == null) return false;
+    for (var group in groupsList) {
+      if (group.gid! == gdiGroup.id) {
+        return true;
+      }
+    }
+    return false;
   }
 }

@@ -4,9 +4,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/menu/data/provider/restaurant_api.dart';
 import 'package:xml/xml.dart';
-import '../../../../../../../data/services/external_menu_service.dart';
 import '../models/meal_model.dart';
 
 class MealResource {
@@ -16,7 +16,8 @@ class MealResource {
 
   MealResource();
 
-  final ExternalMenuService _menuService = Get.find<ExternalMenuService>();
+  final ExternalModulesServices _menuService =
+      Get.find<ExternalModulesServices>();
   late String? accessToken;
   //final HTTPService httpService = Get.find<HTTPService>();
   // static final Map<String, String> jsonHeaders = {
@@ -30,15 +31,14 @@ class MealResource {
     Uri url = Uri.https('restaurante.uff.br', '/cardapiomobile.xml');
     final response = await http.get(
       url,
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-      }
-      );
+      headers: {'Authorization': 'Bearer $accessToken'},
+    );
     //final response = await httpService.get(url);
     if (response == null) return [];
     if (response.statusCode != 200) {
       debugPrint(
-          "Error on LegacyMeal!\n STATUS CODE: ${response.statusCode} \n BODY: ${response.body}");
+        "Error on LegacyMeal!\n STATUS CODE: ${response.statusCode} \n BODY: ${response.body}",
+      );
       return [];
     } else {
       XmlDocument xmlDocument = XmlDocument.parse(response.body);
@@ -80,16 +80,15 @@ class MealResource {
 
   Future<List<MealModel>?> getMealsByCampus(String campus) async {
     accessToken = await _menuService.getAccessToken();
-    final Uri url =
-        _buildUrl("${RestaurantAPI.path}/meals/active/campus=$campus");
+    final Uri url = _buildUrl(
+      "${RestaurantAPI.path}/meals/active/campus=$campus",
+    );
 
     try {
       //final response = await httpService.get(url);
       final response = await http.get(
         url,
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-        },
+        headers: {'Authorization': 'Bearer $accessToken'},
       );
       return _processGetResponse(response);
     } catch (e) {
@@ -115,9 +114,7 @@ class MealResource {
       final response = await http.post(
         url,
         body: jsonEncode(meal.toJson()),
-        headers: {
-        'Authorization': 'Bearer $accessToken',
-        },
+        headers: {'Authorization': 'Bearer $accessToken'},
       );
       await _createMealOnFirestore(meal);
       return _processWriteResponse(response, "Refeição criada com sucesso.");
@@ -152,12 +149,12 @@ class MealResource {
       final response = await http.put(
         url,
         body: jsonEncode(meal.toJson()),
-        headers: {
-        'Authorization': 'Bearer $accessToken',
-        },
+        headers: {'Authorization': 'Bearer $accessToken'},
       );
       return _processWriteResponse(
-          response, "Refeição atualizada com sucesso.");
+        response,
+        "Refeição atualizada com sucesso.",
+      );
     } catch (e) {
       _logError('updateMeal', e);
       if (e.toString() == 'Null check operator used on a null value') {
@@ -179,9 +176,7 @@ class MealResource {
       // );
       final response = await http.delete(
         url,
-        headers: {
-        'Authorization': 'Bearer $accessToken',
-        },
+        headers: {'Authorization': 'Bearer $accessToken'},
       );
       return _processWriteResponse(response, "Refeição deletada com sucesso.");
     } catch (e) {

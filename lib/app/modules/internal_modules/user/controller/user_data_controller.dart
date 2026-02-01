@@ -25,16 +25,21 @@ class UserDataController extends GetxController {
     super.onInit();
   }
 
-  Future<String> saveUserData(UserUmmModel userUmm, String targetMatricula, ProfileTypes profileType) async {
+  Future<String> saveUserData(
+    UserUmmModel userUmm,
+    String targetMatricula,
+    ProfileTypes profileType,
+  ) async {
     try {
       var saciData = await getSaciData();
 
       String textoQrCode = await saciData[0] ?? '-';
       String dataValidadeMatricula = await saciData[1] ?? '-';
 
-      String iduff = userUmm.grad?.matriculas?[0].identificacao?.iduff 
-      ?? await _userIduffController.getIduff()
-      ?? "-";
+      String iduff =
+          userUmm.grad?.matriculas?[0].identificacao?.iduff ??
+          await _userIduffController.getIduff() ??
+          "-";
 
       String fotoUrl = await _userIduffController.getPhotoUrl() ?? "-";
 
@@ -43,53 +48,60 @@ class UserDataController extends GetxController {
       late String name;
       late String curso;
 
-      int? bondIndex =
-          _findActiveBond(userUmm, targetMatricula);
+      int? bondIndex = _findActiveBond(userUmm, targetMatricula);
 
-      if (profileType == ProfileTypes.grad){
-         gradIndex = _findActiveGrad(userUmm, targetMatricula);
+      if (profileType == ProfileTypes.grad) {
+        gradIndex = _findActiveGrad(userUmm, targetMatricula);
 
-        name = userUmm.grad?.matriculas?[gradIndex ?? 0].identificacao?.nomesocial ??
-         userUmm.grad?.matriculas?[gradIndex ?? 0].identificacao?.nome ?? "-";
+        name =
+            userUmm
+                .grad
+                ?.matriculas?[gradIndex ?? 0]
+                .identificacao
+                ?.nomesocial ??
+            userUmm.grad?.matriculas?[gradIndex ?? 0].identificacao?.nome ??
+            "-";
 
         curso = userUmm.grad?.matriculas?[gradIndex ?? 0].nomeCurso ?? "-";
-
-      }
-      else if (profileType == ProfileTypes.pos){
+      } else if (profileType == ProfileTypes.pos) {
         posIndex = _findActivePos(userUmm, targetMatricula);
         name = userUmm.pos?.alunos?[posIndex ?? 0].nome ?? "-";
         curso = userUmm.pos?.alunos?[posIndex ?? 0].cursoNome ?? "-";
       }
 
-     
-    if (name == "-"){
-        name = userUmm.activeBond?.objects?.outerObject?[0].usuario!.nome ?? "-";
-    }
-      String nomeSocial = userUmm.grad?.matriculas?[gradIndex ?? 0].identificacao?.nomesocial ?? "-";
+      if (name == "-") {
+        name =
+            userUmm.activeBond?.objects?.outerObject?[0].usuario!.nome ?? "-";
+      }
+      String nomeSocial =
+          userUmm.grad?.matriculas?[gradIndex ?? 0].identificacao?.nomesocial ??
+          "-";
       String matricula = targetMatricula;
-       
-      String bond = userUmm
-          .activeBond
-          ?.objects
-          ?.outerObject?[1]
-          .innerObjects?[bondIndex ?? 0]
-          .vinculacao
-          ?.vinculo ??
+
+      String bond =
+          userUmm
+              .activeBond
+              ?.objects
+              ?.outerObject?[1]
+              .innerObjects?[bondIndex ?? 0]
+              .vinculacao
+              ?.vinculo ??
           "-";
 
-      String bondId = userUmm
-          .activeBond
-          ?.objects
-          ?.outerObject?[1]
-          .innerObjects?[bondIndex ?? 0]
-          .vinculacao
-          ?.id ??
+      String bondId =
+          userUmm
+              .activeBond
+              ?.objects
+              ?.outerObject?[1]
+              .innerObjects?[bondIndex ?? 0]
+              .vinculacao
+              ?.id ??
           "-";
 
-        var gdiGroups = await getGdiGroups(iduff);
-        String accessToken = await _auth.getAccessToken() ?? "";
+      var gdiGroups = await getPersonalGdiGroups(iduff);
+      String accessToken = await _auth.getAccessToken() ?? "";
 
-      final  userData = UserData(
+      final userData = UserData(
         name: name,
         nomesocial: nomeSocial,
         matricula: matricula,
@@ -102,6 +114,7 @@ class UserDataController extends GetxController {
         bondId: bondId,
         gdiGroups: gdiGroups,
         accessToken: accessToken,
+        profileType: profileType,
       );
       return await _userDataRepository.saveUserData(userData);
     } catch (e) {
@@ -152,7 +165,7 @@ class UserDataController extends GetxController {
     return [];
   }
 
-  Future<List<GdiGroups>> getGdiGroups(String iduff) async {
+  Future<List<GdiGroups>> getPersonalGdiGroups(String iduff) async {
     String token = await _auth.getAccessToken() ?? "";
     List<GdiGroups> groups = await _userDataRepository.getGdiGroups(
       iduff,

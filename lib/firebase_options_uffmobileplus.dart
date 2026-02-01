@@ -62,7 +62,7 @@ class FirebaseOptionsUffmobileplus {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyCIA_27Ff9I_M5YKFJGC9IPgVG4d8dmSFw',
-    appId: '1:222693628192:ios:20432ec8de50689f8adf45',
+    appId: '1:222693628192:ios:58f258903a65c0678adf45',
     messagingSenderId: '222693628192',
     projectId: 'uff-mobile-plus',
     databaseURL: 'https://uff-mobile-plus.firebaseio.com',
@@ -70,13 +70,13 @@ class FirebaseOptionsUffmobileplus {
     androidClientId:
         '222693628192-0aho0srg8evnbobvdb118ptmsjc5jacc.apps.googleusercontent.com',
     iosClientId:
-        '222693628192-jiakuaaa00i9o5ov8kfcmnopq24slr6h.apps.googleusercontent.com',
-    iosBundleId: 'br.uff.uffmobileplus',
+        '222693628192-60ec3i35hu0plsijltn2bm1k3mh47sgb.apps.googleusercontent.com',
+    iosBundleId: 'br.uff.sti.uffmobileplus',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyCIA_27Ff9I_M5YKFJGC9IPgVG4d8dmSFw',
-    appId: '1:222693628192:ios:20432ec8de50689f8adf45',
+    appId: '1:222693628192:ios:58f258903a65c0678adf45',
     messagingSenderId: '222693628192',
     projectId: 'uff-mobile-plus',
     databaseURL: 'https://uff-mobile-plus.firebaseio.com',
@@ -84,8 +84,8 @@ class FirebaseOptionsUffmobileplus {
     androidClientId:
         '222693628192-0aho0srg8evnbobvdb118ptmsjc5jacc.apps.googleusercontent.com',
     iosClientId:
-        '222693628192-jiakuaaa00i9o5ov8kfcmnopq24slr6h.apps.googleusercontent.com',
-    iosBundleId: 'br.uff.uffmobileplus',
+        '222693628192-60ec3i35hu0plsijltn2bm1k3mh47sgb.apps.googleusercontent.com',
+    iosBundleId: 'br.uff.sti.uffmobileplus',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(

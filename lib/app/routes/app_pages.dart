@@ -3,9 +3,17 @@ import 'package:uffmobileplus/app/modules/external_modules/ead/bindings/ead_bind
 import 'package:uffmobileplus/app/modules/external_modules/ead/ui/ead_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/binding/carteirinha_digital_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/ui/carteirinha_digital_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/repositorio_institucional/bindings/repositorio_institucional_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/repositorio_institucional/ui/repositorio_institucional_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/internacional/bindings/internacional_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/internacional/ui/internacional_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/central_de_atendimento/bindings/central_de_atendimento_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/central_de_atendimento/ui/central_de_atendimento_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/bindings/restaurante_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/papers/bindings/papers_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/papers/ui/papers_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/balance_statement/bindings/balance_statement_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/balance_statement/ui/balance_statement_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/bindings/pay_restaurant_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/ui/pages/pay_help_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/ui/pages/pay_ticket_page.dart';
@@ -56,6 +64,8 @@ import 'package:uffmobileplus/app/modules/internal_modules/login/ui/login_page.d
 import 'package:uffmobileplus/app/modules/internal_modules/splash/ui/splash_page.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/lock_develop_mode/ui/lock_develop_mode_page.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/web_view/ui/webview_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/sos/ui/sos_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/sos/bindings/sos_binding.dart';
 
 abstract class AppPages {
   static final pages = [
@@ -191,6 +201,22 @@ abstract class AppPages {
       bindings: [RechargeCardBindings()],
     ),
 
+    GetPage(
+      name: Routes.REPOSITORIO_INSTITUCIONAL,
+      page: () => RepositorioInstitucionalPage(),
+      bindings: [RepositorioInstitucionalBindings()],
+    ),
+
+    GetPage(
+      name: Routes.BALANCE_STATEMENT,
+      page: () => BalanceStatementPage(),
+      bindings: [
+        UserDataBindings(),
+        AuthIduffBindings(),
+        BalanceStatementBindings(),
+      ],
+    ),
+
     GetPage(name: Routes.SETTINGS, page: () => SettingsPage()),
 
     GetPage(name: Routes.ABOUT, page: () => AboutPage()),
@@ -213,7 +239,11 @@ abstract class AppPages {
       page: () => StudyPlanPage(),
       bindings: [StudyPlanBindings()],
     ),
-
+    GetPage(
+      name: Routes.SOS,
+      page: () => SosPage(),
+      binding: SosBinding(),
+    ),
     // Radio
     GetPage(
       name: Routes.RADIO,
@@ -261,11 +291,9 @@ abstract class AppPages {
 
     GetPage(
       name: Routes.MONITORA_UFF,
-      page: () => MonitoraUffPage(),
+      page: () => MonitoraUFFPage(),
       bindings: [MonitoraUffBindings()],
     ),
-
-        // EAD
 
     GetPage(
   name: Routes.EAD,
@@ -273,5 +301,15 @@ abstract class AppPages {
   binding: EadBinding(),
 ),
 
+    GetPage(
+      name: Routes.INTERNACIONAL,
+      page: () => InternacionalPage(),
+      bindings: [InternacionalBindings()],
+    ),
+    GetPage(
+      name: Routes.CENTRAL_DE_ATENDIMENTO,
+      page: () => CentralDeAtendimentoPage(),
+      bindings: [CentralDeAtendimentoBindings()],
+    ),
   ];
 }

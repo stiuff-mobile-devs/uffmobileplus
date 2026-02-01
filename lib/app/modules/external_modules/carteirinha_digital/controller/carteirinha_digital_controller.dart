@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:uffmobileplus/app/data/services/external_carteirinha_service.dart';
+import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 
 class CarteirinhaDigitalController extends GetxController {
   RxBool isBusy = false.obs;
@@ -12,7 +12,7 @@ class CarteirinhaDigitalController extends GetxController {
   Timer? expirationTimer;
   late var qrCodeData;
 
-  late final ExternalCarteirinhaService _carteirinhaService;
+  late ExternalModulesServices _externalModulesServices;
 
   @override
   void onInit() {
@@ -22,9 +22,9 @@ class CarteirinhaDigitalController extends GetxController {
 
   Future<void> _initAsync() async {
     isBusy.value = true;
-    _carteirinhaService = Get.find<ExternalCarteirinhaService>();
+    _externalModulesServices = Get.find<ExternalModulesServices>();
     try {
-      await _carteirinhaService.initialize();
+      await _externalModulesServices.initialize();
     } catch (e) {
       Get.dialog(
         WillPopScope(
@@ -48,19 +48,19 @@ class CarteirinhaDigitalController extends GetxController {
         barrierDismissible: false,
       );
     }
-    qrCodeData = await _carteirinhaService.getQrCodeData();
+    qrCodeData = await _externalModulesServices.getQrCodeData();
     isBusy.value = false;
     update();
   }
 
-  String? getUserName() => _carteirinhaService.getUserName();
-  String getUserMatricula() => _carteirinhaService.getUserMatricula();
-  String getUserIdUFF() => _carteirinhaService.getUserIdUFF();
-  String getUserCourse() => _carteirinhaService.getUserCourse();
-  String getUserPhotoUrl() => _carteirinhaService.getUserPhotoUrl();
-  String getUserValidity() => _carteirinhaService.getUserValidity();
-  String getUserBond() => _carteirinhaService.getUserBond();
-  Future<String> getQrCodeData() => _carteirinhaService.getQrCodeData();
+  String? getUserName() => _externalModulesServices.getUserName();
+  String getUserMatricula() => _externalModulesServices.getUserMatricula();
+  String getUserIdUFF() => _externalModulesServices.getUserIdUFF();
+  String getUserCourse() => _externalModulesServices.getUserCourse();
+  String getUserPhotoUrl() => _externalModulesServices.getUserPhotoUrl();
+  String getUserValidity() => _externalModulesServices.getUserValidity();
+  String getUserBond() => _externalModulesServices.getUserBond();
+  Future<String> getQrCodeData() => _externalModulesServices.getQrCodeData();
 
   void handleTimeout() {
     isExpired.value = true;
@@ -71,7 +71,7 @@ class CarteirinhaDigitalController extends GetxController {
   updateQrCodeData() async {
     isQrCodeLoading.value = true;
     try {
-      qrCodeData = await _carteirinhaService.updateQrCodeData();
+      qrCodeData = await _externalModulesServices.updateQrCodeData();
     } catch (e) {
       Get.snackbar(
         '',

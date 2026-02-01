@@ -4,11 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
-import 'package:uffmobileplus/app/data/services/external_transcript_service.dart';
+import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/modules/external_modules/transcript/data/models/transcript_model.dart';
 
 class TranscriptProvider {
-  final ExternalTranscriptService _transcriptService = Get.find<ExternalTranscriptService>();
+  final ExternalModulesServices _transcriptService =
+      Get.find<ExternalModulesServices>();
 
   Future<TranscriptModel?> getTranscript(bool isRefresh) async {
     final box = await Hive.openBox<TranscriptModel>('transcript');
@@ -36,18 +37,14 @@ class TranscriptProvider {
       host: 'app.uff.br',
       path: '/umm/v2/umplus/get_history',
       scheme: 'https',
-      queryParameters: {
-        'vinculo' : bondId
-      }
+      queryParameters: {'vinculo': bondId},
     );
 
     // Pede o histórico (transcript) do aluno
     try {
       final response = await http.get(
         url,
-        headers: {
-          'Authorization': 'Bearer $accessToken'
-        }
+        headers: {'Authorization': 'Bearer $accessToken'},
       );
 
       if (response.statusCode == 200) {
@@ -55,12 +52,12 @@ class TranscriptProvider {
         return TranscriptModel.fromJson(jsonResponse);
       } else {
         debugPrint(
-          "Transcript API failed.\n Status Code: ${response.statusCode}"
+          "Transcript API failed.\n Status Code: ${response.statusCode}",
         );
       }
     } catch (e) {
       debugPrint('error on get_history from API');
     }
     return null;
-  } 
+  }
 }

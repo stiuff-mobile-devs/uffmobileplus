@@ -7,11 +7,11 @@ import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_google_repository.dart';
 
 class AuthGoogleService {
-  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+  /* final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
   final UserGoogleRepository _userRepository = UserGoogleRepository();
 
   final FirebaseAuth _auth = FirebaseAuth.instanceFor(
-    app: Firebase.app('uffmobileplus'),
+    app: Firebase.app(),
   );
   AuthGoogleService();
 
@@ -64,5 +64,5 @@ class AuthGoogleService {
   logoutGoogle() async {
     await _googleSignIn.signOut();
     await _auth.signOut();
-  }
+  }*/
 }

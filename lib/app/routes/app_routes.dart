@@ -9,6 +9,7 @@ abstract class Routes {
   static const SETTINGS = '/settings';
   static const ABOUT = '/about';
   static const CHOOSE_PROFILE = '/choose_profile';
+
   static const EAD = '/ead';
   
   //Restaurante - Externo
@@ -25,7 +26,8 @@ abstract class Routes {
   static const PAY_RESTAURANT_HELP = '/restaurante/pay_restaurant/help';
   static const RECHARGE_CARD = '/recharge_card';
   static const RECHARGE_CARD_PAY = '/recharge_card/pay';
-
+  static const BALANCE_STATEMENT = '/balance_statement';
+  static const SOS = '/sos';
   //Carteirinha Digital - Externo
   static const CARTEIRINHA_DIGITAL = '/carteirinha_digital';
 
@@ -48,4 +50,13 @@ abstract class Routes {
 
   // Monitora UFF
   static const MONITORA_UFF = '/monitora_uff';
+
+  // Repositorio Institucional
+  static const REPOSITORIO_INSTITUCIONAL = '/repositorio-institucional';
+
+  // Internacional
+  static const INTERNACIONAL = '/internacional';
+
+  // Central de Atendimento
+  static const CENTRAL_DE_ATENDIMENTO = '/central_de_atendimento';
 }

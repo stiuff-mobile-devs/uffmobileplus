@@ -4,7 +4,7 @@ import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 
 class AuthGoogleController extends GetxController {
-  AuthGoogleController();
+  /*AuthGoogleController();
 
   late final AuthGoogleService _authGoogle = AuthGoogleService();
   late final UserGoogleRepository _userRepository = UserGoogleRepository();
@@ -51,5 +51,5 @@ class AuthGoogleController extends GetxController {
     _authGoogle.logoutGoogle();
     _userRepository.deleteUserGoogleModel();
     Get.offAllNamed(Routes.LOGIN);
-  }
+  }*/
 }

@@ -2,8 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_umm_controller.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_umm_model.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
+import 'package:uffmobileplus/app/utils/gdi_groups.dart';
 import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
 
 class ChooseProfileController extends GetxController {
@@ -11,6 +13,9 @@ class ChooseProfileController extends GetxController {
 
   late final UserUmmController _userUmmController;
   late final UserDataController _userDataController;
+  UserData _user = UserData();
+  RxBool _userDataLoaded = false.obs;
+  RxBool hasAdminPermission = false.obs;
 
   RxBool isBusy = false.obs;
   late final String? iduff;
@@ -30,8 +35,27 @@ class ChooseProfileController extends GetxController {
     iduff = Get.arguments;
     _userUmmController = Get.find<UserUmmController>();
     _userDataController = Get.find<UserDataController>();
+    await getUserData();
     super.onInit();
     fetchData();
+  }
+
+  getUserData() async {
+    _user = (await _userDataController.getUserData()) ?? UserData();
+    _userDataLoaded.value = true;
+    _checkAdminPermission();
+  }
+
+  void _checkAdminPermission() {
+    final groups = _user.gdiGroups;
+    if (groups == null || groups.isEmpty) {
+      hasAdminPermission.value = false;
+      return;
+    }
+    hasAdminPermission.value = groups.any(
+      (group) =>
+          group.gid == GdiGroupsEnum.adminCardapioRestauranteUniversitario.id,
+    );
   }
 
   void fetchData() async {

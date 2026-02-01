@@ -2,17 +2,18 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import '../../../../../../../data/services/external_menu_service.dart';
+import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import '../models/meal_model.dart';
 import '../models/user_meal_model.dart';
 import 'restaurant_api.dart';
 
 class UserMealResource {
   UserMealResource();
-  final ExternalMenuService _menuService = Get.find<ExternalMenuService>();
+  final ExternalModulesServices _menuService =
+      Get.find<ExternalModulesServices>();
   //final HTTPService httpService = Get.find<HTTPService>();
   static const Map<String, String> jsonHeaders = {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
   };
   late String? accessToken;
 
@@ -47,9 +48,7 @@ class UserMealResource {
       final response = await http.post(
         url,
         body: jsonEncode(userMeal.toJson()),
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-        },
+        headers: {'Authorization': 'Bearer $accessToken'},
       );
       // final response = await httpService.post(
       //   url,
@@ -57,7 +56,9 @@ class UserMealResource {
       //   headers: jsonHeaders,
       // );
       return _processWriteResponse(
-          response, "Refeição confirmada com sucesso.");
+        response,
+        "Refeição confirmada com sucesso.",
+      );
     } catch (e) {
       _logError('confirm', e);
       if (e.toString() == 'Null check operator used on a null value') {
@@ -96,9 +97,7 @@ class UserMealResource {
       //final response = await httpService.get(url);
       final response = await http.get(
         url,
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-        },
+        headers: {'Authorization': 'Bearer $accessToken'},
       );
       return _processGetMealAcceptedResponse(response, givenMeal);
     } catch (e) {
@@ -119,9 +118,7 @@ class UserMealResource {
       //final response = await httpService.get(url);
       final response = await http.get(
         url,
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-        },
+        headers: {'Authorization': 'Bearer $accessToken'},
       );
       return _processGetMealsAcceptedResponse(response);
     } catch (e) {
@@ -171,7 +168,9 @@ class UserMealResource {
 
   // Função auxiliar para processar resposta de getMealAccepted
   UserMealModel? _processGetMealAcceptedResponse(
-      response, MealModel givenMeal) {
+    response,
+    MealModel givenMeal,
+  ) {
     if (response != null && response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
       for (var meal in jsonResponse) {
