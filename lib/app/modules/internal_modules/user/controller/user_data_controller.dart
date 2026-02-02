@@ -21,6 +21,7 @@ class UserDataController extends GetxController {
   @override
   void onInit() {
     _userIduffController = Get.find<UserIduffController>();
+
     super.onInit();
   }
 
