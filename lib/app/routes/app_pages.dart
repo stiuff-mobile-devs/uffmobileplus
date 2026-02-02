@@ -71,13 +71,13 @@ abstract class AppPages {
       name: Routes.SPLASH,
       page: () => SplashPage(),
       bindings: [
-        SplashBindings(),
-        LockDevelopModeBinding(),
         AuthIduffBindings(),
         UserIduffBindings(),
+        UserDataBindings(),
+        SplashBindings(),
+        LockDevelopModeBinding(),
         UserUmmBindings(),
         AuthGoogleBindings(),
-        UserDataBindings(),
       ],
     ),
 

@@ -17,13 +17,14 @@ class LocationService extends GetxService {
   String? deviceId;
   ExternalModulesServices externalModulesServices = ExternalModulesServices();
 
-  Future<LocationService> init() async {
+  @override
+  Future<void> onInit() async {
+    super.onInit();
     await Future.delayed(Duration(milliseconds: 500));
-    await _initializeLocation();
-    return this;
+    await initializeLocation();
   }
 
-  Future<void> _initializeLocation() async {
+  Future<void> initializeLocation() async {
     try {
       // 1. Mostrar pop-up explicativo
       await _showLocationExplanationDialog();
@@ -100,9 +101,9 @@ class LocationService extends GetxService {
       _locationTimer?.cancel();
       _isTracking = false;
       await FirebaseProvider().updateIsTracked(
-      deviceId ?? 'unkown_device', // TODO: melhorar
-      false,
-    );
+        deviceId ?? 'unkown_device', // TODO: melhorar
+        false,
+      );
       print('Rastreamento parado');
       Get.snackbar('Info', 'Rastreamento parado');
     }

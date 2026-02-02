@@ -30,13 +30,10 @@ class MonitoraUffController extends GetxController {
 
   @override
   void onInit() {
-    // Getx irá automaticamente atualizar 'firebaseUsers' sempre que os
-    // documentos forem atualizados na nuvem
     firebaseUsers.bindStream(FirebaseProvider().getAllUsers());
     locationService = Get.find<LocationService>();
-    locationService.init();
+    locationService.initializeLocation();
     mapController = MapController();
-    //isTrackingEnabled = locationService.isTracking as RxBool;
 
     super.onInit();
   }
