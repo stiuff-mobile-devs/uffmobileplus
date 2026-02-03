@@ -15,9 +15,12 @@ class LocationService extends GetxService {
   Timer? _locationTimer;
   bool _isTracking = false;
   String? deviceId;
-  ExternalModulesServices externalModulesServices = ExternalModulesServices();
+
+  late ExternalModulesServices _externalModulesServices;
 
   Future<LocationService> init() async {
+    _externalModulesServices = Get.find<ExternalModulesServices>();
+    _externalModulesServices.initialize();
     await Future.delayed(Duration(milliseconds: 500));
     await _initializeLocation();
     return this;
@@ -100,9 +103,9 @@ class LocationService extends GetxService {
       _locationTimer?.cancel();
       _isTracking = false;
       await FirebaseProvider().updateIsTracked(
-      deviceId ?? 'unkown_device', // TODO: melhorar
-      false,
-    );
+        deviceId ?? 'unkown_device', // TODO: melhorar
+        false,
+      );
       print('Rastreamento parado');
       Get.snackbar('Info', 'Rastreamento parado');
     }
@@ -152,8 +155,8 @@ class LocationService extends GetxService {
       lat: position.value?.latitude ?? 0.0,
       lng: position.value?.longitude ?? 0.0,
       timestamp: DateTime.now(),
-      nome: externalModulesServices.getUserName(),
-      iduff: externalModulesServices.getUserIdUFF(),
+      nome: _externalModulesServices.getUserName(),
+      iduff: _externalModulesServices.getUserIdUFF(),
       isTracked: _isTracking,
     );
   }
