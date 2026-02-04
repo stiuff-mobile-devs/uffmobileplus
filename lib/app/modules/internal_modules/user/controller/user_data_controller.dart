@@ -31,73 +31,87 @@ class UserDataController extends GetxController {
     ProfileTypes profileType,
   ) async {
     try {
+
+      int? gradIndex = 0;
+      int? posIndex = 0;
+      String name = "-";
+      String curso = "-";
+      String bond = "Sem vínculo";
+      String bondId = "-";
+      String matricula = targetMatricula;
+
       var saciData = await getSaciData();
 
       String textoQrCode = await saciData[0] ?? '-';
       String dataValidadeMatricula = await saciData[1] ?? '-';
 
       String iduff =
-          userUmm.grad?.matriculas?[0].identificacao?.iduff ??
+          userUmm.activeBond?.objects?.outerObject?[0].usuario!.iduff ??
           await _userIduffController.getIduff() ??
           "-";
 
       String fotoUrl = await _userIduffController.getPhotoUrl() ?? "-";
 
-      late int? gradIndex;
-      late int? posIndex;
-      late String name;
-      late String curso;
-
       int? bondIndex = _findActiveBond(userUmm, targetMatricula);
 
       if (profileType == ProfileTypes.grad) {
+        
         gradIndex = _findActiveGrad(userUmm, targetMatricula);
 
-        name =
+        if(gradIndex != null){
+          name =
             userUmm
                 .grad
-                ?.matriculas?[gradIndex ?? 0]
+                ?.matriculas?[gradIndex]
                 .identificacao
                 ?.nomesocial ??
-            userUmm.grad?.matriculas?[gradIndex ?? 0].identificacao?.nome ??
+            userUmm.grad?.matriculas?[gradIndex].identificacao?.nome ??
             "-";
 
-        curso = userUmm.grad?.matriculas?[gradIndex ?? 0].nomeCurso ?? "-";
+        curso = userUmm.grad?.matriculas?[gradIndex].nomeCurso ?? "-";
+        }
+
+        
       } else if (profileType == ProfileTypes.pos) {
         posIndex = _findActivePos(userUmm, targetMatricula);
-        name = userUmm.pos?.alunos?[posIndex ?? 0].nome ?? "-";
-        curso = userUmm.pos?.alunos?[posIndex ?? 0].cursoNome ?? "-";
-      }
 
-      if (name == "-") {
-        name =
-            userUmm.activeBond?.objects?.outerObject?[0].usuario!.nome ?? "-";
+        if(posIndex != null){
+          name = userUmm.pos?.alunos?[posIndex].nome ?? "-";
+          curso = userUmm.pos?.alunos?[posIndex].cursoNome ?? "-";
+        }
+        
       }
       String nomeSocial =
           userUmm.grad?.matriculas?[gradIndex ?? 0].identificacao?.nomesocial ??
           "-";
-      String matricula = targetMatricula;
-
-      String bond =
+          
+      if (name == "-") {
+        name =
+            userUmm.activeBond?.objects?.outerObject?[0].usuario!.nome ?? "-";
+      }
+     
+      if(bondIndex != null){
+        bond =
           userUmm
               .activeBond
               ?.objects
               ?.outerObject?[1]
-              .innerObjects?[bondIndex ?? 0]
+              .innerObjects?[bondIndex ]
               .vinculacao
               ?.vinculo ??
           "-";
 
-      String bondId =
+       bondId =
           userUmm
               .activeBond
               ?.objects
               ?.outerObject?[1]
-              .innerObjects?[bondIndex ?? 0]
+              .innerObjects?[bondIndex]
               .vinculacao
               ?.id ??
           "-";
-
+      }
+      
       var gdiGroups = await getPersonalGdiGroups(iduff);
       String accessToken = await _auth.getAccessToken() ?? "";
 
@@ -174,6 +188,7 @@ class UserDataController extends GetxController {
     return groups;
   }
 
+  //Se ele não achar tem que colocar um -
   int? _findActiveBond(UserUmmModel userUmm, String targetMatricula) {
     final bondsList = userUmm.activeBond?.objects?.outerObject?[1].innerObjects;
     if (bondsList == null || bondsList.isEmpty) return null;
