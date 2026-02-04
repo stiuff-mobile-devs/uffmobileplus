@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/data/provider/firebase_provider.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -5,17 +6,16 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:uffmobileplus/app/data/services/device_service.dart';
-import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_location_model.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
+import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_location_model.dart';
 
 class LocationService extends GetxService {
   LocationPermission? permission;
   bool serviceEnabled = false;
   final Rx<Position?> position = Rx<Position?>(null);
-  Timer? _locationTimer;
-  bool _isTracking = false;
+  final RxBool isTracking = false.obs;
+  Timer? locationTimer;
   String? deviceId;
-
   late ExternalModulesServices _externalModulesServices;
 
   Future<LocationService> init() async {
@@ -62,57 +62,67 @@ class LocationService extends GetxService {
 
       deviceId = (await DeviceService.getBuildNumber()).toString();
       // Pega localização inicial
-      await _fetchCurrentLocation();
-    } catch (e) {
-      print('Erro ao obter localização: $e');
-    }
-  }
-
-  Future<void> _fetchCurrentLocation() async {
-    try {
+      //await _fetchCurrentLocation(); // TODO: atenção aqui
       position.value = await Geolocator.getCurrentPosition();
 
+      /* TODO: o método abaixo, que ativa a localização, está sendo chamado
+      aqui na inicialização, isto significa que ao entrar no módulo, o usuário
+      terá sua localização compartilhada. Esse mecanismo deve ser aprimorado */
       startTracking();
-
-      UserLocationModel userLocationModel = _createUserLocationModel();
-      await FirebaseProvider().adicionarDados(userLocationModel);
     } catch (e) {
-      print('Erro ao buscar localização: $e');
+      if (kDebugMode) {
+        print('Erro ao obter localização: $e');
+      }
     }
   }
 
-  /// Inicia rastreamento contínuo do veículo
-  void startTracking({Duration interval = const Duration(seconds: 10)}) {
-    if (_isTracking) {
-      return;
-    }
+  /// Inicia rastreamento contínuo
+  Future<void> startTracking({
+    Duration interval = const Duration(seconds: 10),
+  }) async {
+    if (locationTimer == null || !locationTimer!.isActive) {
+      if (kDebugMode) {
+        print('Timer periódico inicializado');
+      }
 
-    _isTracking = true;
+      locationTimer = Timer.periodic(interval, (_) async {
+        final currentPosition = await Geolocator.getCurrentPosition();
+        position.value = currentPosition;
 
-    _locationTimer = Timer.periodic(interval, (_) async {
-      await _fetchCurrentLocation();
-      print(
-        'Localização atualizada: ${position.value?.latitude}, ${position.value?.longitude}',
+        if (await FirebaseProvider().doesDocumentExist(deviceId!)) {
+          updateUser();
+        } else {
+          createNewUser();
+        }
+
+        if (kDebugMode) {
+          print(
+            'Localização atualizada localmente com sucesso: ${position.value?.latitude}, ${position.value?.longitude}',
+          );
+        }
+      });
+      await FirebaseProvider().updateIsTracked(
+        deviceId ?? 'unknown_device',
+        true,
       );
-    });
+      isTracking.value = true;
+    }
   }
 
   /// Para o rastreamento
   Future<void> stopTracking() async {
-    if (_isTracking) {
-      _locationTimer?.cancel();
-      _isTracking = false;
-      await FirebaseProvider().updateIsTracked(
-        deviceId ?? 'unkown_device', // TODO: melhorar
-        false,
-      );
+    if (locationTimer == null || !locationTimer!.isActive) return;
+
+    locationTimer?.cancel();
+    await FirebaseProvider().updateIsTracked(
+      deviceId ?? 'unknown_device', // TODO: melhorar
+      false,
+    );
+    isTracking.value = false;
+    if (kDebugMode) {
       print('Rastreamento parado');
-      Get.snackbar('Info', 'Rastreamento parado');
     }
   }
-
-  /// Verifica se está rastreando
-  bool get isTracking => _isTracking;
 
   Future<void> _showLocationExplanationDialog() async {
     return Get.dialog(
@@ -142,22 +152,32 @@ class LocationService extends GetxService {
     );
   }
 
-  @override
-  Future<void> onClose() async {
-    stopTracking();
-    super.onClose();
+  Future<void> createNewUser() async {
+    await FirebaseProvider().adicionarDados(
+      UserLocationModel(
+        id: deviceId ?? 'unknown_device',
+        lat: position.value?.latitude ?? 0.0,
+        lng: position.value?.longitude ?? 0.0,
+        timestamp: DateTime.now(),
+        nome: _externalModulesServices.getUserName(),
+        iduff: _externalModulesServices.getUserIdUFF(),
+        isTracked: isTracking.value,
+      ),
+    );
   }
 
-  UserLocationModel _createUserLocationModel() {
-    // TODO: melhorar
-    return UserLocationModel(
-      id: deviceId ?? 'unknown_device',
-      lat: position.value?.latitude ?? 0.0,
-      lng: position.value?.longitude ?? 0.0,
-      timestamp: DateTime.now(),
-      nome: _externalModulesServices.getUserName(),
-      iduff: _externalModulesServices.getUserIdUFF(),
-      isTracked: _isTracking,
+  Future<void> updateUser() async {
+    await FirebaseProvider().updateLocationAndTimestamp(
+      deviceId ?? 'unknown_device',
+      position.value?.latitude ?? 0.0,
+      position.value?.longitude ?? 0.0,
+      DateTime.now(),
     );
+  }
+
+  @override
+  Future<void> onClose() async {
+    stopTracking(); 
+    super.onClose();
   }
 }

@@ -13,7 +13,7 @@ class MonitoraUffController extends GetxController {
   late final MapController mapController;
   late LocationService locationService;
   Rx<Position?> get position => locationService.position;
-  RxBool isTrackingEnabled = RxBool(true);
+  RxBool get isTrackingEnabled => locationService.isTracking;
 
   void centerMapOnCurrentLocation() {
     final pos = position.value;
@@ -33,11 +33,10 @@ class MonitoraUffController extends GetxController {
     // Getx irá automaticamente atualizar 'firebaseUsers' sempre que os
     // documentos forem atualizados na nuvem
     firebaseUsers.bindStream(FirebaseProvider().getAllUsers());
+    
     locationService = Get.find<LocationService>();
     locationService.init();
     mapController = MapController();
-    //isTrackingEnabled = locationService.isTracking as RxBool;
-
     super.onInit();
   }
 
@@ -58,7 +57,5 @@ class MonitoraUffController extends GetxController {
     } else {
       locationService.startTracking();
     }
-    // TODO: por ser uma variável reativa, talvez essa linha seja desnecessária
-    isTrackingEnabled.value = !isTrackingEnabled.value;
   }
 }

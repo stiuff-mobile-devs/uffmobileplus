@@ -25,7 +25,7 @@ class FirebaseProvider {
         'timestamp': userLocation.timestamp,
         'iduff': userLocation.iduff,
         'nome': userLocation.nome,
-        'isTracked': userLocation.isTracked
+        'isTracked': userLocation.isTracked,
       });
       if (kDebugMode) {
         print("Dados adicionados com sucesso!");
@@ -37,7 +37,9 @@ class FirebaseProvider {
 
   Stream<List<UserLocationModel>> getAllUsers() {
     try {
-      return collectionRef.where('isTracked', isEqualTo: true).snapshots().map((QuerySnapshot query) {
+      return collectionRef.where('isTracked', isEqualTo: true).snapshots().map((
+        QuerySnapshot query,
+      ) {
         List<UserLocationModel> users = [];
         for (var doc in query.docs) {
           users.add(
@@ -60,20 +62,47 @@ class FirebaseProvider {
         throw Exception("Documento não encontrado para o ID: $deviceId");
       }
     } catch (e) {
-      throw Exception("Erro ao buscar localização do usuário por id do dispositivo: $e");
+      throw Exception(
+        "Erro ao buscar localização do usuário por id do dispositivo: $e",
+      );
     }
   }
 
   Future<void> updateIsTracked(String deviceId, bool isTracked) async {
     try {
-      await collectionRef.doc(deviceId).update({
-        'isTracked': isTracked,
-      });
+      await collectionRef.doc(deviceId).update({'isTracked': isTracked});
       if (kDebugMode) {
         print("Campo isTracked atualizado com sucesso!");
       }
     } catch (e) {
       throw Exception("Erro ao atualizar isTracked: $e");
+    }
+  }
+
+  Future<void> updateLocationAndTimestamp(
+    String deviceId,
+    double lat,
+    double lng,
+    DateTime timestamp,
+  ) async {
+    try {
+      await collectionRef.doc(deviceId).update({
+        'lat': lat,
+        'lng': lng,
+        'timestamp': timestamp,
+      });
+      if (kDebugMode) print("Localização e timestamp atualizados no firestore com sucesso!");
+    } catch (e) {
+      throw Exception("Erro ao atualizar coordenadas e timestamp: $e");
+    }
+  }
+
+  Future<bool> doesDocumentExist(String deviceId) async {
+    try {
+      final DocumentSnapshot doc = await collectionRef.doc(deviceId).get();
+      return doc.exists;
+    } catch (e) {
+      throw Exception("Erro ao verificar existência do documento: $e");
     }
   }
 }
