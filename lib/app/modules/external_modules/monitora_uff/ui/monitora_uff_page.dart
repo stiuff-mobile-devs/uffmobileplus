@@ -27,12 +27,15 @@ class MonitoraUFFPage extends GetView<MonitoraUffController> {
         mapController: controller.mapController,
         options: MapOptions(
           initialCenter: LatLng(
-            // posição do dispositivo se possível ou coordenadas de Niteró c.c.
-            controller.position.value?.latitude ?? -22.8807,
-            controller.position.value?.longitude ?? -43.1014,
+            controller.position.latitude, 
+            controller.position.longitude,
           ),
         ),
-        children: [mapa(), firebaseMarkers(), toggleButton()],
+        children: [
+          mapa(),
+          firebaseMarkers(),
+          toggleButton(),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: controller.centerMapOnCurrentLocation,
@@ -79,7 +82,9 @@ class MonitoraUFFPage extends GetView<MonitoraUffController> {
       right: 16,
       child: Obx(
         () => FloatingActionButton(
-          onPressed: controller.toggleTracking,
+          onPressed: () {
+            controller.toggleService();
+          },
           backgroundColor: controller.isTrackingEnabled.value
               ? Colors.green
               : Colors.red,

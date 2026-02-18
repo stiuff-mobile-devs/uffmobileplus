@@ -292,7 +292,10 @@ abstract class AppPages {
     GetPage(
       name: Routes.MONITORA_UFF,
       page: () => MonitoraUFFPage(),
-      bindings: [MonitoraUffBindings()],
+      bindings: [
+        MonitoraUffBindings(),
+        UserDataBindings()
+      ],
     ),
 
     GetPage(
