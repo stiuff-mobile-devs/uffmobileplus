@@ -58,14 +58,15 @@ final Map<String, String> enUS = {
   'radio_name': 'Radio Pop Goiaba',
   'radio_description':
       'Radio Pop Goiaba/UFF is an extension project of Universidade Federal Fluminense linked to NUFEP - Núcleo Fluminense de Estudos e Pesquisas da UFF and coordinated by Professor Roberto Kant de Lima.',
+
+  // Study Plan
+  'plano_estudos': 'Study Plan',
   'turma': 'Class',
   'codigo': 'Code',
   'horario': 'Schedule',
   'as': 'to',
   'status': 'Status',
-
-  // Study Plan
-  'plano_estudos': 'Study Plan',
+  'no_study_plan_info': "Study Plan info unavailable",
 
   // Transcript
   'historico': 'Transcript',

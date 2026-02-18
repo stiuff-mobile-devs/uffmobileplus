@@ -14,8 +14,12 @@ class StudyPlanPage extends GetView<StudyPlanController> {
   Widget build(BuildContext context) {
     return GetBuilder<StudyPlanController>(
       init: StudyPlanController(),
-      builder: (controller) => Scaffold(
-        backgroundColor: Colors.blueAccent,
+      builder: (controller) => DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: AppColors.darkBlueToBlackGradient(),
+        ),
+        child: Scaffold(
+        backgroundColor: Colors.transparent,
         appBar: AppBar(
           centerTitle: true,
           elevation: 8,
@@ -31,18 +35,21 @@ class StudyPlanPage extends GetView<StudyPlanController> {
         body: controller.isLoading
             ? Center(child: CustomProgressDisplay())
             : (controller.studyPlan?.plan == null
-                  ? Center(child: Text('no_study_plan_info'.tr))
+                  ? Center(child: Text('no_study_plan_info'.tr,
+                                  style: TextStyle(color: Colors.white)))
                   : _tabViewWidget(controller.getStudyPlan())),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: AppColors.mediumBlue(),
-          child: const Icon(Icons.refresh, color: Colors.white),
-          onPressed: () => controller.refreshStudyPlan(),
-        ),
+        floatingActionButton: !controller.isLoading
+          ? FloatingActionButton(
+            backgroundColor: AppColors.mediumBlue(),
+            child: const Icon(Icons.refresh, color: Colors.white),
+            onPressed: () => controller.refreshStudyPlan(),
+          )
+          : SizedBox.shrink()
       ),
-    );
+    ));
   }
 
-  _tabViewWidget(studyPlan) {
+  InfiniteScrollTabView _tabViewWidget(studyPlan) {
     return InfiniteScrollTabView(
       backgroundColor: Colors.white,
       contentLength: studyPlan.length,
