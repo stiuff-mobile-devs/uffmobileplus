@@ -141,27 +141,6 @@ class ExternalModulesController extends GetxController {
       _usermodel.profileType ?? ProfileTypes.anonymous,
       _usermodel.gdiGroups ?? <GdiGroups>[],
     );
-
-    // TODO: talvez refatorar.
-    Get.appendTranslations({
-      'pt_BR': {
-        'carteirinha_digital': 'Carteirinha Digital',
-        'restaurante': 'Restaurante',
-        'plano_estudos': 'Plano de Estudos',
-        'radio_pop_goiaba': 'Radio Pop Goiaba',
-        'periodicos': 'Periódicos',
-      },
-      'en_US': {
-        'carteirinha_digital': 'Digital ID Card',
-        'restaurante': 'Restaurant',
-        'plano_estudos': 'Study Plan',
-        'radio_pop_goiaba': 'Radio Pop Goiaba',
-        'periodicos': 'Papers',
-      },
-      'it_IT': {'restaurante': 'Ristorante'},
-      'pt_BR': {'monitora_uff': 'Monitora UFF'},
-      'en_US': {'monitora_uff': 'Monitora UFF'},
-    });
   }
 
   // TODO: parece redundante; melhor usar Get.toNamed direto?

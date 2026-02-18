@@ -89,6 +89,7 @@ final Map<String, String> ptBR = {
       'A Unitevê foi criada originariamente como um canal de televisão a cabo gerido pela Universidade Federal Fluminense e deu inicio às suas transmissões no mês de dezembro de 2000 a partir do Instituto de Arte e Comunicação Social (IACS), com o apoio da Superintendência de Tecnologia da Informação (STI) e da operadora da TV a cabo, nas cidades de Niterói e São Gonçalo. Com a suspensão das atividades da operadora responsável pela distribuição do sinal, seu conteúdo é atualmente disponibilizado através do Youtube e redes sociais. Em 2019 a Unitevê voltou a fazer parte da estrutura da Superintendência de Comunicação Social (SCS) da Universidade Federal Fluminense.',
 
   // Restaurante Universitário
+  'restaurante': 'Restaurante',
   'restaurante_universitario': 'Restaurante Universitário',
   'menu': 'Menu',
 
@@ -127,4 +128,10 @@ final Map<String, String> ptBR = {
   
   // Central de atendimento
   'central_de_atendimento': 'Central de Atendimento',
+
+  // Radio Pop Goiaba
+  'radio_pop_goiaba': 'Radio Pop Goiaba',
+
+  // Monitora UFF
+  'monitora_uff': 'Monitora UFF'
 };
