@@ -60,7 +60,11 @@ class MonitoraUFFPage extends GetView<MonitoraUffController> {
                 point: LatLng(user.lat, user.lng),
                 child: GestureDetector(
                   onTap: () => Get.dialog(popUp(user)),
-                  child: Icon(Icons.location_pin, color: Colors.red, size: 50),
+                  child: Icon(
+                    Icons.location_pin, 
+                    color: controller.setMarkerColor(user), 
+                    size: 50
+                  ),
                 ),
               ),
             )

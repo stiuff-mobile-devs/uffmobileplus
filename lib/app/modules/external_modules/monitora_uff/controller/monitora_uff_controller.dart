@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart' show Colors;
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
@@ -55,6 +57,17 @@ class MonitoraUffController extends GetxController {
     _handlePermission();
     isTrackingEnabled.value = await _service.isRunning();
   }
+
+  /// Método utilizado para escolher a cor dos pins, determinando uma cor
+  /// especial para o pin correspondente à localização do próprio usuário
+  /// e outra para os demais.
+  Color setMarkerColor(UserLocationModel someUser) {
+    String currentUserId = _externalModulesServices.getUserIdUFF();
+    return someUser.iduff == currentUserId
+        ? Colors.indigo
+        : Colors.lightBlue;
+  }
+
 
   Future<void> toggleService() async {
     var isRunning = await _service.isRunning();
