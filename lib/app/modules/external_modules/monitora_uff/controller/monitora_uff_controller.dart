@@ -5,24 +5,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'
     show
         Colors,
-        WidgetsBinding,
         WidgetsBindingObserver,
         AlertDialog,
         Text,
-        TextButton,
-        BorderRadius,
-        RoundedRectangleBorder,
-        Row,
-        Icons,
-        Icon,
-        SizedBox,
-        ElevatedButton;
+        TextButton;
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:get/get.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:uffmobileplus/app/data/services/device_service.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/data/provider/firebase_provider.dart';
@@ -30,7 +21,7 @@ import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/u
 import 'package:uffmobileplus/app/data/services/foreground_service.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 
-class MonitoraUffController extends GetxController with WidgetsBindingObserver {
+class TrackingController extends GetxController with WidgetsBindingObserver {
   final FlutterBackgroundService _service = FlutterBackgroundService();
   late String deviceId;
   Position position = Position(
@@ -49,10 +40,6 @@ class MonitoraUffController extends GetxController with WidgetsBindingObserver {
   late final MapController mapController;
   final isTrackingEnabled = false.obs;
   late ExternalModulesServices _externalModulesServices;
-  final hasWhenInUseLocationPermission = false.obs;
-  final hasAlwaysLocationPermission = false.obs;
-  final hasNotificationPermission = false.obs;
-  //final isLocationServiceEnabled = false.obs;
 
   void centerMapOnCurrentLocation() {
     try {
@@ -62,23 +49,10 @@ class MonitoraUffController extends GetxController with WidgetsBindingObserver {
     }
   }
 
-  /// Esta função realiza trabalho quando o usuário volta para o aplicativo
-  /// após ter saído do mesmo (neste caso, quando ele volta das configurações).
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.resumed) {
-      hasAlwaysLocationPermission.value =
-          await Permission.locationAlways.isGranted;
-      hasNotificationPermission.value = await Permission.notification.isGranted;
-    }
-  }
-
   @override
   Future<void> onInit() async {
     // Getx irá automaticamente atualizar 'firebaseUsers' sempre que os
     // documentos forem atualizados na nuvem
-    WidgetsBinding.instance.addObserver(this);
-
     firebaseUsers.bindStream(FirebaseProvider().getAllUsers());
     super.onInit();
 
@@ -86,11 +60,6 @@ class MonitoraUffController extends GetxController with WidgetsBindingObserver {
     deviceId = (await DeviceService.getBuildNumber()).toString();
     _externalModulesServices = Get.find<ExternalModulesServices>();
     await _externalModulesServices.initialize();
-    hasWhenInUseLocationPermission.value =
-        await Permission.locationWhenInUse.isGranted;
-    hasAlwaysLocationPermission.value =
-        await Permission.locationAlways.isGranted;
-    hasNotificationPermission.value = await Permission.notification.isGranted;
     isTrackingEnabled.value = await _service.isRunning();
   }
 
@@ -186,97 +155,8 @@ class MonitoraUffController extends GetxController with WidgetsBindingObserver {
     FirebaseProvider().updateIsTracked(deviceId, false);
   }
 
-  Future<void> requestWhenInUsePermission() async {
-    await Permission.locationWhenInUse.request();
-    hasWhenInUseLocationPermission.value =
-        await Permission.locationWhenInUse.isGranted;
-  }
-
-  Future<void> requestAlwaysPermission() async {
-    PermissionStatus locationWhenInUseStatus = await Permission
-        .locationWhenInUse
-        .request();
-
-    if (locationWhenInUseStatus.isGranted) {
-      bool userAgreed = await _showBackgroundDisclosure();
-
-      if (userAgreed) {
-        PermissionStatus locationAlwaysStatus = await Permission.locationAlways
-            .request();
-
-        if (locationAlwaysStatus.isPermanentlyDenied) openAppSettings();
-      }
-    } else if (locationWhenInUseStatus.isPermanentlyDenied) {
-      openAppSettings(); // TODO: Esse bloco não está funcionando como deveria.
-    }
-  }
-
-  /// Precisamos de permissão para exibibir notificações pois serviços de
-  /// localização em segundo plano são críticos tanto para a privacidade do
-  /// usuário quanto para o consumo de bateria. Sem notificações, o SO pode
-  /// matar esses serviços.
-  Future<void> requestNotificationPermission() async {
-    await Permission.notification.request();
-    hasNotificationPermission.value = await Permission.notification.isGranted;
-  }
-
-  /// Verifica se todas as permissões necessárias para o monitora funcionar
-  /// adequadamente já foram concedidas ao aplicativo pelo usuário.
-  bool arePermissionsGranted() {
-    return hasAlwaysLocationPermission.value && hasNotificationPermission.value;
-  }
-
-  /// Aviso requerido pela Google Play.
-  Future<bool> _showBackgroundDisclosure() async {
-    return await Get.dialog<bool>(
-          AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(5.0),
-            ),
-            title: Row(
-              children: [
-                Icon(Icons.security, color: AppColors.darkBlue()),
-                const SizedBox(width: 10),
-                const Text("Atenção"),
-              ],
-            ),
-            content: const Text(
-              "O Monitora UFF deseja coletar dados de localização mesmo quando o aplicativo estiver fechado ou não estiver em uso.\n\n"
-              "Esses dados permitem que os supervisores visualizem sua posição em tempo real.\n\n"
-              "Como ativar:\n"
-              "1. Toque em 'Prosseguir'.\n"
-              "2. Em Permissões > Localização.\n"
-              "3. Selecione 'Permitir o tempo todo'.",
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Get.back(result: false),
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.darkBlue(),
-                ),
-                child: Text("AGORA NÃO"),
-              ),
-              TextButton(
-                onPressed: () async {
-                  Get.back(result: true);
-                  // 3. Abre as configurações do sistema diretamente na página do App
-                  await openAppSettings();
-                },
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.darkBlue(),
-                ),
-                child: const Text("PROSSEGUIR"),
-              ),
-            ],
-          ),
-          barrierDismissible: false, // Impede fechar clicando fora
-        ) ??
-        false;
-  }
-
   @override
   void onClose() {
-    WidgetsBinding.instance.removeObserver(this);
     mapController.dispose();
     super.onClose();
   }

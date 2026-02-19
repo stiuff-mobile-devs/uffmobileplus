@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
-import 'package:get/get_state_manager/src/simple/get_view.dart';
+import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/monitora_uff_controller.dart';
+import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/permissions_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_location_model.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 
-class MonitoraUFFPage extends GetView<MonitoraUffController> {
+class MonitoraUFFPage extends StatelessWidget {
   const MonitoraUFFPage({super.key});
+
+  TrackingController get trackingController =>
+      Get.find<TrackingController>();
+  PermissionsController get permissionsController =>
+      Get.find<PermissionsController>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,16 +27,18 @@ class MonitoraUFFPage extends GetView<MonitoraUffController> {
           decoration: BoxDecoration(gradient: AppColors.appBarBottomGradient()),
         ),
       ),
-      body: Obx(() => controller.arePermissionsGranted() 
-        ? mapa() 
-        : permissionScreen()),
-      floatingActionButton: Obx(() => controller.arePermissionsGranted()
-          ? FloatingActionButton(
-            backgroundColor: AppColors.lightBlue(),
-            onPressed: controller.centerMapOnCurrentLocation,
-            child: Icon(Icons.my_location, color: AppColors.darkBlue()),
-        )
-          : Container()),
+      body: Obx(
+        () => permissionsController.arePermissionsGranted() ? mapa() : permissionScreen(),
+      ),
+      floatingActionButton: Obx(
+        () => permissionsController.arePermissionsGranted()
+            ? FloatingActionButton(
+                backgroundColor: AppColors.lightBlue(),
+                onPressed: trackingController.centerMapOnCurrentLocation,
+                child: Icon(Icons.my_location, color: AppColors.darkBlue()),
+              )
+            : Container(),
+      ),
     );
   }
 
@@ -40,11 +46,11 @@ class MonitoraUFFPage extends GetView<MonitoraUffController> {
   /// sido concedidas.
   Widget mapa() {
     return FlutterMap(
-      mapController: controller.mapController,
+      mapController: trackingController.mapController,
       options: MapOptions(
         initialCenter: LatLng(
-          controller.position.latitude,
-          controller.position.longitude,
+          trackingController.position.latitude,
+          trackingController.position.longitude,
         ),
       ),
       children: [tile(), firebaseMarkers(), toggleButton()],
@@ -69,20 +75,21 @@ class MonitoraUFFPage extends GetView<MonitoraUffController> {
                   children: [
                     Expanded(
                       child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: AppColors.darkBlue(),
-                          ),
-                          onPressed: controller.requestNotificationPermission,
-                          child: const Text("Permitir notificação")),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: AppColors.darkBlue(),
+                        ),
+                        onPressed: permissionsController.requestNotificationPermission,
+                        child: const Text("Permitir notificação"),
+                      ),
                     ),
                     const SizedBox(width: 8),
                     Icon(
-                      controller.hasNotificationPermission.value
+                      permissionsController.hasNotificationPermission.value
                           ? Icons.check_box
                           : Icons.check_box_outline_blank,
                       color: Colors.white,
-                    )
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -91,21 +98,21 @@ class MonitoraUFFPage extends GetView<MonitoraUffController> {
                   children: [
                     Expanded(
                       child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: AppColors.darkBlue(),
-                          ),
-                          onPressed: controller.requestWhenInUsePermission,
-                          child:
-                              const Text("Permitir localização (durante uso)")),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: AppColors.darkBlue(),
+                        ),
+                        onPressed: permissionsController.requestWhenInUsePermission,
+                        child: const Text("Permitir localização (durante uso)"),
+                      ),
                     ),
                     const SizedBox(width: 8),
                     Icon(
-                      controller.hasWhenInUseLocationPermission.value
+                      permissionsController.hasWhenInUseLocationPermission.value
                           ? Icons.check_box
                           : Icons.check_box_outline_blank,
                       color: Colors.white,
-                    )
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -114,20 +121,21 @@ class MonitoraUFFPage extends GetView<MonitoraUffController> {
                   children: [
                     Expanded(
                       child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: AppColors.darkBlue(),
-                          ),
-                          onPressed: controller.requestAlwaysPermission,
-                          child: const Text("Permitir localização (sempre)")),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: AppColors.darkBlue(),
+                        ),
+                        onPressed: permissionsController.requestAlwaysPermission,
+                        child: const Text("Permitir localização (sempre)"),
+                      ),
                     ),
                     const SizedBox(width: 8),
                     Icon(
-                      controller.hasAlwaysLocationPermission.value
+                      permissionsController.hasAlwaysLocationPermission.value
                           ? Icons.check_box
                           : Icons.check_box_outline_blank,
                       color: Colors.white,
-                    )
+                    ),
                   ],
                 ),
               ],
@@ -148,7 +156,7 @@ class MonitoraUFFPage extends GetView<MonitoraUffController> {
   Widget firebaseMarkers() {
     return Obx(
       () => MarkerLayer(
-        markers: controller.firebaseUsers
+        markers: trackingController.firebaseUsers
             .map(
               (user) => Marker(
                 point: LatLng(user.lat, user.lng),
@@ -156,7 +164,7 @@ class MonitoraUFFPage extends GetView<MonitoraUffController> {
                   onTap: () => Get.dialog(popUp(user)),
                   child: Icon(
                     Icons.location_pin,
-                    color: controller.setMarkerColor(user),
+                    color: trackingController.setMarkerColor(user),
                     size: 50,
                   ),
                 ),
@@ -180,14 +188,12 @@ class MonitoraUFFPage extends GetView<MonitoraUffController> {
       right: 16,
       child: Obx(
         () => FloatingActionButton(
-          onPressed: () {
-            controller.toggleService();
-          },
-          backgroundColor: controller.isTrackingEnabled.value
+          onPressed: trackingController.toggleService,
+          backgroundColor: trackingController.isTrackingEnabled.value
               ? Colors.green
               : Colors.red,
           child: Icon(
-            controller.isTrackingEnabled.value
+            trackingController.isTrackingEnabled.value
                 ? Icons.location_on
                 : Icons.location_off,
             color: Colors.white,
