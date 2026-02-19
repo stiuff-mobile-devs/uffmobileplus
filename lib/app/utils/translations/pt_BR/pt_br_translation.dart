@@ -66,6 +66,7 @@ final Map<String, String> ptBR = {
   'codigo': 'Código',
   'horario': 'Horário',
   'as': 'às',
+  'no_study_plan_info': "Plano de estudos indisponível",
 
   // Transcript
   'historico': 'Histórico',
