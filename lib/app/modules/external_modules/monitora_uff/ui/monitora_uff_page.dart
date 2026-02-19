@@ -23,28 +23,122 @@ class MonitoraUFFPage extends GetView<MonitoraUffController> {
           decoration: BoxDecoration(gradient: AppColors.appBarBottomGradient()),
         ),
       ),
-      body: FlutterMap(
-        mapController: controller.mapController,
-        options: MapOptions(
-          initialCenter: LatLng(
-            controller.position.latitude, 
-            controller.position.longitude,
+      body: Obx(() => controller.arePermissionsGranted() 
+        ? mapa() 
+        : permissionScreen()),
+      floatingActionButton: Obx(() => controller.arePermissionsGranted()
+          ? FloatingActionButton(
+            backgroundColor: AppColors.lightBlue(),
+            onPressed: controller.centerMapOnCurrentLocation,
+            child: Icon(Icons.my_location, color: AppColors.darkBlue()),
+        )
+          : Container()),
+    );
+  }
+
+  /// Usuário verá essa tela apenas se todas as permissões necessárias já tiverem
+  /// sido concedidas.
+  Widget mapa() {
+    return FlutterMap(
+      mapController: controller.mapController,
+      options: MapOptions(
+        initialCenter: LatLng(
+          controller.position.latitude,
+          controller.position.longitude,
+        ),
+      ),
+      children: [tile(), firebaseMarkers(), toggleButton()],
+    );
+  }
+
+  /// Usuário verá essa tela apenas se algumas das permissões necessárias
+  /// ainda não tiver sido concedida.
+  Widget permissionScreen() {
+    return Container(
+      decoration: BoxDecoration(gradient: AppColors.appBarBottomGradient()),
+      child: Obx(
+        () => Align(
+          alignment: Alignment.center,
+          child: IntrinsicWidth(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: AppColors.darkBlue(),
+                          ),
+                          onPressed: controller.requestNotificationPermission,
+                          child: const Text("Permitir notificação")),
+                    ),
+                    const SizedBox(width: 8),
+                    Icon(
+                      controller.hasNotificationPermission.value
+                          ? Icons.check_box
+                          : Icons.check_box_outline_blank,
+                      color: Colors.white,
+                    )
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: AppColors.darkBlue(),
+                          ),
+                          onPressed: controller.requestWhenInUsePermission,
+                          child:
+                              const Text("Permitir localização (durante uso)")),
+                    ),
+                    const SizedBox(width: 8),
+                    Icon(
+                      controller.hasWhenInUseLocationPermission.value
+                          ? Icons.check_box
+                          : Icons.check_box_outline_blank,
+                      color: Colors.white,
+                    )
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: AppColors.darkBlue(),
+                          ),
+                          onPressed: controller.requestAlwaysPermission,
+                          child: const Text("Permitir localização (sempre)")),
+                    ),
+                    const SizedBox(width: 8),
+                    Icon(
+                      controller.hasAlwaysLocationPermission.value
+                          ? Icons.check_box
+                          : Icons.check_box_outline_blank,
+                      color: Colors.white,
+                    )
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-        children: [
-          mapa(),
-          firebaseMarkers(),
-          toggleButton(),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: controller.centerMapOnCurrentLocation,
-        child: const Icon(Icons.my_location),
       ),
     );
   }
 
-  Widget mapa() {
+  Widget tile() {
     return TileLayer(
       urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
       userAgentPackageName: 'br.uff.sti.uffmobileplus',
@@ -61,9 +155,9 @@ class MonitoraUFFPage extends GetView<MonitoraUffController> {
                 child: GestureDetector(
                   onTap: () => Get.dialog(popUp(user)),
                   child: Icon(
-                    Icons.location_pin, 
-                    color: controller.setMarkerColor(user), 
-                    size: 50
+                    Icons.location_pin,
+                    color: controller.setMarkerColor(user),
+                    size: 50,
                   ),
                 ),
               ),
