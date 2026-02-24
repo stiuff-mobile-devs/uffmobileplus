@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/busuff/controller/busuff_controller.dart';
+import 'package:uffmobileplus/app/modules/external_modules/busuff/utils/widgets.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.dart';
 
@@ -38,7 +39,13 @@ class BusuffPage extends GetView<BusuffController> {
      Obx(
         () => controller.isLoading.value
             ? Center(child: CustomProgressDisplay())
-            : const Text('BusuffPageController')  
+            : TabBarView(
+                physics: NeverScrollableScrollPhysics(),
+                children: <Widget>[
+                  busuffStaticWidget(controller),
+                  busuffMapWidget(controller)
+                ]
+            ),  
       ),
     );
   }
