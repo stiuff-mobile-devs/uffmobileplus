@@ -57,4 +57,7 @@ abstract class Routes {
 
   // Central de Atendimento
   static const CENTRAL_DE_ATENDIMENTO = '/central_de_atendimento';
+
+  // Busuff
+  static const BUSUFF = '/busuff';
 }

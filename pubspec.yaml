@@ -86,6 +86,7 @@ flutter:
     - assets/restaurant/img/
     - assets/restaurant/
     - assets/restaurant/icons/
+    - assets/busuff/icons/
   fonts:
     - family: Jockey One
       fonts:

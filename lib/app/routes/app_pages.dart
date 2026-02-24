@@ -1,4 +1,6 @@
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/modules/external_modules/busuff/binding/busuff_binding.dart';
+import 'package:uffmobileplus/app/modules/external_modules/busuff/ui/busuff_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/binding/carteirinha_digital_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/ui/carteirinha_digital_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/repositorio_institucional/bindings/repositorio_institucional_bindings.dart';
@@ -308,5 +310,11 @@ abstract class AppPages {
       page: () => CentralDeAtendimentoPage(),
       bindings: [CentralDeAtendimentoBindings()],
     ),
+
+    //BusUff
+    GetPage(
+      name: Routes.BUSUFF, 
+    page: () => BusuffPage(), 
+    binding: BusuffBinding())
   ];
 }
