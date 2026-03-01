@@ -26,6 +26,12 @@ class ExternalModulesServices extends GetxService {
     _userData = (await _userDataController.getUserData()) ?? UserData();
   }
 
+  Future<String> getEmail() async {
+    final token = await _auth.getAccessToken();
+    final userInfo = await _auth.getUserInfo(token);
+    return userInfo["email"];
+  }
+
   String? getUserName() {
     return _userData.name;
   }

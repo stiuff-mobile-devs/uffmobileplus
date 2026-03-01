@@ -9,7 +9,7 @@ abstract class Routes {
   static const SETTINGS = '/settings';
   static const ABOUT = '/about';
   static const CHOOSE_PROFILE = '/choose_profile';
-  
+
   //Restaurante - Externo
   static const RESTAURANT_MODULES = '/restaurant_modules';
   static const CATRACA_ONLINE = '/catraca_online';
@@ -48,6 +48,7 @@ abstract class Routes {
 
   // Monitora UFF
   static const MONITORA_UFF = '/monitora_uff';
+  static const MONITORA_UFF_FORM = '/monitora_uff_form';
 
   // Repositorio Institucional
   static const REPOSITORIO_INSTITUCIONAL = '/repositorio-institucional';

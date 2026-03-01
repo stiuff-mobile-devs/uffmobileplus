@@ -3,27 +3,20 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'
-    show
-        Colors,
-        WidgetsBindingObserver,
-        AlertDialog,
-        Text,
-        TextButton;
+    show Colors, WidgetsBindingObserver, AlertDialog, Text, TextButton;
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:get/get.dart';
-import 'package:uffmobileplus/app/data/services/device_service.dart';
-import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
+import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/user_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/data/provider/firebase_provider.dart';
-import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_location_model.dart';
+import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_model.dart';
 import 'package:uffmobileplus/app/data/services/foreground_service.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 
 class TrackingController extends GetxController with WidgetsBindingObserver {
   final FlutterBackgroundService _service = FlutterBackgroundService();
-  late String deviceId;
   Position position = Position(
     latitude: -22.9041, // latitude em Niterói
     longitude: -43.1329, // longitude em Niterói
@@ -36,12 +29,14 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
     speed: 0,
     speedAccuracy: 0,
   );
-  RxList<UserLocationModel> firebaseUsers = <UserLocationModel>[].obs;
+  RxList<UserModel> firebaseUsers = <UserModel>[].obs;
   late final MapController mapController;
   final isTrackingEnabled = false.obs;
-  late ExternalModulesServices _externalModulesServices;
+  final UserController userCtrl = Get.find<UserController>();
 
-  void centerMapOnCurrentLocation() {
+  Future<void> centerMapOnCurrentLocation() async {
+    //print(_currentUserEmail);
+    //print(_currentUser);
     try {
       mapController.move(LatLng(position.latitude, position.longitude), 15.0);
     } catch (e) {
@@ -53,22 +48,23 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
   Future<void> onInit() async {
     // Getx irá automaticamente atualizar 'firebaseUsers' sempre que os
     // documentos forem atualizados na nuvem
-    firebaseUsers.bindStream(FirebaseProvider().getAllUsers());
-    super.onInit();
 
+    super.onInit();
+    firebaseUsers.bindStream(FirebaseProvider().getAllTrackedUsers());
     mapController = MapController();
-    deviceId = (await DeviceService.getBuildNumber()).toString();
-    _externalModulesServices = Get.find<ExternalModulesServices>();
-    await _externalModulesServices.initialize();
+
     isTrackingEnabled.value = await _service.isRunning();
   }
 
   /// Método utilizado para escolher a cor dos pins, determinando uma cor
   /// especial para o pin correspondente à localização do próprio usuário
   /// e outra para os demais.
-  Color setMarkerColor(UserLocationModel someUser) {
-    String currentUserId = _externalModulesServices.getUserIdUFF();
-    return someUser.iduff == currentUserId ? Colors.indigo : Colors.lightBlue;
+  Color setMarkerColor(UserModel someUser) {
+    final currentUserEmail = userCtrl.user?.email;
+
+    return someUser.email == currentUserEmail
+        ? Colors.indigo
+        : Colors.lightBlue;
   }
 
   Future<void> toggleService() async {
@@ -96,6 +92,7 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
     );
   }
 
+  // TODO: mover para permissions controller.
   Future<void> notifyGpsDisabled() async {
     await Get.dialog(
       AlertDialog(
@@ -128,10 +125,11 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
 
     // Este listener ouve o serviço em foreground avisar que está pronto para
     // receber informações do usuário.
-    _service.on('ready').listen((event) {
+    _service.on('ready').listen((event) async {
       _service.invoke("setUserInfo", {
-        "id": _externalModulesServices.getUserIdUFF(),
-        "name": _externalModulesServices.getUserName(),
+        "email": userCtrl.user?.email,
+        "name": userCtrl.user?.nome,
+        "funcao": userCtrl.user?.funcao //_currentUser.funcao,
       });
     });
 
@@ -146,13 +144,13 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
     // Atualiza UI (botão).
     isTrackingEnabled.value = true;
     // Informa Firebase que sua posição pode ser visualizada no mapa.
-    FirebaseProvider().updateIsTracked(deviceId, true);
+    FirebaseProvider().updateIsTracked(userCtrl.user!.email, true);
   }
 
   Future<void> _stopService() async {
     _service.invoke("stopService");
     isTrackingEnabled.value = false;
-    FirebaseProvider().updateIsTracked(deviceId, false);
+    FirebaseProvider().updateIsTracked(userCtrl.user!.email, false);
   }
 
   @override

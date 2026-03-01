@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/binding/carteirinha_digital_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/ui/carteirinha_digital_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/bindings/form_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/ui/admin_form_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/repositorio_institucional/bindings/repositorio_institucional_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/repositorio_institucional/ui/repositorio_institucional_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/internacional/bindings/internacional_bindings.dart';
@@ -296,6 +298,14 @@ abstract class AppPages {
         MonitoraUffBindings(),
         UserDataBindings()
       ],
+    ),
+
+    GetPage(
+      name: Routes.MONITORA_UFF_FORM,
+      page: () => AdminFormPage(),
+      bindings: [
+        FormBindings()
+      ]
     ),
 
     GetPage(
