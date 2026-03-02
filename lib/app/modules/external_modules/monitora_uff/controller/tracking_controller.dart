@@ -35,8 +35,6 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
   final UserController userCtrl = Get.find<UserController>();
 
   Future<void> centerMapOnCurrentLocation() async {
-    //print(_currentUserEmail);
-    //print(_currentUser);
     try {
       mapController.move(LatLng(position.latitude, position.longitude), 15.0);
     } catch (e) {
@@ -51,7 +49,13 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
 
     super.onInit();
     firebaseUsers.bindStream(FirebaseProvider().getAllTrackedUsers());
+
     mapController = MapController();
+
+    // TODO: encapsular em um método
+    if (userCtrl.isMonitor()) {
+      position = await Geolocator.getCurrentPosition();
+    }
 
     isTrackingEnabled.value = await _service.isRunning();
   }
@@ -129,7 +133,7 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
       _service.invoke("setUserInfo", {
         "email": userCtrl.user?.email,
         "name": userCtrl.user?.nome,
-        "funcao": userCtrl.user?.funcao //_currentUser.funcao,
+        "funcao": userCtrl.user?.funcao, //_currentUser.funcao,
       });
     });
 

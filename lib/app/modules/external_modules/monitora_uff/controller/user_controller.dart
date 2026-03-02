@@ -33,7 +33,7 @@ class UserController extends GetxController {
 
   Future<UserModel?> _initializeUser() async {
     final email = await _externalModulesServices.getEmail();
-    return await FirebaseProvider().getUserLocationById(email);
+    return await FirebaseProvider().getUserByEmail(email);
   }
 
   bool isAdmin() => _user.value?.funcao == 'administrador';

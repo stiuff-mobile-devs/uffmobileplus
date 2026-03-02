@@ -73,7 +73,7 @@ class FirebaseProvider {
     }
   }
 
-  Future<UserModel?> getUserLocationById(String email) async {
+  Future<UserModel?> getUserByEmail(String email) async {
     try {
       final DocumentSnapshot doc = await collectionRef.doc(email).get();
       if (doc.exists) {

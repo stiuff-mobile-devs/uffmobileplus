@@ -2,10 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/data/provider/firebase_provider.dart';
-import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_model.dart';
 import 'package:uffmobileplus/firebase_options_tracking.dart';
-
-//Timer? _locationTimer;
 
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
@@ -33,7 +30,7 @@ void updateLocation(ServiceInstance service, String email, String name, String f
   // Configuração do GPS
   final androidSettings = AndroidSettings(
     accuracy: LocationAccuracy.high, // TODO: testar outros valores aqui
-    distanceFilter: 0, // Só atualiza se mover mais de 10 metros
+    distanceFilter: 10, // Só atualiza se mover mais de 10 metros
     intervalDuration: Duration(seconds: 5),
     foregroundNotificationConfig: ForegroundNotificationConfig(
       notificationTitle: "UFF Mobile Plus",
@@ -54,8 +51,6 @@ void updateLocation(ServiceInstance service, String email, String name, String f
     // TODO: Filtro de precisão: Se o erro for maior que 20 metros, ignorar
     // e.g.: if (position.accuracy > 20) return;
 
-    //String deviceId = (await DeviceService.getBuildNumber()).toString();
-
     // Atualiza firebase 
     if (await FirebaseProvider().doesDocumentExist(email)) {
       await FirebaseProvider().updateLocationAndTimestamp(
@@ -67,18 +62,6 @@ void updateLocation(ServiceInstance service, String email, String name, String f
         timestamp: DateTime.now(),
       );
     } 
-    //else {
-    //  await FirebaseProvider().adicionarDados(
-    //    UserLocationModel(
-    //      email: email,
-    //      nome: name,
-    //      lat: position.latitude,
-    //      lng: position.longitude,
-    //      timestamp: DateTime.now(),
-    //      isTracked: true,
-    //    ),
-    //  );
-    //}
 
     // Envia para o app principal
     service.invoke('updateLocationLocally', {'position': position});
