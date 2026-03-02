@@ -92,6 +92,9 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
         isForegroundMode: true,
         autoStart: false,
         autoStartOnBoot: false,
+        initialNotificationTitle: "UM+: Monitoramento de jornada ativo",
+        initialNotificationContent: 
+          "O monitoramento está ligado. Certifique-se de desativá-lo assim que terminar suas atividades."
       ),
     );
   }
