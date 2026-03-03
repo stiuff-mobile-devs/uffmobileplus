@@ -41,4 +41,10 @@ class UserController extends GetxController {
   bool isMonitor() => _user.value?.funcao == 'monitor';
 
   void deleteUser(String email) => FirebaseProvider().deleteUserByEmail(email);
+
+  String getUserName() {
+    return user!.nome 
+    ?? _externalModulesServices.getUserName()
+    ?? "Nome não informado";
+  }
 }

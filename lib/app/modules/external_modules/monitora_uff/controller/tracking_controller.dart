@@ -93,8 +93,8 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
         autoStart: false,
         autoStartOnBoot: false,
         initialNotificationTitle: "UM+: Monitoramento de jornada ativo",
-        initialNotificationContent: 
-          "O monitoramento está ligado. Certifique-se de desativá-lo assim que terminar suas atividades."
+        initialNotificationContent:
+            "O monitoramento está ligado. Certifique-se de desativá-lo assim que terminar suas atividades.",
       ),
     );
   }
@@ -134,9 +134,9 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
     // receber informações do usuário.
     _service.on('ready').listen((event) async {
       _service.invoke("setUserInfo", {
-        "email": userCtrl.user?.email,
-        "name": userCtrl.user?.nome,
-        "funcao": userCtrl.user?.funcao, //_currentUser.funcao,
+        "email": userCtrl.user!.email, 
+        "name": userCtrl.getUserName(), 
+        "funcao": userCtrl.user!.funcao, //_currentUser.funcao,
       });
     });
 

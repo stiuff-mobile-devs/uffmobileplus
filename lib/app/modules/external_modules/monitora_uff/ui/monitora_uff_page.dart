@@ -193,7 +193,7 @@ class MonitoraUFFPage extends StatelessWidget {
         markers: trackingCtrl.firebaseUsers
             .map(
               (user) => Marker(
-                point: LatLng(user.lat!, user.lng!),
+                point: LatLng(user.lat ?? 0.0, user.lng ?? 0.0), // TODO: encontrar uma solução melhor.
                 child: GestureDetector(
                   onTap: () => Get.dialog(popUp(user)),
                   child: Icon(

@@ -47,7 +47,7 @@ void updateLocation(ServiceInstance service, String email, String name, String f
   Geolocator.getPositionStream(locationSettings: androidSettings).listen((
     Position position,
   ) async {
-    print("\n\n${position.accuracy}\n\n");
+    // print("\n\n${position.accuracy}\n\n");
     // TODO: Filtro de precisão: Se o erro for maior que 20 metros, ignorar
     // e.g.: if (position.accuracy > 20) return;
 
