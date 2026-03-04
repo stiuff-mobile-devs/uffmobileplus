@@ -63,6 +63,7 @@ dependencies:
   flutter_speed_dial: ^7.0.0
   sliding_up_panel: ^2.0.0+1
   photo_view: ^0.15.0
+  fluttertoast: ^9.0.0
   
 dev_dependencies:
   flutter_test:

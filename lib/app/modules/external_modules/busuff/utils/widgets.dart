@@ -12,18 +12,17 @@ import 'package:uffmobileplus/app/modules/external_modules/busuff/utils/latLngPo
 import 'package:uffmobileplus/app/modules/external_modules/busuff/utils/polyline_points.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 
-
 List<Marker> mapMarker(List<LatLngPoint> p) {
   return p
-      .map((LatLngPoint e) => Marker(
+      .map(
+        (LatLngPoint e) => Marker(
           point: e.latLng,
           child: CircleAvatar(
             radius: 15,
-            child: Text(
-              e.letter,
-              style: TextStyle(fontSize: 12),
-            ),
-          )))
+            child: Text(e.letter, style: TextStyle(fontSize: 12)),
+          ),
+        ),
+      )
       .toList();
 }
 
@@ -40,8 +39,9 @@ class _BusuffButtonState extends State<BusuffButton> {
 
   @override
   Widget build(BuildContext context) {
-    var d =
-        DateFormat("dd/MM/yyyy hh:mm:ss").format(widget.busuffModel.timestamp!);
+    var d = DateFormat(
+      "dd/MM/yyyy hh:mm:ss",
+    ).format(widget.busuffModel.timestamp!);
     return GestureDetector(
       child: isDialog
           ? Container(
@@ -50,7 +50,8 @@ class _BusuffButtonState extends State<BusuffButton> {
                 borderRadius: BorderRadius.circular(10),
                 color: Colors.white,
               ),
-              child: Text(d))
+              child: Text(d),
+            )
           : const Icon(Icons.directions_bus),
       onTap: () {
         setState(() {
@@ -63,36 +64,37 @@ class _BusuffButtonState extends State<BusuffButton> {
 
 Marker busuffMarker(BusuffModel busuffModel) {
   return Marker(
-      height: 30,
-      width: 30,
-      point: LatLng(busuffModel.latitude!, busuffModel.longitude!),
-      child: Stack(
-        children: [
-          Container(
-            width: 50, // Defina a largura do container
-            height: 50, // Defina a altura do container
-            decoration: BoxDecoration(
-              shape: BoxShape
-                  .circle, // Define a forma do container como um círculo
-              border: Border.all(
-                color: Colors.blue, // Cor da borda
-                width: 5, // Largura da borda
-              ),
-              color: Colors.white, // Cor do fundo do container
+    height: 30,
+    width: 30,
+    point: LatLng(busuffModel.latitude!, busuffModel.longitude!),
+    child: Stack(
+      children: [
+        Container(
+          width: 50, // Defina a largura do container
+          height: 50, // Defina a altura do container
+          decoration: BoxDecoration(
+            shape:
+                BoxShape.circle, // Define a forma do container como um círculo
+            border: Border.all(
+              color: Colors.blue, // Cor da borda
+              width: 5, // Largura da borda
             ),
-            child: Transform.rotate(
-              angle: busuffModel.heading == null || busuffModel.speed! <= 3
-                  ? 0
-                  : busuffModel.heading! * pi / 180,
-              child: Image(
-                image: busuffModel.speed != null && busuffModel.speed! <= 3
-                    ? const AssetImage("assets/busuff/images/square.png")
-                    : const AssetImage("assets/busuff/images/arrow.png"),
-              ),
+            color: Colors.white, // Cor do fundo do container
+          ),
+          child: Transform.rotate(
+            angle: busuffModel.heading == null || busuffModel.speed! <= 3
+                ? 0
+                : busuffModel.heading! * pi / 180,
+            child: Image(
+              image: busuffModel.speed != null && busuffModel.speed! <= 3
+                  ? const AssetImage("assets/busuff/images/square.png")
+                  : const AssetImage("assets/busuff/images/arrow.png"),
             ),
           ),
-        ],
-      ));
+        ),
+      ],
+    ),
+  );
 }
 
 Widget busuffMapWidget(BusuffController c) {
@@ -129,7 +131,7 @@ Widget busuffMapWidget(BusuffController c) {
         color: AppColors.darkBlue(),
         child: Center(
           child: Text(
-            "drag_route_selection".tr,
+            'Arraste para selecionar a rota',
             style: const TextStyle(color: Colors.white),
           ),
         ),
@@ -137,16 +139,19 @@ Widget busuffMapWidget(BusuffController c) {
       body: FlutterMap(
         mapController: c.mapController,
         options: MapOptions(
-            initialCenter:
-                c.currentPanning ?? const LatLng(-22.899163, -43.122786),
-            initialZoom: 16.5,
-            minZoom: 3.0,
-            maxZoom: 18.0,
-            keepAlive: true,
-            interactionOptions: const InteractionOptions(
-                flags: InteractiveFlag.pinchZoom |
-                    InteractiveFlag.drag |
-                    InteractiveFlag.scrollWheelZoom)),
+          initialCenter:
+              c.currentPanning ?? const LatLng(-22.899163, -43.122786),
+          initialZoom: 16.5,
+          minZoom: 3.0,
+          maxZoom: 18.0,
+          keepAlive: true,
+          interactionOptions: const InteractionOptions(
+            flags:
+                InteractiveFlag.pinchZoom |
+                InteractiveFlag.drag |
+                InteractiveFlag.scrollWheelZoom,
+          ),
+        ),
         children: [
           TileLayer(
             urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -156,21 +161,20 @@ Widget busuffMapWidget(BusuffController c) {
           PolylineLayer(
             polylines: [
               Polyline(
-                  points: rota1,
-                  color: Colors.lightBlue,
-                  strokeWidth: 4,
-                  borderColor: Colors.blue,
-                  borderStrokeWidth: 2),
-              Polyline(
-                  points: rota2,
-                  color: Colors.lightGreen,
-                  strokeWidth: 4,
-                  borderColor: Colors.green,
-                  borderStrokeWidth: 2),
-              ...createDottedLine(
-                pontilhado,
-                color: Colors.lightGreen,
+                points: rota1,
+                color: Colors.lightBlue,
+                strokeWidth: 4,
+                borderColor: Colors.blue,
+                borderStrokeWidth: 2,
               ),
+              Polyline(
+                points: rota2,
+                color: Colors.lightGreen,
+                strokeWidth: 4,
+                borderColor: Colors.green,
+                borderStrokeWidth: 2,
+              ),
+              ...createDottedLine(pontilhado, color: Colors.lightGreen),
             ],
           ),
           Obx(() {
@@ -179,11 +183,9 @@ Widget busuffMapWidget(BusuffController c) {
                 // ...mapMarker(c.points[c.currentMapIndex]),
                 ...c.busuffs.map(busuffMarker),
                 Marker(
-                    point: LatLng(c.currentUserLat, c.currentUserLong),
-                    child: Icon(
-                      Icons.location_pin,
-                      color: AppColors.darkBlue(),
-                    )),
+                  point: LatLng(c.currentUserLat, c.currentUserLong),
+                  child: Icon(Icons.location_pin, color: AppColors.darkBlue()),
+                ),
               ],
             );
           }),
@@ -193,8 +195,11 @@ Widget busuffMapWidget(BusuffController c) {
   );
 }
 
-List<Polyline> createDottedLine(List<LatLng> points,
-    {Color color = Colors.black, double dashLength = 5.0}) {
+List<Polyline> createDottedLine(
+  List<LatLng> points, {
+  Color color = Colors.black,
+  double dashLength = 5.0,
+}) {
   List<Polyline> dottedLine = [];
 
   for (int i = 0; i < points.length - 1; i++) {
@@ -220,11 +225,7 @@ List<Polyline> createDottedLine(List<LatLng> points,
       );
 
       dottedLine.add(
-        Polyline(
-          points: [dashStart, dashEnd],
-          color: color,
-          strokeWidth: 4.0,
-        ),
+        Polyline(points: [dashStart, dashEnd], color: color, strokeWidth: 4.0),
       );
     }
   }
@@ -233,6 +234,8 @@ List<Polyline> createDottedLine(List<LatLng> points,
 }
 
 Widget busuffStaticWidget(BusuffController c) {
+  final imagePath = c.currentImgUrl.trim();
+
   return SlidingUpPanel(
     panel: campusSelectionWidgetRoutes(c),
     backdropEnabled: true,
@@ -243,20 +246,27 @@ Widget busuffStaticWidget(BusuffController c) {
       color: AppColors.darkBlue(),
       child: Center(
         child: Text(
-          "drag_route_selection".tr,
+          'Arraste para selecionar a rota',
           style: TextStyle(color: Colors.white),
         ),
       ),
     ),
-    body: PhotoView(
-      imageProvider:
-          AssetImage('assets/busuff/images/rotas_busuff/${c.currentImgUrl}'),
-      backgroundDecoration: BoxDecoration(color: AppColors.lightBlue()),
-      basePosition: Alignment.topCenter,
-      minScale: PhotoViewComputedScale.contained * 0.8,
-      maxScale: PhotoViewComputedScale.covered * 1.8,
-      initialScale: PhotoViewComputedScale.contained,
-    ),
+    body: imagePath.isEmpty
+        ? Container(
+            color: AppColors.lightBlue(),
+            alignment: Alignment.center,
+            child: const Text('Sem imagem de rota disponível'),
+          )
+        : PhotoView(
+            imageProvider: AssetImage(
+              'assets/busuff/images/rotas_busuff/$imagePath',
+            ),
+            backgroundDecoration: BoxDecoration(color: AppColors.lightBlue()),
+            basePosition: Alignment.topCenter,
+            minScale: PhotoViewComputedScale.contained * 0.8,
+            maxScale: PhotoViewComputedScale.covered * 1.8,
+            initialScale: PhotoViewComputedScale.contained,
+          ),
     // body: CachedNetworkImage(
     //   imageUrl: c.currentImgUrl,
     //   imageBuilder: (context, imageProvider) => PhotoView(
@@ -277,37 +287,35 @@ Widget campusSelectionWidgetRoutes(BusuffController c) {
   Set s = {6};
   return Column(
     children: [
-      SizedBox(
-        height: 80,
-      ),
+      SizedBox(height: 80),
       ListView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: c.routeList.length,
-          itemBuilder: (ctx, index) => Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: GestureDetector(
-                  onTap: s.contains(index)
-                      ? null
-                      : () => c.onTapRoutes(true, index),
-                  child: Container(
-                    height: 40.0,
-                    decoration: BoxDecoration(
-                        color: c.routeList[index].selected
-                            ? AppColors.mediumBlue()
-                            : AppColors.darkBlue(),
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(8.0))),
-                    child: Center(
-                        child: Text(
-                      c.routeList[index].name,
-                      style: TextStyle(
-                          color:
-                              s.contains(index) ? Colors.grey : Colors.white),
-                    )),
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
+        itemCount: c.routeList.length,
+        itemBuilder: (ctx, index) => Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: GestureDetector(
+            onTap: s.contains(index) ? null : () => c.onTapRoutes(true, index),
+            child: Container(
+              height: 40.0,
+              decoration: BoxDecoration(
+                color: c.routeList[index].selected
+                    ? AppColors.mediumBlue()
+                    : AppColors.darkBlue(),
+                borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+              ),
+              child: Center(
+                child: Text(
+                  c.routeList[index].name,
+                  style: TextStyle(
+                    color: s.contains(index) ? Colors.grey : Colors.white,
                   ),
                 ),
-              )),
+              ),
+            ),
+          ),
+        ),
+      ),
     ],
   );
 }
@@ -316,36 +324,36 @@ Widget campusSelectionWidgetMaps(BusuffController c) {
   Set<int> s = Set.from({2, 3, 5});
   return Column(
     children: [
-      const SizedBox(
-        height: 80,
-      ),
+      const SizedBox(height: 80),
       ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: c.routeList.length,
-          itemBuilder: (ctx, index) {
-            bool b = s.contains(index);
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: GestureDetector(
-                onTap: b ? null : () => c.onTapRoutes(true, index),
-                child: Container(
-                  height: 40.0,
-                  decoration: BoxDecoration(
-                      color: index == c.currentMapIndex
-                          ? AppColors.mediumBlue()
-                          : AppColors.darkBlue(),
-                      borderRadius:
-                          const BorderRadius.all(Radius.circular(8.0))),
-                  child: Center(
-                      child: Text(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: c.routeList.length,
+        itemBuilder: (ctx, index) {
+          bool b = s.contains(index);
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: GestureDetector(
+              onTap: b ? null : () => c.onTapRoutes(true, index),
+              child: Container(
+                height: 40.0,
+                decoration: BoxDecoration(
+                  color: index == c.currentMapIndex
+                      ? AppColors.mediumBlue()
+                      : AppColors.darkBlue(),
+                  borderRadius: const BorderRadius.all(Radius.circular(8.0)),
+                ),
+                child: Center(
+                  child: Text(
                     c.routeList[index].name,
                     style: TextStyle(color: b ? Colors.grey : Colors.white),
-                  )),
+                  ),
                 ),
               ),
-            );
-          }),
+            ),
+          );
+        },
+      ),
     ],
   );
 }
