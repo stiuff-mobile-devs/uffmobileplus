@@ -40,6 +40,16 @@ class ExternalModulesController extends GetxController {
       availableFor: [ProfileTypes.grad, ProfileTypes.pos],
       gdiGroups: null,
     ),
+    
+    ExternalModules(
+       iconSrc: 'assets/busuff/icons/onibus.svg',
+      subtitle: 'BusUFF'.tr,
+      page: Routes.BUSUFF,
+      url: '',
+      interrogation: false,
+      availableFor: everyoneLogged,
+      gdiGroups: null,
+      ),
 
     ExternalModules(
       iconSrc: 'assets/radio/icons/radio.svg',

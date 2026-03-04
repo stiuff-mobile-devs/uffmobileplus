@@ -60,6 +60,10 @@ dependencies:
   equatable: ^2.0.7
   currency_text_input_formatter: ^2.3.0
   permission_handler: ^12.0.1
+  flutter_speed_dial: ^7.0.0
+  sliding_up_panel: ^2.0.0+1
+  photo_view: ^0.15.0
+  fluttertoast: ^9.0.0
   
 dev_dependencies:
   flutter_test:
@@ -86,6 +90,9 @@ flutter:
     - assets/restaurant/img/
     - assets/restaurant/
     - assets/restaurant/icons/
+    - assets/busuff/icons/
+    - assets/busuff/images/
+    - assets/busuff/images/rotas_busuff/
   fonts:
     - family: Jockey One
       fonts:
