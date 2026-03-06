@@ -4,8 +4,19 @@ import 'package:uffmobileplus/app/modules/internal_modules/user/data/provider/us
 class UserGoogleRepository {
   final UserGoogleProvider _provider = UserGoogleProvider();
 
-  Future<UserGoogleModel> createUserDoc(String email, String name, String uid, String urlImage) {
-    return _provider.createUserDoc(email, name, uid, urlImage);
+  Future<UserGoogleModel> createUserDoc(
+    String email,
+    String name,
+    String uid,
+    String urlImage,
+  ) async {
+    UserGoogleModel user = await _provider.createUserDoc(
+      email,
+      name,
+      uid,
+      urlImage,
+    );
+    return user;
   }
 
   Future<String> saveUserGoogleModel(UserGoogleModel user) {
