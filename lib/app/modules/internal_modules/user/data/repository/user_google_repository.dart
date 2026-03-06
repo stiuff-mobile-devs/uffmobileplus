@@ -16,6 +16,7 @@ class UserGoogleRepository {
       uid,
       urlImage,
     );
+
     return user;
   }
 

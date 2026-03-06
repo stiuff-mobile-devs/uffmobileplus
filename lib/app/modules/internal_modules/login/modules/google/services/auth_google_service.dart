@@ -49,12 +49,14 @@ class AuthGoogleService {
     fb.UserCredential userCredential,
   ) async {
     try {
-      return await _userRepository.createUserDoc(
+      final userDoc = await _userRepository.createUserDoc(
         userCredential.user!.email ?? '',
         userCredential.user!.displayName ?? '',
         userCredential.user!.uid,
         userCredential.user!.photoURL ?? '',
       );
+
+      return userDoc;
     } catch (err) {
       debugPrint(err.toString());
       return null;
