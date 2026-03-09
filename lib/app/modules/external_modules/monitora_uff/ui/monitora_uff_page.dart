@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
@@ -9,7 +10,6 @@ import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controll
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_model.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
-
 
 class MonitoraUFFPage extends StatelessWidget {
   const MonitoraUFFPage({super.key});
@@ -193,7 +193,10 @@ class MonitoraUFFPage extends StatelessWidget {
         markers: trackingCtrl.firebaseUsers
             .map(
               (user) => Marker(
-                point: LatLng(user.lat ?? 0.0, user.lng ?? 0.0), // TODO: encontrar uma solução melhor.
+                point: LatLng(
+                  user.lat ?? 0.0,
+                  user.lng ?? 0.0,
+                ), // TODO: encontrar uma solução melhor.
                 child: GestureDetector(
                   onTap: () => Get.dialog(popUp(user)),
                   child: Icon(
@@ -212,31 +215,50 @@ class MonitoraUFFPage extends StatelessWidget {
   Widget popUp(UserModel user) {
     return AlertDialog(
       backgroundColor: AppColors.darkBlue(),
-      title: Text(
-        "Monitor",
-        style: TextStyle(color: Colors.white),
+      title: Text("Monitor", style: TextStyle(color: Colors.white)),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    user.nome ?? user.email,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    icon: SvgPicture.asset(
+                      'assets/monitora_uff/Google_Meet_icon.svg',
+                      width: 24,
+                      height: 24,
+                      fit: BoxFit.contain,
+                    ),
+                    onPressed: () {
+                      debugPrint("Meet");
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              "Última atualização: ${user.timestamp}",
+              style: TextStyle(fontSize: 12, color: Colors.white70),
+            ),
+          ],
+        ),
       ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            user.nome ?? user.email,
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            "Última atualização: ${user.timestamp}",
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.white70,
-            ),
-          ),
-        ],
-      )
     );
   }
 
@@ -298,7 +320,6 @@ class MonitoraUFFPage extends StatelessWidget {
     );
   }
 
-
   Widget _usersList() {
     return Obx(
       () => ListView(
@@ -340,7 +361,10 @@ class MonitoraUFFPage extends StatelessWidget {
                       ),
                     ),
                     GestureDetector(
-                      onTap: () => Get.toNamed(Routes.MONITORA_UFF_FORM, arguments: user), 
+                      onTap: () => Get.toNamed(
+                        Routes.MONITORA_UFF_FORM,
+                        arguments: user,
+                      ),
                       child: Icon(Icons.edit, color: Colors.blueAccent),
                     ),
                     const SizedBox(width: 16),
@@ -390,7 +414,7 @@ class MonitoraUFFPage extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () => Get.toNamed(Routes.MONITORA_UFF_FORM), 
+          onTap: () => Get.toNamed(Routes.MONITORA_UFF_FORM),
           child: Center(
             child: Icon(Icons.add, size: 32, color: AppColors.darkBlue()),
           ),

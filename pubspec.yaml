@@ -93,6 +93,7 @@ flutter:
     - assets/busuff/icons/
     - assets/busuff/images/
     - assets/busuff/images/rotas_busuff/
+    - assets/monitora_uff/
   fonts:
     - family: Jockey One
       fonts:
