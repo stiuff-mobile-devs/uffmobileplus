@@ -211,8 +211,32 @@ class MonitoraUFFPage extends StatelessWidget {
 
   Widget popUp(UserModel user) {
     return AlertDialog(
-      title: Text("Usuário"),
-      content: Text(user.nome ?? user.email),
+      backgroundColor: AppColors.darkBlue(),
+      title: Text(
+        "Monitor",
+        style: TextStyle(color: Colors.white),
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            user.nome ?? user.email,
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "Última atualização: ${user.timestamp}",
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.white70,
+            ),
+          ),
+        ],
+      )
     );
   }
 
