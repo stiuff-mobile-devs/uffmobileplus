@@ -48,9 +48,9 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
     // documentos forem atualizados na nuvem
 
     super.onInit();
-    firebaseUsers.bindStream(FirebaseProvider().getAllTrackedUsers());
-
     mapController = MapController();
+    firebaseUsers.bindStream(FirebaseProvider().getAllTrackedUsers());
+    
 
     // TODO: encapsular em um método
     if (userCtrl.isMonitor()) {
