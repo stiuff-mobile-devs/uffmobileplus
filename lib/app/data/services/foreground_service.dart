@@ -30,7 +30,7 @@ void updateLocation(ServiceInstance service, String email, String name, String f
   // Configuração do GPS
   final androidSettings = AndroidSettings(
     accuracy: LocationAccuracy.high, // TODO: testar outros valores aqui
-    distanceFilter: 0, // Só atualiza se mover mais de 10 metros
+    distanceFilter: 10, // Só atualiza se mover mais de 10 metros
     intervalDuration: Duration(seconds: 5),
     //foregroundNotificationConfig: ForegroundNotificationConfig(
     //  notificationTitle: "UFF Mobile Plus",
