@@ -24,38 +24,23 @@ class PermissionsController extends GetxController with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed) {
+      hasWhenInUseLocationPermission.value =
+          await Permission.locationWhenInUse.isGranted;
       hasAlwaysLocationPermission.value =
           await Permission.locationAlways.isGranted;
       hasNotificationPermission.value = await Permission.notification.isGranted;
     }
   }
 
-  //Future<void> requestWhenInUsePermission() async {
-  //  PermissionStatus locationWhenInUseStatus = await Permission
-  //      .locationWhenInUse
-  //      .request();
-//
-  //  if (locationWhenInUseStatus.isPermanentlyDenied) {
-  //    openAppSettings();
-  //  }
-//
-  //  hasWhenInUseLocationPermission.value =
-  //      await Permission.locationWhenInUse.isGranted;
-//
-  //  if (!hasWhenInUseLocationPermission.value) {
-  //    openAppSettings();
-  //  }
-  //}
-
   Future<void> requestWhenInUsePermission() async {
     if (await Permission.locationWhenInUse.isPermanentlyDenied) {
-      openAppSettings();
+      await openAppSettings();
     } else {
       await Permission.locationWhenInUse.request();
     }
 
     hasWhenInUseLocationPermission.value =
-          await Permission.locationWhenInUse.isGranted;
+        await Permission.locationWhenInUse.isGranted;
   }
 
   Future<void> requestAlwaysPermission() async {
