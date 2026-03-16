@@ -134,5 +134,16 @@ final Map<String, String> ptBR = {
   'radio_pop_goiaba': 'Radio Pop Goiaba',
 
   // Monitora UFF
-  'monitora_uff': 'Monitora UFF'
+  'monitora_uff': 'Monitora UFF',
+
+  // Bibliotecas
+  'bibliotecas': 'Bibliotecas',
+  'pergamum': 'Meu Pergamum',
+  'cadastro': 'Cadastro',
+  'catalogo': 'Catálogo',
+  'ebooks': 'E-books',
+  'ask': 'Fale com a biblioteca',
+  'ferramentas': 'Ferramentas de pesquisa',
+  'saber': 'SABER',
+  'target': 'Target GEDweb',
 };

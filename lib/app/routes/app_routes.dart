@@ -61,4 +61,8 @@ abstract class Routes {
 
   // Busuff
   static const BUSUFF = '/busuff';
+
+  // Bibliotecas
+  static const BIBLIOTECAS = '/bibliotecas';
+  static const BIBLIOTECAS_WEB_VIEW = '/bibliotecas-web-view';
 }

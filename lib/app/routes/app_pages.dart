@@ -1,4 +1,8 @@
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/modules/external_modules/bibliotecas/binding/bibliotecas_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/bibliotecas/web_page/binding/web_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/bibliotecas/web_page/ui/web_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/bibliotecas/ui/bibliotecas_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/busuff/binding/busuff_binding.dart';
 import 'package:uffmobileplus/app/modules/external_modules/busuff/ui/busuff_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/binding/carteirinha_digital_bindings.dart';
@@ -324,7 +328,21 @@ abstract class AppPages {
     //BusUff
     GetPage(
       name: Routes.BUSUFF, 
-    page: () => BusuffPage(), 
-    binding: BusuffBinding())
+      page: () => BusuffPage(), 
+      binding: BusuffBinding()
+    ),
+
+    // Bibliotecas
+    GetPage(
+      name: Routes.BIBLIOTECAS, 
+      page: () => BibliotecasPage(),
+      binding: BibliotecasBindings(),
+    ),
+
+    GetPage(
+      name: Routes.BIBLIOTECAS_WEB_VIEW, 
+      page: () => BibliotecasWebPage(),
+      binding: BibliotecasWebBindings(),
+    ),
   ];
 }

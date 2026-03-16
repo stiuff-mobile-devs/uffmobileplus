@@ -138,6 +138,17 @@ class ExternalModulesController extends GetxController {
       availableFor: everyoneLogged,
       gdiGroups: null,
     ),
+
+    // Bibliotecas
+    ExternalModules(
+      iconSrc: 'assets/icons/biblioteca.svg',
+      subtitle: 'bibliotecas'.tr,
+      page: Routes.BIBLIOTECAS,
+      url: '',
+      interrogation: false,
+      availableFor: everyoneLogged,
+      gdiGroups: null,
+    ),
   ]);
 
   @override
