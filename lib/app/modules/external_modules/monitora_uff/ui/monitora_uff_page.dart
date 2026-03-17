@@ -188,21 +188,27 @@ class MonitoraUFFPage extends StatelessWidget {
   }
 
   Widget firebaseMarkers() {
+    const double markerSize = 50.0;
+
     return Obx(
       () => MarkerLayer(
         markers: trackingCtrl.firebaseUsers
             .map(
               (user) => Marker(
                 point: LatLng(
-                  user.lat ?? 0.0,
-                  user.lng ?? 0.0,
-                ), // TODO: encontrar uma solução melhor.
+                  user.lat ?? 0.0, // TODO: encontrar uma solução melhor.
+                  user.lng ?? 0.0, // TODO: encontrar uma solução melhor.
+                ), 
+                width: markerSize,
+                height: markerSize,
+                alignment: Alignment.center,
                 child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
                   onTap: () => Get.dialog(popUp(user)),
                   child: Icon(
                     Icons.location_pin,
                     color: trackingCtrl.setMarkerColor(user),
-                    size: 50,
+                    size: markerSize,
                   ),
                 ),
               ),
