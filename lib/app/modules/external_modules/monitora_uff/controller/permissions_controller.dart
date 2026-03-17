@@ -55,11 +55,14 @@ class PermissionsController extends GetxController with WidgetsBindingObserver {
         PermissionStatus locationAlwaysStatus = await Permission.locationAlways
             .request();
 
-        if (locationAlwaysStatus.isPermanentlyDenied) openAppSettings();
+        if (locationAlwaysStatus.isPermanentlyDenied) await openAppSettings();
       }
     } else if (locationWhenInUseStatus.isPermanentlyDenied) {
-      openAppSettings();
+      await openAppSettings();
     }
+
+    hasAlwaysLocationPermission.value =
+        await Permission.locationAlways.isGranted;
   }
 
   /// Precisamos de permissão para exibibir notificações pois serviços de
@@ -67,7 +70,12 @@ class PermissionsController extends GetxController with WidgetsBindingObserver {
   /// usuário quanto para o consumo de bateria. Sem notificações, o SO pode
   /// matar esses serviços.
   Future<void> requestNotificationPermission() async {
-    await Permission.notification.request();
+    if (await Permission.notification.isPermanentlyDenied) {
+      await openAppSettings();
+    } else {
+      await Permission.notification.request();
+    }
+
     hasNotificationPermission.value = await Permission.notification.isGranted;
   }
 
@@ -110,8 +118,6 @@ class PermissionsController extends GetxController with WidgetsBindingObserver {
               TextButton(
                 onPressed: () async {
                   Get.back(result: true);
-                  // 3. Abre as configurações do sistema diretamente na página do App
-                  await openAppSettings();
                 },
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.darkBlue(),
