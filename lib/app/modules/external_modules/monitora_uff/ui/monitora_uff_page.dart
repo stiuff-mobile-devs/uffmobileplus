@@ -205,10 +205,20 @@ class MonitoraUFFPage extends StatelessWidget {
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: () => Get.dialog(popUp(user)),
-                  child: Icon(
-                    Icons.location_pin,
-                    color: trackingCtrl.setMarkerColor(user),
-                    size: markerSize,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: trackingCtrl.setMarkerColor(user),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 3),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    margin: const EdgeInsets.all(10), 
                   ),
                 ),
               ),
