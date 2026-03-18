@@ -1,18 +1,12 @@
-import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hive/hive.dart';
-import 'package:uffmobileplus/app/config/secrets.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/area.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/operator_transaction.dart';
-import 'package:http/http.dart' as http;
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/operator_transaction_offline.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/operator_transaction_offline.dart';
 
 class CatracaOnlineProvider {
   final String _collectionPath = "operator_transactions";
   final String _collectionPathFirebase = "meals";
-  final String _userKey = "current_user";
   final FirebaseFirestore _firestore = FirebaseFirestore.instanceFor(
     app: Firebase.app('catracaoffline'),
   );
@@ -40,10 +34,11 @@ class CatracaOnlineProvider {
   }
 
   Future<List<OperatorTransactionOffline>>
-  getOperatorTransactionsFromFirebase() async {
+  getOperatorTransactionsFromFirebase(String iduffOperator) async {
     try {
       final snapshot = await _firestore
           .collection(_collectionPathFirebase)
+          .where('idUffOperator', isEqualTo: iduffOperator)
           .get();
       return snapshot.docs
           .map((doc) {

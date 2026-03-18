@@ -2,15 +2,15 @@ import 'package:all_validations_br/all_validations_br.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/area.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/operator_transaction.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/operator_transaction_offline.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/repository/catraca_online_repository.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/area.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/operator_transaction.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/operator_transaction_offline.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/repository/catraca_repository.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'dart:async';
 
-class CatracaOnlineController extends GetxController {
-  CatracaOnlineController();
+class CatracaController extends GetxController {
+  CatracaController();
 
   late ExternalModulesServices service;
   CatracaOnlineRepository repository = CatracaOnlineRepository();
@@ -90,7 +90,7 @@ class CatracaOnlineController extends GetxController {
 
     try {
       operatorTransactionsFromFirebase.value = await repository
-          .getOperatorTransactionsFromFirebase();
+          .getOperatorTransactionsFromFirebase(iduff);
     } catch (e) {
       debugPrint('Erro ao buscar transações offline do firebase: $e');
     }
@@ -106,6 +106,7 @@ class CatracaOnlineController extends GetxController {
     }
 
     isTransactionBusy.value = false;
+    syncOfflineTransactions();
   }
 
   void selectArea(index) {
@@ -318,7 +319,11 @@ class CatracaOnlineController extends GetxController {
     } catch (e) {
       debugPrint('Erro ao salvar transação no Firebase: $e');
       saveOperatorTransactionToFirebase = false;
-      // Salvando no banco local
+    }
+
+    // Salvando no banco local se falhar no Firebase  
+    if(!saveOperatorTransactionToFirebase) {
+      
       try {
         await repository.saveOperatorTransactionsOffline(
           operatorTransactionOffline,
@@ -328,16 +333,27 @@ class CatracaOnlineController extends GetxController {
         saveOperatorTransactionsOffline = false;
         debugPrint('Erro ao salvar transação offline: $e');
       }
-    }
+      }
 
-    if (saveOperatorTransactionsOffline || saveOperatorTransactionToFirebase) {
-      transactionResultMessage = "Transação salva em modo OFFLINE com sucesso!";
+    if (saveOperatorTransactionsOffline ) {
+      isOfflineMode = true.obs;
+      statusMessage.value = "Catraca Online";
+      transactionResultMessage = "Transação salva localmente com sucesso!";
       transactionUsername = cpf;
       isTransactionValid = true;
       isQrCodeValid = true;
-    } else {
+    } 
+    else if(saveOperatorTransactionToFirebase) {
+      isOfflineMode = false.obs;
+      statusMessage.value = "Catraca Offline";
+      transactionResultMessage = "Transação salva no servidor com sucesso!";
+      transactionUsername = cpf;
+      isTransactionValid = true;  
+      isQrCodeValid = true;
+    }
+    else {
       transactionResultMessage =
-          "Falha ao salvar a transação offline. Erro Interno.";
+          "Falha ao salvar a transação. Erro Interno.";
       isTransactionValid = false;
       isQrCodeValid = false;
       transactionUsername = cpf;
@@ -345,8 +361,6 @@ class CatracaOnlineController extends GetxController {
   }
 
   void manualValidation() {
-    isOfflineMode.value = true;
-    statusMessage.value = "Catraca Offline";
     Get.toNamed(Routes.VALIDAR_MANUALMENTE);
   }
 
@@ -354,13 +368,7 @@ class CatracaOnlineController extends GetxController {
     Get.toNamed(Routes.RESULTADO_PAGE);
   }
 
-  void toggleMode() {
-    isOfflineMode.value = !isOfflineMode.value;
-    statusMessage.value = isOfflineMode.value
-        ? "Catraca Offline"
-        : "Catraca Online";
-    fetchOperatorTransactions();
-  }
+
 
   /// Inicia checagem periódica (30s) para enviar transações locais ao Firebase.
   void startOfflineSync() {
@@ -391,7 +399,6 @@ class CatracaOnlineController extends GetxController {
               .timeout(const Duration(seconds: 5));
           // remover local após sucesso no Firebase
           try {
-            // Ajuste o nome do método de delete conforme implementação do repositório.
             await repository.deleteOperatorTransactionOffline(tx.id);
           } catch (e) {
             debugPrint('Erro ao apagar transação local: $e');

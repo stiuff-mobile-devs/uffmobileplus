@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/controller/catraca_online_controller.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/utils/transaction_list.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/controller/catraca_controller.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/utils/transaction_list.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.dart';
 
-class ValidarPagamentoPage extends GetView<CatracaOnlineController> {
+class ValidarPagamentoPage extends GetView<CatracaController> {
   const ValidarPagamentoPage({super.key});
 
   @override
@@ -17,13 +17,7 @@ class ValidarPagamentoPage extends GetView<CatracaOnlineController> {
         foregroundColor: Colors.white,
         title: Obx(() => Text(controller.statusMessage.value)),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.sync),
-            tooltip: 'Sincronizar offline',
-            onPressed: () {
-              controller.syncOfflineTransactions();
-            },
-          ),
+         
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Atualizar',

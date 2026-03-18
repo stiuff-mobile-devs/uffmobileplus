@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/controller/catraca_online_controller.dart';
-import 'package:uffmobileplus/app/routes/app_routes.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/controller/catraca_controller.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.dart';
 
-class ValidarManualmentePage extends GetView<CatracaOnlineController> {
+class ValidarManualmentePage extends GetView<CatracaController> {
   final TextEditingController cpfController = TextEditingController();
 
   ValidarManualmentePage({super.key});

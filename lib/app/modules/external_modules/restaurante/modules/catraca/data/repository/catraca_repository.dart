@@ -1,8 +1,8 @@
 import 'package:uffmobileplus/app/data/services/sctm_service.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/area.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/operator_transaction.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/model/operator_transaction_offline.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca_online/data/provider/catraca_online_provider.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/area.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/operator_transaction.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/operator_transaction_offline.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/provider/catraca_provider.dart';
 
 class CatracaOnlineRepository {
   CatracaOnlineRepository();
@@ -57,7 +57,7 @@ class CatracaOnlineRepository {
   }
 
   Future<List<OperatorTransactionOffline>>
-  getOperatorTransactionsFromFirebase() async {
-    return await catracaOnlineProvider.getOperatorTransactionsFromFirebase();
+  getOperatorTransactionsFromFirebase(String iduffOperator) async {
+    return await catracaOnlineProvider.getOperatorTransactionsFromFirebase(iduffOperator);
   }
 }
