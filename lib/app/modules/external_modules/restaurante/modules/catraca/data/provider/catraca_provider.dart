@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hive/hive.dart';
@@ -8,7 +7,8 @@ class CatracaOnlineProvider {
   final String _collectionPath = "operator_transactions";
   final String _collectionPathFirebase = "meals";
   final FirebaseFirestore _firestore = FirebaseFirestore.instanceFor(
-    app: Firebase.app('catracaoffline'),
+    app: Firebase.app("uffmobileplus"),
+    databaseId: 'catraca',
   );
 
   Future<String> saveOperatorTransactionsOffline(
@@ -33,8 +33,9 @@ class CatracaOnlineProvider {
     }
   }
 
-  Future<List<OperatorTransactionOffline>>
-  getOperatorTransactionsFromFirebase(String iduffOperator) async {
+  Future<List<OperatorTransactionOffline>> getOperatorTransactionsFromFirebase(
+    String iduffOperator,
+  ) async {
     try {
       final snapshot = await _firestore
           .collection(_collectionPathFirebase)
