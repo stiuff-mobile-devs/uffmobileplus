@@ -34,7 +34,7 @@ class MealModel {
         this.open,
         this.id});
 
-  MealModel.fromJson(Map<String, dynamic> json) {
+  MealModel.fromJson(Map<String, dynamic> json, String id) {
     date = json["date"];
     campus = json["campus"];
     main = json["main"];
@@ -49,7 +49,7 @@ class MealModel {
     observ = json["observ"];
     open = json["open"];
     createdAt = json["created_at"];
-    id = json["id"];
+    id = id;
   }
 
   Map<String, dynamic> toJson() {
@@ -68,7 +68,7 @@ class MealModel {
       "observ": observ,
       "open": open,
     };
-    return {"meal": refeicao};
+    return refeicao;
   }
 }
 

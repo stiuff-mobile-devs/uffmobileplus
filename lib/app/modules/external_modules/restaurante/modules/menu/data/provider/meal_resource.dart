@@ -11,7 +11,8 @@ import '../models/meal_model.dart';
 
 class MealResource {
   final FirebaseFirestore _firestore = FirebaseFirestore.instanceFor(
-    app: Firebase.app('cardapio_ru'),
+    app: Firebase.app("uffmobileplus"),
+    databaseId: 'cardapio-ru',
   );
 
   MealResource();
@@ -26,28 +27,28 @@ class MealResource {
   // };
 
   // Fetchs a LegacyMeal (from previous RestaurantAPI)
-  Future<List<LegacyMeal>?> getMenu() async {
-    accessToken = await _menuService.getAccessToken();
-    Uri url = Uri.https('restaurante.uff.br', '/cardapiomobile.xml');
-    final response = await http.get(
-      url,
-      headers: {'Authorization': 'Bearer $accessToken'},
-    );
-    //final response = await httpService.get(url);
-    if (response == null) return [];
-    if (response.statusCode != 200) {
-      debugPrint(
-        "Error on LegacyMeal!\n STATUS CODE: ${response.statusCode} \n BODY: ${response.body}",
-      );
-      return [];
-    } else {
-      XmlDocument xmlDocument = XmlDocument.parse(response.body);
-      Iterable<XmlElement> xmlMenu = xmlDocument.findAllElements('node');
-      return xmlMenu.map((mealInfo) {
-        return LegacyMeal.fromXml(mealInfo);
-      }).toList();
-    }
-  }
+  // Future<List<LegacyMeal>?> getMenu() async {
+  //   accessToken = await _menuService.getAccessToken();
+  //   Uri url = Uri.https('restaurante.uff.br', '/cardapiomobile.xml');
+  //   final response = await http.get(
+  //     url,
+  //     headers: {'Authorization': 'Bearer $accessToken'},
+  //   );
+  //   //final response = await httpService.get(url);
+  //   if (response == null) return [];
+  //   if (response.statusCode != 200) {
+  //     debugPrint(
+  //       "Error on LegacyMeal!\n STATUS CODE: ${response.statusCode} \n BODY: ${response.body}",
+  //     );
+  //     return [];
+  //   } else {
+  //     XmlDocument xmlDocument = XmlDocument.parse(response.body);
+  //     Iterable<XmlElement> xmlMenu = xmlDocument.findAllElements('node');
+  //     return xmlMenu.map((mealInfo) {
+  //       return LegacyMeal.fromXml(mealInfo);
+  //     }).toList();
+  //   }
+  // }
 
   bool isToday(DateTime mealDate) {
     DateTime today = DateTime.now();
@@ -79,112 +80,137 @@ class MealResource {
   }
 
   Future<List<MealModel>?> getMealsByCampus(String campus) async {
-    accessToken = await _menuService.getAccessToken();
-    final Uri url = _buildUrl(
-      "${RestaurantAPI.path}/meals/active/campus=$campus",
-    );
+    await _getMealsByCampusOnFirestore(campus);
+    // accessToken = await _menuService.getAccessToken();
+    // final Uri url = _buildUrl(
+    //   "${RestaurantAPI.path}/meals/active/campus=$campus",
+    // );
+    //
+    // try {
+    //   //final response = await httpService.get(url);
+    //   final response = await http.get(
+    //     url,
+    //     headers: {'Authorization': 'Bearer $accessToken'},
+    //   );
+    //   return _processGetResponse(response);
+    // } catch (e) {
+    //   _logError('getMealsByCampus', e);
+    //   if (e.toString() == 'Null check operator used on a null value') {
+    //     rethrow;
+    //   }
+    // }
+    //
+    // return null;
+  }
 
-    try {
-      //final response = await httpService.get(url);
-      final response = await http.get(
-        url,
-        headers: {'Authorization': 'Bearer $accessToken'},
-      );
-      return _processGetResponse(response);
-    } catch (e) {
-      _logError('getMealsByCampus', e);
-      if (e.toString() == 'Null check operator used on a null value') {
-        rethrow;
-      }
-    }
+  Future<List<MealModel>?> _getMealsByCampusOnFirestore(String campus) async {
+    final querySnapshot = await _firestore
+        .collection('meals')
+        .where('campus', isEqualTo: campus)
+        .get();
 
-    return null;
+    return querySnapshot.docs
+        .map((doc) => MealModel.fromJson(doc.data(), doc.id))
+        .toList();
   }
 
   Future<int> createMeal(MealModel meal) async {
-    final Uri url = _buildUrl("${RestaurantAPI.path}/meals");
-    accessToken = await _menuService.getAccessToken();
-
-    try {
-      // final response = await httpService.post(
-      //   url,
-      //   body: jsonEncode(meal.toJson()),
-      //   headers: jsonHeaders,
-      // );
-      final response = await http.post(
-        url,
-        body: jsonEncode(meal.toJson()),
-        headers: {'Authorization': 'Bearer $accessToken'},
-      );
-      await _createMealOnFirestore(meal);
-      return _processWriteResponse(response, "Refeição criada com sucesso.");
-    } catch (e) {
-      _logError('createMeal', e);
-      if (e.toString() == 'Null check operator used on a null value') {
-        rethrow;
-      }
-    }
-
+    await _createMealOnFirestore(meal);
     return 0;
+    // final Uri url = _buildUrl("${RestaurantAPI.path}/meals");
+    // accessToken = await _menuService.getAccessToken();
+    //
+    // try {
+    //   // final response = await httpService.post(
+    //   //   url,
+    //   //   body: jsonEncode(meal.toJson()),
+    //   //   headers: jsonHeaders,
+    //   // );
+    //   final response = await http.post(
+    //     url,
+    //     body: jsonEncode(meal.toJson()),
+    //     headers: {'Authorization': 'Bearer $accessToken'},
+    //   );
+    //   await _createMealOnFirestore(meal);
+    //   return _processWriteResponse(response, "Refeição criada com sucesso.");
+    // } catch (e) {
+    //   _logError('createMeal', e);
+    //   if (e.toString() == 'Null check operator used on a null value') {
+    //     rethrow;
+    //   }
+    // }
+    //
+    // return 0;
   }
 
   _createMealOnFirestore(MealModel meal) async {
     try {
       await _firestore.collection("meals").add(meal.toJson());
     } catch (e) {
-      _logError('createMeal on Firebase', e);
+      _logError('error on createMeal on Firebase', e);
     }
   }
 
   Future<int> updateMeal(MealModel meal) async {
-    final Uri url = _buildUrl("${RestaurantAPI.path}/meals/${meal.id}");
-    accessToken = await _menuService.getAccessToken();
-
-    try {
-      // final response = await httpService.put(
-      //   url,
-      //   body: jsonEncode(meal.toJson()),
-      //   headers: jsonHeaders,
-      // );
-      final response = await http.put(
-        url,
-        body: jsonEncode(meal.toJson()),
-        headers: {'Authorization': 'Bearer $accessToken'},
-      );
-      return _processWriteResponse(
-        response,
-        "Refeição atualizada com sucesso.",
-      );
-    } catch (e) {
-      _logError('updateMeal', e);
-      if (e.toString() == 'Null check operator used on a null value') {
-        rethrow;
-      }
-    }
-
+    await _updateMealOnFirestore(meal);
     return 0;
+    // final Uri url = _buildUrl("${RestaurantAPI.path}/meals/${meal.id}");
+    // accessToken = await _menuService.getAccessToken();
+    //
+    // try {
+    //   // final response = await httpService.put(
+    //   //   url,
+    //   //   body: jsonEncode(meal.toJson()),
+    //   //   headers: jsonHeaders,
+    //   // );
+    //   final response = await http.put(
+    //     url,
+    //     body: jsonEncode(meal.toJson()),
+    //     headers: {'Authorization': 'Bearer $accessToken'},
+    //   );
+    //   return _processWriteResponse(
+    //     response,
+    //     "Refeição atualizada com sucesso.",
+    //   );
+    // } catch (e) {
+    //   _logError('updateMeal', e);
+    //   if (e.toString() == 'Null check operator used on a null value') {
+    //     rethrow;
+    //   }
+    // }
+    //
+    // return 0;
   }
 
-  Future<int> deleteMeal(MealModel meal) async {
-    final Uri url = _buildUrl("${RestaurantAPI.path}/meals/${meal.id}");
-    accessToken = await _menuService.getAccessToken();
-
+  _updateMealOnFirestore(MealModel meal) async {
     try {
-      // final response = await httpService.delete(
-      //   url,
-      //   headers: jsonHeaders,
-      // );
-      final response = await http.delete(
-        url,
-        headers: {'Authorization': 'Bearer $accessToken'},
-      );
-      return _processWriteResponse(response, "Refeição deletada com sucesso.");
+      final docRef = _firestore.collection("meals").doc(meal.id);
+      await docRef.update(meal.toJson());
     } catch (e) {
-      _logError('deleteMeal', e);
+      _logError('error on createMeal on Firebase', e);
     }
-
-    return 0;
   }
+
+  // Future<int> deleteMeal(MealModel meal) async {
+  //   final Uri url = _buildUrl("${RestaurantAPI.path}/meals/${meal.id}");
+  //   accessToken = await _menuService.getAccessToken();
+  //
+  //   try {
+  //     // final response = await httpService.delete(
+  //     //   url,
+  //     //   headers: jsonHeaders,
+  //     // );
+  //     final response = await http.delete(
+  //       url,
+  //       headers: {'Authorization': 'Bearer $accessToken'},
+  //     );
+  //     return _processWriteResponse(response, "Refeição deletada com sucesso.");
+  //   } catch (e) {
+  //     _logError('deleteMeal', e);
+  //   }
+  //
+  //   return 0;
+  // }
 
   // Função auxiliar para construir URLs
   Uri _buildUrl(String path) {
@@ -197,19 +223,19 @@ class MealResource {
   }
 
   // Função auxiliar para processar respostas de leitura (GET)
-  List<MealModel>? _processGetResponse(response) {
-    if (response != null && response.statusCode == 200) {
-      final List<MealModel> meals = [];
-      final jsonResponse = jsonDecode(response.body);
-      for (var meal in jsonResponse) {
-        meals.add(MealModel.fromJson(meal));
-      }
-      return meals;
-    } else {
-      _logApiError(response);
-    }
-    return null;
-  }
+  // List<MealModel>? _processGetResponse(response) {
+  //   if (response != null && response.statusCode == 200) {
+  //     final List<MealModel> meals = [];
+  //     final jsonResponse = jsonDecode(response.body);
+  //     for (var meal in jsonResponse) {
+  //       meals.add(MealModel.fromJson(meal));
+  //     }
+  //     return meals;
+  //   } else {
+  //     _logApiError(response);
+  //   }
+  //   return null;
+  // }
 
   // Função auxiliar para processar respostas de escrita (POST, PUT, DELETE)
   int _processWriteResponse(response, String successMessage) {
