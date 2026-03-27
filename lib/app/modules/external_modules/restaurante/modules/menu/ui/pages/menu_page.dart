@@ -572,13 +572,13 @@ class _MenuPageState extends State<MenuPage> with TickerProviderStateMixin {
                 children: [
                   _buildLocationPanel(controller.selectedLocation,
                       controller.restaurantController),
-                  const SizedBox(height: 10),
+                  //const SizedBox(height: 10),
                   Expanded (
                     child: MenuWidget(
                       campus: controller.selectedLocation.name,
                     ),
                   ),
-                  const SizedBox(height: 15),
+                  //const SizedBox(height: 15),
                 ],
               ),
               (controller.restaurantController.isAdminModeEnabled() ?? false)

@@ -232,10 +232,12 @@ class DetailsController extends GetxController {
 
   Future<List<int>> createMealMenuVisualizer(MealModel meal) async {
     DateTime mData = DateTime.parse(meal.createdAt.toString());
+    //DateTime mData = DateTime.parse(meal.createdAt);
     String formattedDate = intl.DateFormat('yyyy-MM-dd_HH:mm:ss').format(mData);
 
     // Provavelmente não é a melhor forma de fazer isso, mas...
-    var imgId = (meal.id as int) + 918323;
+    //var imgId = (meal.id as int) + 918323;
+    var imgId = meal.id;
 
     final tempDir = await getTemporaryDirectory();
     final filePath = ('${tempDir.path}/SharedMenu_${formattedDate}_$imgId.png');

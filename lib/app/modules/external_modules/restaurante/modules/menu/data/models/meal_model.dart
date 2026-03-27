@@ -15,7 +15,7 @@ class MealModel {
   String? observ;
   dynamic createdAt;
   dynamic open;
-  dynamic id;
+  String? id;
 
   MealModel(
       {this.date,
@@ -34,7 +34,8 @@ class MealModel {
         this.open,
         this.id});
 
-  MealModel.fromJson(Map<String, dynamic> json, String id) {
+  MealModel.fromJson(Map<String, dynamic> json, String newId) {
+    id = newId;
     date = json["date"];
     campus = json["campus"];
     main = json["main"];
@@ -48,8 +49,7 @@ class MealModel {
     dessert = json["dessert"];
     observ = json["observ"];
     open = json["open"];
-    createdAt = json["created_at"];
-    id = id;
+    createdAt = (json["created_at"] ?? DateTime.now());
   }
 
   Map<String, dynamic> toJson() {
@@ -67,6 +67,27 @@ class MealModel {
       "dessert": dessert,
       "observ": observ,
       "open": open,
+      "created_at": DateTime.now()
+    };
+    return refeicao;
+  }
+
+  Map<String, dynamic> toJsonFirestore() {
+    Map<String, dynamic> refeicao = {
+      "date": date.toString(),
+      "campus": campus,
+      "main": main,
+      "main_ingr": mainIngr,
+      "garnish": garnish,
+      "garnish_ingr": garnishIngr,
+      "side": side,
+      "side_ingr": sideIngr,
+      "salad1": salad1,
+      "salad2": salad2,
+      "dessert": dessert,
+      "observ": observ,
+      "open": open,
+      "created_at": DateTime.now()
     };
     return refeicao;
   }
