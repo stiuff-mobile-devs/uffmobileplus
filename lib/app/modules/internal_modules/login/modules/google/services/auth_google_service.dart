@@ -39,15 +39,6 @@ class AuthGoogleService {
       );
       var userCredential = await _auth.signInWithCredential(authCredential);
 
-      // TODO: mover para outro arquivo ======================
-      // problema: se o usuário já tiver logado não funciona, i.e.,
-      // pelo menos uma vez é necessário deslogar e logar com o google.
-      final trackingAuth = fb.FirebaseAuth.instanceFor(
-        app: Firebase.app('tracking'),
-      );
-      await trackingAuth.signInWithCredential(authCredential);
-      // =====================================================
-
       return await _createUserDoc(userCredential);
     } catch (e) {
       debugPrint('Error during Google sign-in: $e');

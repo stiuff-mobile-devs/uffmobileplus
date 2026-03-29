@@ -2,13 +2,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/data/provider/firebase_provider.dart';
-import 'package:uffmobileplus/firebase_options_tracking.dart';
+import 'package:uffmobileplus/firebase_options_uffmobileplus.dart';
 
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
   await Firebase.initializeApp(
-    name: 'tracking',
-    options: FirebaseOptionsTracking.currentPlatform,
+    name: 'uffmobileplus',
+    options: FirebaseOptionsUffmobileplus.currentPlatform,
   );
 
   service.on('stopService').listen((event) {
