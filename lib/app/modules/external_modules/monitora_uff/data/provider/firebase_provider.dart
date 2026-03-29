@@ -4,16 +4,19 @@ import 'package:flutter/foundation.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_model.dart';
 
 class FirebaseProvider {
-  final String firebaseAppName = 'tracking';
+  final String firebaseAppName = 'uffmobileplus';
+  final String firestoreDatabaseId = 'monitora-uff';
 
   CollectionReference get collectionRef => FirebaseFirestore.instanceFor(
     app: Firebase.app(firebaseAppName),
+    databaseId: firestoreDatabaseId,
   ).collection('usuarios');
 
   Future<void> adicionarDados(UserModel userLocation) async {
-    // 1. Instanciar o Firestore com o app específico
+    // 1. Instanciar o Firestore com o app específico e banco de dados
     FirebaseFirestore firestore = FirebaseFirestore.instanceFor(
       app: Firebase.app(firebaseAppName),
+      databaseId: firestoreDatabaseId,
     );
 
     // 2. Referenciar a coleção e adicionar dados
@@ -37,6 +40,7 @@ class FirebaseProvider {
   Future<void> setUser(UserModel user) async {
     FirebaseFirestore firestore = FirebaseFirestore.instanceFor(
       app: Firebase.app(firebaseAppName),
+      databaseId: firestoreDatabaseId,
     );
 
     try {

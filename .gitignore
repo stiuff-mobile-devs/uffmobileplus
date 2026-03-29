@@ -115,6 +115,7 @@ international.json
 android/gradle/wrapper/gradle-wrapper.properties
 
 # Android related
+/android/build/
 **/android/**/gradle-wrapper.jar
 **/android/.gradle
 **/android/captures/
