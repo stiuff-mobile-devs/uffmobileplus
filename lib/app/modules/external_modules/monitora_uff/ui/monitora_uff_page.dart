@@ -1,8 +1,10 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:latlong2/latlong.dart' hide Path;
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/tracking_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/permissions_controller.dart';
@@ -193,36 +195,63 @@ class MonitoraUFFPage extends StatelessWidget {
     return Obx(
       () => MarkerLayer(
         markers: trackingCtrl.firebaseUsers
-            .map(
-              (user) => Marker(
+            .map((user) {
+              final isCurrentUser = user.email == trackingCtrl.userCtrl.user?.email;
+              return Marker(
                 point: LatLng(
                   user.lat ?? 0.0, // TODO: encontrar uma solução melhor.
                   user.lng ?? 0.0, // TODO: encontrar uma solução melhor.
                 ), 
-                width: markerSize,
-                height: markerSize,
+                width: isCurrentUser ? markerSize * 3 : markerSize,
+                height: isCurrentUser ? markerSize * 3 : markerSize,
                 alignment: Alignment.center,
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => Get.dialog(popUp(user)),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: trackingCtrl.setMarkerColor(user),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 3),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 4,
-                          offset: Offset(0, 2),
+                child: Stack(
+                  alignment: Alignment.center,
+                  clipBehavior: Clip.none,
+                  children: [
+                    if (isCurrentUser)
+                      Obx(() {
+                        final heading = trackingCtrl.heading.value;
+                        if (heading == null) return const SizedBox.shrink();
+
+                        return Transform.rotate(
+                          angle: heading * (math.pi / 180),
+                          child: SizedBox(
+                            width: markerSize * 3,
+                            height: markerSize * 3,
+                            child: CustomPaint(
+                              painter: _BeamPainter(),
+                            ),
+                          ),
+                        );
+                      }),
+                    SizedBox(
+                      width: markerSize,
+                      height: markerSize,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => Get.dialog(popUp(user)),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: trackingCtrl.setMarkerColor(user),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 3),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 4,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          margin: const EdgeInsets.all(10), 
                         ),
-                      ],
+                      ),
                     ),
-                    margin: const EdgeInsets.all(10), 
-                  ),
+                  ],
                 ),
-              ),
-            )
+              );
+            })
             .toList(),
       ),
     );
@@ -451,4 +480,35 @@ class MonitoraUFFPage extends StatelessWidget {
       child: Text("Você não tem permissão para utilizar este serviço."),
     );
   }
+}
+
+class _BeamPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+
+    final paint = Paint()
+      ..shader = RadialGradient(
+        colors: [
+          Colors.blueAccent.withValues(alpha: 0.4),
+          Colors.blueAccent.withValues(alpha: 0.0),
+        ],
+      ).createShader(Rect.fromCircle(center: center, radius: radius));
+
+    final path = Path();
+    path.moveTo(center.dx, center.dy);
+    path.arcTo(
+      Rect.fromCircle(center: center, radius: radius),
+      -math.pi / 2 - math.pi / 6, // start angle: -120 deg
+      math.pi / 3, // sweep angle: 60 deg
+      false,
+    );
+    path.close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

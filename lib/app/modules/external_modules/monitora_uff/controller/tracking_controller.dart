@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'
     show Colors, WidgetsBindingObserver, AlertDialog, Text, TextButton;
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
@@ -33,6 +34,8 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
   late final MapController mapController;
   final isTrackingEnabled = false.obs;
   final UserController userCtrl = Get.find<UserController>();
+  final Rx<double?> heading = Rx<double?>(null);
+  StreamSubscription<CompassEvent>? _compassSubscription;
 
   Future<void> centerMapOnCurrentLocation() async {
     try {
@@ -50,6 +53,14 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
     super.onInit();
     mapController = MapController();
     firebaseUsers.bindStream(FirebaseProvider().getAllTrackedUsers());
+
+    try {
+      _compassSubscription = FlutterCompass.events?.listen((event) {
+        heading.value = event.heading;
+      });
+    } catch (e) {
+      if (kDebugMode) print('Compass not available or error: $e');
+    }
     
 
     // TODO: encapsular em um método
@@ -162,6 +173,7 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
 
   @override
   void onClose() {
+    _compassSubscription?.cancel();
     mapController.dispose();
     super.onClose();
   }
