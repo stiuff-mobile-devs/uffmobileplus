@@ -31,6 +31,16 @@ class ExternalModulesController extends GetxController {
       gdiGroups: null,
     ),
 
+      ExternalModules(
+      iconSrc: 'assets/cdc/icons/cdc.svg',
+      subtitle: 'Central de Comunicação'.tr,
+      page: Routes.CDC,
+      url: '',
+      interrogation: false,
+      availableFor: everyone,
+      gdiGroups: null,
+    ),
+
     ExternalModules(
       iconSrc: 'assets/icons/plano.svg',
       subtitle: 'plano_estudos'.tr,

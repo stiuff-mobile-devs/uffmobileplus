@@ -3,6 +3,8 @@ import 'package:uffmobileplus/app/modules/external_modules/busuff/binding/busuff
 import 'package:uffmobileplus/app/modules/external_modules/busuff/ui/busuff_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/binding/carteirinha_digital_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/ui/carteirinha_digital_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/cdc/bindings/cdc_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/cdc/ui/cdc_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/bindings/form_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/ui/admin_form_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/repositorio_institucional/bindings/repositorio_institucional_bindings.dart';
@@ -325,6 +327,13 @@ abstract class AppPages {
     GetPage(
       name: Routes.BUSUFF, 
     page: () => BusuffPage(), 
-    binding: BusuffBinding())
+    binding: BusuffBinding()),
+
+    // CDC
+    GetPage(
+      name: Routes.CDC,
+      page: () => CdcPage(),
+      bindings: [ CdcBindings() ],
+    ),
   ];
 }

@@ -61,4 +61,7 @@ abstract class Routes {
 
   // Busuff
   static const BUSUFF = '/busuff';
+
+  // CDC
+  static const CDC = '/cdc';
 }
