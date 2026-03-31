@@ -69,6 +69,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.4
 
   flutter_lints: ^6.0.0
 
@@ -107,3 +108,10 @@ flutter:
           weight: 300
         - asset: assets/restaurant/fonts/Jost/static/Jost-Bold.ttf
           weight: 500
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/logos/new_logo.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true
