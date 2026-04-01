@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "br.uff.uffmobileplus",
+    "sha256_cert_fingerprints": [
+      "F9:15:FD:CC:4C:04:6C:5D:A6:7F:3E:ED:13:66:5D:66:89:9E:46:23:30:88:87:A7:07:49:8B:C0:C0:EB:A2:06"
+    ]
+  }
+}]

@@ -29,15 +29,23 @@ class SplashController extends GetxController {
     _isDevMode = await _checkDevMode();
     _login = await _tryLogin();
 
+    // Se outra navegação (ex: deep link) já tirou a splash do topo,
+    // não execute redirecionamentos concorrentes.
+    if (Get.currentRoute != Routes.SPLASH) {
+      debugPrint(
+        'Splash skip navigation: current route is ${Get.currentRoute}',
+      );
+      update();
+      return;
+    }
+
     if (_isDevMode && !kDebugMode) {
       Get.offAllNamed(Routes.YOU_SHALL_NOT_PASS);
-    }
-    else {
+    } else {
       if (_login) {
         debugPrint("Auto Login successful");
-        _authController.loginSuccessful();
-      } 
-      else {
+        await _authController.loginSuccessful();
+      } else {
         debugPrint("Auto Login failed");
         Get.offAllNamed(Routes.LOGIN);
       }

@@ -21,6 +21,7 @@ dependencies:
   webview_flutter: ^4.13.1
   awesome_dialog: ^3.2.1
   url_launcher: ^6.3.2
+  app_links: ^7.0.0
   hive: ^2.2.3
   get_it: ^9.2.0
   flutter_appauth: ^11.0.0
