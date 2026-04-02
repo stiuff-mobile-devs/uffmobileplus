@@ -4,27 +4,26 @@ import 'package:uffmobileplus/app/routes/app_routes.dart';
 
 class DeepLinkService {
   static final DeepLinkService _instance = DeepLinkService._internal();
-  
+
   factory DeepLinkService() {
     return _instance;
   }
-  
+
   DeepLinkService._internal();
-  
+
   late final AppLinks _appLinks;
   bool _isInitialized = false;
   String? _pendingRoute;
   Map<String, String>? _pendingArguments;
   String? _lastHandledUri;
   DateTime? _lastHandledAt;
-  
+
   /// Domínio base do Firebase Hosting
   static const String domain = 'https://uff-mobile-plus.web.app';
-  
+
   /// Mapa de rotas para módulos
   /// Key: path do URL → Value: rota da aplicação
   static const Map<String, String> deepLinkRouteMap = {
-    
     // Rotas principais
     'splash': Routes.SPLASH,
     'login': Routes.LOGIN,
@@ -32,7 +31,7 @@ class DeepLinkService {
     'settings': Routes.SETTINGS,
     'about': Routes.ABOUT,
     'profile': Routes.CHOOSE_PROFILE,
-    
+
     // Restaurante
     'restaurante': Routes.RESTAURANT_MODULES,
     'restaurante/cardapio': Routes.BANDEJAPP,
@@ -40,68 +39,67 @@ class DeepLinkService {
     'restaurante/recarga': Routes.RECHARGE_CARD,
     'restaurante/saldo': Routes.BALANCE_STATEMENT,
     'restaurante/sos': Routes.SOS,
-    
+
     // Carteirinha Digital
     'carteirinha': Routes.CARTEIRINHA_DIGITAL,
-    
+
     // Plano de Estudos
     'plano-estudos': Routes.STUDY_PLAN,
-    
+
     // Rádio
     'radio': Routes.RADIO,
-    
+
     // Histórico
     'historico': Routes.HISTORICO,
-    
+
     // Periódicos
     'periodicos': Routes.PAPERS,
-    
+
     // Unitevê
     'uniteve': Routes.UNITEVE,
     'uniteve/historia': Routes.UNITEVE_HISTORIA,
     'uniteve/contato': Routes.UNITEVE_CONTATO,
-    
+
     // Monitora UFF
     'monitora': Routes.MONITORA_UFF,
     'monitora/formulario': Routes.MONITORA_UFF_FORM,
-    
+
     // Repositório Institucional
     'repositorio': Routes.REPOSITORIO_INSTITUCIONAL,
-    
+
     // Internacional
     'internacional': Routes.INTERNACIONAL,
-    
+
     // Central de Atendimento
     'central-atendimento': Routes.CENTRAL_DE_ATENDIMENTO,
-    
+
     // Busuff
     'busuff': Routes.BUSUFF,
-    
+
     // CDC
     'cdc': Routes.CDC,
   };
-  
+
   /// Inicializa o serviço de deep linking
   Future<void> init() async {
     if (_isInitialized) return;
     _isInitialized = true;
 
     _appLinks = AppLinks();
-    
+
     // Ouve links recebidos enquanto o app está rodando
     _appLinks.uriLinkStream.listen(
       (uri) => _handleDeepLink(uri),
       onError: (err) => print('❌ Erro ao processar deep link: $err'),
     );
-    
+
     // Verifica se há um link inicial (app aberto via link)
     final initialLink = await _appLinks.getInitialLink();
     if (initialLink != null) {
       _handleDeepLink(initialLink);
     }
-
   }
-  
+
   /// Processa o deep link e navega para a rota apropriada
   void _handleDeepLink(Uri uri) {
     final uriAsString = uri.toString();
@@ -117,24 +115,27 @@ class DeepLinkService {
       print('❌ Domínio inválido: ${uri.host}');
       return;
     }
-    
-    // Extrai o path e remove barras extras
-    String path = uri.path.replaceFirst('/', '').trim();
-    
+
+    // Extrai e normaliza o path para casar com o map de rotas.
+    final path = uri.pathSegments
+        .where((segment) => segment.trim().isNotEmpty)
+        .map((segment) => segment.trim())
+        .join('/');
+
     // Trata argumentos de query (parâmetros)
     final queryParams = uri.queryParameters;
-    
+
     // Encontra a rota correspondente
     String? targetRoute = _getRouteFromPath(path);
-    
+
     if (targetRoute != null) {
       print('✅ Navegando para: $targetRoute');
 
       _navigateOrQueue(targetRoute, queryParams.isEmpty ? null : queryParams);
     } else {
       print('⚠️ Rota não mapeada para path: $path');
-      // Navega para home como fallback
-      Get.offNamed(Routes.HOME);
+      // Mantém o fluxo atual da app quando o link não pertence a uma rota mapeada.
+      return;
     }
   }
 
@@ -153,13 +154,6 @@ class DeepLinkService {
     Get.toNamed(route, arguments: arguments);
   }
 
-  String? takeStartupRoute() {
-    final route = _pendingRoute;
-    _pendingRoute = null;
-    _pendingArguments = null;
-    return route;
-  }
-
   bool consumePendingNavigation() {
     final route = _pendingRoute;
     if (route == null) return false;
@@ -170,14 +164,15 @@ class DeepLinkService {
     _pendingArguments = null;
 
     print('🚀 Consumindo navegação pendente para: $route');
-    Get.offAllNamed(route, arguments: arguments);
+    Get.toNamed(route, arguments: arguments);
     return true;
   }
 
   bool _isDuplicatedEvent(String uri) {
     final now = DateTime.now();
     final isSameAsLast = _lastHandledUri == uri;
-    final isCloseInTime = _lastHandledAt != null &&
+    final isCloseInTime =
+        _lastHandledAt != null &&
         now.difference(_lastHandledAt!).inMilliseconds < 1500;
 
     _lastHandledUri = uri;
@@ -185,24 +180,28 @@ class DeepLinkService {
 
     return isSameAsLast && isCloseInTime;
   }
-  
+
   /// Valida se o domínio é seguro
   bool _isValidDomain(Uri uri) {
     // Seus domínios autorizados (pode aceitar múltiplos)
     const List<String> validHosts = [
       'uff-mobile-plus.web.app',
       'uff-mobile-plus.firebaseapp.com',
+      'uffmobileplus.com',
+      'www.uffmobileplus.com',
     ];
-    
-    return validHosts.contains(uri.host);
+
+    return validHosts.contains(uri.host.toLowerCase());
   }
-  
+
   /// Mapeia o path do URL para uma rota do app
   String? _getRouteFromPath(String path) {
     if (path.isEmpty) return Routes.HOME;
-    return deepLinkRouteMap[path];
+
+    final normalizedPath = path.toLowerCase();
+    return deepLinkRouteMap[normalizedPath];
   }
-  
+
   /// Gera uma URL de deep link (útil para logs, testes, etc)
   static String generateDeepLink(String path, {Map<String, String>? params}) {
     final uri = Uri.https('uff-mobile-plus.web.app', '/$path', params);

@@ -17,14 +17,13 @@ Future<void> main() async {
 
   // Inicializa Deep Linking (App Links e Universal Links)
   await DeepLinkService().init();
-  final startupRoute = DeepLinkService().takeStartupRoute() ?? Routes.SPLASH;
 
   runApp(
     GetMaterialApp(
       debugShowCheckedModeBanner: true,
 
       title: "UFF Mobile Plus",
-      initialRoute: startupRoute,
+      initialRoute: Routes.SPLASH,
       defaultTransition: Transition.fade,
       translations: AppTranslation(),
       locale: Get.deviceLocale,
