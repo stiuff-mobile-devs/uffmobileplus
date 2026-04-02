@@ -5,7 +5,7 @@
 	<key>LSApplicationCategoryType</key>
 	<string></string>
 	<key>FlutterDeepLinkingEnabled</key>
-	<string>false</string>
+	<false/>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>

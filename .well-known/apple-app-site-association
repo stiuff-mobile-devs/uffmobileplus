@@ -1,0 +1,31 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "TEAM_ID.com.uff.uffmobileplus",
+        "paths": [
+          "/restaurante/*",
+          "/carteirinha/*",
+          "/plano-estudos/*",
+          "/radio/*",
+          "/historico/*",
+          "/periodicos/*",
+          "/uniteve/*",
+          "/monitora/*",
+          "/repositorio/*",
+          "/internacional/*",
+          "/central-atendimento/*",
+          "/busuff/*",
+          "/cdc/*",
+          "/home/*",
+          "/settings/*",
+          "/about/*"
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["TEAM_ID.com.uff.uffmobileplus"]
+  }
+}
