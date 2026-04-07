@@ -1,22 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/external_modules_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/home_page_controller.dart';
+import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 
 class HomePage extends GetView<HomePageController> {
+  const HomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: _buildDrawer(context),
       appBar: AppBar(
         centerTitle: true,
         elevation: 8,
         foregroundColor: Colors.white,
-        title: const Text("UM +"),
+        title: const Text('UFF Mobile Plus'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.question_mark),
+            icon: const Icon(Icons.help_outline),
             tooltip: 'ajuda'.tr,
-            onPressed: () {},
+            onPressed: () => Get.toNamed(Routes.CENTRAL_DE_ATENDIMENTO),
           ),
         ],
         shape: const RoundedRectangleBorder(
@@ -26,132 +32,107 @@ class HomePage extends GetView<HomePageController> {
           decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
         ),
       ),
-
       body: Obx(
         () => controller.isLoading.value
-            ? Center(child: CircularProgressIndicator())
+            ? const Center(child: CircularProgressIndicator())
             : Container(
                 decoration: BoxDecoration(
                   gradient: AppColors.darkBlueToBlackGradient(),
                 ),
-                child: Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(
-                      (MediaQuery.sizeOf(context).width) * 0.05,
-                    ),
+                child: SafeArea(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Ícone de boas-vindas
-                        Container(
-                          padding: EdgeInsets.all(
-                            (MediaQuery.sizeOf(context).width) * 0.05,
-                          ),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white.withOpacity(0.1),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.3),
-                              width: 2,
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                'Atalhos rápidos',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.95),
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                             ),
-                          ),
-                          child: Icon(
-                            Icons.waving_hand,
-                            size: 60,
-                            color: Colors.amber[300],
-                          ),
+                            IconButton(
+                              onPressed: () => _showAddShortcutSheet(context),
+                              tooltip: 'Adicionar atalho',
+                              icon: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.12),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-
-                        const SizedBox(height: 32),
-
-                        // Título principal
-                        Text(
-                          'boas-vindas'.tr,
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
-                            fontSize: 28,
-                            fontWeight: FontWeight.w300,
-                            letterSpacing: 1.2,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-
                         const SizedBox(height: 8),
-
-                        // Logo do UM+
-                        ShaderMask(
-                          shaderCallback: (bounds) => LinearGradient(
-                            colors: [Colors.blue[300]!, Colors.purple[300]!],
-                          ).createShader(bounds),
-                          child: Text(
-                            'UM+',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 48,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 2,
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 24),
-
-                        // Mensagem de desenvolvimento
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 16,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.2),
-                            ),
-                          ),
-                          child: Column(
-                            children: [
-                              Icon(
-                                Icons.construction,
-                                color: Colors.orange[300],
-                                size: 32,
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                'em_desenvolvimento'.tr,
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.9),
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'trab_constante'.tr,
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.7),
-                                  fontSize: 14,
-                                  height: 1.5,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(height: 40),
-
-                        // Logo da aplicação
-                        const SizedBox(height: 16),
-
-                        // Versão
                         Text(
-                          'versao'.tr + ' 6.7.6',
+                          'Acesso direto aos serviços mais usados no seu dia a dia.',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.5),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w300,
+                            color: Colors.white.withOpacity(0.65),
+                            fontSize: 13,
+                            height: 1.4,
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: controller.savedShortcuts.length,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 4,
+                                crossAxisSpacing: 8,
+                                mainAxisSpacing: 8,
+                                childAspectRatio: 0.92,
+                              ),
+                          itemBuilder: (context, index) {
+                            final item = controller.savedShortcuts[index];
+                            return _ShortcutCard(
+                              item: item,
+                              onTap: () => _showShortcutActions(context, item),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            gradient: LinearGradient(
+                              colors: [
+                                AppColors.mediumBlue().withOpacity(0.3),
+                                AppColors.darkBlue().withOpacity(0.55),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.12),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            'versao'.tr + ' 6.7.6',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.48),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w300,
+                            ),
                           ),
                         ),
                       ],
@@ -159,6 +140,407 @@ class HomePage extends GetView<HomePageController> {
                   ),
                 ),
               ),
+      ),
+    );
+  }
+
+  Future<void> _showShortcutActions(
+    BuildContext context,
+    ExternalModules service,
+  ) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.darkBlue(),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.open_in_new, color: Colors.white),
+                title: Text(
+                  'Abrir ${service.subtitle}',
+                  style: const TextStyle(color: Colors.white),
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  controller.openService(service);
+                },
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.remove_circle_outline,
+                  color: Colors.white,
+                ),
+                title: const Text(
+                  'Remover atalho',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  controller.removeShortcut(service);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _showAddShortcutSheet(BuildContext context) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.darkBlue(),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      builder: (context) {
+        return Obx(() {
+          final remainingServices = controller.availableToAdd;
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Adicionar atalho',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.96),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Serviços ainda não salvos na sua grade.',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.68),
+                      fontSize: 13,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  if (remainingServices.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: Text(
+                        'Todos os serviços já estão na sua grade.',
+                        style: TextStyle(color: Colors.white.withOpacity(0.8)),
+                      ),
+                    )
+                  else
+                    Flexible(
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        itemCount: remainingServices.length,
+                        separatorBuilder: (_, __) => Divider(
+                          color: Colors.white.withOpacity(0.12),
+                          height: 1,
+                        ),
+                        itemBuilder: (context, index) {
+                          final service = remainingServices[index];
+                          return ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: _ServiceIcon(iconSrc: service.iconSrc),
+                            title: Text(
+                              service.subtitle,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(
+                                Icons.add_circle_outline,
+                                color: Colors.white,
+                              ),
+                              onPressed: () => controller.addShortcut(service),
+                            ),
+                            onTap: () => controller.addShortcut(service),
+                          );
+                        },
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          );
+        });
+      },
+    );
+  }
+
+  Drawer _buildDrawer(BuildContext context) {
+    return Drawer(
+      backgroundColor: Colors.transparent,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: AppColors.darkBlueToBlackGradient(),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              _buildDrawerProfileHeader(),
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
+                  children: [
+                    _DrawerTile(
+                      icon: Icons.settings_outlined,
+                      title: 'Configurações',
+                      subtitle: 'Ajustes do aplicativo',
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        Get.toNamed(Routes.SETTINGS);
+                      },
+                    ),
+                    _DrawerTile(
+                      icon: Icons.info_outline,
+                      title: 'Sobre',
+                      subtitle: 'Informações do app e versão',
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        Get.toNamed(Routes.ABOUT);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDrawerProfileHeader() {
+    return Obx(
+      () => Container(
+        margin: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          gradient: LinearGradient(
+            colors: [
+              AppColors.mediumBlue().withOpacity(0.95),
+              AppColors.darkBlue().withOpacity(0.95),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 56,
+              width: 56,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.12),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: controller.userPhotoUrl.value.isNotEmpty
+                  ? Image.network(
+                      controller.userPhotoUrl.value,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const Icon(
+                        Icons.person_outline,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                    )
+                  : const Icon(
+                      Icons.person_outline,
+                      color: Colors.white,
+                      size: 28,
+                    ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    controller.userName.value,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.96),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Matrícula: ${controller.userMatricula.value}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.82),
+                      fontSize: 12,
+                    ),
+                  ),
+                  Text(
+                    controller.userEmail.value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.82),
+                      fontSize: 12,
+                    ),
+                  ),
+                  Text(
+                    controller.userCourse.value,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.72),
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ShortcutCard extends StatelessWidget {
+  const _ShortcutCard({required this.item, required this.onTap});
+
+  final ExternalModules item;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              colors: [
+                Colors.white.withOpacity(0.12),
+                Colors.white.withOpacity(0.06),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            border: Border.all(color: Colors.white.withOpacity(0.08)),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _ServiceIcon(iconSrc: item.iconSrc),
+              const SizedBox(height: 8),
+              Text(
+                item.subtitle,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.92),
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w600,
+                  height: 1.05,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ServiceIcon extends StatelessWidget {
+  const _ServiceIcon({required this.iconSrc});
+
+  final String iconSrc;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 32,
+      width: 32,
+      decoration: BoxDecoration(
+        color: AppColors.lightBlue().withOpacity(0.14),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(6),
+        child: iconSrc.endsWith('.svg')
+            ? SvgPicture.asset(iconSrc, color: Colors.white)
+            : Image.asset(iconSrc, color: Colors.white),
+      ),
+    );
+  }
+}
+
+class _DrawerTile extends StatelessWidget {
+  const _DrawerTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Material(
+        color: Colors.white.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(18),
+        child: ListTile(
+          onTap: onTap,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 4,
+          ),
+          leading: Container(
+            height: 40,
+            width: 40,
+            decoration: BoxDecoration(
+              color: AppColors.lightBlue().withOpacity(0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: AppColors.lightBlue(), size: 20),
+          ),
+          title: Text(
+            title,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.95),
+              fontWeight: FontWeight.w700,
+              fontSize: 14,
+            ),
+          ),
+          subtitle: Text(
+            subtitle,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.62),
+              fontSize: 12,
+            ),
+          ),
+          trailing: Icon(
+            Icons.chevron_right,
+            color: Colors.white.withOpacity(0.45),
+          ),
+        ),
       ),
     );
   }
