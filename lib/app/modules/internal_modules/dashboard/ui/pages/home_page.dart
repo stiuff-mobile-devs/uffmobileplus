@@ -5,6 +5,7 @@ import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/home_page_controller.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
+import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.dart';
 
 class HomePage extends GetView<HomePageController> {
   const HomePage({super.key});
@@ -17,7 +18,7 @@ class HomePage extends GetView<HomePageController> {
         centerTitle: true,
         elevation: 8,
         foregroundColor: Colors.white,
-        title: const Text('UFF Mobile Plus'),
+        title: const Text('UFF +'),
         actions: [
           IconButton(
             icon: const Icon(Icons.help_outline),
@@ -29,17 +30,19 @@ class HomePage extends GetView<HomePageController> {
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
         ),
         flexibleSpace: Container(
-          decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
+          decoration: BoxDecoration(gradient: AppColors.appBarBottomGradient()),
         ),
       ),
       body: Obx(
-        () => controller.isLoading.value
-            ? const Center(child: CircularProgressIndicator())
-            : Container(
-                decoration: BoxDecoration(
-                  gradient: AppColors.darkBlueToBlackGradient(),
-                ),
-                child: SafeArea(
+        () => Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            gradient: AppColors.darkBlueToBlackGradient(),
+          ),
+          child: controller.isLoading.value
+              ? const Center(child: CustomProgressDisplay())
+              : SafeArea(
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
                     padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
@@ -52,7 +55,7 @@ class HomePage extends GetView<HomePageController> {
                               child: Text(
                                 'Atalhos rápidos',
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.95),
+                                  color: Colors.white,
                                   fontSize: 20,
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -73,13 +76,31 @@ class HomePage extends GetView<HomePageController> {
                                 ),
                               ),
                             ),
+                            const SizedBox(width: 4),
+                            IconButton(
+                              onPressed: controller.toggleRemoveShortcutMode,
+                              tooltip: 'Remover atalho',
+                              icon: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: controller.isRemovingShortcuts.value
+                                      ? Colors.red.withOpacity(0.25)
+                                      : Colors.white.withOpacity(0.12),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(
+                                  Icons.remove,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 8),
                         Text(
                           'Acesso direto aos serviços mais usados no seu dia a dia.',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.65),
+                            color: Colors.white,
                             fontSize: 13,
                             height: 1.4,
                           ),
@@ -94,36 +115,26 @@ class HomePage extends GetView<HomePageController> {
                                 crossAxisCount: 4,
                                 crossAxisSpacing: 8,
                                 mainAxisSpacing: 8,
-                                childAspectRatio: 0.92,
+                                childAspectRatio: 1,
                               ),
                           itemBuilder: (context, index) {
                             final item = controller.savedShortcuts[index];
                             return _ShortcutCard(
                               item: item,
-                              onTap: () => _showShortcutActions(context, item),
+                              isRemoveMode:
+                                  controller.isRemovingShortcuts.value,
+                              onTap: () {
+                                if (controller.isRemovingShortcuts.value) {
+                                  controller.removeShortcut(item);
+                                  return;
+                                }
+
+                                controller.openService(item);
+                              },
                             );
                           },
                         ),
                         const SizedBox(height: 20),
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            gradient: LinearGradient(
-                              colors: [
-                                AppColors.mediumBlue().withOpacity(0.3),
-                                AppColors.darkBlue().withOpacity(0.55),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.12),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 18),
                         Align(
                           alignment: Alignment.center,
                           child: Text(
@@ -139,54 +150,8 @@ class HomePage extends GetView<HomePageController> {
                     ),
                   ),
                 ),
-              ),
+        ),
       ),
-    );
-  }
-
-  Future<void> _showShortcutActions(
-    BuildContext context,
-    ExternalModules service,
-  ) async {
-    await showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: AppColors.darkBlue(),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
-      ),
-      builder: (context) {
-        return SafeArea(
-          child: Wrap(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.open_in_new, color: Colors.white),
-                title: Text(
-                  'Abrir ${service.subtitle}',
-                  style: const TextStyle(color: Colors.white),
-                ),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  controller.openService(service);
-                },
-              ),
-              ListTile(
-                leading: const Icon(
-                  Icons.remove_circle_outline,
-                  color: Colors.white,
-                ),
-                title: const Text(
-                  'Remover atalho',
-                  style: TextStyle(color: Colors.white),
-                ),
-                onTap: () {
-                  Navigator.of(context).pop();
-                  controller.removeShortcut(service);
-                },
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 
@@ -411,10 +376,15 @@ class HomePage extends GetView<HomePageController> {
 }
 
 class _ShortcutCard extends StatelessWidget {
-  const _ShortcutCard({required this.item, required this.onTap});
+  const _ShortcutCard({
+    required this.item,
+    required this.onTap,
+    required this.isRemoveMode,
+  });
 
   final ExternalModules item;
   final VoidCallback onTap;
+  final bool isRemoveMode;
 
   @override
   Widget build(BuildContext context) {
@@ -423,39 +393,66 @@ class _ShortcutCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: onTap,
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: LinearGradient(
-              colors: [
-                Colors.white.withOpacity(0.12),
-                Colors.white.withOpacity(0.06),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+        child: Stack(
+          fit: StackFit.expand,
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.white.withOpacity(0.12),
+                    Colors.white.withOpacity(0.06),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                border: Border.all(color: Colors.white.withOpacity(0.08)),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _ServiceIcon(iconSrc: item.iconSrc),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    height: 24,
+                    child: Text(
+                      item.subtitle,
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.92),
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w600,
+                        height: 1.05,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            border: Border.all(color: Colors.white.withOpacity(0.08)),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _ServiceIcon(iconSrc: item.iconSrc),
-              const SizedBox(height: 8),
-              Text(
-                item.subtitle,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.92),
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w600,
-                  height: 1.05,
+            if (isRemoveMode)
+              Positioned(
+                top: 4,
+                right: 4,
+                child: Container(
+                  width: 18,
+                  height: 18,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.red,
+                  ),
+                  child: const Icon(
+                    Icons.remove,
+                    size: 12,
+                    color: Colors.white,
+                  ),
                 ),
               ),
-            ],
-          ),
+          ],
         ),
       ),
     );
@@ -479,8 +476,12 @@ class _ServiceIcon extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(6),
         child: iconSrc.endsWith('.svg')
-            ? SvgPicture.asset(iconSrc, color: Colors.white)
-            : Image.asset(iconSrc, color: Colors.white),
+            ? SvgPicture.asset(
+                iconSrc,
+                color: Colors.white,
+                fit: BoxFit.contain,
+              )
+            : Image.asset(iconSrc, color: Colors.white, fit: BoxFit.contain),
       ),
     );
   }

@@ -5,16 +5,21 @@ import 'package:uffmobileplus/app/data/services/deep_link_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/external_modules_controller.dart';
 
 class HomePageController extends GetxController {
+
   RxBool isLoading = false.obs;
+
   final userName = '-'.obs;
   final userMatricula = '-'.obs;
   final userEmail = '-'.obs;
   final userCourse = '-'.obs;
   final userPhotoUrl = ''.obs;
+
   final shortcutRoutes = <String>[].obs;
+  final isRemovingShortcuts = false.obs;
 
   late ExternalModulesServices _externalModulesServices;
   late ExternalModulesController _externalModulesController;
+
   late Worker _servicesWorker;
 
   @override
@@ -28,12 +33,14 @@ class HomePageController extends GetxController {
     _externalModulesController = Get.find<ExternalModulesController>();
 
     _syncShortcutsWithServices();
+    // O worker é reativo à lista de serviços externos, garantindo que os atalhos sejam atualizados sempre que a lista de serviços mudar
     _servicesWorker = ever<List<ExternalModules>>(
       _externalModulesController.externalModulesList,
       (_) => _syncShortcutsWithServices(),
     );
   }
 
+  // Sincroniza as rotas dos atalhos com os serviços disponíveis
   void _syncShortcutsWithServices() {
     final allRoutes = allServices.map((service) => service.page).toSet();
 
@@ -66,6 +73,14 @@ class HomePageController extends GetxController {
 
   void removeShortcut(ExternalModules service) {
     shortcutRoutes.remove(service.page);
+
+    if (shortcutRoutes.isEmpty) {
+      isRemovingShortcuts.value = false;
+    }
+  }
+
+  void toggleRemoveShortcutMode() {
+    isRemovingShortcuts.toggle();
   }
 
   void openService(ExternalModules service) {
