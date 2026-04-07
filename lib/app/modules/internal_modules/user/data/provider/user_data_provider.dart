@@ -81,6 +81,23 @@ class UserDataProvider {
     }
   }
 
+  Future<String> updateShortcutRoutes(List<String> shortcutRoutes) async {
+    try {
+      var box = await Hive.openBox<UserData>(_collectionPath);
+      UserData? user = box.get(_userKey);
+
+      if (user == null) {
+        return "Nenhuma informação de usuário encontrada";
+      }
+
+      user.shortcutRoutes = List<String>.from(shortcutRoutes);
+      await user.save();
+      return "success";
+    } catch (e) {
+      return "Erro ao atualizar atalhos no Hive: $e";
+    }
+  }
+
   Future<List<GdiGroups>> getGdiGroups(String iduff, String token) async {
     final path = '${Secrets.gdiGroupsPath}/$iduff${Secrets.gdiGroupsQuery}';
     var uri = Uri.https(Secrets.gdiGroupsHost, path);

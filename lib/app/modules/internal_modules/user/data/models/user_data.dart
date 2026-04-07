@@ -43,6 +43,9 @@ class UserData extends HiveObject {
   @HiveField(12)
   ProfileTypes? profileType;
 
+  @HiveField(13)
+  List<String>? shortcutRoutes;
+
   UserData({
     this.name,
     this.nomesocial,
@@ -57,6 +60,7 @@ class UserData extends HiveObject {
     this.bondId,
     this.gdiGroups,
     this.profileType,
+    this.shortcutRoutes,
   });
 
   factory UserData.fromJson(Map<String, dynamic> json) {
@@ -82,6 +86,9 @@ class UserData extends HiveObject {
               (e) => e.toString() == 'ProfileTypes.${json['profileType']}',
             )
           : null,
+      shortcutRoutes: json['shortcutRoutes'] != null
+          ? List<String>.from(json['shortcutRoutes'] as List)
+          : null,
     );
   }
 
@@ -102,6 +109,7 @@ class UserData extends HiveObject {
           ?.map((group) => {'gid': group.gid, 'descricao': group.description})
           .toList(),
       'profileType': profileType?.toString().split('.').last,
+      'shortcutRoutes': shortcutRoutes,
     };
   }
 }

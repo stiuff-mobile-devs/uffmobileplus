@@ -30,13 +30,14 @@ class UserDataAdapter extends TypeAdapter<UserData> {
       bondId: fields[10] as String?,
       gdiGroups: (fields[11] as List?)?.cast<GdiGroups>(),
       profileType: fields[12] as ProfileTypes?,
+      shortcutRoutes: (fields[13] as List?)?.cast<String>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, UserData obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
@@ -62,7 +63,9 @@ class UserDataAdapter extends TypeAdapter<UserData> {
       ..writeByte(11)
       ..write(obj.gdiGroups)
       ..writeByte(12)
-      ..write(obj.profileType);
+      ..write(obj.profileType)
+      ..writeByte(13)
+      ..write(obj.shortcutRoutes);
   }
 
   @override

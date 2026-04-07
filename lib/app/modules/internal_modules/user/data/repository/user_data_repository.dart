@@ -33,7 +33,11 @@ class UserDataRepository {
     return await _userDataProvider.updateQrData(textoQrCodeCarteirinha);
   }
 
+  Future<String> updateShortcutRoutes(List<String> shortcutRoutes) async {
+    return await _userDataProvider.updateShortcutRoutes(shortcutRoutes);
+  }
+
   Future<List<GdiGroups>> getGdiGroups(String iduff, String token) async {
     return await _userDataProvider.getGdiGroups(iduff, token);
   }
-  }
+}

@@ -3,9 +3,9 @@ import 'package:get/get.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/data/services/deep_link_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/external_modules_controller.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
 
 class HomePageController extends GetxController {
-
   RxBool isLoading = false.obs;
 
   final userName = '-'.obs;
@@ -19,13 +19,16 @@ class HomePageController extends GetxController {
 
   late ExternalModulesServices _externalModulesServices;
   late ExternalModulesController _externalModulesController;
+  late UserDataController _userDataController;
 
   late Worker _servicesWorker;
 
   @override
   void onInit() {
     super.onInit();
+    _userDataController = Get.find<UserDataController>();
     _bindServicesCatalog();
+    _loadSavedShortcuts();
     _loadProfileData();
   }
 
@@ -52,6 +55,27 @@ class HomePageController extends GetxController {
     shortcutRoutes.retainWhere(allRoutes.contains);
   }
 
+  Future<void> _loadSavedShortcuts() async {
+    try {
+      final userData = await _userDataController.getUserData();
+      final saved = userData?.shortcutRoutes ?? <String>[];
+
+      if (saved.isEmpty) {
+        await _persistShortcuts();
+        return;
+      }
+
+      final validRoutes = allServices.map((service) => service.page).toSet();
+      shortcutRoutes.assignAll(saved.where(validRoutes.contains));
+    } catch (_) {}
+  }
+
+  Future<void> _persistShortcuts() async {
+    try {
+      await _userDataController.updateShortcutRoutes(shortcutRoutes.toList());
+    } catch (_) {}
+  }
+
   List<ExternalModules> get allServices => List<ExternalModules>.from(
     _externalModulesController.externalModulesList,
   );
@@ -69,10 +93,12 @@ class HomePageController extends GetxController {
       return;
     }
     shortcutRoutes.add(service.page);
+    _persistShortcuts();
   }
 
   void removeShortcut(ExternalModules service) {
     shortcutRoutes.remove(service.page);
+    _persistShortcuts();
 
     if (shortcutRoutes.isEmpty) {
       isRemovingShortcuts.value = false;

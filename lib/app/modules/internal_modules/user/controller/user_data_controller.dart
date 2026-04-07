@@ -31,7 +31,6 @@ class UserDataController extends GetxController {
     ProfileTypes profileType,
   ) async {
     try {
-
       int? gradIndex = 0;
       int? posIndex = 0;
       String name = "-";
@@ -55,65 +54,58 @@ class UserDataController extends GetxController {
       int? bondIndex = _findActiveBond(userUmm, targetMatricula);
 
       if (profileType == ProfileTypes.grad) {
-        
         gradIndex = _findActiveGrad(userUmm, targetMatricula);
 
-        if(gradIndex != null){
+        if (gradIndex != null) {
           name =
-            userUmm
-                .grad
-                ?.matriculas?[gradIndex]
-                .identificacao
-                ?.nomesocial ??
-            userUmm.grad?.matriculas?[gradIndex].identificacao?.nome ??
-            "-";
+              userUmm.grad?.matriculas?[gradIndex].identificacao?.nomesocial ??
+              userUmm.grad?.matriculas?[gradIndex].identificacao?.nome ??
+              "-";
 
-        curso = userUmm.grad?.matriculas?[gradIndex].nomeCurso ?? "-";
+          curso = userUmm.grad?.matriculas?[gradIndex].nomeCurso ?? "-";
         }
-
-        
       } else if (profileType == ProfileTypes.pos) {
         posIndex = _findActivePos(userUmm, targetMatricula);
 
-        if(posIndex != null){
+        if (posIndex != null) {
           name = userUmm.pos?.alunos?[posIndex].nome ?? "-";
           curso = userUmm.pos?.alunos?[posIndex].cursoNome ?? "-";
         }
-        
       }
       String nomeSocial =
           userUmm.grad?.matriculas?[gradIndex ?? 0].identificacao?.nomesocial ??
           "-";
-          
+
       if (name == "-") {
         name =
             userUmm.activeBond?.objects?.outerObject?[0].usuario!.nome ?? "-";
       }
-     
-      if(bondIndex != null){
-        bond =
-          userUmm
-              .activeBond
-              ?.objects
-              ?.outerObject?[1]
-              .innerObjects?[bondIndex ]
-              .vinculacao
-              ?.vinculo ??
-          "-";
 
-       bondId =
-          userUmm
-              .activeBond
-              ?.objects
-              ?.outerObject?[1]
-              .innerObjects?[bondIndex]
-              .vinculacao
-              ?.id ??
-          "-";
+      if (bondIndex != null) {
+        bond =
+            userUmm
+                .activeBond
+                ?.objects
+                ?.outerObject?[1]
+                .innerObjects?[bondIndex]
+                .vinculacao
+                ?.vinculo ??
+            "-";
+
+        bondId =
+            userUmm
+                .activeBond
+                ?.objects
+                ?.outerObject?[1]
+                .innerObjects?[bondIndex]
+                .vinculacao
+                ?.id ??
+            "-";
       }
-      
+
       var gdiGroups = await getPersonalGdiGroups(iduff);
       String accessToken = await _auth.getAccessToken() ?? "";
+      final existingUserData = await _userDataRepository.getUserData();
 
       final userData = UserData(
         name: name,
@@ -129,6 +121,7 @@ class UserDataController extends GetxController {
         gdiGroups: gdiGroups,
         accessToken: accessToken,
         profileType: profileType,
+        shortcutRoutes: existingUserData?.shortcutRoutes,
       );
       return await _userDataRepository.saveUserData(userData);
     } catch (e) {
@@ -138,6 +131,10 @@ class UserDataController extends GetxController {
 
   Future<String> updateQrData() async {
     return await _userDataRepository.updateQrData((await getSaciData())[0]);
+  }
+
+  Future<String> updateShortcutRoutes(List<String> shortcutRoutes) async {
+    return await _userDataRepository.updateShortcutRoutes(shortcutRoutes);
   }
 
   Future<UserData?> getUserData() async {
