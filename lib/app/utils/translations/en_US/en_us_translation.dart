@@ -131,4 +131,7 @@ final Map<String, String> enUS = {
 
   // Central de atendimento
   'central_de_atendimento': 'Help Center',
+
+  // Bibliotecas
+  'bibliotecas': 'Libraries',
 };
