@@ -1,4 +1,6 @@
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/modules/external_modules/ead/bindings/ead_binding.dart';
+import 'package:uffmobileplus/app/modules/external_modules/ead/ui/ead_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/bibliotecas/binding/bibliotecas_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/bibliotecas/web_page/binding/web_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/bibliotecas/web_page/ui/web_page.dart';
@@ -316,6 +318,12 @@ abstract class AppPages {
         FormBindings()
       ]
     ),
+
+    GetPage(
+  name: Routes.EAD,
+  page: () => EadPage(),
+  binding: EadBinding(),
+),
 
     GetPage(
       name: Routes.INTERNACIONAL,
