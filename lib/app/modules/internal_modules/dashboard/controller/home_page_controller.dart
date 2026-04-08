@@ -2,10 +2,12 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/data/services/deep_link_service.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/controller/restaurant_modules_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/external_modules_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
 
 class HomePageController extends GetxController {
+
   RxBool isLoading = false.obs;
 
   final userName = '-'.obs;
@@ -20,32 +22,88 @@ class HomePageController extends GetxController {
   late ExternalModulesServices _externalModulesServices;
   late ExternalModulesController _externalModulesController;
   late UserDataController _userDataController;
+  late RestaurantModulesController _restaurantModulesController;
 
   late Worker _servicesWorker;
+
+  List<DashboardShortcut> get allShortcutItems {
+    final byRoute = <String, DashboardShortcut>{};
+
+    for (final service in allServices) {
+      byRoute[service.page] = DashboardShortcut(
+        iconSrc: service.iconSrc,
+        subtitle: service.subtitle,
+        page: service.page,
+        url: service.url,
+        interrogation: service.interrogation,
+      );
+    }
+
+    for (final module in restaurantModules) {
+      byRoute[module.page] = DashboardShortcut(
+        iconSrc: module.iconSrc,
+        subtitle: module.subtitle,
+        page: module.page,
+        url: module.url,
+        interrogation: module.interrogation,
+      );
+    }
+
+    return byRoute.values.toList(growable: false);
+  }
+
+  Set<String> get allShortcutRoutes => allShortcutItems
+      .map((shortcut) => shortcut.page)
+      .toSet();
+
+  Map<String, DashboardShortcut> get shortcutsByRoute => {
+    for (final item in allShortcutItems) item.page: item,
+  };
+
+  List<ExternalModules> get allServices => List<ExternalModules>.from(
+    _externalModulesController.externalModulesList,
+  );
+
+  List<RestaurantModules> get restaurantModules => List<RestaurantModules>.from(
+    _restaurantModulesController.restaurantModulesList,
+  );
+
+    List<DashboardShortcut> get savedShortcuts => shortcutRoutes
+      .map((route) => shortcutsByRoute[route])
+      .whereType<DashboardShortcut>()
+      .toList(growable: false);
+
+    List<DashboardShortcut> get availableToAdd => allShortcutItems
+      .where((service) => !shortcutRoutes.contains(service.page))
+      .toList(growable: false);
 
   @override
   void onInit() {
     super.onInit();
     _userDataController = Get.find<UserDataController>();
+    _externalModulesController = Get.find<ExternalModulesController>();
+    _restaurantModulesController = Get.find<RestaurantModulesController>();
+
     _bindServicesCatalog();
     _loadSavedShortcuts();
     _loadProfileData();
   }
 
   void _bindServicesCatalog() {
-    _externalModulesController = Get.find<ExternalModulesController>();
-
     _syncShortcutsWithServices();
     // O worker é reativo à lista de serviços externos, garantindo que os atalhos sejam atualizados sempre que a lista de serviços mudar
-    _servicesWorker = ever<List<ExternalModules>>(
-      _externalModulesController.externalModulesList,
+    _servicesWorker = everAll(
+      [
+        _externalModulesController.externalModulesList,
+        _restaurantModulesController.restaurantModulesList,
+      ],
       (_) => _syncShortcutsWithServices(),
     );
   }
 
   // Sincroniza as rotas dos atalhos com os serviços disponíveis
   void _syncShortcutsWithServices() {
-    final allRoutes = allServices.map((service) => service.page).toSet();
+    final allRoutes = allShortcutRoutes;
 
     if (shortcutRoutes.isEmpty) {
       shortcutRoutes.assignAll(allRoutes);
@@ -65,7 +123,7 @@ class HomePageController extends GetxController {
         return;
       }
 
-      final validRoutes = allServices.map((service) => service.page).toSet();
+      final validRoutes = allShortcutRoutes;
       shortcutRoutes.assignAll(saved.where(validRoutes.contains));
     } catch (_) {}
   }
@@ -76,51 +134,7 @@ class HomePageController extends GetxController {
     } catch (_) {}
   }
 
-  List<ExternalModules> get allServices => List<ExternalModules>.from(
-    _externalModulesController.externalModulesList,
-  );
-
-  List<ExternalModules> get savedShortcuts => allServices
-      .where((service) => shortcutRoutes.contains(service.page))
-      .toList(growable: false);
-
-  List<ExternalModules> get availableToAdd => allServices
-      .where((service) => !shortcutRoutes.contains(service.page))
-      .toList(growable: false);
-
-  void addShortcut(ExternalModules service) {
-    if (shortcutRoutes.contains(service.page)) {
-      return;
-    }
-    shortcutRoutes.add(service.page);
-    _persistShortcuts();
-  }
-
-  void removeShortcut(ExternalModules service) {
-    shortcutRoutes.remove(service.page);
-    _persistShortcuts();
-
-    if (shortcutRoutes.isEmpty) {
-      isRemovingShortcuts.value = false;
-    }
-  }
-
-  void toggleRemoveShortcutMode() {
-    isRemovingShortcuts.toggle();
-  }
-
-  void openService(ExternalModules service) {
-    Get.toNamed(
-      service.page,
-      arguments: {
-        'url': service.url ?? '',
-        'title': service.subtitle,
-        'interrogation': service.interrogation ?? false,
-      },
-    );
-  }
-
-  Future<void> _loadProfileData() async {
+   Future<void> _loadProfileData() async {
     try {
       isLoading.value = true;
       _externalModulesServices = Get.find<ExternalModulesServices>();
@@ -144,6 +158,40 @@ class HomePageController extends GetxController {
     }
   }
 
+  void addShortcut(DashboardShortcut service) {
+    if (shortcutRoutes.contains(service.page)) {
+      return;
+    }
+    shortcutRoutes.add(service.page);
+    _persistShortcuts();
+  }
+
+  void removeShortcut(DashboardShortcut service) {
+    shortcutRoutes.remove(service.page);
+    _persistShortcuts();
+
+    if (shortcutRoutes.isEmpty) {
+      isRemovingShortcuts.value = false;
+    }
+  }
+
+  void toggleRemoveShortcutMode() {
+    isRemovingShortcuts.toggle();
+  }
+
+  void openShortcut(DashboardShortcut service) {
+    Get.toNamed(
+      service.page,
+      arguments: {
+        'url': service.url ?? '',
+        'title': service.subtitle,
+        'interrogation': service.interrogation ?? false,
+      },
+    );
+  }
+
+ 
+
   @override
   void onReady() {
     super.onReady();
@@ -158,4 +206,20 @@ class HomePageController extends GetxController {
     _servicesWorker.dispose();
     super.onClose();
   }
+}
+
+class DashboardShortcut {
+  final String iconSrc;
+  final String subtitle;
+  final String page;
+  final String? url;
+  final bool? interrogation;
+
+  const DashboardShortcut({
+    required this.iconSrc,
+    required this.subtitle,
+    required this.page,
+    this.url,
+    this.interrogation,
+  });
 }

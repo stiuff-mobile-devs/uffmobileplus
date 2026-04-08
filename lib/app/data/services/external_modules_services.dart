@@ -90,4 +90,8 @@ class ExternalModulesServices extends GetxService {
     }
     return false;
   }
+
+  List<String>? getShortcutRoutes() {
+    return _userData.shortcutRoutes;    
+  }
 }

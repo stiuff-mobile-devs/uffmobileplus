@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/external_modules_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/home_page_controller.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
@@ -129,23 +128,13 @@ class HomePage extends GetView<HomePageController> {
                                   return;
                                 }
 
-                                controller.openService(item);
+                                controller.openShortcut(item);
                               },
                             );
                           },
                         ),
                         const SizedBox(height: 20),
-                        Align(
-                          alignment: Alignment.center,
-                          child: Text(
-                            'versao'.tr + ' 6.7.6',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.48),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w300,
-                            ),
-                          ),
-                        ),
+                       
                       ],
                     ),
                   ),
@@ -382,7 +371,7 @@ class _ShortcutCard extends StatelessWidget {
     required this.isRemoveMode,
   });
 
-  final ExternalModules item;
+  final DashboardShortcut item;
   final VoidCallback onTap;
   final bool isRemoveMode;
 
