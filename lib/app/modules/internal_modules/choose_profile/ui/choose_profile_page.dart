@@ -11,65 +11,80 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        elevation: 8,
-        foregroundColor: Colors.white,
-        title: Text('escolha_perfil'.tr),
-        actions: [
-          IconButton(
-            onPressed: controller.goToCarteirinhaPage,
-            icon: const Icon(Icons.qr_code_2),
-            tooltip: 'carteirinha_digital'.tr,
-          ),
-          Obx(
-            () => controller.hasAdminPermission.value
-                ? IconButton(
-                    onPressed: controller.goToCatracaOnlinePage,
-                    icon: const Icon(Icons.qr_code_scanner),
-                    tooltip: 'catraca'.tr,
-                  )
-                : const SizedBox.shrink(),
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'atualizar'.tr,
-            onPressed: () {
-              controller.fetchData();
-            },
-          ),
-        ],
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
-        ),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
-        ),
-      ),
-
-      body: Obx(
-        () => controller.isBusy.value
-            ? Center(child: CustomProgressDisplay())
-            : Container(
-                decoration: BoxDecoration(
-                  gradient: AppColors.darkBlueToBlackGradient(),
+    return Obx(
+      () => Scaffold(
+        appBar: controller.isBusy.value
+            ? null
+            : AppBar(
+                centerTitle: true,
+                elevation: 8,
+                foregroundColor: Colors.white,
+                title: Text('escolha_perfil'.tr),
+                actions: [
+                  IconButton(
+                    onPressed: controller.goToCarteirinhaPage,
+                    icon: const Icon(Icons.qr_code_2),
+                    tooltip: 'carteirinha_digital'.tr,
+                  ),
+                  Obx(
+                    () => controller.hasAdminPermission.value
+                        ? IconButton(
+                            onPressed: controller.goToCatracaOnlinePage,
+                            icon: const Icon(Icons.qr_code_scanner),
+                            tooltip: 'catraca'.tr,
+                          )
+                        : const SizedBox.shrink(),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.refresh),
+                    tooltip: 'atualizar'.tr,
+                    onPressed: () {
+                      controller.fetchData();
+                    },
+                  ),
+                ],
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(
+                    bottom: Radius.circular(10),
+                  ),
                 ),
-                child: ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    Accordion(
-                      children: [
-                        if (controller.gradQtd > 0) gradAccordion(),
-                        if (controller.posQtd > 0) posAccordion(),
-                        if (controller.employeeQtd > 0) employeeSelection(),
-                        if (controller.teacherQtd > 0) teacherAccordion(),
-                        if (controller.outsourcedQtd > 0) outsourcedAccordion(),
-                      ],
-                    ),
-                  ],
+                flexibleSpace: Container(
+                  decoration:
+                      BoxDecoration(gradient: AppColors.appBarTopGradient()),
                 ),
               ),
+        body: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                gradient: AppColors.darkBlueToBlackGradient(),
+              ),
+              child: ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  Accordion(
+                    children: [
+                      if (controller.gradQtd > 0) gradAccordion(),
+                      if (controller.posQtd > 0) posAccordion(),
+                      if (controller.employeeQtd > 0) employeeSelection(),
+                      if (controller.teacherQtd > 0) teacherAccordion(),
+                      if (controller.outsourcedQtd > 0) outsourcedAccordion(),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            if (controller.isBusy.value)
+              Positioned.fill(
+                child: Container(
+                  color: Colors.black.withOpacity(0.35),
+                  child: const Center(
+                    child: CustomProgressDisplay(),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

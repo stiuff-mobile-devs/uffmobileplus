@@ -105,16 +105,82 @@ class ChooseProfileController extends GetxController {
     debugPrint(
       "gradqtd: $gradQtd / posqtd: $posQtd / teacherQtd: $teacherQtd / employeeQtd: $employeeQtd / outsourcedQtd: $outsourcedQtd",
     );
+
+    final gradSelectableQtd = gradQtd > 0 ? gradQtd : (hasGradButNoGradInfo ? 1 : 0);
     totalProfileQtd =
-        gradQtd + posQtd + teacherQtd + employeeQtd + outsourcedQtd;
+        gradSelectableQtd + posQtd + teacherQtd + employeeQtd + outsourcedQtd;
+
+    if (totalProfileQtd == 1) {
+      await _autoSelectSingleProfile();
+      return;
+    }
+
     isBusy.value = false;
+  }
+
+  Future<void> _autoSelectSingleProfile() async {
+    if (gradQtd == 1) {
+      await saveUserDataBeforeChooseProfile(
+        ProfileTypes.grad,
+        userUmm.grad!.matriculas!.first.matricula!,
+      );
+      return;
+    }
+
+    if (hasGradButNoGradInfo) {
+      await saveUserDataBeforeChooseProfile(
+        ProfileTypes.grad,
+        matricula,
+      );
+      return;
+    }
+
+    if (posQtd == 1) {
+      await saveUserDataBeforeChooseProfile(
+        ProfileTypes.pos,
+        userUmm.pos!.alunos!.first.matricula!,
+      );
+      return;
+    }
+
+    if (teacherQtd == 1) {
+      final bond = _bondById(UffBondIds.teacher);
+      await saveUserDataBeforeChooseProfile(
+        ProfileTypes.teacher,
+        bond.vinculacao!.matricula!,
+      );
+      return;
+    }
+
+    if (employeeQtd == 1) {
+      final bond = _bondById(UffBondIds.employee);
+      await saveUserDataBeforeChooseProfile(
+        ProfileTypes.employee,
+        bond.vinculacao!.matricula!,
+      );
+      return;
+    }
+
+    if (outsourcedQtd == 1) {
+      final bond = _bondById(UffBondIds.outsourced);
+      await saveUserDataBeforeChooseProfile(
+        ProfileTypes.outsourced,
+        bond.vinculacao!.matricula!,
+      );
+    }
+  }
+
+  InnerObject _bondById(String bondId) {
+    return activeBonds().firstWhere(
+          (bond) => bond.vinculacao!.vinculoId == bondId,
+        );
   }
 
   List<InnerObject> activeBonds() {
     return userUmm.activeBond!.objects!.outerObject![1].innerObjects!;
   }
 
-  void saveUserDataBeforeChooseProfile(
+  Future<void> saveUserDataBeforeChooseProfile(
     ProfileTypes profileType,
     String matricula,
   ) async {
