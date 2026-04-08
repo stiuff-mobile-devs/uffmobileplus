@@ -29,7 +29,7 @@ class HomePage extends GetView<HomePageController> {
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
         ),
         flexibleSpace: Container(
-          decoration: BoxDecoration(gradient: AppColors.appBarBottomGradient()),
+          decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
         ),
       ),
       body: Obx(
@@ -48,6 +48,8 @@ class HomePage extends GetView<HomePageController> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        _buildUpdateBanner(),
+                        const SizedBox(height: 18),
                         Row(
                           children: [
                             Expanded(
@@ -140,6 +142,102 @@ class HomePage extends GetView<HomePageController> {
                   ),
                 ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildUpdateBanner() {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF5EE5FF), Color(0xFF2EA1FF), Color(0xFF0B4CD8)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x5533AAFF),
+            blurRadius: 20,
+            offset: Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            top: -24,
+            right: -20,
+            child: Container(
+              height: 90,
+              width: 90,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.20),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: -28,
+            left: -16,
+            child: Container(
+              height: 84,
+              width: 84,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.14),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(999),
+                    color: const Color(0xFF031B53).withOpacity(0.35),
+                  ),
+                  child: const Text(
+                    'NOVA ATUALIZACAO',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.9,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Bem-vindo a nova atualizacao do UFF Mobile Plus',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    height: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Atalhos mais inteligentes, visual renovado e uma navegacao mais rapida para voce.',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.92),
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w500,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
