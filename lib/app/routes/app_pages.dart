@@ -7,10 +7,10 @@ import 'package:uffmobileplus/app/modules/external_modules/bibliotecas/web_page/
 import 'package:uffmobileplus/app/modules/external_modules/bibliotecas/ui/bibliotecas_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/busuff/binding/busuff_binding.dart';
 import 'package:uffmobileplus/app/modules/external_modules/busuff/ui/busuff_page.dart';
-import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/binding/carteirinha_digital_bindings.dart';
-import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/ui/carteirinha_digital_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/cdc/bindings/cdc_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/cdc/ui/cdc_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/binding/carteirinha_digital_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/ui/carteirinha_digital_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/bindings/form_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/ui/admin_form_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/repositorio_institucional/bindings/repositorio_institucional_bindings.dart';
@@ -52,6 +52,7 @@ import 'package:uffmobileplus/app/modules/external_modules/uniteve/ui/uniteve_pa
 import 'package:uffmobileplus/app/modules/internal_modules/choose_profile/bindings/choose_profile_bindings.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/choose_profile/ui/choose_profile_page.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/bindings/dashboard_binding.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/dashboard/bindings/settings_binding.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/ui/pages/settings/about_page.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/ui/pages/settings/settings_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/study_plan/binding/study_plan_bindings.dart';
@@ -234,7 +235,17 @@ abstract class AppPages {
       ],
     ),
 
-    GetPage(name: Routes.SETTINGS, page: () => SettingsPage()),
+    GetPage(
+      name: Routes.CDC,
+      page: () => CdcPage(),
+      binding: CdcBindings(),
+    ),
+
+    GetPage(
+      name: Routes.SETTINGS,
+      page: () => SettingsPage(),
+      bindings: [SettingsBinding(), UserIduffBindings(), AuthGoogleBindings(), UserDataBindings(), LoginBindings()],
+    ),
 
     GetPage(name: Routes.ABOUT, page: () => AboutPage()),
 
