@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:android_intent_plus/android_intent.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'
     show Colors, WidgetsBindingObserver, AlertDialog, Text, TextButton;
@@ -182,11 +183,20 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
 
   Future<void> launchGoogleMeet(String email) async {
     await Clipboard.setData(ClipboardData(text: email));
-    final Uri url = Uri.parse('https://meet.google.com/landing');
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    } else {
-      if (kDebugMode) print('Could not launch Google Meet');
+    String url = 'https://meet.google.com/landing';
+    
+    final intent = AndroidIntent(
+      action: 'action_view',
+      data: url,
+      package: 'com.google.android.apps.tachyon', // Google Meet standalone
+    );
+
+  try {
+    await intent.launch();
+  } catch (e) {
+    if (kDebugMode) {
+      print('Não foi possível abrir o Google Meet standalone: $e');
     }
+  }
   }
 }
