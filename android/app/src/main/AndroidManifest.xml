@@ -58,6 +58,7 @@
 
          In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
      <queries>
+        <package android:name="com.google.android.apps.tachyon" />
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <category android:name="android.intent.category.BROWSABLE" />
@@ -68,6 +69,7 @@
             <category android:name="android.intent.category.APP_BROWSER" />
             <data android:scheme="https" />
         </intent>
+        
     </queries>
     
     <queries>

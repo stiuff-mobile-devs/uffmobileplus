@@ -183,20 +183,21 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
 
   Future<void> launchGoogleMeet(String email) async {
     await Clipboard.setData(ClipboardData(text: email));
-    String url = 'https://meet.google.com/landing';
+    String url = 'https://meet.google.com/landing?calling=1';
     
     final intent = AndroidIntent(
-      action: 'action_view',
-      data: url,
+      //action: 'action_view',
+      action: 'android.intent.action.MAIN',
+      //data: url,
       package: 'com.google.android.apps.tachyon', // Google Meet standalone
     );
 
-  try {
-    await intent.launch();
-  } catch (e) {
-    if (kDebugMode) {
-      print('Não foi possível abrir o Google Meet standalone: $e');
+    try {
+      await intent.launch();
+    } catch (e) {
+      if (kDebugMode) {
+        print('Não foi possível abrir o Google Meet standalone: $e');
+      }
     }
-  }
   }
 }
