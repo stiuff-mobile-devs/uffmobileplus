@@ -290,7 +290,7 @@ class MonitoraUFFPage extends StatelessWidget {
                       fit: BoxFit.contain,
                     ),
                     onPressed: () {
-                      debugPrint("Meet");
+                      trackingCtrl.launchGoogleMeet(user.email);
                     },
                   ),
                 ),

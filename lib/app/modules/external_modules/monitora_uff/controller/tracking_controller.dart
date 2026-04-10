@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'
     show Colors, WidgetsBindingObserver, AlertDialog, Text, TextButton;
+import 'package:flutter/services.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -15,6 +16,7 @@ import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/data/pro
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_model.dart';
 import 'package:uffmobileplus/app/data/services/foreground_service.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TrackingController extends GetxController with WidgetsBindingObserver {
   final FlutterBackgroundService _service = FlutterBackgroundService();
@@ -176,5 +178,15 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
     _compassSubscription?.cancel();
     mapController.dispose();
     super.onClose();
+  }
+
+  Future<void> launchGoogleMeet(String email) async {
+    await Clipboard.setData(ClipboardData(text: email));
+    final Uri url = Uri.parse('https://meet.google.com/landing');
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      if (kDebugMode) print('Could not launch Google Meet');
+    }
   }
 }
