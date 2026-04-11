@@ -45,7 +45,7 @@ class StudyPlanProvider {
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $accessToken'},
-      ).timeout(const Duration(seconds: 10));
+      );
 
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonResponse = jsonDecode(response.body);
@@ -53,10 +53,8 @@ class StudyPlanProvider {
       } else {
         debugPrint('StudyPlan api failed.\n Status Code: ${response.statusCode}');
       }
-    } on TimeoutException {
-      debugPrint('Request timeout: api took too long.');
     } catch (e) {
-      debugPrint('error on getStudyPlan from api: $e');;
+      debugPrint('error on getStudyPlan from api: $e');
     }
 
     return null;

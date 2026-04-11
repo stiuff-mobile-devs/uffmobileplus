@@ -26,11 +26,11 @@ String weekdayToString(WeekDay day) {
   Get.appendTranslations({
     'pt_BR' : {
       'segunda' : 'Segunda',
-      'terca' : 'Terça',
-      'quarta' : 'Quarta',
-      'quinta' : 'Quinta',
-      'sexta' : 'Sexta',
-      'sabado' : 'Sábado'
+      'terca' : ' Terça ',
+      'quarta' : ' Quarta',
+      'quinta' : ' Quinta ',
+      'sexta' : ' Sexta ',
+      'sabado' : 'Sábado '
     },
     'en_US' : {
       'segunda' : 'Monday',
