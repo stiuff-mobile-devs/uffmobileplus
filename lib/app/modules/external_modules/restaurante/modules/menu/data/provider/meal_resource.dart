@@ -85,34 +85,37 @@ class MealResource {
   }
 
   Future<int> updateMeal(MealModel meal) async {
-    await _updateMealOnFirestore(meal);
+    final Uri url = _buildUrl("${RestaurantAPI.path}/meals/${meal.id}");
+    //accessToken = await _menuService.getAccessToken();
+
+    try {
+      // final response = await httpService.put(
+      //   url,
+      //   body: jsonEncode(meal.toJson()),
+      //   headers: jsonHeaders,
+      // );
+      // final response = await http.put(
+      //   url,
+      //   body: jsonEncode(meal.toJson()),
+      //   headers: {'Authorization': 'Bearer $accessToken'},
+      // );
+      await _updateMealOnFirestore(meal);
+      return _processWriteResponse(
+        200,
+        "Refeição atualizada com sucesso.",
+      );
+      // return _processWriteResponse(
+      //   response,
+      //   "Refeição atualizada com sucesso.",
+      // );
+    } catch (e) {
+      _logError('updateMeal', e);
+      if (e.toString() == 'Null check operator used on a null value') {
+        rethrow;
+      }
+    }
+
     return 0;
-    // final Uri url = _buildUrl("${RestaurantAPI.path}/meals/${meal.id}");
-    // accessToken = await _menuService.getAccessToken();
-    //
-    // try {
-    //   // final response = await httpService.put(
-    //   //   url,
-    //   //   body: jsonEncode(meal.toJson()),
-    //   //   headers: jsonHeaders,
-    //   // );
-    //   final response = await http.put(
-    //     url,
-    //     body: jsonEncode(meal.toJson()),
-    //     headers: {'Authorization': 'Bearer $accessToken'},
-    //   );
-    //   return _processWriteResponse(
-    //     response,
-    //     "Refeição atualizada com sucesso.",
-    //   );
-    // } catch (e) {
-    //   _logError('updateMeal', e);
-    //   if (e.toString() == 'Null check operator used on a null value') {
-    //     rethrow;
-    //   }
-    // }
-    //
-    // return 0;
   }
 
   _updateMealOnFirestore(MealModel meal) async {
@@ -120,7 +123,8 @@ class MealResource {
       final docRef = _firestore.collection("meals").doc(meal.id);
       await docRef.update(meal.toJson());
     } catch (e) {
-      _logError('error on createMeal on Firebase', e);
+      _logError('error on updateMeal on Firebase', e);
+      rethrow;
     }
   }
 
