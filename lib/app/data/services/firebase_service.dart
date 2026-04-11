@@ -1,7 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:uffmobileplus/firebase_options_cardapio_ru.dart';
 import 'package:uffmobileplus/firebase_options_catracaoffline.dart';
-
 import 'package:uffmobileplus/firebase_options_uffmobileplus.dart';
 
 class FirebaseService {
@@ -17,13 +15,5 @@ class FirebaseService {
       options: FirebaseOptionsCatracaoffline.currentPlatform,
     );
     print('✅ Firebase catracaoffline initialized');
-
-    await Firebase.initializeApp(
-      name: 'cardapio_ru',
-      options: FirebaseOptionsCardapioRU.currentPlatform,
-    );
-    print('✅ Firebase cardapio_ru initialized');
-
-
   }
 }
