@@ -28,7 +28,7 @@ class MonitoraUFFPage extends StatelessWidget {
 
   AppBar _appBar() {
     return AppBar(
-      title: const Text('Monitora UFF'),
+      title: const Text('Águia'),
       centerTitle: true,
       elevation: 8,
       foregroundColor: Colors.white,
