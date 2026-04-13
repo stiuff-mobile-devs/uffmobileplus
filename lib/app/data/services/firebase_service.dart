@@ -1,5 +1,4 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:uffmobileplus/firebase_options_catracaoffline.dart';
 import 'package:uffmobileplus/firebase_options_uffmobileplus.dart';
 
 class FirebaseService {
@@ -10,10 +9,6 @@ class FirebaseService {
     );
     print('✅ Firebase default app initialized');
 
-    await Firebase.initializeApp(
-      name: 'catracaoffline',
-      options: FirebaseOptionsCatracaoffline.currentPlatform,
-    );
-    print('✅ Firebase catracaoffline initialized');
+    
   }
 }
