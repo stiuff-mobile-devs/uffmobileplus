@@ -491,7 +491,7 @@ class _BeamPainter extends CustomPainter {
     final paint = Paint()
       ..shader = RadialGradient(
         colors: [
-          Colors.blueAccent.withValues(alpha: 0.4),
+          Colors.blueAccent.withValues(alpha: 1.00),
           Colors.blueAccent.withValues(alpha: 0.0),
         ],
       ).createShader(Rect.fromCircle(center: center, radius: radius));
