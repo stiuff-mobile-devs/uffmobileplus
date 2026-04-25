@@ -89,6 +89,7 @@ class MonitoraUFFPage extends StatelessWidget {
           ),
           children: [
             tile(),
+            trajectoryPolylines(),
             firebaseMarkers(),
             toggleButton(),
             _centralizeButton(),
@@ -97,6 +98,41 @@ class MonitoraUFFPage extends StatelessWidget {
         _selectedUserBar(),
       ],
     );
+  }
+
+  /// Desenha a trajetória do usuário focado (aquele cuja barra inferior
+  /// está visível). A trajetória aparece e desaparece junto com a barra.
+  Widget trajectoryPolylines() {
+    return Obx(() {
+      final user = trackingCtrl.selectedFirebaseUser.value;
+      final points = trackingCtrl.selectedTrajectory;
+
+      if (user == null || points.length < 2) {
+        return PolylineLayer<Object>(polylines: []);
+      }
+
+      final latLngPoints = points.map((p) => LatLng(p.lat, p.lng)).toList();
+      final baseColor = trackingCtrl.setMarkerColor(user);
+
+      final darkerBorderColor = Color.fromARGB(
+        baseColor.alpha,
+        (baseColor.red * 0.5).toInt(),
+        (baseColor.green * 0.5).toInt(),
+        (baseColor.blue * 0.5).toInt(),
+      );
+
+      return PolylineLayer<Object>(
+        polylines: [
+          Polyline<Object>(
+            points: latLngPoints,
+            strokeWidth: 5.0,
+            color: baseColor,
+            borderStrokeWidth: 2.0,
+            borderColor: darkerBorderColor,
+          ),
+        ],
+      );
+    });
   }
 
   /// Usuário verá essa tela apenas se algumas das permissões necessárias

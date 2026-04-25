@@ -14,6 +14,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/user_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/data/provider/firebase_provider.dart';
+import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/location_point.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_model.dart';
 import 'package:uffmobileplus/app/data/services/foreground_service.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
@@ -40,6 +41,9 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
   final Rx<double?> heading = Rx<double?>(null);
   StreamSubscription<CompassEvent>? _compassSubscription;
 
+  /// Trajetória recente do usuário focado (aquele cuja barra inferior está visível).
+  final RxList<LocationPoint> selectedTrajectory = <LocationPoint>[].obs;
+  StreamSubscription<List<LocationPoint>>? _trajectorySubscription;
   Future<void> centerMapOnCurrentLocation() async {
     try {
       mapController.move(LatLng(position.latitude, position.longitude), 15.0);
@@ -86,10 +90,24 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
 
   void openFirebaseUserDetails(UserModel user) {
     selectedFirebaseUser.value = user;
+
+    // Cancelar listener anterior (se houver) e iniciar um novo para
+    // o usuário focado.
+    _trajectorySubscription?.cancel();
+    selectedTrajectory.clear();
+    _trajectorySubscription = FirebaseProvider()
+        .getRecentTrajectory(user.email)
+        .listen((points) {
+      selectedTrajectory.value = points;
+    });
   }
 
   void closeFirebaseUserDetails() {
     selectedFirebaseUser.value = null;
+
+    _trajectorySubscription?.cancel();
+    _trajectorySubscription = null;
+    selectedTrajectory.clear();
   }
 
   Future<void> toggleService() async {
@@ -184,9 +202,12 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
   @override
   void onClose() {
     _compassSubscription?.cancel();
+    _trajectorySubscription?.cancel();
     mapController.dispose();
     super.onClose();
   }
+
+
 
   Future<void> launchGoogleMeet(String email) async {
     await Clipboard.setData(ClipboardData(text: email));
