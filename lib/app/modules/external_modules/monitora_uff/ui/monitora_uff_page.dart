@@ -9,7 +9,6 @@ import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/tracking_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/permissions_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/user_controller.dart';
-import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_model.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 
@@ -75,19 +74,27 @@ class MonitoraUFFPage extends StatelessWidget {
   /// Usuário verá essa tela apenas se todas as permissões necessárias já tiverem
   /// sido concedidas.
   Widget mapa() {
-    return FlutterMap(
-      mapController: trackingCtrl.mapController,
-      options: MapOptions(
-        initialCenter: LatLng(
-          trackingCtrl.position.latitude,
-          trackingCtrl.position.longitude,
-        ),
-      ),
+    return Stack(
       children: [
-        tile(),
-        firebaseMarkers(),
-        toggleButton(),
-        _centralizeButton(),
+        FlutterMap(
+          mapController: trackingCtrl.mapController,
+          options: MapOptions(
+            initialCenter: LatLng(
+              trackingCtrl.position.latitude,
+              trackingCtrl.position.longitude,
+            ),
+            onTap: (tapPosition, latLng) {
+              trackingCtrl.closeFirebaseUserDetails();
+            },
+          ),
+          children: [
+            tile(),
+            firebaseMarkers(),
+            toggleButton(),
+            _centralizeButton(),
+          ],
+        ),
+        _selectedUserBar(),
       ],
     );
   }
@@ -194,117 +201,160 @@ class MonitoraUFFPage extends StatelessWidget {
 
     return Obx(
       () => MarkerLayer(
-        markers: trackingCtrl.firebaseUsers
-            .map((user) {
-              final isCurrentUser = user.email == trackingCtrl.userCtrl.user?.email;
-              return Marker(
-                point: LatLng(
-                  user.lat ?? 0.0, // TODO: encontrar uma solução melhor.
-                  user.lng ?? 0.0, // TODO: encontrar uma solução melhor.
-                ), 
-                width: isCurrentUser ? markerSize * 3 : markerSize,
-                height: isCurrentUser ? markerSize * 3 : markerSize,
-                alignment: Alignment.center,
-                child: Stack(
-                  alignment: Alignment.center,
-                  clipBehavior: Clip.none,
-                  children: [
-                    if (isCurrentUser)
-                      Obx(() {
-                        final heading = trackingCtrl.heading.value;
-                        if (heading == null) return const SizedBox.shrink();
-
-                        return Transform.rotate(
-                          angle: heading * (math.pi / 180),
-                          child: SizedBox(
-                            width: markerSize * 3,
-                            height: markerSize * 3,
-                            child: CustomPaint(
-                              painter: _BeamPainter(),
-                            ),
-                          ),
-                        );
-                      }),
-                    SizedBox(
-                      width: markerSize,
-                      height: markerSize,
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () => Get.dialog(popUp(user)),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: trackingCtrl.setMarkerColor(user),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 3),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 4,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          margin: const EdgeInsets.all(10), 
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            })
-            .toList(),
-      ),
-    );
-  }
-
-  Widget popUp(UserModel user) {
-    return AlertDialog(
-      backgroundColor: AppColors.darkBlue(),
-      title: Text("Monitor", style: TextStyle(color: Colors.white)),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+        markers: trackingCtrl.firebaseUsers.map((user) {
+          final isCurrentUser = user.email == trackingCtrl.userCtrl.user?.email;
+          return Marker(
+            point: LatLng(
+              user.lat ?? 0.0, // TODO: encontrar uma solução melhor.
+              user.lng ?? 0.0, // TODO: encontrar uma solução melhor.
+            ),
+            width: isCurrentUser ? markerSize * 3 : markerSize,
+            height: isCurrentUser ? markerSize * 3 : markerSize,
+            alignment: Alignment.center,
+            child: Stack(
+              alignment: Alignment.center,
+              clipBehavior: Clip.none,
               children: [
-                Expanded(
-                  child: Text(
-                    user.nome ?? user.email,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
+                if (isCurrentUser)
+                  Obx(() {
+                    final heading = trackingCtrl.heading.value;
+                    if (heading == null) return const SizedBox.shrink();
+
+                    return Transform.rotate(
+                      angle: heading * (math.pi / 180),
+                      child: SizedBox(
+                        width: markerSize * 3,
+                        height: markerSize * 3,
+                        child: CustomPaint(painter: _BeamPainter()),
+                      ),
+                    );
+                  }),
                 SizedBox(
-                  width: 40,
-                  height: 40,
-                  child: IconButton(
-                    padding: EdgeInsets.zero,
-                    icon: SvgPicture.asset(
-                      'assets/monitora_uff/Google_Meet_icon.svg',
-                      width: 24,
-                      height: 24,
-                      fit: BoxFit.contain,
+                  width: markerSize,
+                  height: markerSize,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => trackingCtrl.openFirebaseUserDetails(user),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: trackingCtrl.setMarkerColor(user),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 3),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      margin: const EdgeInsets.all(10),
                     ),
-                    onPressed: () {
-                      trackingCtrl.launchGoogleMeet(user.email);
-                    },
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              "Última atualização: ${user.timestamp}",
-              style: TextStyle(fontSize: 12, color: Colors.white70),
-            ),
-          ],
-        ),
+          );
+        }).toList(),
       ),
     );
+  }
+
+  Widget _selectedUserBar() {
+    return Obx(() {
+      final user = trackingCtrl.selectedFirebaseUser.value;
+
+      if (user == null) {
+        return const SizedBox.shrink();
+      }
+
+      return Positioned(
+        left: 0,
+        right: 0,
+        bottom: 0,
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Material(
+              color: AppColors.darkBlue(),
+              elevation: 12,
+              borderRadius: BorderRadius.circular(16),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 12, 16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "Monitor",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          visualDensity: VisualDensity.compact,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          icon: const Icon(Icons.close, color: Colors.white),
+                          onPressed: trackingCtrl.closeFirebaseUserDetails,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            user.nome ?? user.email,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 40,
+                          height: 40,
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            icon: SvgPicture.asset(
+                              'assets/monitora_uff/Google_Meet_icon.svg',
+                              width: 24,
+                              height: 24,
+                              fit: BoxFit.contain,
+                            ),
+                            onPressed: () {
+                              trackingCtrl.launchGoogleMeet(user.email);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      "Última atualização: ${user.timestamp}",
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.white70,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    });
   }
 
   Widget toggleButton() {

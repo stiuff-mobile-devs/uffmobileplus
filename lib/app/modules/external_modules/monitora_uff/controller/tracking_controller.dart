@@ -17,7 +17,6 @@ import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/data/pro
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_model.dart';
 import 'package:uffmobileplus/app/data/services/foreground_service.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class TrackingController extends GetxController with WidgetsBindingObserver {
   final FlutterBackgroundService _service = FlutterBackgroundService();
@@ -34,6 +33,7 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
     speedAccuracy: 0,
   );
   RxList<UserModel> firebaseUsers = <UserModel>[].obs;
+  final Rxn<UserModel> selectedFirebaseUser = Rxn<UserModel>();
   late final MapController mapController;
   final isTrackingEnabled = false.obs;
   final UserController userCtrl = Get.find<UserController>();
@@ -64,7 +64,6 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
     } catch (e) {
       if (kDebugMode) print('Compass not available or error: $e');
     }
-    
 
     // TODO: encapsular em um método
     if (userCtrl.isMonitor()) {
@@ -83,6 +82,14 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
     return someUser.email == currentUserEmail
         ? Colors.indigo
         : Colors.lightBlue;
+  }
+
+  void openFirebaseUserDetails(UserModel user) {
+    selectedFirebaseUser.value = user;
+  }
+
+  void closeFirebaseUserDetails() {
+    selectedFirebaseUser.value = null;
   }
 
   Future<void> toggleService() async {
@@ -148,8 +155,8 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
     // receber informações do usuário.
     _service.on('ready').listen((event) async {
       _service.invoke("setUserInfo", {
-        "email": userCtrl.user!.email, 
-        "name": userCtrl.getUserName(), 
+        "email": userCtrl.user!.email,
+        "name": userCtrl.getUserName(),
         "funcao": userCtrl.user!.funcao, //_currentUser.funcao,
       });
     });
@@ -183,8 +190,7 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
 
   Future<void> launchGoogleMeet(String email) async {
     await Clipboard.setData(ClipboardData(text: email));
-    String url = 'https://meet.google.com/landing?calling=1';
-    
+
     final intent = AndroidIntent(
       //action: 'action_view',
       action: 'android.intent.action.MAIN',
