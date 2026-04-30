@@ -21,12 +21,12 @@ class CustomProgressDisplay extends StatelessWidget {
         body: Center(
           child: SizedBox(
             height: height,
-            child: RiveAnimation.asset(
+            /*child: RiveAnimation.asset(
               brightMode
                   ? "assets/animations/logo_uff_animado_white.riv"
                   : "assets/animations/logo_uff_animado.riv",
               alignment: Alignment.center,
-            ),
+            ),*/
           ),
         ),
       ),
