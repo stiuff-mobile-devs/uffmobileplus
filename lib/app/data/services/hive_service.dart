@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/operator_transaction_offline.dart';
 import 'package:uffmobileplus/app/modules/external_modules/transcript/data/models/transcript_discipline.dart';
@@ -29,7 +30,7 @@ class HiveService {
       Hive.registerAdapter(TranscriptDisciplineAdapter());
       Hive.registerAdapter(OperatorTransactionOfflineAdapter());
     } catch (e, st) {
-      print('Hive init/register adapters error: $e\n$st');
+      debugPrint('Hive init/register adapters error: $e\n$st');
     }
   }
 }

@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:uffmobileplus/firebase_options_uffmobileplus.dart';
 
 class FirebaseService {
@@ -7,7 +8,7 @@ class FirebaseService {
       name: 'uffmobileplus',
       options: FirebaseOptionsUffmobileplus.currentPlatform,
     );
-    print('✅ Firebase default app initialized');
+    debugPrint('✅ Firebase default app initialized');
 
     
   }

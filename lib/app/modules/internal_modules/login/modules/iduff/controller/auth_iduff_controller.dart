@@ -151,13 +151,13 @@ class AuthIduffController extends GetxController {
     );
   }
 
-  loginSuccessful() async {
+  Future<void> loginSuccessful() async {
     String? iduff = await _userIduffController.getIduff();
     isLoading.value = false;
     Get.offAllNamed(Routes.CHOOSE_PROFILE, arguments: iduff);
   }
 
-  login() async {
+  Future<void> login() async {
     isLoading.value = true;
     try {
       final result = await _authIduffService.authenticate(Get.context);

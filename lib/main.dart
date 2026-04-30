@@ -20,7 +20,7 @@ Future<void> main() async {
 
   runApp(
     GetMaterialApp(
-      debugShowCheckedModeBanner: true,
+      debugShowCheckedModeBanner: false,
 
       title: "UFF Mobile Plus",
       initialRoute: Routes.SPLASH,
