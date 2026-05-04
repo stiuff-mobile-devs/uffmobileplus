@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:rive/rive.dart' as rive;
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/data/services/firebase_service.dart';
 import 'package:uffmobileplus/app/data/services/hive_service.dart';
@@ -10,6 +11,7 @@ import 'package:uffmobileplus/app/utils/translations/app_translations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await rive.RiveNative.init();
 
   await FirebaseService.init();
   await HiveService.init();
