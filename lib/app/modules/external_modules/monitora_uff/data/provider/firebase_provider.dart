@@ -68,8 +68,12 @@ class FirebaseProvider {
         QuerySnapshot query,
       ) {
         List<UserModel> users = [];
+        final limit = DateTime.now().subtract(const Duration(minutes: 2));
         for (var doc in query.docs) {
-          users.add(UserModel.fromMap(doc.data() as Map<String, dynamic>));
+          final user = UserModel.fromMap(doc.data() as Map<String, dynamic>);
+          if (user.timestamp != null && user.timestamp!.isAfter(limit)) {
+            users.add(user);
+          }
         }
         return users;
       });
@@ -102,6 +106,19 @@ class FirebaseProvider {
       }
     } catch (e) {
       throw Exception("Erro ao atualizar isTracked: $e");
+    }
+  }
+
+  Future<void> updateHeartbeat(String email) async {
+    try {
+      await collectionRef.doc(email).update({'timestamp': DateTime.now()});
+      if (kDebugMode) {
+        print("Heartbeat atualizado com sucesso!");
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Erro ao atualizar heartbeat: $e");
+      }
     }
   }
 

@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/data/provider/firebase_provider.dart';
 import 'package:uffmobileplus/firebase_options_uffmobileplus.dart';
+
+Timer? _heartbeatTimer;
 
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
@@ -12,6 +15,7 @@ void onStart(ServiceInstance service) async {
   );
 
   service.on('stopService').listen((event) {
+    _heartbeatTimer?.cancel();
     service.stopSelf();
   });
 
@@ -43,6 +47,13 @@ void updateLocation(ServiceInstance service, String email, String name, String f
 
   // TODO: adicionar condição aqui para saber se serviço é Android ou IOS e seleciona a configuração correta;
 
+  _heartbeatTimer?.cancel();
+  _heartbeatTimer = Timer.periodic(const Duration(minutes: 1), (timer) async {
+    if (await FirebaseProvider().doesDocumentExist(email)) {
+      await FirebaseProvider().updateHeartbeat(email);
+    }
+  });
+
   // TODO: trocar androidSettings por locationSettings
   Geolocator.getPositionStream(locationSettings: androidSettings).listen((
     Position position,
@@ -61,7 +72,7 @@ void updateLocation(ServiceInstance service, String email, String name, String f
         lng: position.longitude,
         timestamp: DateTime.now(),
       );
-    } 
+    }
 
     // Envia para o app principal
     service.invoke('updateLocationLocally', {'position': position});
