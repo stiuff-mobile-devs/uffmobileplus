@@ -122,7 +122,11 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
 
   Future<void> _setPlatformSpecifics() async {
     await _service.configure(
-      iosConfiguration: IosConfiguration(),
+      iosConfiguration: IosConfiguration(
+        autoStart: false,
+        onForeground: onStart,
+        onBackground: onIosBackground,
+      ),
       androidConfiguration: AndroidConfiguration(
         // Esta linha conecta os isolates.
         onStart: onStart,
