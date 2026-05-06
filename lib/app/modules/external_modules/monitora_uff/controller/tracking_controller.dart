@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:android_intent_plus/android_intent.dart';
@@ -18,6 +19,7 @@ import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/l
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_model.dart';
 import 'package:uffmobileplus/app/data/services/foreground_service.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TrackingController extends GetxController with WidgetsBindingObserver {
   final FlutterBackgroundService _service = FlutterBackgroundService();
@@ -216,18 +218,36 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
   Future<void> launchGoogleMeet(String email) async {
     await Clipboard.setData(ClipboardData(text: email));
 
-    final intent = AndroidIntent(
-      //action: 'action_view',
-      action: 'android.intent.action.MAIN',
-      //data: url,
-      package: 'com.google.android.apps.tachyon', // Google Meet standalone
-    );
+    if (Platform.isAndroid) {
+      final intent = AndroidIntent(
+        //action: 'action_view',
+        action: 'android.intent.action.MAIN',
+        //data: url,
+        package: 'com.google.android.apps.tachyon', // Google Meet standalone
+      );
 
-    try {
-      await intent.launch();
-    } catch (e) {
-      if (kDebugMode) {
-        print('Não foi possível abrir o Google Meet standalone: $e');
+      try {
+        await intent.launch();
+      } catch (e) {
+        if (kDebugMode) {
+          print('Não foi possível abrir o Google Meet standalone: $e');
+        }
+      }
+    } else if (Platform.isIOS) {
+      final Uri meetAppUri = Uri.parse('gmeet://');
+      final Uri meetWebUri = Uri.parse('https://meet.google.com/');
+      try {
+        // Tenta abrir o aplicativo nativo do Google Meet
+        if (await canLaunchUrl(meetAppUri)) {
+          await launchUrl(meetAppUri);
+        } else {
+          // Caso não esteja instalado, abre no Safari como fallback
+          await launchUrl(meetWebUri, mode: LaunchMode.externalApplication);
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print('Não foi possível abrir o Google Meet no iOS: $e');
+        }
       }
     }
   }

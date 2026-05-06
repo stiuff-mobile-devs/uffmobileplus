@@ -49,6 +49,7 @@
 	<array>
 		<string>mailto</string>
 		<string>https</string>
+		<string>gmeet</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
