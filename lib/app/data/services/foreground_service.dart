@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:ui';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:geolocator/geolocator.dart';
@@ -29,23 +31,37 @@ void onStart(ServiceInstance service) async {
   service.invoke('ready');
 }
 
+@pragma('vm:entry-point')
+Future<bool> onIosBackground(ServiceInstance service) async {
+  DartPluginRegistrant.ensureInitialized();
+  return true;
+}
+
 // TODO: passar UserModel para essa função em vez de email, nome.
 void updateLocation(ServiceInstance service, String email, String name, String funcao) {
   // Configuração do GPS
-  final androidSettings = AndroidSettings(
-    accuracy: LocationAccuracy.high, // TODO: testar outros valores aqui
-    distanceFilter: 10, // Só atualiza se mover mais de 10 metros
-    intervalDuration: Duration(seconds: 5),
-    //foregroundNotificationConfig: ForegroundNotificationConfig(
-    //  notificationTitle: "UFF Mobile Plus",
-    //  notificationText: "Sua posição está sendo monitorada.",
-    //  enableWakeLock: true, // TODO: ler a descrição deste atributo.
-    //),
-  );
+  late LocationSettings locationSettings;
 
-  // TODO: configurar IOSSettings
-
-  // TODO: adicionar condição aqui para saber se serviço é Android ou IOS e seleciona a configuração correta;
+  if (Platform.isAndroid) {
+    locationSettings = AndroidSettings(
+      accuracy: LocationAccuracy.high, // TODO: testar outros valores aqui
+      distanceFilter: 10, // Só atualiza se mover mais de 10 metros
+      intervalDuration: Duration(seconds: 5),
+    );
+  } else if (Platform.isIOS) {
+    locationSettings = AppleSettings(
+      accuracy: LocationAccuracy.high,
+      activityType: ActivityType.other,
+      distanceFilter: 10,
+      pauseLocationUpdatesAutomatically: true,
+      showBackgroundLocationIndicator: true,
+    );
+  } else {
+    locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 10,
+    );
+  }
 
   _heartbeatTimer?.cancel();
   _heartbeatTimer = Timer.periodic(const Duration(minutes: 1), (timer) async {
@@ -54,8 +70,7 @@ void updateLocation(ServiceInstance service, String email, String name, String f
     }
   });
 
-  // TODO: trocar androidSettings por locationSettings
-  Geolocator.getPositionStream(locationSettings: androidSettings).listen((
+  Geolocator.getPositionStream(locationSettings: locationSettings).listen((
     Position position,
   ) async {
     // print("\n\n${position.accuracy}\n\n");
