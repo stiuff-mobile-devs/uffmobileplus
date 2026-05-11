@@ -1,6 +1,7 @@
 import 'package:all_validations_br/all_validations_br.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/area.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/operator_transaction.dart';
@@ -45,12 +46,16 @@ class CatracaController extends GetxController {
   bool isQrCodeValid = true;
   String transactionResultMessage = "";
   String transactionUsername = "";
-  Timer? _syncTimer;
+
+  StreamSubscription<InternetStatus>? _connectionSubscription;
+  Timer? _timer;
+  int secondsRefresh = 60;
 
   @override
   void onInit() {
     super.onInit();
     _initAsync();
+    _startInternetMonitoring();
   }
 
   Future<void> _initAsync() async {
@@ -58,7 +63,6 @@ class CatracaController extends GetxController {
     await service.initialize();
     iduff = service.getUserIdUFF();
     await fetchAreas();
-    startOfflineSync();
     update();
   }
 
@@ -109,7 +113,7 @@ class CatracaController extends GetxController {
     syncOfflineTransactions();
   }
 
-  void selectArea(index) {
+  void selectArea(int index) {
     selectedArea.value = areas[index];
     fetchOperatorTransactions();
     Get.toNamed(Routes.VALIDAR_PAGAMENTO);
@@ -202,18 +206,7 @@ class CatracaController extends GetxController {
                 );
 
             bool saveOperatorTransactionsOffline = false;
-            bool saveOperatorTransactionToFirebase = false;
-
-            // Salvando no Firebase
-            try {
-              await repository
-                  .saveOperatorTransactionToFirebase(operatorTransactionOffline)
-                  .timeout(const Duration(seconds: 5));
-              saveOperatorTransactionToFirebase = true;
-            } catch (e) {
-              debugPrint('Erro ao salvar transação no Firebase: $e');
-              saveOperatorTransactionToFirebase = false;
-              // Salvando no banco local
+            // Salvando no banco local
               try {
                 await repository.saveOperatorTransactionsOffline(
                   operatorTransactionOffline,
@@ -223,10 +216,8 @@ class CatracaController extends GetxController {
                 saveOperatorTransactionsOffline = false;
                 debugPrint('Erro ao salvar transação offline: $e');
               }
-            }
 
-            if (saveOperatorTransactionsOffline ||
-                saveOperatorTransactionToFirebase) {
+            if (saveOperatorTransactionsOffline ) {
               transactionResultMessage =
                   "Transação salva em modo OFFLINE com sucesso!";
               transactionUsername = idUffValue;
@@ -234,7 +225,7 @@ class CatracaController extends GetxController {
               isQrCodeValid = true;
             } else {
               transactionResultMessage =
-                  "Falha ao salvar a transação offline. Erro Interno.";
+                  "Falha ao salvar a transação offline. Erro Interno, tente novamente";
               isTransactionValid = false;
               isQrCodeValid = false;
               transactionUsername = idUffValue;
@@ -308,23 +299,8 @@ class CatracaController extends GetxController {
         );
 
     bool saveOperatorTransactionsOffline = false;
-    bool saveOperatorTransactionToFirebase = false;
 
-    // Salvando no Firebase
-    try {
-      await repository
-          .saveOperatorTransactionToFirebase(operatorTransactionOffline)
-          .timeout(const Duration(seconds: 5));
-      saveOperatorTransactionToFirebase = true;
-    } catch (e) {
-      debugPrint('Erro ao salvar transação no Firebase: $e');
-      saveOperatorTransactionToFirebase = false;
-    }
-
-    // Salvando no banco local se falhar no Firebase  
-    if(!saveOperatorTransactionToFirebase) {
-      
-      try {
+   try {
         await repository.saveOperatorTransactionsOffline(
           operatorTransactionOffline,
         );
@@ -332,7 +308,6 @@ class CatracaController extends GetxController {
       } catch (e) {
         saveOperatorTransactionsOffline = false;
         debugPrint('Erro ao salvar transação offline: $e');
-      }
       }
 
     if (saveOperatorTransactionsOffline ) {
@@ -343,17 +318,9 @@ class CatracaController extends GetxController {
       isTransactionValid = true;
       isQrCodeValid = true;
     } 
-    else if(saveOperatorTransactionToFirebase) {
-      isOfflineMode = false.obs;
-      statusMessage.value = "Catraca Offline";
-      transactionResultMessage = "Transação salva no servidor com sucesso!";
-      transactionUsername = cpf;
-      isTransactionValid = true;  
-      isQrCodeValid = true;
-    }
     else {
       transactionResultMessage =
-          "Falha ao salvar a transação. Erro Interno.";
+          "Falha ao salvar a transação. Erro Interno. Tente novamente.";
       isTransactionValid = false;
       isQrCodeValid = false;
       transactionUsername = cpf;
@@ -366,22 +333,6 @@ class CatracaController extends GetxController {
 
   void getResultPage() {
     Get.toNamed(Routes.RESULTADO_PAGE);
-  }
-
-
-
-  /// Inicia checagem periódica (30s) para enviar transações locais ao Firebase.
-  void startOfflineSync() {
-    _syncTimer?.cancel();
-    _syncTimer = Timer.periodic(const Duration(seconds: 30), (_) {
-      syncOfflineTransactions();
-    });
-  }
-
-  /// Para a checagem periódica.
-  void stopOfflineSync() {
-    _syncTimer?.cancel();
-    _syncTimer = null;
   }
 
   /// Tenta enviar transações salvas no Hive ao Firebase (timeout 5s).
@@ -412,4 +363,34 @@ class CatracaController extends GetxController {
       debugPrint('Erro na sincronização offline: $e');
     }
   }
+
+  void _startInternetMonitoring() {
+    // Escuta as mudanças de status da internet
+    _connectionSubscription = InternetConnection().onStatusChange.listen((
+      InternetStatus status,
+    ) {
+      switch (status) {
+        case InternetStatus.connected:
+          _startTimer(secondsRefresh);
+          break;
+        case InternetStatus.disconnected:
+          _timer?.cancel();
+          break;
+      }
+    });
+  }
+   void _startTimer(int secondsRefresh) {
+    _timer = Timer.periodic(Duration(seconds: secondsRefresh), (timer) {
+      debugPrint('Sincronizando catraca...');
+      syncOfflineTransactions();
+    });
+  }
+
+  @override
+  void onClose(){
+    _connectionSubscription?.cancel();
+    _timer?.cancel();
+    super.onClose();
+  }
+
 }

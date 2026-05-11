@@ -143,37 +143,37 @@ abstract class AppPages {
     GetPage(
       name: Routes.CATRACA_ONLINE,
       page: () => CatracaOnlinePage(),
-      bindings: [CatracaOnlineBindings()],
+      binding: CatracaOnlineBindings(),
     ),
 
     GetPage(
       name: Routes.VALIDAR_PAGAMENTO,
       page: () => ValidarPagamentoPage(),
-      bindings: [CatracaOnlineBindings()],
+      binding: CatracaOnlineBindings(),
     ),
 
     GetPage(
       name: Routes.RESULTADO_PAGE,
       page: () => ResultadoPage(),
-      bindings: [CatracaOnlineBindings()],
+      binding: CatracaOnlineBindings(),
     ),
 
     GetPage(
       name: Routes.LEITOR_QRCODE,
       page: () => LeitorQrCodePage(),
-      bindings: [CatracaOnlineBindings()],
+      binding: CatracaOnlineBindings(),
     ),
 
     GetPage(
       name: Routes.RESULTADO_DETALHADO_PAGE,
       page: () => ResultadoDetalhadoPage(),
-      bindings: [CatracaOnlineBindings()],
+      binding: CatracaOnlineBindings(),
     ),
 
     GetPage(
       name: Routes.VALIDAR_MANUALMENTE,
       page: () => ValidarManualmentePage(),
-      bindings: [CatracaOnlineBindings()],
+      binding: CatracaOnlineBindings(),
     ),
 
     GetPage(
