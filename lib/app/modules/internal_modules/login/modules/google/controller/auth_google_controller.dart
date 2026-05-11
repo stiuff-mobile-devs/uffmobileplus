@@ -2,6 +2,8 @@ import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/services/auth_google_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_google_repository.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
+import 'package:uffmobileplus/app/data/services/app_availability_service.dart';
+import 'package:uffmobileplus/app/ui/widgets/app_recommendation_dialog.dart';
 
 class AuthGoogleController extends GetxController {
   AuthGoogleController();
@@ -21,6 +23,13 @@ class AuthGoogleController extends GetxController {
       if (user != null) {
         _userRepository.saveUserGoogleModel(user);
         Get.offNamed(Routes.HOME);
+        // check for Gmail / Meet and show recommendation dialog if needed
+        try {
+          final result = await AppAvailabilityService.checkBoth();
+          if (!result.allInstalled) {
+            await AppRecommendationDialog.show(result);
+          }
+        } catch (_) {}
       } else {
         Get.snackbar(
           "Erro de Login",

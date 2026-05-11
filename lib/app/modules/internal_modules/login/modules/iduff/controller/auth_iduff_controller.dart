@@ -6,6 +6,8 @@ import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_iduff_controller.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
+import 'package:uffmobileplus/app/data/services/app_availability_service.dart';
+import 'package:uffmobileplus/app/ui/widgets/app_recommendation_dialog.dart';
 
 class AuthIduffController extends GetxController {
   final AuthIduffService _authIduffService = Get.find<AuthIduffService>();
@@ -155,6 +157,12 @@ class AuthIduffController extends GetxController {
     String? iduff = await _userIduffController.getIduff();
     isLoading.value = false;
     Get.offAllNamed(Routes.CHOOSE_PROFILE, arguments: iduff);
+    try {
+      final result = await AppAvailabilityService.checkBoth();
+      if (!result.allInstalled) {
+        await AppRecommendationDialog.show(result);
+      }
+    } catch (_) {}
   }
 
   Future<void> login() async {
