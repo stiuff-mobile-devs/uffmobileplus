@@ -70,4 +70,7 @@ abstract class Routes {
 
   // CDC
   static const CDC = '/cdc';
+
+  // Conexões
+  static const CONNECTIONS = '/connections';
 }

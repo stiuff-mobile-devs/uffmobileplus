@@ -1,4 +1,6 @@
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/modules/external_modules/connections/bindings/connections_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/connections/ui/connections_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/ead/bindings/ead_binding.dart';
 import 'package:uffmobileplus/app/modules/external_modules/ead/ui/ead_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/bibliotecas/binding/bibliotecas_bindings.dart';
@@ -235,16 +237,18 @@ abstract class AppPages {
       ],
     ),
 
-    GetPage(
-      name: Routes.CDC,
-      page: () => CdcPage(),
-      binding: CdcBindings(),
-    ),
+    GetPage(name: Routes.CDC, page: () => CdcPage(), binding: CdcBindings()),
 
     GetPage(
       name: Routes.SETTINGS,
       page: () => SettingsPage(),
-      bindings: [SettingsBinding(), UserIduffBindings(), AuthGoogleBindings(), UserDataBindings(), LoginBindings()],
+      bindings: [
+        SettingsBinding(),
+        UserIduffBindings(),
+        AuthGoogleBindings(),
+        UserDataBindings(),
+        LoginBindings(),
+      ],
     ),
 
     GetPage(name: Routes.ABOUT, page: () => AboutPage()),
@@ -316,25 +320,16 @@ abstract class AppPages {
     GetPage(
       name: Routes.MONITORA_UFF,
       page: () => MonitoraUFFPage(),
-      bindings: [
-        MonitoraUffBindings(),
-        UserDataBindings()
-      ],
+      bindings: [MonitoraUffBindings(), UserDataBindings()],
     ),
 
     GetPage(
       name: Routes.MONITORA_UFF_FORM,
       page: () => AdminFormPage(),
-      bindings: [
-        FormBindings()
-      ]
+      bindings: [FormBindings()],
     ),
 
-    GetPage(
-  name: Routes.EAD,
-  page: () => EadPage(),
-  binding: EadBinding(),
-),
+    GetPage(name: Routes.EAD, page: () => EadPage(), binding: EadBinding()),
 
     GetPage(
       name: Routes.INTERNACIONAL,
@@ -349,22 +344,28 @@ abstract class AppPages {
 
     //BusUff
     GetPage(
-      name: Routes.BUSUFF, 
-      page: () => BusuffPage(), 
-      binding: BusuffBinding()
+      name: Routes.BUSUFF,
+      page: () => BusuffPage(),
+      binding: BusuffBinding(),
     ),
 
     // Bibliotecas
     GetPage(
-      name: Routes.BIBLIOTECAS, 
+      name: Routes.BIBLIOTECAS,
       page: () => BibliotecasPage(),
       binding: BibliotecasBindings(),
     ),
 
     GetPage(
-      name: Routes.BIBLIOTECAS_WEB_VIEW, 
+      name: Routes.BIBLIOTECAS_WEB_VIEW,
       page: () => BibliotecasWebPage(),
       binding: BibliotecasWebBindings(),
+    ),
+
+    GetPage(
+      name: Routes.CONNECTIONS,
+      page: () => ConnectionsPage(),
+      binding: ConnectionsBindings(),
     ),
   ];
 }
