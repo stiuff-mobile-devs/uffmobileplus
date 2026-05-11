@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:uffmobileplus/app/modules/external_modules/connections/data/repository/connections_repository.dart';
 
 class ConnectionsController extends GetxController {
   ConnectionsController();
+  ConnectionsRepository connectionsRepository = ConnectionsRepository();
 
   final RxBool isLoading = false.obs;
 
@@ -17,7 +19,7 @@ class ConnectionsController extends GetxController {
   StreamSubscription<InternetStatus>? _connectionSubscription;
 
   Timer? _timer;
-  int secondsRefresh = 10;
+  int secondsRefresh = 15;
 
   @override
   void onInit() {
@@ -43,10 +45,10 @@ class ConnectionsController extends GetxController {
     });
   }
 
-  void refreshConnectionsForTest() {
-    _testUmmConnection();
-    _testSctmConnection();
-    _testSaciConnection();
+  Future<void> refreshConnectionsForTest() async {
+   isUmmConnected.value = await connectionsRepository.getUmmStatus();
+   isSctmConnected.value = await connectionsRepository.getSctmStatus();
+   isSaciConnected.value = await connectionsRepository.getSaciStatus();
   }
 
   void _startTimer(int secondsRefresh) {
@@ -56,22 +58,7 @@ class ConnectionsController extends GetxController {
     });
   }
 
-  void _testUmmConnection() {
-    // Simula um teste de conexão com a UMM
-    isUmmConnected.value = !isUmmConnected.value; // Alterna o status para teste
-  }
 
-  void _testSctmConnection() {
-    // Simula um teste de conexão com o SCTM
-    isSctmConnected.value =
-        !isSctmConnected.value; // Alterna o status para teste
-  }
-
-  void _testSaciConnection() {
-    // Simula um teste de conexão com o SACI
-    isSaciConnected.value =
-        !isSaciConnected.value; // Alterna o status para teste
-  }
 
   @override
   void onClose() {
