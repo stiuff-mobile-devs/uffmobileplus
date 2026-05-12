@@ -68,7 +68,7 @@ dependencies:
   flutter_compass: ^0.8.1
   android_intent_plus: ^6.0.0
   internet_connection_checker_plus: ^3.0.0
-  screen_protector: ^1.5.1
+  #screen_protector: ^1.5.1
   
 dev_dependencies:
   flutter_test:
