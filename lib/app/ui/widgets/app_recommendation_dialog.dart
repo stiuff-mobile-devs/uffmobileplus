@@ -49,7 +49,7 @@ class AppRecommendationDialog {
             TextButton(
               onPressed: () async {
                 const meetAndroid = 'https://play.google.com/store/apps/details?id=com.google.android.apps.meetings';
-                const meetIos = 'https://apps.apple.com/app/google-meet/id1013231476';
+                const meetIos = 'itms-apps://apps.apple.com/br/app/google-meet/id1096918571';
                 final uri = Uri.parse(Platform.isIOS ? meetIos : meetAndroid);
                 await _launchUri(uri);
               },

@@ -18,7 +18,7 @@ class AppAvailabilityService {
   static const _meetPackage = 'com.google.android.apps.meetings';
 
   static const _gmailScheme = 'googlegmail';
-  static const _meetScheme = 'comgooglemeet';
+  static const _meetScheme = 'gmeet';
 
   /// Checks if Gmail is installed on the current device.
   static Future<bool> isGmailInstalled() async {
