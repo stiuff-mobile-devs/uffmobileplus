@@ -50,6 +50,8 @@
 		<string>mailto</string>
 		<string>https</string>
 		<string>gmeet</string>
+		<string>googlegmail</string>
+		<string>comgooglemeet</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>

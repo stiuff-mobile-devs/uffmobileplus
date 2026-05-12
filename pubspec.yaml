@@ -69,6 +69,7 @@ dependencies:
   android_intent_plus: ^6.0.0
   internet_connection_checker_plus: ^3.0.0
   #screen_protector: ^1.5.1
+  external_app_launcher: ^4.0.3
   
 dev_dependencies:
   flutter_test:
