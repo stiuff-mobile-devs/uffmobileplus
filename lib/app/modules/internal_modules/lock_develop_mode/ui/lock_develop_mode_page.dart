@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:open_settings_plus/open_settings_plus.dart';
-import 'package:uffmobileplus/app/config/secrets.dart';
-import 'package:uffmobileplus/app/routes/app_routes.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/lock_develop_mode/controller/lock_develop_mode_controller.dart';
 
-class LockDevelopModePage extends StatelessWidget {
+class LockDevelopModePage extends GetView<LockDevelopModeController> {
   const LockDevelopModePage({super.key});
 
   @override
@@ -17,23 +15,18 @@ class LockDevelopModePage extends StatelessWidget {
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.black, size: 28),
+            onPressed: controller.refreshPage,
+            tooltip: 'atualizar'.tr,
+          ),
+          IconButton(
             icon: const Icon(Icons.help_outline, color: Colors.black, size: 28),
-            onPressed: () async {
-              Get.toNamed(
-                Routes.WEB_VIEW,
-                arguments: {
-                  'url': Secrets.helpUrl,
-                  'title': 'modo_desenvolvedor'.tr,
-                },
-              );
-            },
+            onPressed: controller.openHelp,
           ),
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () async {
-          Get.offAllNamed(Routes.SPLASH);
-        },
+        onRefresh: controller.refreshPage,
         color: Colors.black,
         backgroundColor: Colors.white,
         child: SingleChildScrollView(
@@ -67,46 +60,7 @@ class LockDevelopModePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 30),
                 ElevatedButton(
-                  onPressed: () async {
-                    try {
-                      switch (OpenSettingsPlus.shared) {
-                        case OpenSettingsPlusAndroid settings:
-                          await settings.applicationDevelopment();
-                          break;
-                        case OpenSettingsPlusIOS settings:
-                          await settings.general();
-                          break;
-                        default:
-                          throw Exception('Platform not supported');
-                      }
-                    } catch (e) {
-                      // Fallback para configurações gerais se falhar
-                      try {
-                        switch (OpenSettingsPlus.shared) {
-                          case OpenSettingsPlusAndroid settings:
-                            await settings.appSettings();
-                            break;
-                          case OpenSettingsPlusIOS settings:
-                            await settings.general();
-                            break;
-                          default:
-                            Get.snackbar(
-                              'erro'.tr,
-                              'plataforma_nao_suportada'.tr,
-                              backgroundColor: Colors.red,
-                              colorText: Colors.white,
-                            );
-                        }
-                      } catch (e) {
-                        Get.snackbar(
-                          'erro'.tr,
-                          'nao_foi_possivel_abrir_as_configuracoes'.tr,
-                          backgroundColor: Colors.red,
-                          colorText: Colors.white,
-                        );
-                      }
-                    }
-                  },
+                  onPressed: controller.openSettings,
                   style: ElevatedButton.styleFrom(
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.black,

@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:ui';
 
+import 'package:android_intent_plus/android_intent.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'
     show Colors, WidgetsBindingObserver, AlertDialog, Text, TextButton;
+import 'package:flutter/services.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -12,9 +15,11 @@ import 'package:latlong2/latlong.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/user_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/data/provider/firebase_provider.dart';
+import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/location_point.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_model.dart';
 import 'package:uffmobileplus/app/data/services/foreground_service.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TrackingController extends GetxController with WidgetsBindingObserver {
   final FlutterBackgroundService _service = FlutterBackgroundService();
@@ -31,12 +36,16 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
     speedAccuracy: 0,
   );
   RxList<UserModel> firebaseUsers = <UserModel>[].obs;
+  final Rxn<UserModel> selectedFirebaseUser = Rxn<UserModel>();
   late final MapController mapController;
   final isTrackingEnabled = false.obs;
   final UserController userCtrl = Get.find<UserController>();
   final Rx<double?> heading = Rx<double?>(null);
   StreamSubscription<CompassEvent>? _compassSubscription;
 
+  /// Trajetória recente do usuário focado (aquele cuja barra inferior está visível).
+  final RxList<LocationPoint> selectedTrajectory = <LocationPoint>[].obs;
+  StreamSubscription<List<LocationPoint>>? _trajectorySubscription;
   Future<void> centerMapOnCurrentLocation() async {
     try {
       mapController.move(LatLng(position.latitude, position.longitude), 15.0);
@@ -61,7 +70,6 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
     } catch (e) {
       if (kDebugMode) print('Compass not available or error: $e');
     }
-    
 
     // TODO: encapsular em um método
     if (userCtrl.isMonitor()) {
@@ -82,6 +90,28 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
         : Colors.lightBlue;
   }
 
+  void openFirebaseUserDetails(UserModel user) {
+    selectedFirebaseUser.value = user;
+
+    // Cancelar listener anterior (se houver) e iniciar um novo para
+    // o usuário focado.
+    _trajectorySubscription?.cancel();
+    selectedTrajectory.clear();
+    _trajectorySubscription = FirebaseProvider()
+        .getRecentTrajectory(user.email)
+        .listen((points) {
+      selectedTrajectory.value = points;
+    });
+  }
+
+  void closeFirebaseUserDetails() {
+    selectedFirebaseUser.value = null;
+
+    _trajectorySubscription?.cancel();
+    _trajectorySubscription = null;
+    selectedTrajectory.clear();
+  }
+
   Future<void> toggleService() async {
     var isRunning = await _service.isRunning();
 
@@ -94,7 +124,11 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
 
   Future<void> _setPlatformSpecifics() async {
     await _service.configure(
-      iosConfiguration: IosConfiguration(),
+      iosConfiguration: IosConfiguration(
+        autoStart: false,
+        onForeground: onStart,
+        onBackground: onIosBackground,
+      ),
       androidConfiguration: AndroidConfiguration(
         // Esta linha conecta os isolates.
         onStart: onStart,
@@ -145,8 +179,8 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
     // receber informações do usuário.
     _service.on('ready').listen((event) async {
       _service.invoke("setUserInfo", {
-        "email": userCtrl.user!.email, 
-        "name": userCtrl.getUserName(), 
+        "email": userCtrl.user!.email,
+        "name": userCtrl.getUserName(),
         "funcao": userCtrl.user!.funcao, //_currentUser.funcao,
       });
     });
@@ -174,7 +208,47 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
   @override
   void onClose() {
     _compassSubscription?.cancel();
+    _trajectorySubscription?.cancel();
     mapController.dispose();
     super.onClose();
+  }
+
+
+
+  Future<void> launchGoogleMeet(String email) async {
+    await Clipboard.setData(ClipboardData(text: email));
+
+    if (Platform.isAndroid) {
+      final intent = AndroidIntent(
+        //action: 'action_view',
+        action: 'android.intent.action.MAIN',
+        //data: url,
+        package: 'com.google.android.apps.tachyon', // Google Meet standalone
+      );
+
+      try {
+        await intent.launch();
+      } catch (e) {
+        if (kDebugMode) {
+          print('Não foi possível abrir o Google Meet standalone: $e');
+        }
+      }
+    } else if (Platform.isIOS) {
+      final Uri meetAppUri = Uri.parse('gmeet://');
+      final Uri meetWebUri = Uri.parse('https://meet.google.com/');
+      try {
+        // Tenta abrir o aplicativo nativo do Google Meet
+        if (await canLaunchUrl(meetAppUri)) {
+          await launchUrl(meetAppUri);
+        } else {
+          // Caso não esteja instalado, abre no Safari como fallback
+          await launchUrl(meetWebUri, mode: LaunchMode.externalApplication);
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print('Não foi possível abrir o Google Meet no iOS: $e');
+        }
+      }
+    }
   }
 }

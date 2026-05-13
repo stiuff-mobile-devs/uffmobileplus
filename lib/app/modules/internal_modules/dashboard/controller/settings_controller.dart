@@ -4,7 +4,6 @@ import 'package:uffmobileplus/app/modules/internal_modules/login/controller/logi
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/controller/auth_google_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_iduff_controller.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 
 class SettingsController extends GetxController {
