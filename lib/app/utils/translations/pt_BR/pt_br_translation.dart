@@ -134,7 +134,7 @@ final Map<String, String> ptBR = {
   'radio_pop_goiaba': 'Radio Pop Goiaba',
 
   // Monitora UFF
-  'monitora_uff': 'Águia',
+  'monitora_uff': 'Monitora UFF',
 
   // Bibliotecas
   'bibliotecas': 'Bibliotecas',

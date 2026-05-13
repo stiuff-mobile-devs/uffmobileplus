@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
-        android:label="UFF+"
+        android:label="UFF +"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <service
@@ -58,10 +58,6 @@
 
          In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
      <queries>
-        
-          <package android:name="com.google.android.apps.tachyon" />
-          <package android:name="com.google.android.gm" />
-          <package android:name="com.google.android.apps.meetings" />
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <category android:name="android.intent.category.BROWSABLE" />
@@ -72,7 +68,6 @@
             <category android:name="android.intent.category.APP_BROWSER" />
             <data android:scheme="https" />
         </intent>
-        
     </queries>
     
     <queries>
