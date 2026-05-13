@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
-import 'package:uffmobileplus/app/data/services/screen_protector_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/data/repository/pay_restaurant_repository.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/utils/message_dialogs.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
@@ -25,14 +24,10 @@ class PayRestaurantController extends GetxController {
   RxString currentBalance = "".obs;
   Map<String, dynamic> paymentCode = {};
 
-  ScreenProtectorService screenProtector = ScreenProtectorService();
-
   @override
   onInit() {
     externalModulesServices = Get.find<ExternalModulesServices>();
     externalModulesServices.initialize();
-
-    screenProtector.enableScreenProtection();
 
     userName = externalModulesServices.getUserName() ?? "";
     userIdUFF = externalModulesServices.getUserIdUFF();
@@ -116,11 +111,5 @@ class PayRestaurantController extends GetxController {
     } finally {
       isLoading.value = false;
     }
-  }
-
-  @override
-  void onClose() {
-    screenProtector.disableScreenProtection();
-    super.onClose();
   }
 }

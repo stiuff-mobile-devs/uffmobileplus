@@ -29,14 +29,13 @@ class LoginController extends GetxController {
   Future<void> onInit() async {
     _loginGoogleController = Get.find<AuthGoogleController>();
     _umInfosService = Get.find<UmInfosService>();
+    versionCode = _umInfosService.version.value;
     _userDataController = Get.find<UserDataController>();
     _userIduffController = Get.find<UserIduffController>();
     _authIduffService = Get.find<AuthIduffService>();
     _userGoogleRepository = UserGoogleRepository();
-
-    versionCode = _umInfosService.version.value;
     _user = (await _userDataController.getUserData()) ?? UserData();
-    _checkAdminPermission(GdiGroupsEnum.controladoresDeAcesso.id);
+    _checkAdminPermission();
     _loadBondStates();
     super.onInit();
   }
@@ -69,7 +68,7 @@ class LoginController extends GetxController {
     await _loadBondStates();
   }
 
-  void _checkAdminPermission(final gdi) {
+  void _checkAdminPermission() {
     final groups = _user.gdiGroups;
     if (groups == null || groups.isEmpty) {
       hasAdminPermission.value = false;
@@ -77,9 +76,10 @@ class LoginController extends GetxController {
     }
     hasAdminPermission.value = groups.any(
       (group) =>
-          group.gid == gdi,
+          group.gid == GdiGroupsEnum.adminCardapioRestauranteUniversitario.id,
     );
   }
+
   void loginIDUFF() {
     Get.offAllNamed(
       Routes.AUTH,

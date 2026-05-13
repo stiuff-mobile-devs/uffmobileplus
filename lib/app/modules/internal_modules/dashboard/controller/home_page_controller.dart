@@ -1,12 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:uffmobileplus/app/data/services/app_availability_service.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/data/services/deep_link_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/controller/restaurant_modules_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/external_modules_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
-import 'package:uffmobileplus/app/ui/widgets/app_recommendation_dialog.dart';
 
 class HomePageController extends GetxController {
 
@@ -201,18 +199,6 @@ class HomePageController extends GetxController {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       DeepLinkService().consumePendingNavigation();
     });
-
-    _showAppRecommendationDialog();
-  }
-
-  Future<void> _showAppRecommendationDialog() async {
-    final result = await AppAvailabilityService.checkBoth();
-
-    try {
-      if (!result.allInstalled) {
-        await AppRecommendationDialog.show(result);
-      }
-    } catch (_) {}
   }
 
   @override

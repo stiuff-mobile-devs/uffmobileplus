@@ -5,7 +5,10 @@ import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/c
 class CatracaOnlineBindings implements Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<CatracaController>(() => CatracaController());
+    Get.put<CatracaController>(
+      CatracaController(),
+      permanent: true,
+    );
 
     Get.lazyPut<LeitorQrCodeController>(() => LeitorQrCodeController());
   }

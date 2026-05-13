@@ -348,15 +348,6 @@ class HomePage extends GetView<HomePageController> {
                       },
                     ),
                     _DrawerTile(
-                      icon: Icons.wifi,
-                      title: 'Conexões',
-                      subtitle: 'Informações sobre as infraestrutuas',
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        Get.toNamed(Routes.CONNECTIONS);
-                      },
-                    ),
-                    _DrawerTile(
                       icon: Icons.info_outline,
                       title: 'Sobre',
                       subtitle: 'Informações do app e versão',

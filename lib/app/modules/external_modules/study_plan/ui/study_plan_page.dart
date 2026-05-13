@@ -6,7 +6,6 @@ import 'package:uffmobileplus/app/modules/external_modules/study_plan/data/model
 import '../../../../utils/color_pallete.dart';
 import '../../../../utils/ui_components/custom_progress_display.dart';
 import '../controller/study_plan_controller.dart';
-import '../data/models/study_plan_model.dart';
 
 class StudyPlanPage extends GetView<StudyPlanController> {
   const StudyPlanPage({super.key});
@@ -50,12 +49,10 @@ class StudyPlanPage extends GetView<StudyPlanController> {
     ));
   }
 
-  InfiniteScrollTabView _tabViewWidget(StudyPlanModel? studyPlanModel) {
-    final studyPlan = studyPlanModel?.plan;
-
+  InfiniteScrollTabView _tabViewWidget(studyPlan) {
     return InfiniteScrollTabView(
       backgroundColor: Colors.white,
-      contentLength: studyPlan!.length,
+      contentLength: studyPlan.length,
       indicatorColor: AppColors.mediumBlue(),
       tabBuilder: (index, isSelected) {
         WeekDay day = studyPlan.keys.elementAt(index);
@@ -79,16 +76,16 @@ class StudyPlanPage extends GetView<StudyPlanController> {
                   thickness: 2.0,
                   color: AppColors.alternativeMediumBlue(),
                 ),
-                itemCount: studyPlan.values.elementAt(index)!.length,
+                itemCount: studyPlan.values.elementAt(index).length,
                 shrinkWrap: true,
                 itemBuilder: (context, innerIndex) {
-                  Discipline? subject = studyPlan.values.elementAt(
+                  Discipline subject = studyPlan.values.elementAt(
                     index,
-                  )?[innerIndex];
+                  )[innerIndex];
                   return Column(
                     children: [
                       Text(
-                        subject?.title ?? "",
+                        subject.title ?? "",
                         style: TextStyle(color: Colors.white),
                       ),
                       Row(
@@ -98,7 +95,7 @@ class StudyPlanPage extends GetView<StudyPlanController> {
                             style: TextStyle(color: Colors.white),
                           ),
                           Text(
-                            ': ${subject?.codClass}',
+                            ': ${subject.codClass}',
                             style: TextStyle(color: Colors.white),
                           ),
                         ],
@@ -110,7 +107,7 @@ class StudyPlanPage extends GetView<StudyPlanController> {
                             style: TextStyle(color: Colors.white),
                           ),
                           Text(
-                            ': ${subject?.cod}',
+                            ': ${subject.cod}',
                             style: TextStyle(color: Colors.white),
                           ),
                         ],
@@ -122,7 +119,7 @@ class StudyPlanPage extends GetView<StudyPlanController> {
                             style: TextStyle(color: Colors.white),
                           ),
                           Text(
-                            ': ${subject?.startTime} ${'as'.tr} ${subject?.endTime}',
+                            ': ${subject.startTime} ${'as'.tr} ${subject.endTime}',
                             style: TextStyle(color: Colors.white),
                           ),
                         ],
@@ -134,7 +131,7 @@ class StudyPlanPage extends GetView<StudyPlanController> {
                             style: TextStyle(color: Colors.white),
                           ),
                           Text(
-                            ': ${subject?.status}',
+                            ': ${subject.status}',
                             style: TextStyle(color: Colors.white),
                           ),
                         ],
