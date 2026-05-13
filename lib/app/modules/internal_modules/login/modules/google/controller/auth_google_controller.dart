@@ -23,13 +23,6 @@ class AuthGoogleController extends GetxController {
       if (user != null) {
         _userRepository.saveUserGoogleModel(user);
         Get.offNamed(Routes.HOME);
-        // check for Gmail / Meet and show recommendation dialog if needed
-        try {
-          final result = await AppAvailabilityService.checkBoth();
-          if (!result.allInstalled) {
-            await AppRecommendationDialog.show(result);
-          }
-        } catch (_) {}
       } else {
         Get.snackbar(
           "Erro de Login",

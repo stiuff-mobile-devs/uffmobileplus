@@ -157,12 +157,6 @@ class AuthIduffController extends GetxController {
     String? iduff = await _userIduffController.getIduff();
     isLoading.value = false;
     Get.offAllNamed(Routes.CHOOSE_PROFILE, arguments: iduff);
-    try {
-      final result = await AppAvailabilityService.checkBoth();
-      if (!result.allInstalled) {
-        await AppRecommendationDialog.show(result);
-      }
-    } catch (_) {}
   }
 
   Future<void> login() async {
