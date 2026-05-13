@@ -12,10 +12,7 @@ class AppRecommendationDialog {
     await Get.dialog(
       AlertDialog(
         backgroundColor: Colors.black87,
-        title: Text(
-          'Recomendação',
-          style: TextStyle(color: Colors.white),
-        ),
+        title: Text('Recomendação', style: TextStyle(color: Colors.white)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,8 +35,10 @@ class AppRecommendationDialog {
           if (!result.gmailInstalled)
             TextButton(
               onPressed: () async {
-                const gmailAndroid = 'https://play.google.com/store/apps/details?id=com.google.android.gm';
-                const gmailIos = 'https://apps.apple.com/app/gmail-email-by-google/id422689480';
+                const gmailAndroid =
+                    'https://play.google.com/store/apps/details?id=com.google.android.gm';
+                const gmailIos =
+                    'https://apps.apple.com/app/gmail-email-by-google/id422689480';
                 final uri = Uri.parse(Platform.isIOS ? gmailIos : gmailAndroid);
                 await _launchUri(uri);
               },
@@ -48,17 +47,15 @@ class AppRecommendationDialog {
           if (!result.meetInstalled)
             TextButton(
               onPressed: () async {
-                const meetAndroid = 'https://play.google.com/store/apps/details?id=com.google.android.apps.meetings';
-                const meetIos = 'https://apps.apple.com/app/google-meet/id1013231476';
+                const meetAndroid =
+                    'https://play.google.com/store/apps/details?id=com.google.android.apps.tachyon';
+                const meetIos = 'https://apps.apple.com/br/app/id1096918571';
                 final uri = Uri.parse(Platform.isIOS ? meetIos : meetAndroid);
                 await _launchUri(uri);
               },
               child: Text('Instalar Meet'),
             ),
-          TextButton(
-            onPressed: () => Get.back(),
-            child: Text('Ignorar'),
-          ),
+          TextButton(onPressed: () => Get.back(), child: Text('Ignorar')),
         ],
       ),
       barrierDismissible: true,

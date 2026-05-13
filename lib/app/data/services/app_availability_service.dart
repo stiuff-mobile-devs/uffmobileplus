@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:external_app_launcher/external_app_launcher.dart';
 
 class AppAvailabilityResult {
@@ -15,10 +17,11 @@ class AppAvailabilityResult {
 class AppAvailabilityService {
   // Package names and schemes
   static const _gmailPackage = 'com.google.android.gm';
-  static const _meetPackage = 'com.google.android.apps.meetings';
+  static const _meetPackage = 'com.google.android.apps.tachyon';
 
   static const _gmailScheme = 'googlegmail';
   static const _meetScheme = 'comgooglemeet';
+  static const _meetAltScheme = 'gmeet';
 
   /// Checks if Gmail is installed on the current device.
   static Future<bool> isGmailInstalled() async {
@@ -36,8 +39,21 @@ class AppAvailabilityService {
   /// Checks if Google Meet is installed on the current device.
   static Future<bool> isMeetInstalled() async {
     try {
+      if (Platform.isIOS) {
+        final installedPrimary = await LaunchApp.isAppInstalled(
+          iosUrlScheme: _meetScheme,
+          androidPackageName: _meetPackage,
+        );
+        if (installedPrimary == true) return true;
+
+        final installedAlt = await LaunchApp.isAppInstalled(
+          iosUrlScheme: _meetAltScheme,
+          androidPackageName: _meetPackage,
+        );
+        return installedAlt == true;
+      }
+
       final installed = await LaunchApp.isAppInstalled(
-        iosUrlScheme: _meetScheme,
         androidPackageName: _meetPackage,
       );
       return installed == true;
