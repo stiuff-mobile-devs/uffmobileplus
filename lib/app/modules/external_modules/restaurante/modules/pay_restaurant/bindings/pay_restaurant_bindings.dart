@@ -4,8 +4,9 @@ import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/p
 class PayRestaurantBindings implements Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<PayRestaurantController>(
-      () => PayRestaurantController(),
+    Get.put<PayRestaurantController>(
+      PayRestaurantController(),
+      permanent: true,
     );
   }
 }

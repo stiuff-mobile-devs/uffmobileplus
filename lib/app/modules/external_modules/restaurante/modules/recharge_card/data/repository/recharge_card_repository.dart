@@ -1,4 +1,4 @@
-import 'package:uffmobileplus/app/data/services/connections/sctm_service.dart';
+import 'package:uffmobileplus/app/data/services/sctm_service.dart';
 
 class RechargeCardRepository {
   RechargeCardRepository();
