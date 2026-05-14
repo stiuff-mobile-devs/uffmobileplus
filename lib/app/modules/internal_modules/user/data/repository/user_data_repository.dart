@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:uffmobileplus/app/data/services/connections/saci_service.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/provider/user_data_provider.dart';
 
 class UserDataRepository {
   final UserDataProvider _userDataProvider = UserDataProvider();
+  final SaciService saciService = SaciService();
 
   UserDataRepository() {
     debugPrint("Creating User Data Repo");
@@ -39,5 +42,9 @@ class UserDataRepository {
 
   Future<List<GdiGroups>> getGdiGroups(String iduff, String token) async {
     return await _userDataProvider.getGdiGroups(iduff, token);
+  }
+
+  Future<List<dynamic>> getSaciData(String? token, String? iduffUsuario, AuthIduffService auth) async {
+    return await saciService.getSaciData(token, iduffUsuario, auth);
   }
 }

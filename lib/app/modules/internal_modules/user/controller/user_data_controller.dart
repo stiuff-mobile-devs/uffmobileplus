@@ -1,29 +1,17 @@
-import 'dart:convert';
-
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
-import 'package:uffmobileplus/app/config/secrets.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_iduff_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_umm_model.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_iduff_repository.dart';
 import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
 
 class UserDataController extends GetxController {
   UserDataController();
 
   final UserDataRepository _userDataRepository = UserDataRepository();
+  final UserIduffRepository userIduffRepository = UserIduffRepository();
   final AuthIduffService _auth = Get.find<AuthIduffService>();
-
-  late final UserIduffController _userIduffController;
-
-  @override
-  void onInit() {
-    _userIduffController = Get.find<UserIduffController>();
-
-    super.onInit();
-  }
 
   Future<String> saveUserData(
     UserUmmModel userUmm,
@@ -31,6 +19,12 @@ class UserDataController extends GetxController {
     ProfileTypes profileType,
   ) async {
     try {
+      List<dynamic>? saciData = await _userDataRepository.getSaciData(
+        await _auth.getAccessToken(),
+        await userIduffRepository.getIduff(),
+        _auth,
+      );
+
       int? gradIndex = 0;
       int? posIndex = 0;
       String name = "-";
@@ -39,17 +33,15 @@ class UserDataController extends GetxController {
       String bondId = "-";
       String matricula = targetMatricula;
 
-      var saciData = await getSaciData();
-
       String textoQrCode = await saciData[0] ?? '-';
-      String dataValidadeMatricula = await saciData[1] ?? '-';
+      String? dataValidadeMatricula = await saciData[1];
 
       String iduff =
+          await userIduffRepository.getIduff() ??
           userUmm.activeBond?.objects?.outerObject?[0].usuario!.iduff ??
-          await _userIduffController.getIduff() ??
           "-";
 
-      String fotoUrl = await _userIduffController.getPhotoUrl() ?? "-";
+      String fotoUrl = await userIduffRepository.getPhotoUrl() ?? "-";
 
       int? bondIndex = _findActiveBond(userUmm, targetMatricula);
 
@@ -103,7 +95,7 @@ class UserDataController extends GetxController {
             "-";
       }
 
-      var gdiGroups = await getPersonalGdiGroups(iduff);
+      List<GdiGroups>? gdiGroups = await getPersonalGdiGroups(iduff);
       String accessToken = await _auth.getAccessToken() ?? "";
       final existingUserData = await _userDataRepository.getUserData();
 
@@ -125,55 +117,8 @@ class UserDataController extends GetxController {
       );
       return await _userDataRepository.saveUserData(userData);
     } catch (e) {
-      return Future.error("Erro ao salvar dados do usuário: $e");
+      throw Exception("Erro ao salvar dados do usuário: $e");
     }
-  }
-
-  Future<String> updateQrData() async {
-    return await _userDataRepository.updateQrData((await getSaciData())[0]);
-  }
-
-  Future<String> updateShortcutRoutes(List<String> shortcutRoutes) async {
-    return await _userDataRepository.updateShortcutRoutes(shortcutRoutes);
-  }
-
-  Future<UserData?> getUserData() async {
-    return await _userDataRepository.getUserData();
-  }
-
-  Future<String> deleteUserData() async {
-    return await _userDataRepository.deleteUserData();
-  }
-
-  Future<String> clearAllUserData() async {
-    return await _userDataRepository.clearAllUserData();
-  }
-
-  Future<bool> hasUserData() async {
-    return await _userDataRepository.hasUserData();
-  }
-
-  Future<List<dynamic>> getSaciData() async {
-    String? token = await _auth.getAccessToken();
-    String? iduffUsuario = await _userIduffController.getIduff();
-
-    var uri = Uri.https(
-      Secrets.carteirinhaValidationHost,
-      Secrets.carteirinhaValidationPath,
-      {"iduff_usuario": iduffUsuario, "token": token ?? ""},
-    );
-    http.Response response = await _auth.client!.post(uri);
-    var responseDecoded = json.decode(response.body);
-    if (response.statusCode == 200) {
-      if (responseDecoded["content"] != null) {
-        final data = json.decode(response.body);
-        final textoQrCode = data['content']['texto_qr_code'].toString();
-        final dataValidade =
-            data['content']['dados_usuario']['vinculacoes'][0]['data_validade'];
-        return [textoQrCode, dataValidade];
-      }
-    }
-    return [];
   }
 
   Future<List<GdiGroups>> getPersonalGdiGroups(String iduff) async {
@@ -185,6 +130,13 @@ class UserDataController extends GetxController {
     return groups;
   }
 
+   Future<String> updateQrData() async {
+    String? token = await _auth.getAccessToken();
+    String? iduffUsuario = await userIduffRepository.getIduff();
+
+    var textoQrCode = await _userDataRepository.getSaciData(token, iduffUsuario, _auth) ;
+    return await _userDataRepository.updateQrData(textoQrCode[0]);
+  }
   //Se ele não achar tem que colocar um -
   int? _findActiveBond(UserUmmModel userUmm, String targetMatricula) {
     final bondsList = userUmm.activeBond?.objects?.outerObject?[1].innerObjects;

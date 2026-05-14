@@ -27,12 +27,13 @@ class UserUMMProvider {
 
       if (statusCode != 200) {
         debugPrint("ERROR WITH API. CODE: $statusCode\n BODY: $body");
+        throw Exception("Erro ao obter dados do usuário da API");
       }
       final userJson = jsonDecode(body);
       return UserUmmModel.fromJson(userJson);
     } catch (e) {
       debugPrint("ERROR -getUserData $e");
-      return UserUmmModel();
+      throw Exception("Erro ao obter dados do usuário da API: $e");
     }
   }
 

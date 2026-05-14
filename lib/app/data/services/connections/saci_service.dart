@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:uffmobileplus/app/config/secrets.dart';
 import 'package:http/http.dart' as http;
+import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
 
 
 class SaciService {
@@ -29,5 +31,33 @@ Future<bool> getStatus() async {
       debugPrint("Erro desconhecido ao checar status: $e");
       return false;
     }
+  }
+
+Future<List<dynamic>> getSaciData(String? token, String? iduffUsuario, AuthIduffService auth) async {
+   try{
+    var uri = Uri.https(
+      Secrets.carteirinhaValidationHost,
+      Secrets.carteirinhaValidationPath,
+      {"iduff_usuario": iduffUsuario, "token": token ?? ""},
+    );
+
+    http.Response response = await auth.client!.post(uri);
+    var responseDecoded = json.decode(response.body);
+    
+    if (response.statusCode == 200) {
+      if (responseDecoded["content"] != null) {
+        final data = json.decode(response.body);
+        final textoQrCode = data['content']['texto_qr_code'].toString();
+        final dataValidade =
+            data['content']['dados_usuario']['vinculacoes'][0]['data_validade'];
+        return [textoQrCode, dataValidade];
+      }
+    }
+   }
+    catch(e){
+      debugPrint("Erro ao obter dados do SACI: $e");
+      return [];
+    }
+    return [];
   }
 }

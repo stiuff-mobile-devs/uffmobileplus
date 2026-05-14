@@ -66,8 +66,6 @@ import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/b
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/ui/auth_iduff_page.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/splash/bindings/splash_bindings.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/bindings/user_data_bindings.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/bindings/user_iduff_bindings.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/bindings/user_umm_bindings.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/web_view/bindings/webview_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/bindings/monitora_uff_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/ui/monitora_uff_page.dart';
@@ -89,10 +87,7 @@ abstract class AppPages {
         SplashBindings(),
         LockDevelopModeBinding(),
         AuthIduffBindings(),
-        UserIduffBindings(),
-        UserUmmBindings(),
         AuthGoogleBindings(),
-        UserDataBindings(),
       ],
     ),
 
@@ -111,7 +106,7 @@ abstract class AppPages {
     GetPage(
       name: Routes.AUTH,
       page: () => AuthIduffPage(),
-      bindings: [AuthIduffBindings(), UserUmmBindings(), UserIduffBindings()],
+      bindings: [AuthIduffBindings()],
     ),
 
     GetPage(
@@ -125,7 +120,6 @@ abstract class AppPages {
       page: () => Dashboard(),
       bindings: [
         DashboardBinding(),
-        UserIduffBindings(),
         LoginBindings(),
         AuthGoogleBindings(),
         UserDataBindings(),
@@ -244,7 +238,6 @@ abstract class AppPages {
       page: () => SettingsPage(),
       bindings: [
         SettingsBinding(),
-        UserIduffBindings(),
         AuthGoogleBindings(),
         UserDataBindings(),
         LoginBindings(),
@@ -259,8 +252,6 @@ abstract class AppPages {
       page: () => CarteirinhaDigitalPage(),
       bindings: [
         AuthIduffBindings(),
-        UserUmmBindings(),
-        UserIduffBindings(),
         CarteirinhaDigitalBindings(),
         UserDataBindings(),
       ],
@@ -275,7 +266,7 @@ abstract class AppPages {
     // Radio
     GetPage(
       name: Routes.RADIO,
-      page: () => Radio(), // TODO: trocar nome para RadioPage
+      page: () => Radio(), 
       bindings: [RadioBindings()],
     ),
 
@@ -289,9 +280,7 @@ abstract class AppPages {
       name: Routes.CHOOSE_PROFILE,
       page: () => ChooseProfilePage(),
       bindings: [
-        UserIduffBindings(),
-        ChooseProfileBindings(),
-        UserUmmBindings(),
+        ChooseProfileBindings(), UserDataBindings(),
       ],
     ),
 

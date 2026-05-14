@@ -20,7 +20,7 @@ class UserDataProvider {
       await box.put(_userKey, userData);
       return "success";
     } catch (e) {
-      return "Erro ao salvar dados do usuário no Hive: $e";
+      throw Exception("Erro ao salvar dados do usuário no Hive: $e");
     }
   }
 

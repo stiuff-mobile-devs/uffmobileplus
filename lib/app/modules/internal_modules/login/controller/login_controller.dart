@@ -5,9 +5,10 @@ import 'package:uffmobileplus/app/data/services/um_infos_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/controller/auth_google_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_iduff_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_google_repository.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_iduff_repository.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/gdi_groups.dart';
 
@@ -16,10 +17,12 @@ class LoginController extends GetxController {
   late String versionCode;
   late final AuthGoogleController _loginGoogleController;
   late UmInfosService _umInfosService;
-  late UserDataController _userDataController;
-  late UserIduffController _userIduffController;
   late AuthIduffService _authIduffService;
+
   late final UserGoogleRepository _userGoogleRepository;
+  UserDataRepository userDataRepository = UserDataRepository();
+  UserIduffRepository userIduffRepository = UserIduffRepository();
+
   UserData _user = UserData();
   RxBool hasAdminPermission = false.obs;
   RxBool hasActiveIduffBondObs = false.obs;
@@ -29,13 +32,11 @@ class LoginController extends GetxController {
   Future<void> onInit() async {
     _loginGoogleController = Get.find<AuthGoogleController>();
     _umInfosService = Get.find<UmInfosService>();
-    _userDataController = Get.find<UserDataController>();
-    _userIduffController = Get.find<UserIduffController>();
     _authIduffService = Get.find<AuthIduffService>();
     _userGoogleRepository = UserGoogleRepository();
 
     versionCode = _umInfosService.version.value;
-    _user = (await _userDataController.getUserData()) ?? UserData();
+    _user = (await userDataRepository.getUserData()) ?? UserData();
     _checkAdminPermission(GdiGroupsEnum.controladoresDeAcesso.id);
     _loadBondStates();
     super.onInit();
@@ -51,7 +52,7 @@ class LoginController extends GetxController {
   }
 
   Future<bool> hasActiveIduffBond() async {
-    final storedUser = await _userIduffController.getUserIduffModel();
+    final storedUser = await userIduffRepository.getUserIduffModel();
     final hasStoredUser =
         storedUser != null && (storedUser.iduff?.isNotEmpty ?? false);
     final isLogged = storedUser?.authData?.isLogged ?? false;

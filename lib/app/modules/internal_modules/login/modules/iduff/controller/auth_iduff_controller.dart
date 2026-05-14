@@ -2,24 +2,22 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_iduff_repository.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_iduff_controller.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
-import 'package:uffmobileplus/app/data/services/app_availability_service.dart';
-import 'package:uffmobileplus/app/ui/widgets/app_recommendation_dialog.dart';
 
 class AuthIduffController extends GetxController {
   final AuthIduffService _authIduffService = Get.find<AuthIduffService>();
 
-  late final UserIduffController _userIduffController;
+  UserIduffRepository userIduffRepository = UserIduffRepository();
+
   RxBool isLoading = false.obs;
   late final bool isLogin;
   final int _timeoutSeconds = 5;
 
   @override
   void onInit() {
-    _userIduffController = Get.find<UserIduffController>();
     isLogin = Get.arguments as bool? ?? false;
     if (isLogin) {
       login();
@@ -27,11 +25,11 @@ class AuthIduffController extends GetxController {
     super.onInit();
   }
 
-  backToLogin() {
+  void backToLogin() {
     Get.offAndToNamed(Routes.LOGIN);
   }
 
-  loginFailed(String message) {
+  Future<void> loginFailed(String message) async {
     isLoading.value = false;
     const email = 'atendimento@id.uff.br';
 
@@ -133,7 +131,7 @@ class AuthIduffController extends GetxController {
                           ),
                         ),
                         onPressed: () {
-                          _userIduffController.deleteUserIduffModel();
+                          userIduffRepository.deleteUserIduffModel();
                           Get.offAllNamed(Routes.LOGIN);
                         },
                         child: const Text(
@@ -154,7 +152,7 @@ class AuthIduffController extends GetxController {
   }
 
   Future<void> loginSuccessful() async {
-    String? iduff = await _userIduffController.getIduff();
+    String? iduff = await userIduffRepository.getIduff();
     isLoading.value = false;
     Get.offAllNamed(Routes.CHOOSE_PROFILE, arguments: iduff);
   }
@@ -162,7 +160,7 @@ class AuthIduffController extends GetxController {
   Future<void> login() async {
     isLoading.value = true;
     try {
-      final result = await _authIduffService.authenticate(Get.context);
+      AuthResult result = await _authIduffService.authenticate(Get.context);
 
       if (result.success) {
         await loginSuccessful();

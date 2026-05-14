@@ -9,7 +9,7 @@ class UserIduffRepository {
     debugPrint("Creating User Auth Repo");
   }
 
-  Future<String> saveUserIduffModel(UserIduffModel userAuth) async {
+  Future<void> saveUserIduffModel(UserIduffModel userAuth) async {
     return await _userIduffProvider.saveUserIduffModel(userAuth);
   }
 

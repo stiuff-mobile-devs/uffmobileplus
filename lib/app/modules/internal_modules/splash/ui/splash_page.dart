@@ -57,7 +57,6 @@ class SplashPage extends StatelessWidget {
                   ),
                 ),
                 AnimatedContainer(
-                  onEnd: controller.onEnd,
                   curve: Curves.fastOutSlowIn,
                   duration: const Duration(milliseconds: 1300),
                   alignment: Alignment.center,

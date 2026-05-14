@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/gdi_groups.dart';
 import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
@@ -8,15 +8,13 @@ import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
 class RestaurantModulesController extends GetxController {
   RestaurantModulesController();
 
-  late UserDataController _userDataController;
   late UserData _usermodel;
-
+  UserDataRepository userDataRepository = UserDataRepository();
   @override
   Future<void> onInit() async {
     super.onInit();
 
-    _userDataController = Get.find<UserDataController>();
-    _usermodel = (await _userDataController.getUserData()) ?? UserData();
+    _usermodel = (await userDataRepository.getUserData()) ?? UserData();
 
     await filterButtonList(
       _usermodel.profileType ?? ProfileTypes.anonymous,

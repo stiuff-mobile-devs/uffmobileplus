@@ -26,8 +26,8 @@ class SplashController extends GetxController {
     visibleStrip = true;
     animatedMargin = 80.0;
 
-    _isDevMode = await _checkDevMode();
-    _login = await _tryLogin();
+    _isDevMode = await _lockController.updateDevMode();
+    _login = await _authController.tryLogin();
 
     // Se outra navegação (ex: deep link) já tirou a splash do topo,
     // não execute redirecionamentos concorrentes.
@@ -63,13 +63,4 @@ class SplashController extends GetxController {
     return ((Get.height - findLogoSize() - padding * 2 * 10) / 10);
   }
 
-  void onEnd() {}
-
-  Future<bool> _checkDevMode() async {
-    return await _lockController.updateDevMode();
-  }
-
-  Future<bool> _tryLogin() async {
-    return await _authController.tryLogin();
-  }
 }

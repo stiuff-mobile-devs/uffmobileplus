@@ -27,7 +27,7 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
                     tooltip: 'carteirinha_digital'.tr,
                   ),
                   Obx(
-                    () => controller.hasAdminPermission.value
+                    () => controller.hasControlPermission.value
                         ? IconButton(
                             onPressed: controller.goToCatracaOnlinePage,
                             icon: const Icon(Icons.qr_code_scanner),

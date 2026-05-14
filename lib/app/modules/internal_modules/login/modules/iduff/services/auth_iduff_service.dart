@@ -1,14 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:uffmobileplus/app/config/secrets.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/utils/auth_client.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_iduff_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_iduff_model.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_iduff_repository.dart';
 import 'package:uffmobileplus/app/utils/errors_mensages.dart';
 
 enum KeycloakEnvironment { homologacao, production }
@@ -30,8 +29,7 @@ class OAuth2Info {
 class AuthIduffService {
   final FlutterAppAuth appAuth = FlutterAppAuth();
 
-  UserIduffController get _userIduffController =>
-      Get.find<UserIduffController>();
+  UserIduffRepository userIduffRepository = UserIduffRepository();
 
   AuthenticatedClient? client;
 
@@ -76,15 +74,15 @@ class AuthIduffService {
     TokenResponse? tokenResponse;
     AuthorizationResponse? authorizationResponse;
     debugPrint("calling authorize");
-    try {
-      //Troca o refresh token por um novo access token quando o atual expira, sem precisar fazer login completo novamente.
-      if (await _userIduffController.getRefreshToken() != null) {
-        tokenResponse = await _getNewAccessToken();
 
-        if (tokenResponse != null) {
-          // sharedUser.refreshToken = tokenResponse!.refreshToken;
-          debugPrint("Refreshed Token!");
-        }
+    try {
+
+      String? refreshToken = await userIduffRepository.getRefreshToken();
+
+      //Troca o refresh token por um novo access token quando o atual expira, sem precisar fazer login completo novamente.
+
+      if (refreshToken != null) {
+        tokenResponse = await _getNewAccessToken(refreshToken);
       }
 
       //Se nao tiver refresh token, ou se o refresh token ja tiver expirado, faz o login de novo
@@ -92,9 +90,11 @@ class AuthIduffService {
         debugPrint("Primeiro Acesso!");
 
         authorizationResponse = await _getAuthorization();
+        
         if (authorizationResponse == null) {
           return AuthResult(false, ErrorMessage.erro001);
         }
+
         bool accessTokenTimeOut = false;
 
         tokenResponse = await _getAccessToken(authorizationResponse).timeout(
@@ -147,7 +147,7 @@ class AuthIduffService {
 
       return authorizationResponse;
     } catch (e) {
-      debugPrint("ERRO NO getAuthorization: $e");
+      debugPrint("Erro no getAuthorization: $e");
     }
 
     return authorizationResponse;
@@ -183,10 +183,11 @@ class AuthIduffService {
   //Renova automaticamente o access token usando o refresh token salvo, mantendo o usuário logado.
   Future<bool> refreshToken() async {
     TokenResponse? tokenResponse;
+      String? refreshToken = await userIduffRepository.getRefreshToken();
 
-    if (await _userIduffController.getRefreshToken() == null) return false;
+    if (refreshToken == null) return false;
 
-    tokenResponse = await _getNewAccessToken();
+    tokenResponse = await _getNewAccessToken(refreshToken);
 
     if (tokenResponse == null) return false;
 
@@ -234,15 +235,13 @@ class AuthIduffService {
         authData: authInfo,
       );
 
-      String userResult = await _userIduffController.saveUserIduffModel(
+     await userIduffRepository.saveUserIduffModel(
         userAuth,
       );
-      if (userResult != "success") {
-        debugPrint("Erro ao salvar UserAuth: $userResult");
-      }
+     
       return AuthResult(true, "success");
     } catch (e) {
-      debugPrint("ERRO EM Authorize: $e");
+      debugPrint("Erro em Authorize: $e");
       return AuthResult(false, ErrorMessage.erro004);
     }
   }
@@ -253,7 +252,7 @@ class AuthIduffService {
   }
 
   // Esta função tenta renovar o token de acesso usando o token de atualização armazenado
-  Future<TokenResponse?> _getNewAccessToken() async {
+  Future<TokenResponse?> _getNewAccessToken(String refreshToken) async {
     TokenResponse? tokenResponse;
     try {
       tokenResponse = await appAuth.token(
@@ -261,9 +260,9 @@ class AuthIduffService {
           keycloakInfo[keycloakEnv]!.appId,
           Secrets.redirectUri,
           grantType: 'refresh_token',
-          refreshToken: await _userIduffController.getRefreshToken(),
-          authorizationCode: await _userIduffController.getAuthorizationCode(),
-          codeVerifier: await _userIduffController.getCodeVerifier(),
+          refreshToken: refreshToken,
+          authorizationCode: await userIduffRepository.getAuthorizationCode(),
+          codeVerifier: await userIduffRepository.getCodeVerifier(),
           serviceConfiguration: keycloakInfo[keycloakEnv]!.authServiceConfig,
           scopes: Secrets.authScopes,
         ),
@@ -282,18 +281,25 @@ class AuthIduffService {
 
   Future<Map<String, dynamic>> getUserInfo(token) async {
     client = AuthenticatedClient({"Authorization": "Bearer $token"});
-    var baseUrl = Secrets.homologacaoBaseUrl;
+    String baseUrl = Secrets.homologacaoBaseUrl;
+
     if (keycloakEnv == KeycloakEnvironment.production) {
       baseUrl = Secrets.productionBaseUrl;
     }
-    var uri = Uri.https(baseUrl, Secrets.userInfoPath);
-    http.Response response = await client!.get(uri);
 
-    if (response.statusCode == 200) {
-      debugPrint("user info:");
-      debugPrint(response.body);
-      return json.decode(response.body);
-    } else {
+    try {
+      Uri uri = Uri.https(baseUrl, Secrets.userInfoPath);
+      http.Response response = await client!.get(uri);
+      
+      if (response.statusCode == 200) {
+        debugPrint("user info:");
+        debugPrint(response.body);
+        return json.decode(response.body);
+      } else {
+        throw Exception('Failed to get UserInfo');
+      }
+    } catch (e) {
+      debugPrint("Erro ao buscar user info: $e");
       throw Exception('Failed to get UserInfo');
     }
   }
@@ -301,18 +307,19 @@ class AuthIduffService {
   Future<bool> tryLogin() async {
     TokenResponse? tokenResponse;
     try {
-      String? refreshToken = await _userIduffController.getRefreshToken();
+      String? refreshToken = await userIduffRepository.getRefreshToken();
+
       if (refreshToken == null) return false;
-      tokenResponse = await _getNewAccessToken();
-      debugPrint("Access Token $tokenResponse!!!!!!!!!");
-    } on PlatformException catch (e) {
-      if (e.message ==
-          "Failed to get token: [error: null, description: Network error]") {
-        return true;
-      }
+
+      tokenResponse = await _getNewAccessToken(refreshToken);
+    } catch (e) {
+      return false;
     }
+
     if (tokenResponse == null) return false;
+
     AuthResult authResult = await _setInfo(tokenResponse, null);
+
     return authResult.success;
   }
 
@@ -320,7 +327,7 @@ class AuthIduffService {
     // Tenta renovar o token, se possível
     await refreshToken();
     // Busca o access token salvo no UserIduffController
-    return await _userIduffController.getAccessToken();
+    return await userIduffRepository.getAccessToken();
   }
 }
 

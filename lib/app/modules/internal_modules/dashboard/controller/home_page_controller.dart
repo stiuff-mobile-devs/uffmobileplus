@@ -1,11 +1,13 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:googleapis/driveactivity/v2.dart';
 import 'package:uffmobileplus/app/data/services/app_availability_service.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/data/services/deep_link_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/controller/restaurant_modules_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/external_modules_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
 import 'package:uffmobileplus/app/ui/widgets/app_recommendation_dialog.dart';
 
 class HomePageController extends GetxController {
@@ -23,7 +25,7 @@ class HomePageController extends GetxController {
 
   late ExternalModulesServices _externalModulesServices;
   late ExternalModulesController _externalModulesController;
-  late UserDataController _userDataController;
+  UserDataRepository userDataRepository = UserDataRepository();
   late RestaurantModulesController _restaurantModulesController;
 
   late Worker _servicesWorker;
@@ -82,7 +84,6 @@ class HomePageController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _userDataController = Get.find<UserDataController>();
     _externalModulesController = Get.find<ExternalModulesController>();
     _restaurantModulesController = Get.find<RestaurantModulesController>();
 
@@ -117,7 +118,7 @@ class HomePageController extends GetxController {
 
   Future<void> _loadSavedShortcuts() async {
     try {
-      final userData = await _userDataController.getUserData();
+      final userData = await userDataRepository.getUserData();
       final saved = userData?.shortcutRoutes ?? <String>[];
 
       if (saved.isEmpty) {
@@ -132,7 +133,7 @@ class HomePageController extends GetxController {
 
   Future<void> _persistShortcuts() async {
     try {
-      await _userDataController.updateShortcutRoutes(shortcutRoutes.toList());
+      await userDataRepository.updateShortcutRoutes(shortcutRoutes.toList());
     } catch (_) {}
   }
 

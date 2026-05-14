@@ -2,27 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/controller/login_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/controller/auth_google_controller.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_iduff_controller.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_iduff_repository.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 
 class SettingsController extends GetxController {
   SettingsController();
-
-  late final UserIduffController _userIduffController;
+  UserIduffRepository userIduffRepository = UserIduffRepository();
+  UserDataRepository userDataRepository = UserDataRepository();
   late final LoginController _loginController;
   late final AuthGoogleController _authGoogleController;
-  late final UserDataController _userDataController;
 
   late RxBool hasActiveIduffBondObs;
   late RxBool hasActiveGoogleBondObs;
 
   @override
   onInit() {
-    _userIduffController = Get.find<UserIduffController>();
     _loginController = Get.find<LoginController>();
     _authGoogleController = Get.find<AuthGoogleController>();
-    _userDataController = Get.find<UserDataController>();
 
     hasActiveIduffBondObs = _loginController.hasActiveIduffBondObs;
     hasActiveGoogleBondObs = _loginController.hasActiveGoogleBondObs;
@@ -30,14 +27,14 @@ class SettingsController extends GetxController {
   }
 
   void logoutIduff() {
-    _userIduffController.deleteUserIduffModel();
+    userIduffRepository.deleteUserIduffModel();
     _loginController.logoutGoogle();
-    _userDataController.clearAllUserData();
+    userDataRepository.clearAllUserData();
     Get.offAllNamed(Routes.LOGIN);
   }
 
   void changeMatricula() async {
-    String? iduff = await _userIduffController.getIduff();
+    String? iduff = await userIduffRepository.getIduff();
     Get.offAllNamed(Routes.CHOOSE_PROFILE, arguments: iduff);
   }
 

@@ -2,10 +2,12 @@ import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
 import 'package:uffmobileplus/app/utils/gdi_groups.dart';
 
 class ExternalModulesServices extends GetxService {
   late UserDataController _userDataController;
+  UserDataRepository userDataRepository = UserDataRepository();
   UserData _userData = UserData();
   late AuthIduffService _auth;
 
@@ -23,7 +25,7 @@ class ExternalModulesServices extends GetxService {
     _userDataController = Get.find<UserDataController>();
     _auth = Get.find<AuthIduffService>();
 
-    _userData = (await _userDataController.getUserData()) ?? UserData();
+    _userData = (await userDataRepository.getUserData()) ?? UserData();
   }
 
   Future<String> getEmail() async {

@@ -10,13 +10,13 @@ class UserIduffProvider {
     debugPrint("Started User Iduff provider");
   }
 
-  Future<String> saveUserIduffModel(UserIduffModel userAuth) async {
+  Future<void> saveUserIduffModel(UserIduffModel userAuth) async {
     try {
       var box = await Hive.openBox<UserIduffModel>(_collectionPath);
       await box.put(_authKey, userAuth);
-      return "success";
     } catch (e) {
-      return "Erro ao salvar dados do usuário no Hive: $e";
+      debugPrint("Erro ao salvar dados do usuário no Hive: $e");
+      throw Exception("Erro ao salvar dados do usuário no Hive: $e");
     }
   }
 
