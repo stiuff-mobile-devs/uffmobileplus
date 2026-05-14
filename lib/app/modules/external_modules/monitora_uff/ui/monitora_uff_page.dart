@@ -115,10 +115,10 @@ class MonitoraUFFPage extends StatelessWidget {
       final baseColor = trackingCtrl.setMarkerColor(user);
 
       final darkerBorderColor = Color.fromARGB(
-        baseColor.alpha,
-        (baseColor.red * 0.5).toInt(),
-        (baseColor.green * 0.5).toInt(),
-        (baseColor.blue * 0.5).toInt(),
+        (baseColor.a * 255.0).round().clamp(0, 255),
+        (baseColor.r * 255.0 * 0.5).round().clamp(0, 255),
+        (baseColor.g * 255.0 * 0.5).round().clamp(0, 255),
+        (baseColor.b * 255.0 * 0.5).round().clamp(0, 255),
       );
 
       return PolylineLayer<Object>(
@@ -239,11 +239,15 @@ class MonitoraUFFPage extends StatelessWidget {
       () => MarkerLayer(
         markers: trackingCtrl.firebaseUsers.map((user) {
           final isCurrentUser = user.email == trackingCtrl.userCtrl.user?.email;
+          // Usa a posição animada se disponível, caso contrário usa a posição atual
+          final animatedPos = trackingCtrl.animatedMarkerPositions[user.email];
+          final position = animatedPos ?? LatLng(
+            user.lat ?? 0.0,
+            user.lng ?? 0.0,
+          );
+
           return Marker(
-            point: LatLng(
-              user.lat ?? 0.0, // TODO: encontrar uma solução melhor.
-              user.lng ?? 0.0, // TODO: encontrar uma solução melhor.
-            ),
+            point: position,
             width: isCurrentUser ? markerSize * 3 : markerSize,
             height: isCurrentUser ? markerSize * 3 : markerSize,
             alignment: Alignment.center,

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:flutter/foundation.dart';
@@ -15,6 +14,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/user_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/data/provider/firebase_provider.dart';
+import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/animated_user_marker.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/location_point.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_model.dart';
 import 'package:uffmobileplus/app/data/services/foreground_service.dart';
@@ -43,6 +43,22 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
   final Rx<double?> heading = Rx<double?>(null);
   StreamSubscription<CompassEvent>? _compassSubscription;
 
+  /// Mapa de usuários com suas posições animadas para renderização suave.
+  final Map<String, AnimatedUserMarker> _animatedMarkers =
+      <String, AnimatedUserMarker>{};
+
+  /// RxMap reativo dos marcadores animados para trigger rebuilds na UI.
+  final RxMap<String, LatLng> animatedMarkerPositions = <String, LatLng>{}.obs;
+
+  /// Timer para animar a transição dos marcadores.
+  Timer? _markerAnimationTimer;
+
+  /// Progresso da animação (0.0 a 1.0).
+  double _animationProgress = 1.0;
+
+  /// Duração da animação em milissegundos.
+  static const int _animationDurationMs = 500;
+
   /// Trajetória recente do usuário focado (aquele cuja barra inferior está visível).
   final RxList<LocationPoint> selectedTrajectory = <LocationPoint>[].obs;
   StreamSubscription<List<LocationPoint>>? _trajectorySubscription;
@@ -61,7 +77,12 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
 
     super.onInit();
     mapController = MapController();
+
+    // Vincula o stream do Firebase aos usuários rastreados
     firebaseUsers.bindStream(FirebaseProvider().getAllTrackedUsers());
+    
+    // Escuta mudanças na lista de usuários para atualizar as animações
+    ever(firebaseUsers, _onFirebaseUsersUpdated);
 
     try {
       _compassSubscription = FlutterCompass.events?.listen((event) {
@@ -77,6 +98,79 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
     }
 
     isTrackingEnabled.value = await _service.isRunning();
+  }
+
+  /// Chamado quando a lista de usuários do Firebase é atualizada.
+  /// Inicializa ou atualiza as animações dos marcadores.
+  void _onFirebaseUsersUpdated(List<UserModel> users) {
+    bool shouldAnimateMarkers = false;
+
+    for (final user in users) {
+      if (_animatedMarkers.containsKey(user.email)) {
+        // Atualiza posição existente
+        final didUpdate =
+            _animatedMarkers[user.email]!.updateTargetPosition(
+          user.lat ?? 0.0,
+          user.lng ?? 0.0,
+        );
+        if (didUpdate) {
+          shouldAnimateMarkers = true;
+        }
+      } else {
+        // Cria novo marcador animado
+        _animatedMarkers[user.email] = AnimatedUserMarker(user: user);
+        animatedMarkerPositions[user.email] =
+            LatLng(user.lat ?? 0.0, user.lng ?? 0.0);
+      }
+    }
+
+    // Remove marcadores que não estão mais na lista
+    final emailsToRemove = <String>[];
+    for (final email in _animatedMarkers.keys) {
+      if (!users.any((u) => u.email == email)) {
+        emailsToRemove.add(email);
+      }
+    }
+    for (final email in emailsToRemove) {
+      _animatedMarkers.remove(email);
+      animatedMarkerPositions.remove(email);
+    }
+
+    // Inicia a animação se necessário
+    if (shouldAnimateMarkers) {
+      _startMarkerAnimation();
+    }
+  }
+
+  /// Inicia o timer de animação dos marcadores.
+  void _startMarkerAnimation() {
+    _markerAnimationTimer?.cancel();
+    _animationProgress = 0.0;
+
+    _markerAnimationTimer = Timer.periodic(
+      const Duration(milliseconds: 16), // ~60fps
+      (timer) {
+        // Incrementa o progresso
+        _animationProgress += 16.0 / _animationDurationMs;
+
+        if (_animationProgress >= 1.0) {
+          _animationProgress = 1.0;
+          timer.cancel();
+          _markerAnimationTimer = null;
+        }
+
+        _updateAnimatedMarkerPositions();
+      },
+    );
+  }
+
+  /// Atualiza as posições animadas dos marcadores com base no progresso da animação.
+  void _updateAnimatedMarkerPositions() {
+    for (final entry in _animatedMarkers.entries) {
+      final renderedPosition =
+          entry.value.updateAnimationProgress(_animationProgress);
+      animatedMarkerPositions[entry.key] = renderedPosition;
+    }
   }
 
   /// Método utilizado para escolher a cor dos pins, determinando uma cor
@@ -209,6 +303,7 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
   void onClose() {
     _compassSubscription?.cancel();
     _trajectorySubscription?.cancel();
+    _markerAnimationTimer?.cancel();
     mapController.dispose();
     super.onClose();
   }
