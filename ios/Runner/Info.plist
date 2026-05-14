@@ -2,6 +2,11 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>dev.flutter.background.refresh</string>
+	</array>
+
 	<key>LSApplicationCategoryType</key>
 	<string></string>
 	<key>FlutterDeepLinkingEnabled</key>
@@ -11,7 +16,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>UFF +</string>
+	<string>UFF+</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -44,6 +49,9 @@
 	<array>
 		<string>mailto</string>
 		<string>https</string>
+		<string>gmeet</string>
+		<string>googlegmail</string>
+		<string>comgooglemeet</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
@@ -60,9 +68,14 @@
 		<string>Precisamos da localização precisa para melhor informar as distâncias.</string>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Precisamos da localização para saber a distância do ônibus mais próximo.</string>
+	<string>Precisamos da localização para exibi-lá no mapa para administradores e outros monitores.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>We need access to your location to provide location-based services even when the app is in the background.</string>
+	<string>Precisamos da localização para exibi-lá no mapa para administradores e outros monitores mesmo quando o app estiver em segundo plano.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>location</string>
+	</array>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
+import '../data/models/discipline_model.dart';
 import '../data/models/study_plan_model.dart';
+import '../data/models/weekday_model.dart';
 import '../data/repository/study_plan_repository.dart';
 
 class StudyPlanController extends GetxController {
@@ -14,17 +16,25 @@ class StudyPlanController extends GetxController {
     _fetchStudyPlan(false);
   }
 
-  _fetchStudyPlan(bool isRefresh) async {
+  void _fetchStudyPlan(bool isRefresh) async {
     studyPlan = await _repository.getStudyPlan(isRefresh);
+    if (studyPlan != null) {
+      final plan = studyPlan?.plan;
+
+      studyPlan?.plan = Map.fromEntries(
+        plan!.entries.where((e) => (e.value?.isNotEmpty ?? false)),
+      ).map((key, value) => MapEntry(key, value!));
+    }
+
     isLoading = false;
     update();
   }
 
-  getStudyPlan() {
-    return studyPlan?.plan;
+  StudyPlanModel? getStudyPlan() {
+    return studyPlan;
   }
 
-  refreshStudyPlan() {
+  void refreshStudyPlan() {
     isLoading = true;
     update();
     _fetchStudyPlan(true);

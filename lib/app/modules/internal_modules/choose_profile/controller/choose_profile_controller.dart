@@ -14,7 +14,7 @@ class ChooseProfileController extends GetxController {
   late final UserUmmController _userUmmController;
   late final UserDataController _userDataController;
   UserData _user = UserData();
-  RxBool _userDataLoaded = false.obs;
+  final RxBool _userDataLoaded = false.obs;
   RxBool hasAdminPermission = false.obs;
 
   RxBool isBusy = false.obs;
@@ -40,13 +40,13 @@ class ChooseProfileController extends GetxController {
     fetchData();
   }
 
-  getUserData() async {
+  Future<void> getUserData() async {
     _user = (await _userDataController.getUserData()) ?? UserData();
     _userDataLoaded.value = true;
-    _checkAdminPermission();
+    _checkControlPermission();
   }
 
-  void _checkAdminPermission() {
+  void _checkControlPermission() {
     final groups = _user.gdiGroups;
     if (groups == null || groups.isEmpty) {
       hasAdminPermission.value = false;
@@ -54,7 +54,7 @@ class ChooseProfileController extends GetxController {
     }
     hasAdminPermission.value = groups.any(
       (group) =>
-          group.gid == GdiGroupsEnum.adminCardapioRestauranteUniversitario.id,
+          group.gid == GdiGroupsEnum.controladoresDeAcesso.id,
     );
   }
 

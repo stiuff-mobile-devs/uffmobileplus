@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
+import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/location_point.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_model.dart';
 
 class FirebaseProvider {
@@ -67,8 +68,12 @@ class FirebaseProvider {
         QuerySnapshot query,
       ) {
         List<UserModel> users = [];
+        final limit = DateTime.now().subtract(const Duration(minutes: 2));
         for (var doc in query.docs) {
-          users.add(UserModel.fromMap(doc.data() as Map<String, dynamic>));
+          final user = UserModel.fromMap(doc.data() as Map<String, dynamic>);
+          if (user.timestamp != null && user.timestamp!.isAfter(limit)) {
+            users.add(user);
+          }
         }
         return users;
       });
@@ -104,6 +109,19 @@ class FirebaseProvider {
     }
   }
 
+  Future<void> updateHeartbeat(String email) async {
+    try {
+      await collectionRef.doc(email).update({'timestamp': DateTime.now()});
+      if (kDebugMode) {
+        print("Heartbeat atualizado com sucesso!");
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Erro ao atualizar heartbeat: $e");
+      }
+    }
+  }
+
   Future<void> updateLocationAndTimestamp({
     required String email,
     required String nome,
@@ -121,10 +139,43 @@ class FirebaseProvider {
         'lng': lng,
         'timestamp': timestamp,
       });
+
+      // Salva o ponto na subcoleção permanente de histórico de posições.
+      await collectionRef.doc(email).collection('historico_posicoes').add({
+        'lat': lat,
+        'lng': lng,
+        'timestamp': timestamp,
+      });
+
       if (kDebugMode) print("Dados atualizados no firestore com sucesso!");
     } catch (e) {
       throw Exception("Erro ao atualizar coordenadas e timestamp: $e");
     }
+  }
+
+  /// Retorna um Stream com os últimos [limit] pontos da trajetória de um
+  /// usuário, das últimas 24 horas.
+  Stream<List<LocationPoint>> getRecentTrajectory(
+    String email, {
+    int limit = 100,
+  }) {
+    final twentyFourHoursAgo =
+        DateTime.now().subtract(const Duration(hours: 24));
+
+    return collectionRef
+        .doc(email)
+        .collection('historico_posicoes')
+        .where('timestamp', isGreaterThanOrEqualTo: twentyFourHoursAgo)
+        .orderBy('timestamp', descending: true)
+        .limit(limit)
+        .snapshots()
+        .map((snapshot) {
+      final points = snapshot.docs
+          .map((doc) => LocationPoint.fromMap(doc.data()))
+          .toList();
+      // Inverte para que a ordem dos pontos no mapa seja consistente cronologicamente
+      return points.reversed.toList();
+    });
   }
 
   Future<bool> doesDocumentExist(String email) async {

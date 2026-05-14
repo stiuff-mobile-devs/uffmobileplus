@@ -1,5 +1,5 @@
 
-import 'package:uffmobileplus/app/data/services/sctm_service.dart';
+import 'package:uffmobileplus/app/data/services/connections/sctm_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/data/model/user_balance.dart';
 
 class BalanceStatementRepository {

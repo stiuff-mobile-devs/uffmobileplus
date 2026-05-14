@@ -43,6 +43,13 @@ post_install do |installer|
     target.build_configurations.each do |config|
       # Isso força todos os plugins a usarem o iOS 15.0
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+
+      # Ativa as permissões do permission_handler para o iOS
+      config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
+        '$(inherited)',
+        'PERMISSION_NOTIFICATIONS=1', # Permissão de Notificações
+        'PERMISSION_LOCATION=1',      # Permissão de Localização (Quando em Uso e Sempre)
+      ]
     end
   end
 end
