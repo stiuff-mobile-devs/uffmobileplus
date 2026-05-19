@@ -87,7 +87,6 @@ abstract class AppPages {
         SplashBindings(),
         LockDevelopModeBinding(),
         AuthIduffBindings(),
-        AuthGoogleBindings(),
       ],
     ),
 

@@ -17,8 +17,8 @@ class ChooseProfileController extends GetxController {
   late UserDataController _userDataController;
 
   UserData _user = UserData();
+  UserUmmModel userUmm = UserUmmModel();
 
-  late UserUmmModel userUmm;
   String matricula = '';
   String? iduff;
 
@@ -54,6 +54,7 @@ class ChooseProfileController extends GetxController {
   }
 
   void _checkControlPermission() {
+    try{
     final groups = _user.gdiGroups;
     if (groups == null || groups.isEmpty) {
       hasControlPermission.value = false;
@@ -62,6 +63,11 @@ class ChooseProfileController extends GetxController {
     hasControlPermission.value = groups.any(
       (group) => group.gid == GdiGroupsEnum.controladoresDeAcesso.id,
     );
+    }
+    catch(e){
+      debugPrint("Error checking control permission: $e");
+      hasControlPermission.value = false;
+    }
   }
 
   Future<void> fetchData() async {
@@ -71,12 +77,12 @@ class ChooseProfileController extends GetxController {
       userUmm = await userUmmRepository.getUserData(iduff);
     } catch (e) {
       isBusy.value = false;
-      throw Exception("Erro ao obter dados do usuário: $e");
+      throw Exception("Erro ao obter dados do usuário: $e"); //TODO: TRATAR MELHOR ESSE ERRO
            
     }
 
     List<InnerObject> bonds =
-        userUmm.activeBond?.objects?.outerObject?[1].innerObjects ?? [];
+        userUmm.activeBond?.objects?.outerObject?[1].innerObjects ?? []; //TODO: Se for lista vazia da pra pular
 
     //Verifica se o usuario tem algum perfil de graduação
     gradQtd = userUmm.grad?.matriculas?.length ?? 0;
@@ -194,7 +200,8 @@ class ChooseProfileController extends GetxController {
     try {
       await _userDataController.saveUserData(userUmm, matricula, profileType);
     } catch (e) {
-      throw Exception("Erro ao salvar dados do usuário: $e");
+      isBusy.value = false;
+      throw Exception("Erro ao salvar dados do usuário: $e"); //TODO: TRATAR MELHOR ESSE ERRO
     }
     isBusy.value = false;
     Get.offAllNamed(Routes.HOME);

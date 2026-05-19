@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:open_settings_plus/open_settings_plus.dart';
 import 'package:safe_device/safe_device.dart';
@@ -10,10 +11,15 @@ class LockDevelopModeController extends GetxController {
   LockDevelopModeController();
 
   Future<bool> updateDevMode() async {
-    if (!Platform.isAndroid) {
-      return false;
+    try {
+      if (!Platform.isAndroid) {
+        return false;
+      }
+      return await SafeDevice.isDevelopmentModeEnable;
+    } catch (e) {
+      debugPrint("Error checking development mode: $e");
+      return true; // Permitir acesso em caso de erro para evitar bloqueios indevidos
     }
-    return await SafeDevice.isDevelopmentModeEnable;
   }
 
   Future<void> refreshPage() async {

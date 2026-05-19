@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/data/services/um_infos_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/controller/auth_google_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_google_repository.dart';
@@ -24,6 +24,7 @@ class LoginController extends GetxController {
   UserIduffRepository userIduffRepository = UserIduffRepository();
 
   UserData _user = UserData();
+
   RxBool hasAdminPermission = false.obs;
   RxBool hasActiveIduffBondObs = false.obs;
   RxBool hasActiveGoogleBondObs = false.obs;
@@ -33,37 +34,52 @@ class LoginController extends GetxController {
     _loginGoogleController = Get.find<AuthGoogleController>();
     _umInfosService = Get.find<UmInfosService>();
     _authIduffService = Get.find<AuthIduffService>();
-    _userGoogleRepository = UserGoogleRepository();
 
     versionCode = _umInfosService.version.value;
     _user = (await userDataRepository.getUserData()) ?? UserData();
+
     _checkAdminPermission(GdiGroupsEnum.controladoresDeAcesso.id);
     _loadBondStates();
     super.onInit();
   }
 
   Future<bool> hasActiveGoogleBond() async {
+    try{
     final currentUser = fb.FirebaseAuth.instanceFor(
       app: Firebase.app('uffmobileplus'),
     ).currentUser;
     final storedUser = await _userGoogleRepository.getUserGoogleModel();
     final hasStoredUser = storedUser != null && storedUser.email.isNotEmpty;
     return currentUser != null && hasStoredUser;
+    }
+    catch(e){
+      debugPrint("Error checking Google bond: $e");
+      return false;
+  }
   }
 
   Future<bool> hasActiveIduffBond() async {
-    final storedUser = await userIduffRepository.getUserIduffModel();
-    final hasStoredUser =
-        storedUser != null && (storedUser.iduff?.isNotEmpty ?? false);
-    final isLogged = storedUser?.authData?.isLogged ?? false;
-    final accessToken = await _authIduffService.getAccessToken();
-    final hasToken = accessToken != null && accessToken.isNotEmpty;
-    return hasStoredUser && isLogged && hasToken;
+    try {
+      final storedUser = await userIduffRepository.getUserIduffModel();
+      final hasStoredUser =
+          storedUser != null && (storedUser.iduff?.isNotEmpty ?? false);
+      final isLogged = storedUser?.authData?.isLogged ?? false;
+      final accessToken = await _authIduffService.getAccessToken();
+      final hasToken = accessToken != null && accessToken.isNotEmpty;
+      return hasStoredUser && isLogged && hasToken;
+    } catch (e) {
+      debugPrint("Error checking Iduff bond: $e");
+      return false;
+    }
   }
 
   Future<void> _loadBondStates() async {
-    hasActiveIduffBondObs.value = await hasActiveIduffBond();
-    hasActiveGoogleBondObs.value = await hasActiveGoogleBond();
+    try {
+      hasActiveIduffBondObs.value = await hasActiveIduffBond();
+      hasActiveGoogleBondObs.value = await hasActiveGoogleBond();
+    } catch (e) {
+      debugPrint("Error loading bond states: $e");
+    }
   }
 
   Future<void> reloadBondStates() async {
@@ -76,11 +92,9 @@ class LoginController extends GetxController {
       hasAdminPermission.value = false;
       return;
     }
-    hasAdminPermission.value = groups.any(
-      (group) =>
-          group.gid == gdi,
-    );
+    hasAdminPermission.value = groups.any((group) => group.gid == gdi);
   }
+
   void loginIDUFF() {
     Get.offAllNamed(
       Routes.AUTH,

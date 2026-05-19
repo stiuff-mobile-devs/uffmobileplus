@@ -148,9 +148,8 @@ class AuthIduffService {
       return authorizationResponse;
     } catch (e) {
       debugPrint("Erro no getAuthorization: $e");
+      return null;
     }
-
-    return authorizationResponse;
   }
 
   // Esta função é responsável por trocar o código de autorização recebido na etapa anterior por tokens de acesso e atualização
@@ -174,9 +173,8 @@ class AuthIduffService {
       return tokenResponse;
     } catch (e) {
       debugPrint("Erro no getAccess: $e");
+      return null;
     }
-
-    return tokenResponse;
   }
 
   // Esta função tenta renovar o token de acesso usando o token de atualização armazenado

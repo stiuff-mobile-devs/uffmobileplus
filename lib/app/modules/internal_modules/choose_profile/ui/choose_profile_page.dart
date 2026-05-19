@@ -372,7 +372,7 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
               onTap: () {
                 controller.saveUserDataBeforeChooseProfile(
                   ProfileTypes.outsourced,
-                  controller.activeBonds()[index].vinculacao!.matricula!,
+                  controller.activeBonds()[index].vinculacao!.matricula!, //Todo: Verificar os !
                 );
               },
               child: Container(

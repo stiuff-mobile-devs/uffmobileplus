@@ -20,7 +20,7 @@ class AuthIduffController extends GetxController {
   void onInit() {
     isLogin = Get.arguments as bool? ?? false;
     if (isLogin) {
-      login();
+      _login();
     }
     super.onInit();
   }
@@ -157,7 +157,7 @@ class AuthIduffController extends GetxController {
     Get.offAllNamed(Routes.CHOOSE_PROFILE, arguments: iduff);
   }
 
-  Future<void> login() async {
+  Future<void> _login() async {
     isLoading.value = true;
     try {
       AuthResult result = await _authIduffService.authenticate(Get.context);

@@ -38,7 +38,7 @@ class UserDataController extends GetxController {
 
       String iduff =
           await userIduffRepository.getIduff() ??
-          userUmm.activeBond?.objects?.outerObject?[0].usuario!.iduff ??
+          userUmm.activeBond?.objects?.outerObject?[0].usuario?.iduff ??
           "-";
 
       String fotoUrl = await userIduffRepository.getPhotoUrl() ?? "-";
@@ -70,7 +70,7 @@ class UserDataController extends GetxController {
 
       if (name == "-") {
         name =
-            userUmm.activeBond?.objects?.outerObject?[0].usuario!.nome ?? "-";
+            userUmm.activeBond?.objects?.outerObject?[0].usuario?.nome ?? "-";
       }
 
       if (bondIndex != null) {
@@ -117,7 +117,7 @@ class UserDataController extends GetxController {
       );
       return await _userDataRepository.saveUserData(userData);
     } catch (e) {
-      throw Exception("Erro ao salvar dados do usuário: $e");
+      throw Exception("Erro ao salvar dados do usuário: $e"); //TODO: Tratar melhor esse erro
     }
   }
 

@@ -27,7 +27,6 @@ class SplashController extends GetxController {
     animatedMargin = 80.0;
 
     _isDevMode = await _lockController.updateDevMode();
-    _login = await _authController.tryLogin();
 
     // Se outra navegação (ex: deep link) já tirou a splash do topo,
     // não execute redirecionamentos concorrentes.
@@ -42,11 +41,18 @@ class SplashController extends GetxController {
     if (_isDevMode && !kDebugMode) {
       Get.offAllNamed(Routes.YOU_SHALL_NOT_PASS);
     } else {
-      if (_login) {
-        debugPrint("Auto Login successful");
-        await _authController.loginSuccessful();
-      } else {
-        debugPrint("Auto Login failed");
+      try {
+        _login = await _authController.tryLogin();
+        debugPrint("Auto Login result: $_login");
+        if (_login) {
+          debugPrint("Auto Login successful");
+          await _authController.loginSuccessful();
+        } else {
+          debugPrint("Auto Login failed");
+          Get.offAllNamed(Routes.LOGIN);
+        }
+      } catch (e) {
+        debugPrint("Error during auto login: $e");
         Get.offAllNamed(Routes.LOGIN);
       }
     }
@@ -62,5 +68,4 @@ class SplashController extends GetxController {
     double padding = 2.0;
     return ((Get.height - findLogoSize() - padding * 2 * 10) / 10);
   }
-
 }
