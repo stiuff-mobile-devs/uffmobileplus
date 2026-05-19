@@ -83,4 +83,15 @@ class AuthGoogleService {
     await _googleSignIn.signOut();
     await _auth.signOut();
   }
+
+  Future<String?> getFirebaseIdToken() async {
+  // Pega o usuário logado atualmente no Firebase
+  final user = _auth.currentUser;
+  
+  if (user != null) {
+    // getIdToken(true) força a atualização do token caso ele esteja expirado
+    return await user.getIdToken(true); 
+  }
+  return null;
+}
 }
