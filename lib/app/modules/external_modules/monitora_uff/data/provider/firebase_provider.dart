@@ -178,6 +178,32 @@ class FirebaseProvider {
     });
   }
 
+  /// Retorna um Stream com os últimos [limit] pontos da trajetória de um
+  /// usuário para um dia específico.
+  Stream<List<LocationPoint>> getTrajectoryForDate(
+    String email, {
+    required DateTime day,
+    int limit = 100,
+  }) {
+    final startOfDay = DateTime(day.year, day.month, day.day);
+    final endOfDay = startOfDay.add(const Duration(days: 1));
+
+    return collectionRef
+        .doc(email)
+        .collection('historico_posicoes')
+        .where('timestamp', isGreaterThanOrEqualTo: startOfDay)
+        .where('timestamp', isLessThan: endOfDay)
+        .orderBy('timestamp', descending: true)
+        .limit(limit)
+        .snapshots()
+        .map((snapshot) {
+      final points = snapshot.docs
+          .map((doc) => LocationPoint.fromMap(doc.data()))
+          .toList();
+      return points.reversed.toList();
+    });
+  }
+
   Future<bool> doesDocumentExist(String email) async {
     try {
       final DocumentSnapshot doc = await collectionRef.doc(email).get();
