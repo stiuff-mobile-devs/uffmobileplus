@@ -48,8 +48,12 @@ Future<List<dynamic>> getSaciData(String? token, String? iduffUsuario, AuthIduff
       if (responseDecoded["content"] != null) {
         final data = json.decode(response.body);
         final textoQrCode = data['content']['texto_qr_code'].toString();
-        final dataValidade =
-            data['content']['dados_usuario']['vinculacoes'][0]['data_validade'];
+        final vinculacoes = data['content']?['dados_usuario']?['vinculacoes'];
+        final dataValidade = vinculacoes is List &&
+            vinculacoes.isNotEmpty &&
+            vinculacoes.first is Map
+          ? (vinculacoes.first as Map)['data_validade']?.toString() ?? ''
+          : '';
         return [textoQrCode, dataValidade];
       }
     }
