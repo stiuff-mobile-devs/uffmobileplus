@@ -14,7 +14,7 @@ class ConnectionsPage extends GetView<ConnectionsController> {
         centerTitle: true,
         elevation: 8,
         foregroundColor: Colors.white,
-        title: const Text('Conexões'),
+        title: Text('conexoes'.tr),
         actions: [
           IconButton(onPressed: controller.refreshConnectionsForTest, icon: Icon(Icons.refresh), color: Colors.white70),
         ],
@@ -68,8 +68,8 @@ class ConnectionsPage extends GetView<ConnectionsController> {
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
       ),
-      child: const Text(
-        'Gerencie e acompanhe o status das suas conexões externas.',
+      child: Text(
+        'conexoes_descricao'.tr,
         style: TextStyle(
           color: Colors.white,
           fontSize: 14,
@@ -83,8 +83,8 @@ class ConnectionsPage extends GetView<ConnectionsController> {
   Widget _buildInternetConnectionCard() {
     return Obx(
       () => _buildConnectionCard(
-        title: 'Internet',
-        description: 'Conectividade geral para os módulos do aplicativo.',
+        title: 'internet'.tr,
+        description: 'internet_descricao'.tr,
         icon: Icons.wifi_rounded,
         accentColor: Colors.cyan.shade300,
         isConnected: controller.isInternetConnected.value,
@@ -96,7 +96,7 @@ class ConnectionsPage extends GetView<ConnectionsController> {
     return Obx(
       () => _buildConnectionCard(
         title: 'UMM',
-        description: 'Conexão com o serviço institucional UMM.',
+        description: 'umm_descricao'.tr,
         icon: Icons.apartment_rounded,
         accentColor: AppColors.mediumBlue(),
         isConnected: controller.isUmmConnected.value,
@@ -108,7 +108,7 @@ class ConnectionsPage extends GetView<ConnectionsController> {
     return Obx(
       () => _buildConnectionCard(
         title: 'SCTM',
-        description: 'Integração em tempo real com o sistema SCTM.',
+        description: 'sctm_descricao'.tr,
         icon: Icons.hub_rounded,
         accentColor: Colors.green.shade400,
         isConnected: controller.isSctmConnected.value,
@@ -120,7 +120,7 @@ class ConnectionsPage extends GetView<ConnectionsController> {
     return Obx(
       () => _buildConnectionCard(
         title: 'SACI',
-        description: 'Acesso aos recursos acadêmicos do SACI.',
+        description: 'saci_descricao'.tr,
         icon: Icons.school_rounded,
         accentColor: Colors.purple.shade300,
         isConnected: controller.isSaciConnected.value,
@@ -200,7 +200,7 @@ class ConnectionsPage extends GetView<ConnectionsController> {
     required Color accentColor,
   }) {
     final Color badgeColor = isConnected ? accentColor : Colors.redAccent;
-    final String label = isConnected ? 'Ativo' : 'Falha';
+    final String label = isConnected ? 'ativo'.tr : 'falha'.tr;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),

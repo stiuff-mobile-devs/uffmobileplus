@@ -39,15 +39,15 @@ class ExternalModulesServices extends GetxService {
   }
 
   String getUserMatricula() {
-    return _userData.matricula ?? "-";
+    return _userData.matricula ?? "";
   }
 
   String getUserIdUFF() {
-    return _userData.iduff ?? "-";
+    return _userData.iduff ?? "";
   }
 
   String getUserCourse() {
-    return _userData.curso ?? "-";
+    return _userData.curso ?? "";
   }
 
   String getUserPhotoUrl() {

@@ -13,7 +13,6 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
   const CarteirinhaDigitalPage({super.key});
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -59,12 +58,12 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                               color: Colors.white,
                             ),
                             const SizedBox(width: 8),
-                            const Column(
+                            Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Universidade",
+                                  'universidade'.tr,
                                   style: TextStyle(
                                     fontSize: 10,
                                     color: Colors.white,
@@ -72,7 +71,7 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                                   ),
                                 ),
                                 Text(
-                                  "Federal",
+                                  'federal'.tr,
                                   style: TextStyle(
                                     fontSize: 10,
                                     color: Colors.white,
@@ -80,7 +79,7 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                                   ),
                                 ),
                                 Text(
-                                  "Fluminense",
+                                  'fluminense'.tr,
                                   style: TextStyle(
                                     fontSize: 10,
                                     color: Colors.white,
@@ -92,37 +91,44 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                           ],
                         ),
                       ),
-                      controller.getUserPhotoUrl().length > 0
-                          ? SizedBox(
-                              height: 140,
-                              child: CachedNetworkImage(
-                                imageUrl: controller.getUserPhotoUrl(),
-                                progressIndicatorBuilder:
-                                    (context, url, downloadProgress) =>
-                                        CircularProgressIndicator(
-                                          value: downloadProgress.progress,
-                                          color: Colors.white,
-                                        ),
-                                errorWidget: (context, url, error) =>
-                                    Icon(Icons.error),
-                              ),
-                            )
-                          : const SizedBox(),
                       const SizedBox(height: 10),
+                      // Foto do usuário
+                      SizedBox(
+                        height: 140,
+                        child: CachedNetworkImage(
+                          imageUrl: controller.getUserPhotoUrl(),
+                          progressIndicatorBuilder:
+                              (context, url, downloadProgress) =>
+                                  CircularProgressIndicator(
+                                    value: downloadProgress.progress,
+                                    color: Colors.white,
+                                  ),
+                          errorWidget: (context, url, error) => const Icon(
+                            Icons.account_circle,
+                            size: 140,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      // Nome e IDUFF do usuário
                       Column(
                         children: [
                           Text(
-                            controller.getUserName() ?? "-",
+                            controller.getUserName() ?? "",
 
                             style: const TextStyle(color: Colors.white),
                           ),
                           Text(
-                            '${'Documento'.tr}: ${controller.getUserIdUFF()}',
+                            controller.getUserIdUFF().isNotEmpty
+                                ? '${'Documento'.tr}: ${controller.getUserIdUFF()}'
+                                : '',
                             style: const TextStyle(color: Colors.white),
                           ),
                         ],
                       ),
                       const SizedBox(height: 10),
+                      // Cartão com informações e QR Code
                       Container(
                         decoration: BoxDecoration(
                           shape: BoxShape.rectangle,
@@ -166,17 +172,21 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        'matricula'.tr,
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
+                                      if (controller
+                                          .getUserMatricula()
+                                          .isNotEmpty) ...[
+                                        Text(
+                                          'matricula'.tr,
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
-                                      ),
-                                      Text(
-                                        controller.getUserMatricula(),
-                                        style: TextStyle(fontSize: 15),
-                                      ),
+                                        Text(
+                                          controller.getUserMatricula(),
+                                          style: TextStyle(fontSize: 15),
+                                        ),
+                                      ],
                                     ],
                                   ),
                                 ),
@@ -186,17 +196,21 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        'validade'.tr,
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
+                                      if (controller
+                                          .getUserValidity()
+                                          .isNotEmpty) ...[
+                                        Text(
+                                          'validade'.tr,
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
-                                      ),
-                                      Text(
-                                        controller.getUserValidity(),
-                                        style: TextStyle(fontSize: 15),
-                                      ),
+                                        Text(
+                                          controller.getUserValidity(),
+                                          style: TextStyle(fontSize: 15),
+                                        ),
+                                      ],
                                     ],
                                   ),
                                 ),
@@ -211,14 +225,18 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                                   children: [
                                     Row(
                                       children: [
-                                        Text(
-                                          'curso'.tr,
-                                          textAlign: TextAlign.left,
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold,
+                                        if (controller
+                                            .getUserCourse()
+                                            .isNotEmpty) ...[
+                                          Text(
+                                            'curso'.tr,
+                                            textAlign: TextAlign.left,
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
-                                        ),
+                                        ],
                                       ],
                                     ),
                                     Text(
@@ -305,7 +323,7 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
             children: [
               TextSpan(text: "validador_instrucao".tr),
               TextSpan(
-                text: " Validador Carteirinha UFF",
+                text: ' ${'validador_carteirinha_uff'.tr}',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ],
@@ -324,39 +342,14 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
         Obx(
           () => controller.isQrCodeLoading.value
               ? Center(child: CircularProgressIndicator())
-              : QrImageView(
+              :
+              controller.qrCodeData.isEmpty
+                  ? SizedBox.shrink()
+                  : 
+              QrImageView(
                   data: controller.qrCodeData,
                   version: QrVersions.auto,
                 ),
-        ),
-
-        AnimatedOpacity(
-          opacity: controller.isExpired.value ? 1.0 : 0.0,
-          duration: const Duration(milliseconds: 400),
-          child: Visibility(
-            visible: controller.isExpired.value,
-            child: Align(
-              alignment: Alignment.center,
-              child: IconButton(
-                iconSize: 40,
-                onPressed: () => controller.updateQrCodeData(),
-                icon: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black,
-                        offset: Offset(0.4, 0.4),
-                        blurRadius: 5.0,
-                      ),
-                    ],
-                  ),
-                  child: Icon(Icons.refresh, color: Colors.blue[800]),
-                ),
-              ),
-            ),
-          ),
         ),
       ],
     );

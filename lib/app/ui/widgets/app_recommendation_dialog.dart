@@ -12,20 +12,20 @@ class AppRecommendationDialog {
     await Get.dialog(
       AlertDialog(
         backgroundColor: Colors.black87,
-        title: Text('Recomendação', style: TextStyle(color: Colors.white)),
+        title: Text('recomendacao'.tr, style: TextStyle(color: Colors.white)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (!result.gmailInstalled)
               Text(
-                'Recomendamos instalar o Gmail para facilitar o uso de e-mails.',
+                'recomendamos_instalar_gmail'.tr,
                 style: TextStyle(color: Colors.white70),
               ),
             if (!result.meetInstalled) ...[
               const SizedBox(height: 8),
               Text(
-                'Recomendamos instalar o Google Meet para participar de reuniões.',
+                'recomendamos_instalar_meet'.tr,
                 style: TextStyle(color: Colors.white70),
               ),
             ],
@@ -42,7 +42,7 @@ class AppRecommendationDialog {
                 final uri = Uri.parse(Platform.isIOS ? gmailIos : gmailAndroid);
                 await _launchUri(uri);
               },
-              child: Text('Instalar Gmail'),
+              child: Text('instalar_gmail'.tr),
             ),
           if (!result.meetInstalled)
             TextButton(
@@ -53,9 +53,9 @@ class AppRecommendationDialog {
                 final uri = Uri.parse(Platform.isIOS ? meetIos : meetAndroid);
                 await _launchUri(uri);
               },
-              child: Text('Instalar Meet'),
+              child: Text('instalar_meet'.tr),
             ),
-          TextButton(onPressed: () => Get.back(), child: Text('Ignorar')),
+          TextButton(onPressed: () => Get.back(), child: Text('ignorar'.tr)),
         ],
       ),
       barrierDismissible: true,
@@ -65,10 +65,10 @@ class AppRecommendationDialog {
   static Future<void> _launchUri(Uri uri) async {
     try {
       if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-        Get.snackbar('Erro', 'Não foi possível abrir a loja.');
+        Get.snackbar('erro'.tr, 'nao_foi_possivel_abrir_loja'.tr);
       }
     } catch (e) {
-      Get.snackbar('Erro', 'Não foi possível abrir a loja.');
+      Get.snackbar('erro'.tr, 'nao_foi_possivel_abrir_loja'.tr);
     }
   }
 }

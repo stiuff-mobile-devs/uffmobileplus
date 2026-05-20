@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
@@ -74,7 +73,7 @@ class ExternalModulesController extends GetxController {
 
   ExternalModules(
     iconSrc: 'assets/icons/historico.svg',
-    subtitle: 'Histórico',
+    subtitle: 'historico'.tr,
     page: Routes.HISTORICO,
     url: '',
     interrogation: false,
@@ -94,7 +93,7 @@ class ExternalModulesController extends GetxController {
 
   ExternalModules(
     iconSrc: 'assets/icons/uniteve.svg',
-    subtitle: 'Unitevê',
+    subtitle: 'uniteve'.tr,
     page: Routes.UNITEVE,
     url: '',
     interrogation: false,

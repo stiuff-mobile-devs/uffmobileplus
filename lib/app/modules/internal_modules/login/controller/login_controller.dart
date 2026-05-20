@@ -19,7 +19,7 @@ class LoginController extends GetxController {
   late UmInfosService _umInfosService;
   late AuthIduffService _authIduffService;
 
-  late final UserGoogleRepository _userGoogleRepository;
+  UserGoogleRepository userGoogleRepository = UserGoogleRepository();
   UserDataRepository userDataRepository = UserDataRepository();
   UserIduffRepository userIduffRepository = UserIduffRepository();
 
@@ -48,7 +48,7 @@ class LoginController extends GetxController {
     final currentUser = fb.FirebaseAuth.instanceFor(
       app: Firebase.app('uffmobileplus'),
     ).currentUser;
-    final storedUser = await _userGoogleRepository.getUserGoogleModel();
+    final storedUser = await userGoogleRepository.getUserGoogleModel();
     final hasStoredUser = storedUser != null && storedUser.email.isNotEmpty;
     return currentUser != null && hasStoredUser;
     }

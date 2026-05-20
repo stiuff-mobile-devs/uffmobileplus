@@ -1,18 +1,60 @@
+import 'package:uffmobileplus/app/utils/translations/pt_BR/pt_br_translation.dart';
+
 final Map<String, String> itIT = {
-  // Persistent Tab View
-  'atalhos' : 'Scorciatoie',
-  'servicoes' : 'Servizi',
-  'configuracoes' : 'Impostazioni',
+  // Fallback para manter cobertura total de chaves já usadas no app.
+  ...ptBR,
 
-  // Tela Configuracoes
-  'sobre' : 'Informazioni',
-  'sobre_descricao' : 'Dettagli dell\'app',
-  'ling_descricao' :  'Cambia la lingua dell\'app',
-  'sair' :  'Esci',
-
-  // Restaurante Universitário
-  'restaurante_universitario': 'Mensa Universitaria',
-
-  // Catraca
+  // Principais traduções em italiano.
+  'atalhos': 'Scorciatoie',
+  'servicos': 'Servizi',
+  'configuracoes': 'Impostazioni',
+  'sobre': 'Informazioni',
+  'sobre_descricao': 'Dettagli dell\'app',
+  'ling_descricao': 'Cambia la lingua dell\'app',
+  'sair': 'Esci',
+  'carteirinha_digital': 'Tessera digitale',
+  'entrar': 'Accedi',
+  'escolha_perfil': 'Scegli il tuo profilo',
+  'graduacao': 'Laurea triennale',
+  'pos_graduacao': 'Laurea magistrale',
+  'docente': 'Docente',
+  'tecnico_administrativo': 'Personale amministrativo',
+  'terceirizado': 'Esternalizzato',
+  'restaurante': 'Ristorante',
+  'restaurante_universitario': 'Mensa universitaria',
+  'menu': 'Menu',
   'catraca_online': 'Tornello',
+  'catraca_offline': 'Tornello offline',
+  'historico': 'Storico',
+  'periodicos': 'Periodici',
+  'plano_estudos': 'Piano di studi',
+  'contato': 'Contatto',
+  'historia': 'Storia',
+  'uniteve': 'Unitevê',
+  'bibliotecas': 'Biblioteche',
+  'central_de_atendimento': 'Centro assistenza',
+  'internacional': 'Internazionale',
+  'sos': 'SOS',
+  'conexoes': 'Connessioni',
+  'internet': 'Internet',
+  'ativo': 'Attivo',
+  'falha': 'Errore',
+  'atualizar': 'Aggiorna',
+  'usuario': 'Utente',
+  'ler_qr_code': 'Leggi QR Code',
+  'liberar_manualmente': 'Convalida manuale',
+  'selecione_o_campus': 'Seleziona il campus',
+  'erro_carregar_dados_usuario': 'Errore nel caricamento dei dati utente',
+  'erro_salvar_dados_usuario': 'Errore nel salvataggio dei dati utente',
+  'erro_carregar_dados_carteirinha':
+      'Errore nel caricamento dei dati della tessera',
+  'erro_atualizar_qr_code': 'Errore durante l\'aggiornamento del QR Code',
+  'google_classroom': 'Google Classroom',
+  'moodle': 'Moodle',
+  'acessar_google_classroom': 'Apri Google Classroom',
+  'acessar_moodle': 'Apri Moodle',
+  'instalar_gmail': 'Installa Gmail',
+  'instalar_meet': 'Installa Meet',
+  'ignorar': 'Ignora',
+  'recomendacao': 'Raccomandazione',
 };

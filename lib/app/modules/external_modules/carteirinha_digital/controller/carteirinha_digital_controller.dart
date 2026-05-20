@@ -7,7 +7,6 @@ import 'package:uffmobileplus/app/data/services/screen_protector_service.dart';
 
 class CarteirinhaDigitalController extends GetxController {
   RxBool isBusy = false.obs;
-  RxBool isExpired = false.obs;
   RxBool isQrCodeLoading = false.obs;
 
   Timer? expirationTimer;
@@ -38,26 +37,26 @@ class CarteirinhaDigitalController extends GetxController {
     try {
       await _externalModulesServices.initialize();
     } catch (e) {
-      Get.dialog(
-        WillPopScope(
-          onWillPop: () async => false,
-          child: AlertDialog(
-            title: const Text('Atenção'),
-            content: const Text(
-              'Por gentileza efetue o login com seu idUFF, pelo menos uma vez, para que os dados de sua carteirinha sejam disponibilizados.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Get.back();
-                  Get.back();
-                },
-                child: const Text('OK'),
-              ),
-            ],
+      Get.snackbar(
+        '',
+        '',
+        snackPosition: SnackPosition.BOTTOM,
+        snackStyle: SnackStyle.FLOATING,
+        margin: const EdgeInsets.all(12),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        titleText: Text(
+          'erro'.tr,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
           ),
         ),
-        barrierDismissible: false,
+        messageText: Text(
+          'erro_carregar_dados_carteirinha'.tr,
+          style: TextStyle(color: Colors.white, fontSize: 16),
+        ),
       );
     }
     qrCodeData = await _externalModulesServices.getQrCodeData();
@@ -78,16 +77,16 @@ class CarteirinhaDigitalController extends GetxController {
         margin: const EdgeInsets.all(12),
         backgroundColor: Colors.red,
         colorText: Colors.white,
-        titleText: const Text(
-          'Erro',
+        titleText: Text(
+          'erro'.tr,
           style: TextStyle(
             color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
-        messageText: const Text(
-          'Erro ao atualizar o QR Code',
+        messageText: Text(
+          'erro_atualizar_qr_code'.tr,
           style: TextStyle(color: Colors.white, fontSize: 16),
         ),
       );

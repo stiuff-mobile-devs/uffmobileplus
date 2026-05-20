@@ -19,7 +19,7 @@ class ResultadoDetalhadoPage extends GetView<CatracaController> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: 'Atualizar',
+            tooltip: 'atualizar'.tr,
             onPressed: () {},
           ),
         ],
@@ -52,8 +52,8 @@ class ResultadoDetalhadoPage extends GetView<CatracaController> {
                                 .name
                                 ?.isNotEmpty ==
                             true) ...[
-                          const Text(
-                            "Usuário",
+                          Text(
+                            'usuario'.tr,
                             style: TextStyle(fontSize: 20, color: Colors.white),
                           ),
                           Container(
@@ -82,7 +82,7 @@ class ResultadoDetalhadoPage extends GetView<CatracaController> {
                         Container(
                           margin: const EdgeInsets.symmetric(horizontal: 10),
                           child: Text(
-                            "Valor Debitado: R\$ ${controller.selectedTransaction.value.value ?? '0,00'}",
+                            '${'valor_debitado'.tr}: R\$ ${controller.selectedTransaction.value.value ?? '0,00'}',
                             style: const TextStyle(
                               fontStyle: FontStyle.italic,
                               fontSize: 18,
@@ -95,7 +95,7 @@ class ResultadoDetalhadoPage extends GetView<CatracaController> {
                         Container(
                           margin: const EdgeInsets.symmetric(horizontal: 10),
                           child: Text(
-                            "Feito em: ${controller.selectedTransaction.value.area ?? 'Local não informado'}",
+                            '${'feito_em'.tr}: ${controller.selectedTransaction.value.area ?? 'local_nao_informado'.tr}',
                             style: const TextStyle(
                               fontStyle: FontStyle.italic,
                               fontSize: 18,
@@ -108,7 +108,7 @@ class ResultadoDetalhadoPage extends GetView<CatracaController> {
                         Container(
                           margin: const EdgeInsets.symmetric(horizontal: 10),
                           child: Text(
-                            "Horário: ${controller.selectedTransaction.value.date != null ? DateFormat('dd/MM/yy HH:mm').format(controller.selectedTransaction.value.date!) : 'Data não disponível'}",
+                            '${'horario'.tr}: ${controller.selectedTransaction.value.date != null ? DateFormat('dd/MM/yy HH:mm').format(controller.selectedTransaction.value.date!) : 'data_nao_disponivel'.tr}',
                             style: const TextStyle(
                               fontStyle: FontStyle.italic,
                               fontSize: 18,

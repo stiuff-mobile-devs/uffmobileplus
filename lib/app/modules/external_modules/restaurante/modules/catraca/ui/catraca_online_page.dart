@@ -18,7 +18,7 @@ class CatracaOnlinePage extends GetView<CatracaController> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: 'Atualizar',
+            tooltip: 'atualizar'.tr,
             onPressed: () {
               controller.fetchAreas();
             },
@@ -42,10 +42,10 @@ class CatracaOnlinePage extends GetView<CatracaController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.fromLTRB(20, 24, 20, 8),
                       child: Text(
-                        'Selecione o Campus',
+                        'selecione_o_campus'.tr,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 20,
@@ -73,7 +73,8 @@ class CatracaOnlinePage extends GetView<CatracaController> {
                                 size: 26.0,
                               ),
                               title: Text(
-                                controller.areas[index].nome ?? "Área sem nome",
+                                controller.areas[index].nome ??
+                                    'area_sem_nome'.tr,
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,

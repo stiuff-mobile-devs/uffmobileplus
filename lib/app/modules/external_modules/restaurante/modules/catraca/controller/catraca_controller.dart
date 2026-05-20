@@ -22,7 +22,7 @@ class CatracaController extends GetxController {
   RxBool isDetailResultBusy = false.obs;
   RxBool isManualValidationBusy = false.obs;
   RxBool isOfflineMode = false.obs;
-  RxString statusMessage = "Catraca Online".obs;
+  RxString statusMessage = 'catraca_online'.tr.obs;
   Rx<AreaModel> selectedArea = AreaModel().obs;
 
   late RxList<AreaModel> areas = <AreaModel>[].obs;
@@ -72,11 +72,11 @@ class CatracaController extends GetxController {
     try {
       areas.value = await repository.getAreas(iduff, token);
       isOfflineMode.value = false;
-      statusMessage.value = "Catraca Online";
+      statusMessage.value = 'catraca_online'.tr;
     } catch (e) {
       areas.value = await getOffLineAreas();
       isOfflineMode.value = true;
-      statusMessage.value = "Catraca Offline";
+      statusMessage.value = 'catraca_offline'.tr;
     }
     isAreaBusy.value = false;
   }
@@ -155,7 +155,7 @@ class CatracaController extends GetxController {
       // Validar pagamento online
       if (matchCarteirinhaPagamento == qrCodeScanRes) {
         try {
-          statusMessage.value = "Catraca Online";
+          statusMessage.value = 'catraca_online'.tr;
           isOfflineMode.value = false;
           token = await service.getAccessToken();
 
@@ -179,14 +179,14 @@ class CatracaController extends GetxController {
           debugPrint('Erro ao validar pagamento online: $e');
           isTransactionValid = false;
           isQrCodeValid = false;
-          statusMessage.value = "Catraca Offline";
+          statusMessage.value = 'catraca_offline'.tr;
           isOfflineMode.value = true;
         }
       }
       // Validar pagamento offline
       else if (matchCarteirinhaDigital != null) {
         try {
-          statusMessage.value = "Catraca Offline";
+          statusMessage.value = 'catraca_offline'.tr;
           isOfflineMode.value = true;
 
           RegExp expIdUff = RegExp(r"iduff=([0-9]+)");
@@ -219,13 +219,13 @@ class CatracaController extends GetxController {
 
             if (saveOperatorTransactionsOffline ) {
               transactionResultMessage =
-                  "Transação salva em modo OFFLINE com sucesso!";
+                  'transacao_offline_salva_sucesso'.tr;
               transactionUsername = idUffValue;
               isTransactionValid = true;
               isQrCodeValid = true;
             } else {
               transactionResultMessage =
-                  "Falha ao salvar a transação offline. Erro Interno, tente novamente";
+                  'falha_salvar_transacao_offline'.tr;
               isTransactionValid = false;
               isQrCodeValid = false;
               transactionUsername = idUffValue;
@@ -233,27 +233,27 @@ class CatracaController extends GetxController {
           } else {
             isTransactionValid = false;
             isQrCodeValid = false;
-            transactionResultMessage = "Código QR inválido.";
+            transactionResultMessage = 'codigo_qr_invalido'.tr;
             transactionUsername = "";
           }
         } catch (e) {
           debugPrint('Erro ao validar pagamento offline: $e');
           isTransactionValid = false;
           isQrCodeValid = false;
-          transactionResultMessage = "Erro ao validar pagamento offline.";
+          transactionResultMessage = 'erro_validar_pagamento_offline'.tr;
           transactionUsername = "";
         }
       } else {
         isTransactionValid = false;
         isQrCodeValid = false;
-        transactionResultMessage = "Código QR inválido.";
+        transactionResultMessage = 'codigo_qr_invalido'.tr;
         transactionUsername = '';
       }
     } catch (e) {
       debugPrint('Erro ao ler código QR offline: $e');
       isTransactionValid = false;
       isQrCodeValid = false;
-      transactionResultMessage = "Erro ao ler código QR offline.";
+      transactionResultMessage = 'erro_ler_qr_offline'.tr;
       transactionUsername = "";
     }
     isReadQRCodeBusy.value = false;

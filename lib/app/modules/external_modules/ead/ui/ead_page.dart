@@ -9,7 +9,7 @@ class EadPage extends GetView<EadController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('EAD'),
+        title: Text('ead'.tr),
       ),
       body: Padding(
         padding: const EdgeInsets.all(24),
@@ -18,12 +18,12 @@ class EadPage extends GetView<EadController> {
           children: [
             ElevatedButton(
               onPressed: controller.openClassroom,
-              child: const Text('Google Classroom'),
+              child: Text('google_classroom'.tr),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: controller.openMoodle,
-              child: const Text('Moodle'),
+              child: Text('moodle'.tr),
             ),
           ],
         ),

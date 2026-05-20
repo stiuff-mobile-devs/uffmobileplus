@@ -81,8 +81,8 @@ class ChooseProfileController extends GetxController {
     } catch (e) {
       isBusy.value = false;
       _showErrorSnackbar(
-        "Erro ao carregar dados do usuário",
-        "Ocorreu um erro ao carregar os dados do usuário. Por favor, faça login novamente ou entre em contato com o suporte.",
+        'erro_carregar_dados_usuario'.tr,
+        'erro_carregar_dados_usuario_msg'.tr,
       );
       _logoutIduff();
       debugPrint("Error fetching user data: $e");
@@ -92,8 +92,8 @@ class ChooseProfileController extends GetxController {
         userUmm.activeBond?.objects?.outerObject?[1].innerObjects ?? [];
     if (bonds.isEmpty) {
       _showErrorSnackbar(
-        "Nenhum perfil encontrado",
-        "Não foi possível encontrar nenhum perfil vinculado a esse usuário. Faça login novamente ou entre em contato com o suporte.",
+        'nenhum_perfil_encontrado'.tr,
+        'nenhum_perfil_encontrado_msg'.tr,
       );
       _logoutIduff();
     }
@@ -217,8 +217,8 @@ class ChooseProfileController extends GetxController {
     } catch (e) {
       isBusy.value = false;
       _showErrorSnackbar(
-        "Erro ao salvar dados do usuário",
-        "Ocorreu um erro ao salvar os dados do usuário. Por favor, faça login novamente ou entre em contato com o suporte.",
+        'erro_salvar_dados_usuario'.tr,
+        'erro_salvar_dados_usuario_msg'.tr,
       );
       _logoutIduff();
     } finally {

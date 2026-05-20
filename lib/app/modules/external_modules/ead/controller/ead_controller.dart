@@ -11,7 +11,7 @@ class EadController extends GetxController {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
-      Get.snackbar('Erro', 'Não foi possível abrir o Google Classroom');
+      Get.snackbar('erro'.tr, 'nao_foi_possivel_abrir_google_classroom'.tr);
     }
   }
 
@@ -23,7 +23,7 @@ class EadController extends GetxController {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
-      Get.snackbar('Erro', 'Não foi possível abrir o Moodle');
+      Get.snackbar('erro'.tr, 'nao_foi_possivel_abrir_moodle'.tr);
     }
   }
 }

@@ -340,8 +340,8 @@ class HomePage extends GetView<HomePageController> {
                   children: [
                     _DrawerTile(
                       icon: Icons.settings_outlined,
-                      title: 'Configurações',
-                      subtitle: 'Ajustes do aplicativo',
+                      title: 'configuracoes'.tr,
+                      subtitle: 'ajustes_do_aplicativo'.tr,
                       onTap: () {
                         Navigator.of(context).pop();
                         Get.toNamed(Routes.SETTINGS);
@@ -349,8 +349,8 @@ class HomePage extends GetView<HomePageController> {
                     ),
                     _DrawerTile(
                       icon: Icons.wifi,
-                      title: 'Conexões',
-                      subtitle: 'Informações sobre as infraestrutuas',
+                      title: 'conexoes'.tr,
+                      subtitle: 'informacoes_sobre_infraestruturas'.tr,
                       onTap: () {
                         Navigator.of(context).pop();
                         Get.toNamed(Routes.CONNECTIONS);
@@ -358,8 +358,8 @@ class HomePage extends GetView<HomePageController> {
                     ),
                     _DrawerTile(
                       icon: Icons.info_outline,
-                      title: 'Sobre',
-                      subtitle: 'Informações do app e versão',
+                      title: 'sobre'.tr,
+                      subtitle: 'informacoes_app_versao'.tr,
                       onTap: () {
                         Navigator.of(context).pop();
                         Get.toNamed(Routes.ABOUT);

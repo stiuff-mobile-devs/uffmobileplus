@@ -20,7 +20,7 @@ class ValidarPagamentoPage extends GetView<CatracaController> {
          
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: 'Atualizar',
+            tooltip: 'atualizar'.tr,
             onPressed: () {
               controller.fetchOperatorTransactions();
             },
@@ -53,7 +53,7 @@ class ValidarPagamentoPage extends GetView<CatracaController> {
                             children: [
                               Text(
                                 controller.selectedArea.value.nome ??
-                                    'Área não selecionada',
+                                    'area_nao_selecionada'.tr,
                                 style: TextStyle(
                                   color: Colors.blue[100],
                                   fontSize: 16,
@@ -104,7 +104,7 @@ class ValidarPagamentoPage extends GetView<CatracaController> {
                                       vertical: 18,
                                     ),
                                     child: Text(
-                                      "Nenhuma transação recente.",
+                                      'nenhuma_transacao_recente'.tr,
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 18,
@@ -132,7 +132,7 @@ class ValidarPagamentoPage extends GetView<CatracaController> {
                                 controller.manualValidation();
                               },
                               child: Text(
-                                "Liberar Manualmente ",
+                                '${'liberar_manualmente'.tr} ',
                                 style: TextStyle(color: Colors.blue[100]),
                               ),
                             ),
@@ -159,8 +159,8 @@ class ValidarPagamentoPage extends GetView<CatracaController> {
                             size: 18,
                             color: Colors.white,
                           ),
-                          label: const Text(
-                            "Ler QR Code",
+                          label: Text(
+                            'ler_qr_code'.tr,
                             style: TextStyle(color: Colors.white, fontSize: 18),
                           ),
                           onPressed: () {

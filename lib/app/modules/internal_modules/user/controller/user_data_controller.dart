@@ -117,7 +117,7 @@ class UserDataController extends GetxController {
       );
       return await _userDataRepository.saveUserData(userData);
     } catch (e) {
-      throw Exception("Erro ao salvar dados do usuário: $e"); //TODO: Tratar melhor esse erro
+      throw Exception("Erro ao salvar dados do usuário: $e"); 
     }
   }
 
