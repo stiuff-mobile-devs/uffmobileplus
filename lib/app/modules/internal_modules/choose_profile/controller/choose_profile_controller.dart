@@ -1,11 +1,14 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_umm_model.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_iduff_repository.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_umm_repository.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
+import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/utils/gdi_groups.dart';
 import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
 
@@ -14,6 +17,8 @@ class ChooseProfileController extends GetxController {
 
   final UserUmmRepository userUmmRepository = UserUmmRepository();
   final UserDataRepository userDataRepository = UserDataRepository();
+  final UserIduffRepository userIduffRepository = UserIduffRepository();
+
   late UserDataController _userDataController;
 
   UserData _user = UserData();
@@ -39,7 +44,6 @@ class ChooseProfileController extends GetxController {
 
   @override
   void onInit() async {
-
     super.onInit();
     _userDataController = Get.find<UserDataController>();
     iduff = Get.arguments;
@@ -54,17 +58,16 @@ class ChooseProfileController extends GetxController {
   }
 
   void _checkControlPermission() {
-    try{
-    final groups = _user.gdiGroups;
-    if (groups == null || groups.isEmpty) {
-      hasControlPermission.value = false;
-      return;
-    }
-    hasControlPermission.value = groups.any(
-      (group) => group.gid == GdiGroupsEnum.controladoresDeAcesso.id,
-    );
-    }
-    catch(e){
+    try {
+      final groups = _user.gdiGroups;
+      if (groups == null || groups.isEmpty) {
+        hasControlPermission.value = false;
+        return;
+      }
+      hasControlPermission.value = groups.any(
+        (group) => group.gid == GdiGroupsEnum.controladoresDeAcesso.id,
+      );
+    } catch (e) {
       debugPrint("Error checking control permission: $e");
       hasControlPermission.value = false;
     }
@@ -77,12 +80,23 @@ class ChooseProfileController extends GetxController {
       userUmm = await userUmmRepository.getUserData(iduff);
     } catch (e) {
       isBusy.value = false;
-      throw Exception("Erro ao obter dados do usuário: $e"); //TODO: TRATAR MELHOR ESSE ERRO
-           
+      _showErrorSnackbar(
+        "Erro ao carregar dados do usuário",
+        "Ocorreu um erro ao carregar os dados do usuário. Por favor, faça login novamente ou entre em contato com o suporte.",
+      );
+      _logoutIduff();
+      debugPrint("Error fetching user data: $e");
     }
 
     List<InnerObject> bonds =
-        userUmm.activeBond?.objects?.outerObject?[1].innerObjects ?? []; //TODO: Se for lista vazia da pra pular
+        userUmm.activeBond?.objects?.outerObject?[1].innerObjects ?? [];
+    if (bonds.isEmpty) {
+      _showErrorSnackbar(
+        "Nenhum perfil encontrado",
+        "Não foi possível encontrar nenhum perfil vinculado a esse usuário. Faça login novamente ou entre em contato com o suporte.",
+      );
+      _logoutIduff();
+    }
 
     //Verifica se o usuario tem algum perfil de graduação
     gradQtd = userUmm.grad?.matriculas?.length ?? 0;
@@ -199,12 +213,34 @@ class ChooseProfileController extends GetxController {
 
     try {
       await _userDataController.saveUserData(userUmm, matricula, profileType);
+      Get.offAllNamed(Routes.HOME);
     } catch (e) {
       isBusy.value = false;
-      throw Exception("Erro ao salvar dados do usuário: $e"); //TODO: TRATAR MELHOR ESSE ERRO
+      _showErrorSnackbar(
+        "Erro ao salvar dados do usuário",
+        "Ocorreu um erro ao salvar os dados do usuário. Por favor, faça login novamente ou entre em contato com o suporte.",
+      );
+      _logoutIduff();
+    } finally {
+      isBusy.value = false;
     }
-    isBusy.value = false;
-    Get.offAllNamed(Routes.HOME);
+  }
+
+  void _showErrorSnackbar(String title, String message) {
+    Get.snackbar(
+      title,
+      message,
+      snackPosition: SnackPosition.BOTTOM,
+      snackStyle: SnackStyle.FLOATING,
+      backgroundColor: AppColors.darkBlue(),
+      colorText: Colors.white,
+      borderRadius: 12,
+      margin: const EdgeInsets.all(12),
+      icon: const Icon(
+        Icons.error_outline,
+        color: Colors.redAccent,
+      ),
+    );
   }
 
   void goToCarteirinhaPage() {
@@ -213,5 +249,12 @@ class ChooseProfileController extends GetxController {
 
   void goToCatracaOnlinePage() {
     Get.toNamed(Routes.CATRACA_ONLINE);
+  }
+
+  void _logoutIduff() {
+    userIduffRepository.deleteUserIduffModel();
+    userUmmRepository.deleteUserUmmModel();
+    userDataRepository.clearAllUserData();
+    Get.offAllNamed(Routes.LOGIN);
   }
 }
