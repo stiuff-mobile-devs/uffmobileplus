@@ -1,16 +1,13 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:qr_flutter/qr_flutter.dart';
-import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/controller/carteirinha_digital_controller.dart';
+import 'package:uffmobileplus/app/modules/external_modules/carteirinha_validador/controller/carteirinha_validador_controller.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
-  const CarteirinhaDigitalPage({super.key});
+class CarteirinhaValidadorResultPage extends GetView<CarteirinhaValidadorController> {
+  const CarteirinhaValidadorResultPage({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,13 +17,6 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
         foregroundColor: Colors.white,
         title: Text('carteirinha_digital'.tr),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'atualizar'.tr,
-            onPressed: () {
-              controller.updateQrCodeData();
-            },
-          ),
         ],
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
@@ -96,7 +86,7 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                       SizedBox(
                         height: 140,
                         child: CachedNetworkImage(
-                          imageUrl: controller.getUserPhotoUrl(),
+                          imageUrl: controller.validationData[2] ?? "",
                           progressIndicatorBuilder:
                               (context, url, downloadProgress) =>
                                   CircularProgressIndicator(
@@ -115,13 +105,12 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                       Column(
                         children: [
                           Text(
-                            controller.getUserName() ?? "",
-
+                            controller.validationData[1] ?? "",
                             style: const TextStyle(color: Colors.white),
                           ),
                           Text(
-                            controller.getUserIdUFF().isNotEmpty
-                                ? '${'Documento'.tr}: ${controller.getUserIdUFF()}'
+                            controller.validationData[0].isNotEmpty
+                                ? '${'Documento'.tr}: ${controller.validationData[0]}'
                                 : '',
                             style: const TextStyle(color: Colors.white),
                           ),
@@ -151,7 +140,7 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                               child: Row(
                                 children: [
                                   Text(
-                                    controller.getUserBond(),
+                                    controller.validationData[3][1] ?? "",
                                     textAlign: TextAlign.left,
                                     style: TextStyle(
                                       fontSize: 18,
@@ -173,8 +162,7 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       if (controller
-                                          .getUserMatricula()
-                                          .isNotEmpty) ...[
+                                          .validationData[3][0].isNotEmpty) ...[
                                         Text(
                                           'matricula'.tr,
                                           style: TextStyle(
@@ -183,7 +171,7 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                                           ),
                                         ),
                                         Text(
-                                          controller.getUserMatricula(),
+                                          controller.validationData[3][0],
                                           style: TextStyle(fontSize: 15),
                                         ),
                                       ],
@@ -197,8 +185,7 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       if (controller
-                                          .getUserValidity()
-                                          .isNotEmpty) ...[
+                                          .validationData[3][2].isNotEmpty) ...[
                                         Text(
                                           'validade'.tr,
                                           style: TextStyle(
@@ -207,7 +194,7 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                                           ),
                                         ),
                                         Text(
-                                          controller.getUserValidity(),
+                                          controller.validationData[3][2],
                                           style: TextStyle(fontSize: 15),
                                         ),
                                       ],
@@ -226,8 +213,7 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                                     Row(
                                       children: [
                                         if (controller
-                                            .getUserCourse()
-                                            .isNotEmpty) ...[
+                                            .validationData[3][3].isNotEmpty) ...[
                                           Text(
                                             'curso'.tr,
                                             textAlign: TextAlign.left,
@@ -240,23 +226,15 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                                       ],
                                     ),
                                     Text(
-                                      controller.getUserCourse(),
+                                      controller.validationData[3][3],
                                       style: const TextStyle(fontSize: 15),
                                     ),
                                   ],
                                 ),
                               ),
                             ),
-                            Container(
-                              alignment: Alignment.bottomCenter,
-                              margin: const EdgeInsets.only(
-                                top: 40,
-                                bottom: 36,
-                              ),
-                              width: 180,
-                              height: 180,
-                              child: qrCodeWidget(controller, context),
-                            ),
+                          
+                           
                           ],
                         ),
                       ),
@@ -268,25 +246,4 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
     );
   }
 
-  Stack qrCodeWidget(
-    CarteirinhaDigitalController controller,
-    BuildContext context,
-  ) {
-    return Stack(
-      children: [
-        Obx(
-          () => controller.isQrCodeLoading.value
-              ? Center(child: CircularProgressIndicator())
-              :
-              controller.qrCodeData.isEmpty
-                  ? SizedBox.shrink()
-                  : 
-              QrImageView(
-                  data: controller.qrCodeData,
-                  version: QrVersions.auto,
-                ),
-        ),
-      ],
-    );
-  }
 }

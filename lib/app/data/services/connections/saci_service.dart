@@ -64,4 +64,51 @@ Future<List<dynamic>> getSaciData(String? token, String? iduffUsuario, AuthIduff
     }
     return [];
   }
+
+  Future<List<dynamic>> validateCard(String qrCodeText, AuthIduffService auth) async {
+
+    String url = "https://${Secrets.getValidationResultHost}${Secrets.getValidationResultPath}";
+
+    String iduff = "";
+    String token = "";
+
+    const startIdUff = "&iduff=";
+    const endIdUff = "&";
+    const startToken = "token_validacao=";
+
+    final startIndexIdUff = qrCodeText.indexOf(startIdUff);
+    final endIndexIdUff =
+        qrCodeText.indexOf(endIdUff, startIndexIdUff + startIdUff.length);
+
+    iduff = qrCodeText.substring(
+        startIndexIdUff + startIdUff.length, endIndexIdUff);
+
+    final startIndexToken = qrCodeText.indexOf(startToken);
+
+    token = qrCodeText.substring(startIndexToken + startToken.length);
+
+    var uri = Uri.parse("$url?iduff_usuario=$iduff&token_validacao=$token");
+
+    http.Response response = await auth.client!.post(uri);
+
+    Map<String, dynamic> responseDecoded = json.decode(response.body);
+
+    if (responseDecoded.containsKey("content")) {
+      if (responseDecoded["content"].containsKey("dados_usuario")) {
+        return [
+          responseDecoded["content"]["dados_usuario"]["iduff"],
+          responseDecoded["content"]["dados_usuario"]["nome"],
+          responseDecoded["content"]["dados_usuario"]["foto"],
+          responseDecoded["content"]["dados_usuario"]["vinculacoes"]?? [],
+        ];
+      } else {
+        if (responseDecoded["content"].containsKey("mensagem") &&
+            responseDecoded["content"]["mensagem"] != "") {
+          throw Exception(responseDecoded["content"]["mensagem"]);
+        }
+      }
+    }
+    throw Exception(
+        'Falha ao validar carteirinha. Por favor, tente novamente.');
+  }
 }

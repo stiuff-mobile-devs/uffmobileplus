@@ -1,4 +1,8 @@
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/data/services/leitor_qr_code.dart';
+import 'package:uffmobileplus/app/modules/external_modules/carteirinha_validador/bindings/carteirinha_validador_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/carteirinha_validador/ui/carteirinha_validador_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/carteirinha_validador/ui/pages/resultado_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/connections/bindings/connections_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/connections/ui/connections_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/ead/bindings/ead_binding.dart';
@@ -356,6 +360,22 @@ abstract class AppPages {
       name: Routes.CONNECTIONS,
       page: () => ConnectionsPage(),
       binding: ConnectionsBindings(),
+    ),
+    GetPage(
+      name: Routes.CARTEIRINHA_VALIDADOR,
+      page: () => CarteirinhaValidadorPage(),
+      binding: CarteirinhaValidadorBinding(),
+    ),
+
+    GetPage(
+      name: Routes.CARTEIRINHA_VALIDADOR_RESULTADO,
+      page: () => CarteirinhaValidadorResultPage(),
+      binding: CarteirinhaValidadorBinding(),
+    ),
+
+    GetPage(
+      name: Routes.LEITOR_QR_CODE,
+      page: () => LeitorQrCode(),
     ),
   ];
 }
