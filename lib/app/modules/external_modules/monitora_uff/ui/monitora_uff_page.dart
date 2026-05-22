@@ -64,7 +64,7 @@ class MonitoraUFFPage extends StatelessWidget {
       if (userCtrl.isAdmin()) {
         return _adminDashboard(context);
       } else if (userCtrl.isMonitor()) {
-        return _monitorPage();
+        return _monitorPage(context);
       }
 
       return _unauthorizedPage();
@@ -73,7 +73,7 @@ class MonitoraUFFPage extends StatelessWidget {
 
   /// Usuário verá essa tela apenas se todas as permissões necessárias já tiverem
   /// sido concedidas.
-  Widget mapa() {
+  Widget mapa(BuildContext context) {
     return Stack(
       children: [
         FlutterMap(
@@ -95,7 +95,7 @@ class MonitoraUFFPage extends StatelessWidget {
             _centralizeButton(),
           ],
         ),
-        _selectedUserBar(),
+        _selectedUserBar(context),
       ],
     );
   }
@@ -300,7 +300,7 @@ class MonitoraUFFPage extends StatelessWidget {
     );
   }
 
-  Widget _selectedUserBar() {
+  Widget _selectedUserBar(BuildContext context) {
     return Obx(() {
       final user = trackingCtrl.selectedFirebaseUser.value;
 
@@ -366,6 +366,21 @@ class MonitoraUFFPage extends StatelessWidget {
                           height: 40,
                           child: IconButton(
                             padding: EdgeInsets.zero,
+                            icon: const Icon(
+                              Icons.calendar_month,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {
+                              trackingCtrl.pickTrajectoryDate(context);
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        SizedBox(
+                          width: 40,
+                          height: 40,
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
                             icon: SvgPicture.asset(
                               'assets/monitora_uff/Google_Meet_icon.svg',
                               width: 24,
@@ -426,7 +441,7 @@ class MonitoraUFFPage extends StatelessWidget {
       decoration: BoxDecoration(gradient: AppColors.darkBlueToBlackGradient()),
       child: PersistentTabView(
         context,
-        screens: [mapa(), _adminPage()],
+        screens: [mapa(context), _adminPage()],
         items: [
           PersistentBottomNavBarItem(
             icon: Icon(Icons.map, color: Colors.white),
@@ -558,10 +573,12 @@ class MonitoraUFFPage extends StatelessWidget {
     );
   }
 
-  Widget _monitorPage() {
+  Widget _monitorPage(BuildContext context) {
     return Obx(
       () =>
-          permissionsCtrl.arePermissionsGranted() ? mapa() : permissionScreen(),
+          permissionsCtrl.arePermissionsGranted()
+              ? mapa(context)
+              : permissionScreen(),
     );
   }
 
