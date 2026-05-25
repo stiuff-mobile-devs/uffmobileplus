@@ -59,7 +59,6 @@ import 'package:uffmobileplus/app/modules/internal_modules/choose_profile/bindin
 import 'package:uffmobileplus/app/modules/internal_modules/choose_profile/ui/choose_profile_page.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/bindings/dashboard_binding.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/bindings/settings_binding.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/external_modules_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/ui/pages/settings/about_page.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/ui/pages/settings/settings_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/study_plan/binding/study_plan_bindings.dart';
@@ -376,6 +375,7 @@ abstract class AppPages {
     GetPage(
       name: Routes.LEITOR_QR_CODE,
       page: () => LeitorQrCode(),
+      binding: LeitorQrCodeBinding(),
     ),
   ];
 }

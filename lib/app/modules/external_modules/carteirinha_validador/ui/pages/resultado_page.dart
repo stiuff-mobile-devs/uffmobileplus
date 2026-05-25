@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_validador/controller/carteirinha_validador_controller.dart';
@@ -8,6 +7,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 class CarteirinhaValidadorResultPage extends GetView<CarteirinhaValidadorController> {
   const CarteirinhaValidadorResultPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,8 +16,7 @@ class CarteirinhaValidadorResultPage extends GetView<CarteirinhaValidadorControl
         elevation: 8,
         foregroundColor: Colors.white,
         title: Text('carteirinha_digital'.tr),
-        actions: [
-        ],
+        actions: const [],
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
         ),
@@ -25,7 +24,6 @@ class CarteirinhaValidadorResultPage extends GetView<CarteirinhaValidadorControl
           decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
         ),
       ),
-
       body: Obx(
         () => controller.isBusy.value
             ? const Center(child: CustomProgressDisplay())
@@ -54,7 +52,7 @@ class CarteirinhaValidadorResultPage extends GetView<CarteirinhaValidadorControl
                               children: [
                                 Text(
                                   'universidade'.tr,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 10,
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -62,7 +60,7 @@ class CarteirinhaValidadorResultPage extends GetView<CarteirinhaValidadorControl
                                 ),
                                 Text(
                                   'federal'.tr,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 10,
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -70,7 +68,7 @@ class CarteirinhaValidadorResultPage extends GetView<CarteirinhaValidadorControl
                                 ),
                                 Text(
                                   'fluminense'.tr,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 10,
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -82,11 +80,14 @@ class CarteirinhaValidadorResultPage extends GetView<CarteirinhaValidadorControl
                         ),
                       ),
                       const SizedBox(height: 10),
-                      // Foto do usuário
+                      
+                      // x = 2: Foto do usuário (Fixo)
                       SizedBox(
                         height: 140,
                         child: CachedNetworkImage(
-                          imageUrl: controller.validationData[2] ?? "",
+                          imageUrl: controller.validationData.length > 2 
+                              ? (controller.validationData[2] ?? "") 
+                              : "",
                           progressIndicatorBuilder:
                               (context, url, downloadProgress) =>
                                   CircularProgressIndicator(
@@ -101,15 +102,20 @@ class CarteirinhaValidadorResultPage extends GetView<CarteirinhaValidadorControl
                         ),
                       ),
                       const SizedBox(height: 10),
-                      // Nome e IDUFF do usuário
+                      
+                      // Nome (x = 1) e Documento (x = 0) (Fixos)
                       Column(
                         children: [
                           Text(
-                            controller.validationData[1] ?? "",
-                            style: const TextStyle(color: Colors.white),
+                            controller.validationData.length > 1 
+                                ? (controller.validationData[1] ?? "") 
+                                : "",
+                            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            controller.validationData[0].isNotEmpty
+                            controller.validationData.isNotEmpty &&
+                                    controller.validationData[0] != null &&
+                                    controller.validationData[0].isNotEmpty
                                 ? '${'Documento'.tr}: ${controller.validationData[0]}'
                                 : '',
                             style: const TextStyle(color: Colors.white),
@@ -117,122 +123,138 @@ class CarteirinhaValidadorResultPage extends GetView<CarteirinhaValidadorControl
                         ],
                       ),
                       const SizedBox(height: 10),
-                      // Cartão com informações e QR Code
-                      Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.circular(20),
-                          color: Colors.white,
-                        ),
-                        constraints: const BoxConstraints(minHeight: 300),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 30,
-                          vertical: 16,
-                        ),
-                        child: Column(
-                          children: [
-                            Image.asset(
-                              "assets/carteirinha_digital/images/brasao_uff.png",
-                              height: 100,
+
+                      // --- APENAS SE x = 3: MAPEIA O 'y' DINAMICAMENTE ---
+                        if (controller.validationData.length > 3 && controller.validationData[3] is List)
+                        ...(controller.validationData[3] as List).map((itemY) {
+                          // Extrai o Map que está na posição z = 0 de cada itemY
+                          final Map<String, dynamic> matricula = (itemY is List && itemY.isNotEmpty)
+                              ? itemY[0]
+                              : (itemY is Map ? itemY : {});
+
+                          if (matricula.isEmpty) return const SizedBox.shrink();
+
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.white,
                             ),
-                            Container(
-                              margin: EdgeInsets.only(top: 14),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    controller.validationData[3][0]["descricao"] ?? "",
-                                    textAlign: TextAlign.left,
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.blue[900],
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            constraints: const BoxConstraints(minHeight: 300),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 30,
+                              vertical: 16,
                             ),
-                            Divider(height: 14, color: Colors.blue[800]),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            child: Column(
                               children: [
-                                Visibility(
-                                  visible: true,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                Image.asset(
+                                  "assets/carteirinha_digital/images/brasao_uff.png",
+                                  height: 100,
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.only(top: 14),
+                                  child: Row(
                                     children: [
-                                   
-                                        Text(
-                                          'matricula'.tr,
+                                      Expanded(
+                                        child: Text(
+                                          matricula["descricao"] ?? "",
+                                          textAlign: TextAlign.left,
                                           style: TextStyle(
-                                            fontSize: 15,
+                                            fontSize: 18,
                                             fontWeight: FontWeight.bold,
+                                            color: Colors.blue[900],
                                           ),
                                         ),
-                                        Text(
-                                          controller.validationData[3][0]["matricula"] ?? "",
-                                          style: TextStyle(fontSize: 15),
-                                        ),
-                                      
+                                      ),
                                     ],
                                   ),
                                 ),
-                                Visibility(
-                                  visible: true,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                     
+                                Divider(height: 14, color: Colors.blue[800]),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
                                         Text(
-                                          'validade'.tr,
-                                          style: TextStyle(
+                                          'matricula'.tr,
+                                          style: const TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
                                         Text(
-                                          controller.validationData[3][0]["data_validade"] ?? "",
-                                          style: TextStyle(fontSize: 15),
+                                          matricula["matricula"] ?? "",
+                                          style: const TextStyle(fontSize: 15),
                                         ),
-                                      
+                                      ],
+                                    ),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'validade'.tr,
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          matricula["data_validade"] ?? "",
+                                          style: const TextStyle(fontSize: 15),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.only(top: 10),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            'curso'.tr,
+                                            textAlign: TextAlign.left,
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Text(
+                                        matricula["nome_curso"] ?? "",
+                                        style: const TextStyle(fontSize: 15),
+                                      ),
                                     ],
                                   ),
                                 ),
                               ],
                             ),
-                            Visibility(
-                              visible: true,
-                              child: Container(
-                                margin: EdgeInsets.only(top: 10),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        
-                                          Text(
-                                            'curso'.tr,
-                                            textAlign: TextAlign.left,
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        
-                                      ],
-                                    ),
-                                    Text(
-                                      controller.validationData[3][0]["nome_curso"] ?? "",
-                                      style: const TextStyle(fontSize: 15),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                          );
+                        }),
+                      const SizedBox(height: 20),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              await controller.scanQrCode();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              backgroundColor: Colors.blue,
                             ),
-                          
-                           
-                          ],
+                            child: Text(
+                              'Escanear nova carteirinha',
+                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -242,5 +264,4 @@ class CarteirinhaValidadorResultPage extends GetView<CarteirinhaValidadorControl
       ),
     );
   }
-
 }

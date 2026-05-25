@@ -22,6 +22,13 @@ class LeitorQrCodesController extends GetxController {
   }
 }
 
+class LeitorQrCodeBinding implements Bindings {
+  @override
+  void dependencies() {
+    Get.lazyPut<LeitorQrCodesController>(() => LeitorQrCodesController());
+  }
+}
+
 class LeitorQrCode extends GetView<LeitorQrCodesController> {
   const LeitorQrCode({super.key});
 

@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_validador/repository/carteirinha_validador_repository.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
+import 'package:uffmobileplus/app/utils/ui_components/custom_alert_dialog.dart';
 
 class CarteirinhaValidadorController extends GetxController {
   CarteirinhaValidadorController();
@@ -26,17 +27,28 @@ class CarteirinhaValidadorController extends GetxController {
       validationData = await repository.validateCard(qrCodeText, _auth);
       await _buildResult();
     }catch (e) {
-      Get.snackbar("Erro", "Ocorreu um erro ao validar a carteirinha.");
+      await _buildResult(e.toString());
     } finally {
       isBusy.value = false;
     }
   }
 
-  Future<void> _buildResult() async {
+  Future<void> _buildResult([String? errorMessage]) async {
     if (validationData.isNotEmpty) {
       Get.toNamed(Routes.CARTEIRINHA_VALIDADOR_RESULTADO);
     } else {
-      Get.snackbar("Resultado", "Carteirinha inválida ou dados não encontrados.");
+      if (Get.context != null) {
+        final dialog = idUffAlertDialog(
+          Get.context!,
+          title: "Resultado",
+          desc: errorMessage ?? "Carteirinha inválida ou dados não encontrados.",
+          btnConfirmText: "OK",
+          // keep default dialogType to match project style
+        );
+        dialog.show();
+      } else {
+        Get.snackbar("Resultado", errorMessage ?? "Carteirinha inválida ou dados não encontrados.");
+      }
     }
 
 
