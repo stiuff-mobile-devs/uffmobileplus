@@ -73,4 +73,12 @@ abstract class Routes {
 
   // Conexões
   static const CONNECTIONS = '/connections';
+
+  // Carteirinha Validador
+  static const CARTEIRINHA_VALIDADOR = '/carteirinha_validador';
+
+  static const CARTEIRINHA_VALIDADOR_RESULTADO = '/carteirinha_validador_resultado';
+
+  //  leitor de QR Code
+  static const LEITOR_QR_CODE = '/leitor_qr_code';  
 }
