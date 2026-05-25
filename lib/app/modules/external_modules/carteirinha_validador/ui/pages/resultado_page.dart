@@ -140,7 +140,7 @@ class CarteirinhaValidadorResultPage extends GetView<CarteirinhaValidadorControl
                               child: Row(
                                 children: [
                                   Text(
-                                    controller.validationData[3][1] ?? "",
+                                    controller.validationData[3][0]["descricao"] ?? "",
                                     textAlign: TextAlign.left,
                                     style: TextStyle(
                                       fontSize: 18,
@@ -161,8 +161,7 @@ class CarteirinhaValidadorResultPage extends GetView<CarteirinhaValidadorControl
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      if (controller
-                                          .validationData[3][0].isNotEmpty) ...[
+                                   
                                         Text(
                                           'matricula'.tr,
                                           style: TextStyle(
@@ -171,10 +170,10 @@ class CarteirinhaValidadorResultPage extends GetView<CarteirinhaValidadorControl
                                           ),
                                         ),
                                         Text(
-                                          controller.validationData[3][0],
+                                          controller.validationData[3][0]["matricula"] ?? "",
                                           style: TextStyle(fontSize: 15),
                                         ),
-                                      ],
+                                      
                                     ],
                                   ),
                                 ),
@@ -184,8 +183,7 @@ class CarteirinhaValidadorResultPage extends GetView<CarteirinhaValidadorControl
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      if (controller
-                                          .validationData[3][2].isNotEmpty) ...[
+                                     
                                         Text(
                                           'validade'.tr,
                                           style: TextStyle(
@@ -194,10 +192,10 @@ class CarteirinhaValidadorResultPage extends GetView<CarteirinhaValidadorControl
                                           ),
                                         ),
                                         Text(
-                                          controller.validationData[3][2],
+                                          controller.validationData[3][0]["data_validade"] ?? "",
                                           style: TextStyle(fontSize: 15),
                                         ),
-                                      ],
+                                      
                                     ],
                                   ),
                                 ),
@@ -212,8 +210,7 @@ class CarteirinhaValidadorResultPage extends GetView<CarteirinhaValidadorControl
                                   children: [
                                     Row(
                                       children: [
-                                        if (controller
-                                            .validationData[3][3].isNotEmpty) ...[
+                                        
                                           Text(
                                             'curso'.tr,
                                             textAlign: TextAlign.left,
@@ -222,11 +219,11 @@ class CarteirinhaValidadorResultPage extends GetView<CarteirinhaValidadorControl
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                        ],
+                                        
                                       ],
                                     ),
                                     Text(
-                                      controller.validationData[3][3],
+                                      controller.validationData[3][0]["nome_curso"] ?? "",
                                       style: const TextStyle(fontSize: 15),
                                     ),
                                   ],
