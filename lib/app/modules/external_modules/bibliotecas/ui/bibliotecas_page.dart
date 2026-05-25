@@ -10,62 +10,98 @@ class BibliotecasPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          centerTitle: true,
-          elevation: 8,
-          foregroundColor: Colors.white,
-          title: Text('bibliotecas'.tr),
-          flexibleSpace: Container(
-          decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
-        ),
-      ),
-      backgroundColor: AppColors.lightBlue(),
       body: Container(
         decoration: BoxDecoration(
           gradient: AppColors.darkBlueToBlackGradient(),
         ),
-        // Adicionamos o GetBuilder com o init para instanciar o Controller
         child: GetBuilder<BibliotecasController>(
-          init: BibliotecasController(), 
+          init: BibliotecasController(),
           builder: (controller) {
             return Obx(() {
-              return CustomScrollView(
-                slivers: [
-                  SliverPadding(
-                    padding: const EdgeInsets.all(20),
-                    sliver: SliverGrid(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        return bibliotecasModulesWidget(
-                          controller.bibliotecasModulesList[index],
-                          controller,
-                          context,
-                        );
-                      }, childCount: controller.bibliotecasModulesList.length),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        childAspectRatio: 0.9,
+              final modules = controller.bibliotecasModulesList;
+              final moduleCount = modules.length;
+
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  final crossAxisCount = _crossAxisCountForWidth(constraints.maxWidth);
+                  final childAspectRatio = constraints.maxWidth < 360
+                      ? 0.86
+                      : constraints.maxWidth < 600
+                          ? 0.92
+                          : 0.98;
+
+                  return CustomScrollView(
+                    slivers: [
+                      SliverAppBar(
+                        foregroundColor: Colors.white,
+                        title: Text('bibliotecas'.tr),
+                        centerTitle: true,
+                        elevation: 8,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(
+                            bottom: Radius.circular(10),
+                          ),
+                        ),
+                        flexibleSpace: Container(
+                          decoration: BoxDecoration(
+                            gradient: AppColors.appBarTopGradient(),
+                          ),
+                        ),
+                        actions: <Widget>[
+                          IconButton(
+                            onPressed: () {},
+                            icon: const Icon(Icons.question_mark),
+                          ),
+                        ],
                       ),
-                    ),
-                  ),
-                ],
+                      SliverPadding(
+                        padding: const EdgeInsets.fromLTRB(16, 18, 16, 20),
+                        sliver: SliverGrid(
+                          delegate: SliverChildBuilderDelegate((context, index) {
+                            final bibliotecaModule = modules[index];
+                            return _moduleCard(
+                              bibliotecaModule: bibliotecaModule,
+                              controller: controller,
+                            );
+                          }, childCount: moduleCount),
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: crossAxisCount,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                            childAspectRatio: childAspectRatio,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
               );
             });
           }
         ),
-      )
+      ),
     );
   }
 
-  Widget bibliotecasModulesWidget(
-    BibliotecasModules bibliotecaModule,
-    BibliotecasController controller,
-    BuildContext context,
-  ) {
-    Widget module = GestureDetector(
+  int _crossAxisCountForWidth(double width) {
+    if (width < 360) return 2;
+    if (width < 600) return 3;
+    if (width < 900) return 4;
+    return 5;
+  }
+
+  Widget _moduleCard({
+    required BibliotecasModules bibliotecaModule,
+    required BibliotecasController controller,
+  }) {
+    return Material(
+      color: Colors.transparent,
       child: InkWell(
-        splashColor: Colors.blue.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(18),
+        splashColor: Colors.white.withOpacity(0.08),
+        highlightColor: Colors.white.withOpacity(0.04),
         onTap: () async {
-          await Future.delayed(const Duration(milliseconds: 100));
+          await Future.delayed(const Duration(milliseconds: 80));
           controller.navigateTo(
             bibliotecaModule.page,
             interrogation: bibliotecaModule.interrogation ?? false,
@@ -73,66 +109,95 @@ class BibliotecasPage extends StatelessWidget {
             appBarTitle: bibliotecaModule.subtitle,
           );
         },
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            iconVisualEffect(
-              child: SvgPicture.asset(
-                bibliotecaModule.iconSrc,
-                width: 50,
-                height: 50,
-                color: Colors.white,
-              ),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withOpacity(0.08),
+                Colors.white.withOpacity(0.03),
+              ],
             ),
-            const SizedBox(height: 10),
-            Align(
-              alignment: Alignment.center,
-              child: Text(
-                bibliotecaModule.subtitle.tr,
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: Colors.white.withOpacity(0.08)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.18),
+                blurRadius: 14,
+                offset: const Offset(0, 8),
               ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+            child: Stack(
+              children: [
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: Container(
+                    width: 32,
+                    height: 3,
+                    decoration: BoxDecoration(
+                      gradient: AppColors.appBarTopGradient(),
+                      borderRadius: BorderRadius.circular(99),
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.center,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 58,
+                        height: 58,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: RadialGradient(
+                            colors: [
+                              Colors.cyan.withOpacity(0.30),
+                              Colors.blue.withOpacity(0.18),
+                              AppColors.darkBlue().withOpacity(0.08),
+                            ],
+                          ),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.16),
+                          ),
+                        ),
+                        child: Center(
+                          child: SvgPicture.asset(
+                            bibliotecaModule.iconSrc,
+                            width: 28,
+                            height: 28,
+                            colorFilter: const ColorFilter.mode(
+                              Colors.white,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        bibliotecaModule.subtitle.tr,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          height: 1.1,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
-    );
-    return module;
-  }
-
-  Widget iconVisualEffect({required Widget child}) {
-    return Container(
-      width: 85,
-      height: 85,
-      decoration: BoxDecoration(
-        gradient: RadialGradient(
-          colors: [
-            Colors.cyan.withOpacity(0.4),
-            Colors.blue.withOpacity(0.2),
-            AppColors.darkBlue().withOpacity(0.1),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(42.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.cyan.withOpacity(0.6),
-            blurRadius: 20,
-            spreadRadius: 0,
-          ),
-          BoxShadow(
-            color: Colors.blue.withOpacity(0.3),
-            blurRadius: 30,
-            spreadRadius: 5,
-          ),
-          BoxShadow(
-            color: Colors.white.withOpacity(0.1),
-            blurRadius: 10,
-            spreadRadius: 1,
-          ),
-        ],
-        border: Border.all(color: Colors.cyan.withOpacity(0.5), width: 1.5),
-      ),
-      child: Center(child: child),
     );
   }
 }

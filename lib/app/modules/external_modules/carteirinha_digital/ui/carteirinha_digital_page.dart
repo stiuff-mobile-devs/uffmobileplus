@@ -257,7 +257,6 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                               height: 180,
                               child: qrCodeWidget(controller, context),
                             ),
-                            validateButton(),
                           ],
                         ),
                       ),
@@ -265,70 +264,6 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                   ),
                 ),
               ),
-      ),
-    );
-  }
-
-  GestureDetector validateButton() {
-    return GestureDetector(
-      onTap: () async {
-        if (Platform.isAndroid) {
-          await canLaunchUrl(
-                Uri(
-                  scheme: "https",
-                  host: "play.google.com",
-                  path: "/store/apps/details",
-                  queryParameters: {'id': 'br.uff.validador_carteirinha_uff'},
-                ),
-              )
-              ? await launchUrl(
-                  Uri(
-                    scheme: "https",
-                    host: "play.google.com",
-                    path: "/store/apps/details",
-                    queryParameters: {'id': 'br.uff.validador_carteirinha_uff'},
-                  ),
-                )
-              : throw 'Could not launch validador url';
-        } else if (Platform.isIOS) {
-          await canLaunchUrl(
-                Uri(
-                  scheme: "https",
-                  host: "apps.apple.com",
-                  path: "/br/app/validador-carteirinha-uff/id1569202162",
-                ),
-              )
-              ? await launchUrl(
-                  Uri(
-                    scheme: "https",
-                    host: "apps.apple.com",
-                    path: "/br/app/validador-carteirinha-uff/id1569202162",
-                  ),
-                )
-              : throw 'Could not launch validador url';
-        }
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          shape: BoxShape.rectangle,
-          borderRadius: BorderRadius.circular(16),
-          color: Colors.grey[200],
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        margin: const EdgeInsets.only(top: 20, bottom: 16),
-        child: RichText(
-          textAlign: TextAlign.center,
-          text: TextSpan(
-            style: TextStyle(fontSize: 13.0, color: Colors.black),
-            children: [
-              TextSpan(text: "validador_instrucao".tr),
-              TextSpan(
-                text: ' ${'validador_carteirinha_uff'.tr}',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

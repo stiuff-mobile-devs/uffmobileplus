@@ -1,4 +1,8 @@
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/data/services/leitor_qr_code.dart';
+import 'package:uffmobileplus/app/modules/external_modules/carteirinha_validador/bindings/carteirinha_validador_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/carteirinha_validador/ui/carteirinha_validador_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/carteirinha_validador/ui/pages/resultado_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/connections/bindings/connections_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/connections/ui/connections_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/ead/bindings/ead_binding.dart';
@@ -55,7 +59,6 @@ import 'package:uffmobileplus/app/modules/internal_modules/choose_profile/bindin
 import 'package:uffmobileplus/app/modules/internal_modules/choose_profile/ui/choose_profile_page.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/bindings/dashboard_binding.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/bindings/settings_binding.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/external_modules_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/ui/pages/settings/about_page.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/ui/pages/settings/settings_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/study_plan/binding/study_plan_bindings.dart';
@@ -356,6 +359,23 @@ abstract class AppPages {
       name: Routes.CONNECTIONS,
       page: () => ConnectionsPage(),
       binding: ConnectionsBindings(),
+    ),
+    GetPage(
+      name: Routes.CARTEIRINHA_VALIDADOR,
+      page: () => CarteirinhaValidadorPage(),
+      binding: CarteirinhaValidadorBinding(),
+    ),
+
+    GetPage(
+      name: Routes.CARTEIRINHA_VALIDADOR_RESULTADO,
+      page: () => CarteirinhaValidadorResultPage(),
+      binding: CarteirinhaValidadorBinding(),
+    ),
+
+    GetPage(
+      name: Routes.LEITOR_QR_CODE,
+      page: () => LeitorQrCode(),
+      binding: LeitorQrCodeBinding(),
     ),
   ];
 }

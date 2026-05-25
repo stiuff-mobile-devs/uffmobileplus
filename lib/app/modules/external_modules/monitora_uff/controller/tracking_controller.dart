@@ -4,7 +4,14 @@ import 'dart:io';
 import 'package:android_intent_plus/android_intent.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'
-    show Colors, WidgetsBindingObserver, AlertDialog, Text, TextButton;
+  show
+    AlertDialog,
+    BuildContext,
+    Colors,
+    Text,
+    TextButton,
+    WidgetsBindingObserver,
+    showDatePicker;
 import 'package:flutter/services.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_compass/flutter_compass.dart';
@@ -61,6 +68,7 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
 
   /// Trajetória recente do usuário focado (aquele cuja barra inferior está visível).
   final RxList<LocationPoint> selectedTrajectory = <LocationPoint>[].obs;
+  final Rxn<DateTime> selectedTrajectoryDay = Rxn<DateTime>();
   StreamSubscription<List<LocationPoint>>? _trajectorySubscription;
   Future<void> centerMapOnCurrentLocation() async {
     try {
@@ -186,20 +194,47 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
 
   void openFirebaseUserDetails(UserModel user) {
     selectedFirebaseUser.value = user;
+    selectedTrajectoryDay.value = null;
+    _subscribeToTrajectory(user);
+  }
 
-    // Cancelar listener anterior (se houver) e iniciar um novo para
-    // o usuário focado.
+  void _subscribeToTrajectory(UserModel user, {DateTime? day}) {
     _trajectorySubscription?.cancel();
     selectedTrajectory.clear();
-    _trajectorySubscription = FirebaseProvider()
-        .getRecentTrajectory(user.email)
-        .listen((points) {
+
+    final stream = day == null
+        ? FirebaseProvider().getRecentTrajectory(user.email)
+        : FirebaseProvider().getTrajectoryForDate(user.email, day: day);
+
+    _trajectorySubscription = stream.listen((points) {
       selectedTrajectory.value = points;
     });
   }
 
+  Future<void> pickTrajectoryDate(BuildContext context) async {
+    final user = selectedFirebaseUser.value;
+    if (user == null) return;
+
+    final now = DateTime.now();
+    final initial = selectedTrajectoryDay.value ?? now;
+
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime(initial.year, initial.month, initial.day),
+      firstDate: DateTime(now.year - 5, 1, 1),
+      lastDate: DateTime(now.year, now.month, now.day),
+    );
+
+    if (picked == null) return;
+
+    final normalized = DateTime(picked.year, picked.month, picked.day);
+    selectedTrajectoryDay.value = normalized;
+    _subscribeToTrajectory(user, day: normalized);
+  }
+
   void closeFirebaseUserDetails() {
     selectedFirebaseUser.value = null;
+    selectedTrajectoryDay.value = null;
 
     _trajectorySubscription?.cancel();
     _trajectorySubscription = null;
