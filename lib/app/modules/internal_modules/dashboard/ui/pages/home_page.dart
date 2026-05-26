@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/data/services/responsive_layout_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/home_page_controller.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
@@ -8,6 +9,76 @@ import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.da
 
 class HomePage extends GetView<HomePageController> {
   const HomePage({super.key});
+
+  ResponsiveLayoutService get _layoutService =>
+      Get.find<ResponsiveLayoutService>();
+
+  static const ResponsiveGridConfig _shortcutGridConfig =
+      ResponsiveGridConfig(
+    breakpoints: [
+      ResponsiveGridBreakpoint(
+        maxWidth: 360,
+        spec: ResponsiveGridSpec(
+          crossAxisCount: 2,
+          childAspectRatio: 0.86,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+          cardPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 9),
+          iconBoxSize: 30,
+          iconPadding: 5,
+          iconBorderRadius: 10,
+          labelFontSize: 10,
+          labelHeight: 1.05,
+          iconLabelSpacing: 6,
+        ),
+      ),
+      ResponsiveGridBreakpoint(
+        maxWidth: 600,
+        spec: ResponsiveGridSpec(
+          crossAxisCount: 3,
+          childAspectRatio: 0.92,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+          cardPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+          iconBoxSize: 32,
+          iconPadding: 6,
+          iconBorderRadius: 10,
+          labelFontSize: 10.5,
+          labelHeight: 1.05,
+          iconLabelSpacing: 8,
+        ),
+      ),
+      ResponsiveGridBreakpoint(
+        maxWidth: 900,
+        spec: ResponsiveGridSpec(
+          crossAxisCount: 4,
+          childAspectRatio: 0.98,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+          cardPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+          iconBoxSize: 32,
+          iconPadding: 6,
+          iconBorderRadius: 10,
+          labelFontSize: 10.5,
+          labelHeight: 1.05,
+          iconLabelSpacing: 8,
+        ),
+      ),
+    ],
+    defaultSpec: ResponsiveGridSpec(
+      crossAxisCount: 5,
+      childAspectRatio: 0.98,
+      crossAxisSpacing: 8,
+      mainAxisSpacing: 8,
+      cardPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+      iconBoxSize: 32,
+      iconPadding: 6,
+      iconBorderRadius: 10,
+      labelFontSize: 10.5,
+      labelHeight: 1.05,
+      iconLabelSpacing: 8,
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +105,8 @@ class HomePage extends GetView<HomePageController> {
       ),
       body: Obx(() {
         final safeBottom = MediaQuery.of(context).padding.bottom;
-        final bottomPadding = safeBottom + kBottomNavigationBarHeight + 24;
+        final bottomPadding =
+            _layoutService.bottomPadding(safeBottom: safeBottom);
 
         return Container(
           width: double.infinity,
@@ -48,13 +120,9 @@ class HomePage extends GetView<HomePageController> {
                   bottom: false,
                   child: LayoutBuilder(
                     builder: (context, constraints) {
-                      final crossAxisCount =
-                          _shortcutGridCrossAxisCountForWidth(
-                        constraints.maxWidth,
-                      );
-                      final childAspectRatio =
-                          _shortcutGridChildAspectRatioForWidth(
-                        constraints.maxWidth,
+                      final layoutSpec = _layoutService.gridSpecForWidth(
+                        width: constraints.maxWidth,
+                        config: _shortcutGridConfig,
                       );
 
                       return CustomScrollView(
@@ -145,6 +213,7 @@ class HomePage extends GetView<HomePageController> {
                                       controller.savedShortcuts[index];
                                   return _ShortcutCard(
                                     item: item,
+                                    layoutSpec: layoutSpec,
                                     isRemoveMode:
                                         controller.isRemovingShortcuts.value,
                                     onTap: () {
@@ -162,10 +231,10 @@ class HomePage extends GetView<HomePageController> {
                               ),
                               gridDelegate:
                                   SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: crossAxisCount,
-                                crossAxisSpacing: 8,
-                                mainAxisSpacing: 8,
-                                childAspectRatio: childAspectRatio,
+                                crossAxisCount: layoutSpec.crossAxisCount,
+                                crossAxisSpacing: layoutSpec.crossAxisSpacing,
+                                mainAxisSpacing: layoutSpec.mainAxisSpacing,
+                                childAspectRatio: layoutSpec.childAspectRatio,
                               ),
                             ),
                           ),
@@ -177,19 +246,6 @@ class HomePage extends GetView<HomePageController> {
         );
       }),
     );
-  }
-
-  int _shortcutGridCrossAxisCountForWidth(double width) {
-    if (width < 360) return 2;
-    if (width < 600) return 3;
-    if (width < 900) return 4;
-    return 5;
-  }
-
-  double _shortcutGridChildAspectRatioForWidth(double width) {
-    if (width < 360) return 0.86;
-    if (width < 600) return 0.92;
-    return 0.98;
   }
 
   Widget _buildUpdateBanner() {
@@ -522,11 +578,13 @@ class _ShortcutCard extends StatelessWidget {
     required this.item,
     required this.onTap,
     required this.isRemoveMode,
+    required this.layoutSpec,
   });
 
   final DashboardShortcut item;
   final VoidCallback onTap;
   final bool isRemoveMode;
+  final ResponsiveGridSpec layoutSpec;
 
   @override
   Widget build(BuildContext context) {
@@ -552,12 +610,15 @@ class _ShortcutCard extends StatelessWidget {
                 ),
                 border: Border.all(color: Colors.white.withOpacity(0.08)),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+              padding: layoutSpec.cardPadding,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _ServiceIcon(iconSrc: item.iconSrc),
-                  const SizedBox(height: 8),
+                  _ServiceIcon(
+                    iconSrc: item.iconSrc,
+                    layoutSpec: layoutSpec,
+                  ),
+                  SizedBox(height: layoutSpec.iconLabelSpacing),
                   Text(
                     item.subtitle,
                     textAlign: TextAlign.center,
@@ -565,9 +626,9 @@ class _ShortcutCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.92),
-                      fontSize: 10.5,
+                      fontSize: layoutSpec.labelFontSize,
                       fontWeight: FontWeight.w600,
-                      height: 1.05,
+                      height: layoutSpec.labelHeight,
                     ),
                   ),
                 ],
@@ -599,21 +660,26 @@ class _ShortcutCard extends StatelessWidget {
 }
 
 class _ServiceIcon extends StatelessWidget {
-  const _ServiceIcon({required this.iconSrc});
+  const _ServiceIcon({required this.iconSrc, this.layoutSpec});
 
   final String iconSrc;
+  final ResponsiveGridSpec? layoutSpec;
 
   @override
   Widget build(BuildContext context) {
+    final iconSize = layoutSpec?.iconBoxSize ?? 32;
+    final iconPadding = layoutSpec?.iconPadding ?? 6;
+    final iconRadius = layoutSpec?.iconBorderRadius ?? 10;
+
     return Container(
-      height: 32,
-      width: 32,
+      height: iconSize,
+      width: iconSize,
       decoration: BoxDecoration(
         color: AppColors.lightBlue().withOpacity(0.14),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(iconRadius),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(6),
+        padding: EdgeInsets.all(iconPadding),
         child: iconSrc.endsWith('.svg')
             ? SvgPicture.asset(
                 iconSrc,
