@@ -4,6 +4,7 @@ import 'package:googleapis/driveactivity/v2.dart';
 import 'package:uffmobileplus/app/data/services/app_availability_service.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/data/services/deep_link_service.dart';
+import 'package:uffmobileplus/app/data/services/responsive_layout_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/controller/restaurant_modules_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/external_modules_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
@@ -27,8 +28,11 @@ class HomePageController extends GetxController {
   late ExternalModulesController _externalModulesController;
   UserDataRepository userDataRepository = UserDataRepository();
   late RestaurantModulesController _restaurantModulesController;
+  late ResponsiveLayoutService _layoutService;
 
   late Worker _servicesWorker;
+
+  ResponsiveLayoutService get layoutService => _layoutService;
 
   List<DashboardShortcut> get allShortcutItems {
     final byRoute = <String, DashboardShortcut>{};
@@ -86,6 +90,7 @@ class HomePageController extends GetxController {
     super.onInit();
     _externalModulesController = Get.find<ExternalModulesController>();
     _restaurantModulesController = Get.find<RestaurantModulesController>();
+    _layoutService = Get.find<ResponsiveLayoutService>();
 
     _bindServicesCatalog();
     _loadSavedShortcuts();

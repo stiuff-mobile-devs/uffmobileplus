@@ -10,9 +10,6 @@ import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.da
 class HomePage extends GetView<HomePageController> {
   const HomePage({super.key});
 
-  ResponsiveLayoutService get _layoutService =>
-      Get.find<ResponsiveLayoutService>();
-
   static const ResponsiveGridConfig _shortcutGridConfig =
       ResponsiveGridConfig(
     breakpoints: [
@@ -104,9 +101,10 @@ class HomePage extends GetView<HomePageController> {
         ),
       ),
       body: Obx(() {
+        final layoutService = controller.layoutService;
         final safeBottom = MediaQuery.of(context).padding.bottom;
         final bottomPadding =
-            _layoutService.bottomPadding(safeBottom: safeBottom);
+            layoutService.bottomPadding(safeBottom: safeBottom);
 
         return Container(
           width: double.infinity,
@@ -120,7 +118,7 @@ class HomePage extends GetView<HomePageController> {
                   bottom: false,
                   child: LayoutBuilder(
                     builder: (context, constraints) {
-                      final layoutSpec = _layoutService.gridSpecForWidth(
+                      final layoutSpec = layoutService.gridSpecForWidth(
                         width: constraints.maxWidth,
                         config: _shortcutGridConfig,
                       );
