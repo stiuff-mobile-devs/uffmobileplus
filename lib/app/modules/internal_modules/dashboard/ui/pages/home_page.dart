@@ -105,6 +105,10 @@ class HomePage extends GetView<HomePageController> {
         final safeBottom = MediaQuery.of(context).padding.bottom;
         final bottomPadding =
             layoutService.bottomPadding(safeBottom: safeBottom);
+        final isLoading = controller.isLoading.value;
+        final isRemoving = controller.isRemovingShortcuts.value;
+        final savedShortcuts =
+            controller.savedShortcuts.toList(growable: false);
 
         return Container(
           width: double.infinity,
@@ -112,7 +116,7 @@ class HomePage extends GetView<HomePageController> {
           decoration: BoxDecoration(
             gradient: AppColors.darkBlueToBlackGradient(),
           ),
-          child: controller.isLoading.value
+          child: isLoading
               ? const Center(child: CustomProgressDisplay())
               : SafeArea(
                   bottom: false,
@@ -172,8 +176,7 @@ class HomePage extends GetView<HomePageController> {
                                         icon: Container(
                                           padding: const EdgeInsets.all(4),
                                           decoration: BoxDecoration(
-                                            color: controller
-                                                    .isRemovingShortcuts.value
+                                            color: isRemoving
                                                 ? Colors.red.withOpacity(0.25)
                                                 : Colors.white.withOpacity(0.12),
                                             borderRadius:
@@ -207,16 +210,14 @@ class HomePage extends GetView<HomePageController> {
                             sliver: SliverGrid(
                               delegate: SliverChildBuilderDelegate(
                                 (context, index) {
-                                  final item =
-                                      controller.savedShortcuts[index];
+                                  final item = savedShortcuts[index];
                                   return _ShortcutCard(
+                                    key: ValueKey(item.page),
                                     item: item,
                                     layoutSpec: layoutSpec,
-                                    isRemoveMode:
-                                        controller.isRemovingShortcuts.value,
+                                    isRemoveMode: isRemoving,
                                     onTap: () {
-                                      if (controller
-                                          .isRemovingShortcuts.value) {
+                                      if (isRemoving) {
                                         controller.removeShortcut(item);
                                         return;
                                       }
@@ -225,7 +226,7 @@ class HomePage extends GetView<HomePageController> {
                                     },
                                   );
                                 },
-                                childCount: controller.savedShortcuts.length,
+                                childCount: savedShortcuts.length,
                               ),
                               gridDelegate:
                                   SliverGridDelegateWithFixedCrossAxisCount(
@@ -352,10 +353,17 @@ class HomePage extends GetView<HomePageController> {
       ),
       builder: (context) {
         return Obx(() {
-          final remainingServices = controller.availableToAdd;
+          final remainingServices =
+              controller.availableToAdd.toList(growable: false);
+          final layoutService = controller.layoutService;
+          final safeBottom = MediaQuery.of(context).padding.bottom;
+          final bottomPadding =
+              layoutService.bottomPadding(safeBottom: safeBottom);
+
           return SafeArea(
+            bottom: false,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+              padding: EdgeInsets.fromLTRB(16, 14, 16, bottomPadding),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -573,6 +581,7 @@ class HomePage extends GetView<HomePageController> {
 
 class _ShortcutCard extends StatelessWidget {
   const _ShortcutCard({
+    super.key,
     required this.item,
     required this.onTap,
     required this.isRemoveMode,
