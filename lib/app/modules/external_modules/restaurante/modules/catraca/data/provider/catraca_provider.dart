@@ -33,34 +33,41 @@ class CatracaOnlineProvider {
     }
   }
 
-  Future<List<OperatorTransactionOffline>> getOperatorTransactionsFromFirebase(
-    String iduffOperator,
-  ) async {
-    try {
-      final snapshot = await _firestore
-          .collection(_collectionPathFirebase)
-          .where('idUffOperator', isEqualTo: iduffOperator)
-          .get();
-      return snapshot.docs
-          .map((doc) {
-            try {
-              final data = doc.data();
-              return OperatorTransactionOffline.fromJson(
-                Map<String, dynamic>.from(data),
-              );
-            } catch (e) {
-              // ignora documentos com formato inválido
-              return null;
-            }
-          })
-          .where((t) => t != null)
-          .cast<OperatorTransactionOffline>()
-          .toList();
-    } catch (e) {
-      // Em caso de erro, retorna lista vazia
-      return [];
-    }
+Future<List<OperatorTransactionOffline>> getOperatorTransactionsFromFirebase(
+  String iduffOperator,
+) async {
+  try {
+    final now = DateTime.now();
+    final limite24Horas = now.subtract(const Duration(hours: 24));
+
+    final snapshot = await _firestore
+        .collection(_collectionPathFirebase)
+        .where('idUffOperator', isEqualTo: iduffOperator)
+        .where('entryTime', isGreaterThan: limite24Horas) 
+        .get();
+
+    return snapshot.docs
+        .map((doc) {
+          try {
+            final data = doc.data();
+            return OperatorTransactionOffline.fromJson(
+              Map<String, dynamic>.from(data),
+            );
+          } catch (e) {
+            // ignora documentos com formato inválido
+            print('Erro ao converter documento individual: $e');
+            return null;
+          }
+        })
+        .where((t) => t != null)
+        .cast<OperatorTransactionOffline>()
+        .toList();
+  } catch (e) {
+    print('Erro ao buscar transações do Firebase: $e');
+    // Em caso de erro, retorna lista vazia
+    return [];
   }
+}
 
   Future<String> saveOperatorTransactionToFirebase(
     OperatorTransactionOffline operatorTransactionOffline,

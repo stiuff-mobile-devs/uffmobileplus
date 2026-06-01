@@ -211,7 +211,7 @@ class CatracaController extends GetxController {
             }
             OperatorTransactionOffline operatorTransactionOffline =
                 OperatorTransactionOffline(
-                  id: DateTime.now().millisecondsSinceEpoch.toString(),
+                  id: DateTime.now().toString(),
                   idUffUser: idUffValue,
                   idUffOperator: identificador, 
                   idCampus: selectedArea.value.id.toString(),
@@ -310,7 +310,7 @@ class CatracaController extends GetxController {
             }
     OperatorTransactionOffline operatorTransactionOffline =
         OperatorTransactionOffline(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          id: DateTime.now().toString(),
           idUffUser: cpf,
           idUffOperator: identificador,
           idCampus: selectedArea.value.id.toString(),

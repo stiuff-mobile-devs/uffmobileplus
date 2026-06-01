@@ -56,7 +56,7 @@ class OperatorTransactionOffline {
       'id': id,
       'idCampus': idCampus,
       'campus': campus,
-      'entryTime': entryTime.toIso8601String(),
+      'entryTime': entryTime,
       'idUffOperator': idUffOperator,
       'idUffUser': idUffUser,
       'processed': processed,
