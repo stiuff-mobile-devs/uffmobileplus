@@ -23,6 +23,8 @@ class HomePageController extends GetxController {
 
   final shortcutRoutes = <String>[].obs;
   final isRemovingShortcuts = false.obs;
+  final savedShortcuts = <DashboardShortcut>[].obs;
+  final availableToAdd = <DashboardShortcut>[].obs;
 
   late ExternalModulesServices _externalModulesServices;
   late ExternalModulesController _externalModulesController;
@@ -76,14 +78,7 @@ class HomePageController extends GetxController {
     _restaurantModulesController.restaurantModulesList,
   );
 
-    List<DashboardShortcut> get savedShortcuts => shortcutRoutes
-      .map((route) => shortcutsByRoute[route])
-      .whereType<DashboardShortcut>()
-      .toList(growable: false);
 
-    List<DashboardShortcut> get availableToAdd => allShortcutItems
-      .where((service) => !shortcutRoutes.contains(service.page))
-      .toList(growable: false);
 
   @override
   void onInit() {
@@ -115,10 +110,11 @@ class HomePageController extends GetxController {
 
     if (shortcutRoutes.isEmpty) {
       shortcutRoutes.assignAll(allRoutes);
-      return;
+    } else {
+      shortcutRoutes.retainWhere(allRoutes.contains);
     }
 
-    shortcutRoutes.retainWhere(allRoutes.contains);
+    _rebuildShortcutCaches();
   }
 
   Future<void> _loadSavedShortcuts() async {
@@ -127,12 +123,14 @@ class HomePageController extends GetxController {
       final saved = userData?.shortcutRoutes ?? <String>[];
 
       if (saved.isEmpty) {
+        _rebuildShortcutCaches();
         await _persistShortcuts();
         return;
       }
 
       final validRoutes = allShortcutRoutes;
       shortcutRoutes.assignAll(saved.where(validRoutes.contains));
+      _rebuildShortcutCaches();
     } catch (_) {}
   }
 
@@ -171,11 +169,13 @@ class HomePageController extends GetxController {
       return;
     }
     shortcutRoutes.add(service.page);
+    _rebuildShortcutCaches();
     _persistShortcuts();
   }
 
   void removeShortcut(DashboardShortcut service) {
     shortcutRoutes.remove(service.page);
+    _rebuildShortcutCaches();
     _persistShortcuts();
 
     if (shortcutRoutes.isEmpty) {
@@ -225,6 +225,25 @@ class HomePageController extends GetxController {
   void onClose() {
     _servicesWorker.dispose();
     super.onClose();
+  }
+
+  void _rebuildShortcutCaches() {
+    final byRoute = shortcutsByRoute;
+    final saved = <DashboardShortcut>[];
+
+    for (final route in shortcutRoutes) {
+      final item = byRoute[route];
+      if (item != null) {
+        saved.add(item);
+      }
+    }
+
+    savedShortcuts.assignAll(saved);
+
+    final available = allShortcutItems
+        .where((service) => !shortcutRoutes.contains(service.page))
+        .toList(growable: false);
+    availableToAdd.assignAll(available);
   }
 }
 
