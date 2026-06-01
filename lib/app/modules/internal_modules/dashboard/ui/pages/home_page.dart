@@ -355,9 +355,15 @@ class HomePage extends GetView<HomePageController> {
         return Obx(() {
           final remainingServices =
               controller.availableToAdd.toList(growable: false);
+          final layoutService = controller.layoutService;
+          final safeBottom = MediaQuery.of(context).padding.bottom;
+          final bottomPadding =
+              layoutService.bottomPadding(safeBottom: safeBottom);
+
           return SafeArea(
+            bottom: false,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+              padding: EdgeInsets.fromLTRB(16, 14, 16, bottomPadding),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
