@@ -7,6 +7,8 @@ import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/c
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/operator_transaction.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/operator_transaction_offline.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/repository/catraca_repository.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_google_model.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_google_repository.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'dart:async';
 
@@ -15,6 +17,7 @@ class CatracaController extends GetxController {
 
   late ExternalModulesServices service;
   CatracaOnlineRepository repository = CatracaOnlineRepository();
+  UserGoogleRepository userGoogleRepository = UserGoogleRepository();
 
   RxBool isAreaBusy = false.obs;
   RxBool isTransactionBusy = false.obs;
@@ -24,6 +27,8 @@ class CatracaController extends GetxController {
   RxBool isOfflineMode = false.obs;
   RxString statusMessage = 'catraca_online'.tr.obs;
   Rx<AreaModel> selectedArea = AreaModel().obs;
+
+  late UserGoogleModel _userGoogleModel;
 
   late RxList<AreaModel> areas = <AreaModel>[].obs;
 
@@ -41,6 +46,7 @@ class CatracaController extends GetxController {
 
   late final String iduff;
   late String? token;
+  late String identificador;
 
   bool isTransactionValid = false;
   bool isQrCodeValid = true;
@@ -52,10 +58,11 @@ class CatracaController extends GetxController {
   int secondsRefresh = 60;
 
   @override
-  void onInit() {
+  Future<void> onInit() async {
     super.onInit();
     _initAsync();
     _startInternetMonitoring();
+     _userGoogleModel = (await userGoogleRepository.getUserGoogleModel()) ?? UserGoogleModel(email: '');
   }
 
   Future<void> _initAsync() async {
@@ -196,11 +203,17 @@ class CatracaController extends GetxController {
               : "";
 
           if (RegExp(r'^\d{11}$').hasMatch(idUffValue)) {
+            if(iduff == ''){
+              identificador = _userGoogleModel.email;
+            }
+            else{
+              identificador = iduff;
+            }
             OperatorTransactionOffline operatorTransactionOffline =
                 OperatorTransactionOffline(
                   id: DateTime.now().millisecondsSinceEpoch.toString(),
                   idUffUser: idUffValue,
-                  idUffOperator: iduff,
+                  idUffOperator: identificador, 
                   idCampus: selectedArea.value.id.toString(),
                   campus: selectedArea.value.nome,
                 );
@@ -289,11 +302,17 @@ class CatracaController extends GetxController {
   }
 
   Future<void> saveCpfValidationTransaction(String cpf) async {
+      if(iduff == ''){
+              identificador = _userGoogleModel.email;
+            }
+            else{
+              identificador = iduff;
+            }
     OperatorTransactionOffline operatorTransactionOffline =
         OperatorTransactionOffline(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           idUffUser: cpf,
-          idUffOperator: iduff,
+          idUffOperator: identificador,
           idCampus: selectedArea.value.id.toString(),
           campus: selectedArea.value.nome,
         );
