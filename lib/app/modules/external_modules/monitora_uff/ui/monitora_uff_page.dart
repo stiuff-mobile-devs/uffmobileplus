@@ -90,6 +90,7 @@ class MonitoraUFFPage extends StatelessWidget {
           children: [
             tile(),
             trajectoryPolylines(),
+            trajectoryEndpointMarkers(),
             firebaseMarkers(),
             toggleButton(),
             _centralizeButton(),
@@ -133,6 +134,69 @@ class MonitoraUFFPage extends StatelessWidget {
         ],
       );
     });
+  }
+
+  Widget trajectoryEndpointMarkers() {
+    return Obx(() {
+      final user = trackingCtrl.selectedFirebaseUser.value;
+      final points = trackingCtrl.selectedTrajectory;
+
+      if (user == null || points.isEmpty) {
+        return MarkerLayer(markers: []);
+      }
+
+      final latLngPoints = points.map((p) => LatLng(p.lat, p.lng)).toList();
+      final samePoint = latLngPoints.first == latLngPoints.last;
+
+      return MarkerLayer(
+        markers: [
+          _trajectoryEndpointMarker(
+            point: latLngPoints.first,
+            icon: Icons.trip_origin,
+            backgroundColor: Colors.indigo,
+            offset: samePoint ? const Offset(-6, -6) : Offset.zero,
+          ),
+          _trajectoryEndpointMarker(
+            point: latLngPoints.last,
+            icon: Icons.flag,
+            backgroundColor: Colors.indigo,
+            offset: samePoint ? const Offset(6, 6) : Offset.zero,
+          ),
+        ],
+      );
+    });
+  }
+
+  Marker _trajectoryEndpointMarker({
+    required LatLng point,
+    required IconData icon,
+    required Color backgroundColor,
+    required Offset offset,
+  }) {
+    return Marker(
+      point: point,
+      width: 22,
+      height: 22,
+      alignment: Alignment.center,
+      child: Transform.translate(
+        offset: offset,
+        child: Container(
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 2),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Icon(icon, color: Colors.white, size: 18),
+        ),
+      ),
+    );
   }
 
   /// Usuário verá essa tela apenas se algumas das permissões necessárias
