@@ -5,21 +5,21 @@ import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/c
 
 class CatracaOnlineProvider {
   final String _collectionPath = "operator_transactions";
-  final String _collectionPathFirebase = "meals"; // para testes user meals_test
+  final String _collectionPathFirebase =
+      "meals"; // para testes user meals_test
   final FirebaseFirestore _firestore = FirebaseFirestore.instanceFor(
     app: Firebase.app("uffmobileplus"),
     databaseId: 'catraca',
   );
 
-  Future<String> saveOperatorTransactionsOffline(
+  Future<void> saveOperatorTransactionsOffline(
     OperatorTransactionOffline operatorTransactionOffline,
   ) async {
     try {
       var box = await Hive.openBox<OperatorTransactionOffline>(_collectionPath);
       await box.put(operatorTransactionOffline.id, operatorTransactionOffline);
-      return "success";
     } catch (e) {
-      return "Erro ao salvar dados do usuário no Hive: $e";
+      throw Exception("Erro ao salvar dados do usuário no Hive: $e");
     }
   }
 
@@ -33,41 +33,41 @@ class CatracaOnlineProvider {
     }
   }
 
-Future<List<OperatorTransactionOffline>> getOperatorTransactionsFromFirebase(
-  String iduffOperator,
-) async {
-  try {
-    final now = DateTime.now();
-    final limite24Horas = now.subtract(const Duration(hours: 24));
+  Future<List<OperatorTransactionOffline>> getOperatorTransactionsFromFirebase(
+    String iduffOperator,
+  ) async {
+    try {
+      final now = DateTime.now();
+      final limite24Horas = now.subtract(const Duration(hours: 24));
 
-    final snapshot = await _firestore
-        .collection(_collectionPathFirebase)
-        .where('idUffOperator', isEqualTo: iduffOperator)
-        .where('entryTime', isGreaterThan: limite24Horas) 
-        .get();
+      final snapshot = await _firestore
+          .collection(_collectionPathFirebase)
+          .where('idUffOperator', isEqualTo: iduffOperator)
+          .where('entryTime', isGreaterThan: Timestamp.fromDate(limite24Horas))
+          .get();
 
-    return snapshot.docs
-        .map((doc) {
-          try {
-            final data = doc.data();
-            return OperatorTransactionOffline.fromJson(
-              Map<String, dynamic>.from(data),
-            );
-          } catch (e) {
-            // ignora documentos com formato inválido
-            print('Erro ao converter documento individual: $e');
-            return null;
-          }
-        })
-        .where((t) => t != null)
-        .cast<OperatorTransactionOffline>()
-        .toList();
-  } catch (e) {
-    print('Erro ao buscar transações do Firebase: $e');
-    // Em caso de erro, retorna lista vazia
-    return [];
+      return snapshot.docs
+          .map((doc) {
+            try {
+              final data = doc.data();
+              return OperatorTransactionOffline.fromJson(
+                Map<String, dynamic>.from(data),
+              );
+            } catch (e) {
+              // ignora documentos com formato inválido
+              print('Erro ao converter documento individual: $e');
+              return null;
+            }
+          })
+          .where((t) => t != null)
+          .cast<OperatorTransactionOffline>()
+          .toList();
+    } catch (e) {
+      print('Erro ao buscar transações do Firebase: $e');
+      // Em caso de erro, retorna lista vazia
+      return [];
+    }
   }
-}
 
   Future<String> saveOperatorTransactionToFirebase(
     OperatorTransactionOffline operatorTransactionOffline,

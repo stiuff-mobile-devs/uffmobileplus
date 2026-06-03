@@ -31,7 +31,7 @@ class CatracaOnlineRepository {
     return await sctmService.validatePayment(paymentCode, iduff, token, areaId);
   }
 
-  Future<String> saveOperatorTransactionsOffline(
+  Future<void> saveOperatorTransactionsOffline(
     OperatorTransactionOffline operatorTransactionOffline,
   ) async {
     return await catracaOnlineProvider.saveOperatorTransactionsOffline(
