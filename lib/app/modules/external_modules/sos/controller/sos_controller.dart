@@ -1,8 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:uffmobileplus/app/config/secrets.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
+import 'package:uffmobileplus/app/modules/external_modules/sos/data/provider/sos_provider.dart';
 import 'package:uffmobileplus/app/modules/external_modules/sos/data/repository/sos_repository.dart';
+import 'package:uffmobileplus/app/modules/external_modules/sos/data/services/sos_background_service.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/utils/ui_components/custom_alert_dialog.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
@@ -13,9 +20,17 @@ class SosController extends GetxController {
 
   final SosRepository _repository = Get.find<SosRepository>();
 
+  final FlutterBackgroundService _service = FlutterBackgroundService();
+
   final RxBool isLoading = false.obs;
+  final RxBool isTracking = false.obs;
   bool _isPermissionGranted = false;
   bool _isUserLoaded = false;
+  String? _matricula;
+  String? _nome;
+  String? _email;
+  String? _dispatchIncidentId;
+  StreamSubscription? _sosStoppedSub;
 
   @override
   void onInit() {
@@ -26,12 +41,44 @@ class SosController extends GetxController {
   Future<void> _inicializarTudo() async {
     try {
       await _externalModulesServices.initialize();
+      _matricula = _externalModulesServices.getUserMatricula();
+      _nome = _externalModulesServices.getUserName();
+      _email = await _externalModulesServices.getEmail();
+
+      if (_matricula == null ||
+          _matricula!.isEmpty ||
+          _nome == null ||
+          _nome!.isEmpty ||
+          _email == null ||
+          _email!.isEmpty) {
+        _mostrarDialogoBloqueio(
+          "erro".tr,
+          "nao_foi_possivel_carregar_dados".tr,
+        );
+        return;
+      }
+
       _isUserLoaded = true;
     } catch (e) {
       _mostrarDialogoBloqueio("erro".tr, "nao_foi_possivel_carregar_dados".tr);
       return;
     }
     await _verificarPermissoesGPS();
+  }
+
+  Future<void> _setPlatformSpecifics() async {
+    await _service.configure(
+      iosConfiguration: IosConfiguration(),
+      androidConfiguration: AndroidConfiguration(
+        onStart: onSosStart,
+        isForegroundMode: true,
+        autoStart: false,
+        autoStartOnBoot: false,
+        initialNotificationTitle: "UM+: SOS ativo",
+        initialNotificationContent:
+            "Rastreamento SOS ativo. Toque aqui para abrir o app.",
+      ),
+    );
   }
 
   Future<void> _verificarPermissoesGPS() async {
@@ -104,43 +151,49 @@ class SosController extends GetxController {
       await _verificarPermissoesGPS();
       if (!_isPermissionGranted) return;
     }
+    if (isTracking.value) return;
 
     isLoading.value = true;
 
     try {
-      Position position = await Geolocator.getCurrentPosition(
+      final Position position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
         ),
       ).timeout(const Duration(seconds: 10));
 
-      final String matricula = _externalModulesServices.getUserMatricula();
-      final String? nome = _externalModulesServices.getUserName();
-      print(
-        "User: $nome | Matricula: $matricula | Lat: ${position.latitude} | Lng: ${position.longitude}",
-      );
+      final SosDispatchResult? startResult = await _sendStartDispatch(position);
+      _dispatchIncidentId = startResult?.incidentId;
 
-      final bool success = await _repository.sendSos(
-        nome: nome,
-        matricula: matricula,
-        lat: position.latitude,
-        lng: position.longitude,
-      );
-
-      if (success) {
-        Get.snackbar(
-          'sos'.tr,
-          'sos_sucesso_envio'.tr,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-          icon: const Icon(Icons.check_circle, color: Colors.white, size: 30),
-          duration: const Duration(seconds: 5),
-          snackPosition: SnackPosition.BOTTOM,
-          margin: const EdgeInsets.all(10),
-        );
-      } else {
-        throw Exception("API retornou erro");
+      // Abre o Google Meet se o servidor retornar link
+      final String? meetLink = startResult?.meetLink;
+      if (meetLink != null && meetLink.isNotEmpty) {
+        final Uri meetUri = Uri.parse(meetLink);
+        if (await canLaunchUrl(meetUri)) {
+          await launchUrl(meetUri, mode: LaunchMode.externalApplication);
+        }
       }
+
+      // Inicia o background service — responsável por todo GPS + HTTP enquanto
+      // o app estiver em segundo plano (ex: usuário abriu o Google Meet)
+      try {
+        await _startBackgroundService();
+      } catch (e) {
+        // Non-fatal: SOS já foi enviado ao servidor, background não iniciou
+      }
+
+      isTracking.value = true;
+
+      Get.snackbar(
+        'sos'.tr,
+        'sos_sucesso_envio'.tr,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        icon: const Icon(Icons.check_circle, color: Colors.white, size: 30),
+        duration: const Duration(seconds: 5),
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(10),
+      );
     } catch (e) {
       Get.snackbar(
         "erro".tr,
@@ -153,5 +206,71 @@ class SosController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  Future<SosDispatchResult?> _sendStartDispatch(Position position) async {
+    final String matricula = _matricula!;
+    final String nome = _nome!;
+    final String email = _email!;
+
+    return _repository.sendDispatch(
+      incidentId: _dispatchIncidentId,
+      action: 'start',
+      pointType: 'fixed',
+      status: 'active',
+      nome: nome,
+      matricula: matricula,
+      email: email,
+      lat: position.latitude,
+      lng: position.longitude,
+    );
+  }
+
+  Future<void> _startBackgroundService() async {
+    await _setPlatformSpecifics();
+    await _service.startService();
+
+    final String matricula = _matricula!;
+    final String nome = _nome!;
+    final String email = _email!;
+
+    // Envia configuração para o isolate do background service
+    _service.invoke('sosConfig', {
+      'incidentId': _dispatchIncidentId,
+      'apiUrl': Secrets.sosApiUrl,
+      'matricula': matricula,
+      'nome': nome,
+      'email': email,
+    });
+
+    // Escuta o sinal de parada iniciado pelo servidor
+    _sosStoppedSub?.cancel();
+    _sosStoppedSub = _service.on('sosStopped').listen((_) {
+      isTracking.value = false;
+      _dispatchIncidentId = null;
+      _sosStoppedSub?.cancel();
+      _sosStoppedSub = null;
+    });
+  }
+
+  Future<void> stopSosTracking() async {
+    _sosStoppedSub?.cancel();
+    _sosStoppedSub = null;
+
+    // Manda o background service enviar o stop para a API e encerrar
+    try {
+      _service.invoke('stopSos');
+    } catch (e) {
+      // ignore
+    }
+
+    _dispatchIncidentId = null;
+    isTracking.value = false;
+  }
+
+  @override
+  void onClose() {
+    _sosStoppedSub?.cancel();
+    super.onClose();
   }
 }
