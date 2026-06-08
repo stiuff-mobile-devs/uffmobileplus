@@ -3,7 +3,7 @@ description: "A new Flutter project."
 
 publish_to: 'none' 
 
-version: 6.8.2+625
+version: 6.8.3+626
 
 environment:
   sdk: ^3.9.0
@@ -71,6 +71,7 @@ dependencies:
   screen_protector: ^1.5.1
   external_app_launcher: ^4.0.3
   firebase_messaging: ^16.2.2
+  uuid: ^4.5.3
   
 dev_dependencies:
   flutter_test:

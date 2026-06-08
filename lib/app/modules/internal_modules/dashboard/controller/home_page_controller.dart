@@ -4,6 +4,7 @@ import 'package:googleapis/driveactivity/v2.dart';
 import 'package:uffmobileplus/app/data/services/app_availability_service.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/data/services/deep_link_service.dart';
+import 'package:uffmobileplus/app/data/services/responsive_layout_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/controller/restaurant_modules_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/external_modules_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
@@ -22,13 +23,18 @@ class HomePageController extends GetxController {
 
   final shortcutRoutes = <String>[].obs;
   final isRemovingShortcuts = false.obs;
+  final savedShortcuts = <DashboardShortcut>[].obs;
+  final availableToAdd = <DashboardShortcut>[].obs;
 
   late ExternalModulesServices _externalModulesServices;
   late ExternalModulesController _externalModulesController;
   UserDataRepository userDataRepository = UserDataRepository();
   late RestaurantModulesController _restaurantModulesController;
+  late ResponsiveLayoutService _layoutService;
 
   late Worker _servicesWorker;
+
+  ResponsiveLayoutService get layoutService => _layoutService;
 
   List<DashboardShortcut> get allShortcutItems {
     final byRoute = <String, DashboardShortcut>{};
@@ -72,20 +78,14 @@ class HomePageController extends GetxController {
     _restaurantModulesController.restaurantModulesList,
   );
 
-    List<DashboardShortcut> get savedShortcuts => shortcutRoutes
-      .map((route) => shortcutsByRoute[route])
-      .whereType<DashboardShortcut>()
-      .toList(growable: false);
 
-    List<DashboardShortcut> get availableToAdd => allShortcutItems
-      .where((service) => !shortcutRoutes.contains(service.page))
-      .toList(growable: false);
 
   @override
   void onInit() {
     super.onInit();
     _externalModulesController = Get.find<ExternalModulesController>();
     _restaurantModulesController = Get.find<RestaurantModulesController>();
+    _layoutService = Get.find<ResponsiveLayoutService>();
 
     _bindServicesCatalog();
     _loadSavedShortcuts();
@@ -110,10 +110,11 @@ class HomePageController extends GetxController {
 
     if (shortcutRoutes.isEmpty) {
       shortcutRoutes.assignAll(allRoutes);
-      return;
+    } else {
+      shortcutRoutes.retainWhere(allRoutes.contains);
     }
 
-    shortcutRoutes.retainWhere(allRoutes.contains);
+    _rebuildShortcutCaches();
   }
 
   Future<void> _loadSavedShortcuts() async {
@@ -122,12 +123,14 @@ class HomePageController extends GetxController {
       final saved = userData?.shortcutRoutes ?? <String>[];
 
       if (saved.isEmpty) {
+        _rebuildShortcutCaches();
         await _persistShortcuts();
         return;
       }
 
       final validRoutes = allShortcutRoutes;
       shortcutRoutes.assignAll(saved.where(validRoutes.contains));
+      _rebuildShortcutCaches();
     } catch (_) {}
   }
 
@@ -166,11 +169,13 @@ class HomePageController extends GetxController {
       return;
     }
     shortcutRoutes.add(service.page);
+    _rebuildShortcutCaches();
     _persistShortcuts();
   }
 
   void removeShortcut(DashboardShortcut service) {
     shortcutRoutes.remove(service.page);
+    _rebuildShortcutCaches();
     _persistShortcuts();
 
     if (shortcutRoutes.isEmpty) {
@@ -220,6 +225,25 @@ class HomePageController extends GetxController {
   void onClose() {
     _servicesWorker.dispose();
     super.onClose();
+  }
+
+  void _rebuildShortcutCaches() {
+    final byRoute = shortcutsByRoute;
+    final saved = <DashboardShortcut>[];
+
+    for (final route in shortcutRoutes) {
+      final item = byRoute[route];
+      if (item != null) {
+        saved.add(item);
+      }
+    }
+
+    savedShortcuts.assignAll(saved);
+
+    final available = allShortcutItems
+        .where((service) => !shortcutRoutes.contains(service.page))
+        .toList(growable: false);
+    availableToAdd.assignAll(available);
   }
 }
 

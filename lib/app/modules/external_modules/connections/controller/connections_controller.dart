@@ -15,6 +15,7 @@ class ConnectionsController extends GetxController {
   final RxBool isUmmConnected = false.obs;
   final RxBool isSctmConnected = false.obs;
   final RxBool isSaciConnected = false.obs;
+  final RxInt isSaciUmmConnected = 0.obs;
 
   StreamSubscription<InternetStatus>? _connectionSubscription;
 
@@ -46,9 +47,19 @@ class ConnectionsController extends GetxController {
   }
 
   Future<void> refreshConnectionsForTest() async {
-   isUmmConnected.value = await connectionsRepository.getUmmStatus();
-   isSctmConnected.value = await connectionsRepository.getSctmStatus();
-   isSaciConnected.value = await connectionsRepository.getSaciStatus();
+    isUmmConnected.value = await connectionsRepository.getUmmStatus();
+    isSctmConnected.value = await connectionsRepository.getSctmStatus();
+    isSaciConnected.value = await connectionsRepository.getSaciStatus();
+
+    if (isSaciConnected.value && isUmmConnected.value) {
+      isSaciUmmConnected.value = 2;
+    } else if (!isSaciConnected.value && !isUmmConnected.value) {
+      isSaciUmmConnected.value = 0;
+    } else if (!isSaciConnected.value && isUmmConnected.value) {
+      isSaciUmmConnected.value = 3;
+    } else {
+      isSaciUmmConnected.value = 4;
+    }
   }
 
   void _startTimer(int secondsRefresh) {
@@ -57,8 +68,6 @@ class ConnectionsController extends GetxController {
       refreshConnectionsForTest();
     });
   }
-
-
 
   @override
   void onClose() {

@@ -1,4 +1,6 @@
 import 'package:hive/hive.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:uuid/uuid.dart';
 
 part 'operator_transaction_offline.g.dart';
 
@@ -26,23 +28,22 @@ class OperatorTransactionOffline {
   bool processed;
 
   OperatorTransactionOffline({
-    required this.id,
+    String? id,
     this.idCampus,
     this.campus,
     DateTime? entryTime,
     this.idUffOperator,
     this.idUffUser,
     this.processed = false,
-  }) : entryTime = entryTime ?? DateTime.now();
+  }) : id = id ?? Uuid().v4(),
+       entryTime = entryTime ?? DateTime.now();
 
   factory OperatorTransactionOffline.fromJson(Map<String, dynamic> json) {
     return OperatorTransactionOffline(
-      id: json['id'] as String,
+      id: (json['id'] as String?) ?? Uuid().v4(),
       idCampus: json['idCampus'] != null ? json['idCampus'] as String : null,
       campus: json['campus'] != null ? json['campus'] as String : null,
-      entryTime: json['entryTime'] != null
-          ? DateTime.parse(json['entryTime'] as String)
-          : DateTime.now(),
+      entryTime: _parseEntryTime(json['entryTime']),
       idUffOperator: json['idUffOperator'] != null
           ? json['idUffOperator'] as String
           : null,
@@ -51,12 +52,36 @@ class OperatorTransactionOffline {
     );
   }
 
+  static DateTime _parseEntryTime(dynamic value) {
+    if (value == null) {
+      return DateTime.now();
+    }
+
+    if (value is Timestamp) {
+      return value.toDate();
+    }
+
+    if (value is DateTime) {
+      return value;
+    }
+
+    if (value is String) {
+      return DateTime.parse(value);
+    }
+
+    if (value is int) {
+      return DateTime.fromMillisecondsSinceEpoch(value);
+    }
+
+    throw FormatException('entryTime inválido: $value');
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'idCampus': idCampus,
       'campus': campus,
-      'entryTime': entryTime.toIso8601String(),
+      'entryTime': entryTime,
       'idUffOperator': idUffOperator,
       'idUffUser': idUffUser,
       'processed': processed,

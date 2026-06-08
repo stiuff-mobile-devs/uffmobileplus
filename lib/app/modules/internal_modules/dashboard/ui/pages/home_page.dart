@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/data/services/responsive_layout_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/home_page_controller.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
@@ -8,6 +9,73 @@ import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.da
 
 class HomePage extends GetView<HomePageController> {
   const HomePage({super.key});
+
+  static const ResponsiveGridConfig _shortcutGridConfig =
+      ResponsiveGridConfig(
+    breakpoints: [
+      ResponsiveGridBreakpoint(
+        maxWidth: 360,
+        spec: ResponsiveGridSpec(
+          crossAxisCount: 2,
+          childAspectRatio: 0.86,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+          cardPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 9),
+          iconBoxSize: 30,
+          iconPadding: 5,
+          iconBorderRadius: 10,
+          labelFontSize: 10,
+          labelHeight: 1.05,
+          iconLabelSpacing: 6,
+        ),
+      ),
+      ResponsiveGridBreakpoint(
+        maxWidth: 600,
+        spec: ResponsiveGridSpec(
+          crossAxisCount: 3,
+          childAspectRatio: 0.92,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+          cardPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+          iconBoxSize: 32,
+          iconPadding: 6,
+          iconBorderRadius: 10,
+          labelFontSize: 10.5,
+          labelHeight: 1.05,
+          iconLabelSpacing: 8,
+        ),
+      ),
+      ResponsiveGridBreakpoint(
+        maxWidth: 900,
+        spec: ResponsiveGridSpec(
+          crossAxisCount: 4,
+          childAspectRatio: 0.98,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+          cardPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+          iconBoxSize: 32,
+          iconPadding: 6,
+          iconBorderRadius: 10,
+          labelFontSize: 10.5,
+          labelHeight: 1.05,
+          iconLabelSpacing: 8,
+        ),
+      ),
+    ],
+    defaultSpec: ResponsiveGridSpec(
+      crossAxisCount: 5,
+      childAspectRatio: 0.98,
+      crossAxisSpacing: 8,
+      mainAxisSpacing: 8,
+      cardPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+      iconBoxSize: 32,
+      iconPadding: 6,
+      iconBorderRadius: 10,
+      labelFontSize: 10.5,
+      labelHeight: 1.05,
+      iconLabelSpacing: 8,
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -32,117 +100,150 @@ class HomePage extends GetView<HomePageController> {
           decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
         ),
       ),
-      body: Obx(
-        () => Container(
+      body: Obx(() {
+        final layoutService = controller.layoutService;
+        final safeBottom = MediaQuery.of(context).padding.bottom;
+        final bottomPadding =
+            layoutService.bottomPadding(safeBottom: safeBottom);
+        final isLoading = controller.isLoading.value;
+        final isRemoving = controller.isRemovingShortcuts.value;
+        final savedShortcuts =
+            controller.savedShortcuts.toList(growable: false);
+
+        return Container(
           width: double.infinity,
           height: double.infinity,
           decoration: BoxDecoration(
             gradient: AppColors.darkBlueToBlackGradient(),
           ),
-          child: controller.isLoading.value
+          child: isLoading
               ? const Center(child: CustomProgressDisplay())
               : SafeArea(
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildUpdateBanner(),
-                        const SizedBox(height: 18),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                'Atalhos rápidos',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () => _showAddShortcutSheet(context),
-                              tooltip: 'Adicionar atalho',
-                              icon: Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.12),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Icon(
-                                  Icons.add,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            IconButton(
-                              onPressed: controller.toggleRemoveShortcutMode,
-                              tooltip: 'Remover atalho',
-                              icon: Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: BoxDecoration(
-                                  color: controller.isRemovingShortcuts.value
-                                      ? Colors.red.withOpacity(0.25)
-                                      : Colors.white.withOpacity(0.12),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Icon(
-                                  Icons.remove,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Acesso direto aos serviços mais usados no seu dia a dia.',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
-                            height: 1.4,
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: controller.savedShortcuts.length,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 4,
-                                crossAxisSpacing: 8,
-                                mainAxisSpacing: 8,
-                                childAspectRatio: 1,
-                              ),
-                          itemBuilder: (context, index) {
-                            final item = controller.savedShortcuts[index];
-                            return _ShortcutCard(
-                              item: item,
-                              isRemoveMode:
-                                  controller.isRemovingShortcuts.value,
-                              onTap: () {
-                                if (controller.isRemovingShortcuts.value) {
-                                  controller.removeShortcut(item);
-                                  return;
-                                }
+                  bottom: false,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final layoutSpec = layoutService.gridSpecForWidth(
+                        width: constraints.maxWidth,
+                        config: _shortcutGridConfig,
+                      );
 
-                                controller.openShortcut(item);
-                              },
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 20),
-                       
-                      ],
-                    ),
+                      return CustomScrollView(
+                        physics: const BouncingScrollPhysics(),
+                        slivers: [
+                          SliverPadding(
+                            padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+                            sliver: SliverToBoxAdapter(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _buildUpdateBanner(),
+                                  const SizedBox(height: 18),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          'Atalhos rápidos',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () =>
+                                            _showAddShortcutSheet(context),
+                                        tooltip: 'Adicionar atalho',
+                                        icon: Container(
+                                          padding: const EdgeInsets.all(4),
+                                          decoration: BoxDecoration(
+                                            color:
+                                                Colors.white.withOpacity(0.12),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: const Icon(
+                                            Icons.add,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      IconButton(
+                                        onPressed:
+                                            controller.toggleRemoveShortcutMode,
+                                        tooltip: 'Remover atalho',
+                                        icon: Container(
+                                          padding: const EdgeInsets.all(4),
+                                          decoration: BoxDecoration(
+                                            color: isRemoving
+                                                ? Colors.red.withOpacity(0.25)
+                                                : Colors.white.withOpacity(0.12),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: const Icon(
+                                            Icons.remove,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Acesso direto aos serviços mais usados no seu dia a dia.',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 13,
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 14),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SliverPadding(
+                            padding:
+                                EdgeInsets.fromLTRB(16, 0, 16, bottomPadding),
+                            sliver: SliverGrid(
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) {
+                                  final item = savedShortcuts[index];
+                                  return _ShortcutCard(
+                                    key: ValueKey(item.page),
+                                    item: item,
+                                    layoutSpec: layoutSpec,
+                                    isRemoveMode: isRemoving,
+                                    onTap: () {
+                                      if (isRemoving) {
+                                        controller.removeShortcut(item);
+                                        return;
+                                      }
+
+                                      controller.openShortcut(item);
+                                    },
+                                  );
+                                },
+                                childCount: savedShortcuts.length,
+                              ),
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: layoutSpec.crossAxisCount,
+                                crossAxisSpacing: layoutSpec.crossAxisSpacing,
+                                mainAxisSpacing: layoutSpec.mainAxisSpacing,
+                                childAspectRatio: layoutSpec.childAspectRatio,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
-        ),
-      ),
+        );
+      }),
     );
   }
 
@@ -252,10 +353,17 @@ class HomePage extends GetView<HomePageController> {
       ),
       builder: (context) {
         return Obx(() {
-          final remainingServices = controller.availableToAdd;
+          final remainingServices =
+              controller.availableToAdd.toList(growable: false);
+          final layoutService = controller.layoutService;
+          final safeBottom = MediaQuery.of(context).padding.bottom;
+          final bottomPadding =
+              layoutService.bottomPadding(safeBottom: safeBottom);
+
           return SafeArea(
+            bottom: false,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+              padding: EdgeInsets.fromLTRB(16, 14, 16, bottomPadding),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -473,14 +581,17 @@ class HomePage extends GetView<HomePageController> {
 
 class _ShortcutCard extends StatelessWidget {
   const _ShortcutCard({
+    super.key,
     required this.item,
     required this.onTap,
     required this.isRemoveMode,
+    required this.layoutSpec,
   });
 
   final DashboardShortcut item;
   final VoidCallback onTap;
   final bool isRemoveMode;
+  final ResponsiveGridSpec layoutSpec;
 
   @override
   Widget build(BuildContext context) {
@@ -506,25 +617,25 @@ class _ShortcutCard extends StatelessWidget {
                 ),
                 border: Border.all(color: Colors.white.withOpacity(0.08)),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+              padding: layoutSpec.cardPadding,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _ServiceIcon(iconSrc: item.iconSrc),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    height: 24,
-                    child: Text(
-                      item.subtitle,
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.92),
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w600,
-                        height: 1.05,
-                      ),
+                  _ServiceIcon(
+                    iconSrc: item.iconSrc,
+                    layoutSpec: layoutSpec,
+                  ),
+                  SizedBox(height: layoutSpec.iconLabelSpacing),
+                  Text(
+                    item.subtitle,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.92),
+                      fontSize: layoutSpec.labelFontSize,
+                      fontWeight: FontWeight.w600,
+                      height: layoutSpec.labelHeight,
                     ),
                   ),
                 ],
@@ -556,21 +667,26 @@ class _ShortcutCard extends StatelessWidget {
 }
 
 class _ServiceIcon extends StatelessWidget {
-  const _ServiceIcon({required this.iconSrc});
+  const _ServiceIcon({required this.iconSrc, this.layoutSpec});
 
   final String iconSrc;
+  final ResponsiveGridSpec? layoutSpec;
 
   @override
   Widget build(BuildContext context) {
+    final iconSize = layoutSpec?.iconBoxSize ?? 32;
+    final iconPadding = layoutSpec?.iconPadding ?? 6;
+    final iconRadius = layoutSpec?.iconBorderRadius ?? 10;
+
     return Container(
-      height: 32,
-      width: 32,
+      height: iconSize,
+      width: iconSize,
       decoration: BoxDecoration(
         color: AppColors.lightBlue().withOpacity(0.14),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(iconRadius),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(6),
+        padding: EdgeInsets.all(iconPadding),
         child: iconSrc.endsWith('.svg')
             ? SvgPicture.asset(
                 iconSrc,

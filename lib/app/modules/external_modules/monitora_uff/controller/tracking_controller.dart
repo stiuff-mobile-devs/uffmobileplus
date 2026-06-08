@@ -6,10 +6,19 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'
   show
     AlertDialog,
+    BorderSide,
     BuildContext,
+    ColorScheme,
     Colors,
+    DatePickerThemeData,
     Text,
     TextButton,
+    TextButtonThemeData,
+    TextStyle,
+    Theme,
+    ThemeData,
+    WidgetState,
+    WidgetStateColor,
     WidgetsBindingObserver,
     showDatePicker;
 import 'package:flutter/services.dart';
@@ -223,6 +232,80 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
       initialDate: DateTime(initial.year, initial.month, initial.day),
       firstDate: DateTime(now.year - 5, 1, 1),
       lastDate: DateTime(now.year, now.month, now.day),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: AppColors.darkBlue(),
+              onPrimary: Colors.white,
+              onSurface: AppColors.darkBlue(),
+              secondary: AppColors.mediumBlue(),
+              onSecondary: Colors.white,
+              surface: Colors.white,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.mediumBlue(),
+              ),
+            ),
+            datePickerTheme: DatePickerThemeData(
+              backgroundColor: Colors.white,
+              headerBackgroundColor: AppColors.darkBlue(),
+              headerForegroundColor: Colors.white,
+              dayForegroundColor: WidgetStateColor.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return Colors.white;
+                }
+                if (states.contains(WidgetState.disabled)) {
+                  return Colors.grey;
+                }
+                return AppColors.darkBlue();
+              }),
+              dayBackgroundColor: WidgetStateColor.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return AppColors.mediumBlue();
+                }
+                return Colors.transparent;
+              }),
+              todayForegroundColor: WidgetStateColor.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return Colors.white;
+                }
+                return AppColors.mediumBlue();
+              }),
+              todayBackgroundColor: WidgetStateColor.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return AppColors.mediumBlue();
+                }
+                return Colors.transparent;
+              }),
+              todayBorder: BorderSide(color: AppColors.mediumBlue(), width: 1),
+              yearForegroundColor: WidgetStateColor.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return Colors.white;
+                }
+                return AppColors.darkBlue();
+              }),
+              yearBackgroundColor: WidgetStateColor.resolveWith((states) {
+                if (states.contains(WidgetState.selected)) {
+                  return AppColors.mediumBlue();
+                }
+                return Colors.transparent;
+              }),
+              yearOverlayColor: WidgetStateColor.resolveWith((_) {
+                return AppColors.lightBlue();
+              }),
+              dayOverlayColor: WidgetStateColor.resolveWith((_) {
+                return AppColors.lightBlue();
+              }),
+              rangeSelectionBackgroundColor: AppColors.lightBlue(),
+              dividerColor: AppColors.lightBlue(),
+              weekdayStyle: TextStyle(color: AppColors.alternativeMediumBlue()),
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (picked == null) return;

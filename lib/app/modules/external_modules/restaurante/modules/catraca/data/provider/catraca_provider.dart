@@ -5,21 +5,21 @@ import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/c
 
 class CatracaOnlineProvider {
   final String _collectionPath = "operator_transactions";
-  final String _collectionPathFirebase = "meals";
+  final String _collectionPathFirebase =
+      "meals"; // para testes user meals_test
   final FirebaseFirestore _firestore = FirebaseFirestore.instanceFor(
     app: Firebase.app("uffmobileplus"),
     databaseId: 'catraca',
   );
 
-  Future<String> saveOperatorTransactionsOffline(
+  Future<void> saveOperatorTransactionsOffline(
     OperatorTransactionOffline operatorTransactionOffline,
   ) async {
     try {
       var box = await Hive.openBox<OperatorTransactionOffline>(_collectionPath);
       await box.put(operatorTransactionOffline.id, operatorTransactionOffline);
-      return "success";
     } catch (e) {
-      return "Erro ao salvar dados do usuário no Hive: $e";
+      throw Exception("Erro ao salvar dados do usuário no Hive: $e");
     }
   }
 
@@ -37,10 +37,15 @@ class CatracaOnlineProvider {
     String iduffOperator,
   ) async {
     try {
+      final now = DateTime.now();
+      final limite24Horas = now.subtract(const Duration(hours: 24));
+
       final snapshot = await _firestore
           .collection(_collectionPathFirebase)
           .where('idUffOperator', isEqualTo: iduffOperator)
+          .where('entryTime', isGreaterThan: Timestamp.fromDate(limite24Horas))
           .get();
+
       return snapshot.docs
           .map((doc) {
             try {
@@ -50,6 +55,7 @@ class CatracaOnlineProvider {
               );
             } catch (e) {
               // ignora documentos com formato inválido
+              print('Erro ao converter documento individual: $e');
               return null;
             }
           })
@@ -57,6 +63,7 @@ class CatracaOnlineProvider {
           .cast<OperatorTransactionOffline>()
           .toList();
     } catch (e) {
+      print('Erro ao buscar transações do Firebase: $e');
       // Em caso de erro, retorna lista vazia
       return [];
     }

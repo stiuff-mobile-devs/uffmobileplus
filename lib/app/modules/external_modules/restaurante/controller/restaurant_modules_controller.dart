@@ -1,6 +1,9 @@
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/services/firebase_users_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_google_model.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_google_repository.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/gdi_groups.dart';
 import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
@@ -8,18 +11,30 @@ import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
 class RestaurantModulesController extends GetxController {
   RestaurantModulesController();
 
+  bool isOperator = false;
   late UserData _usermodel;
+  late UserGoogleModel _userGoogleModel;
   UserDataRepository userDataRepository = UserDataRepository();
+  UserGoogleRepository userGoogleRepository = UserGoogleRepository();
+  FirebaseUsersService firebaseUsersService = FirebaseUsersService();
+
   @override
   Future<void> onInit() async {
     super.onInit();
 
     _usermodel = (await userDataRepository.getUserData()) ?? UserData();
+    _userGoogleModel = (await userGoogleRepository.getUserGoogleModel()) ?? UserGoogleModel(email: '');
+
+    await _isOperator();
 
     await filterButtonList(
       _usermodel.profileType ?? ProfileTypes.anonymous,
       _usermodel.gdiGroups ?? <GdiGroups>[],
     );
+  }
+  Future<void> _isOperator() async {
+    final operatorsEmails = await firebaseUsersService.getOperators();
+    isOperator = operatorsEmails.contains(_userGoogleModel.email);
   }
 
   final RxList<RestaurantModules> restaurantModulesList = RxList([
@@ -69,6 +84,7 @@ class RestaurantModulesController extends GetxController {
       url: '',
       interrogation: false,
       availableFor: everyoneLogged,
+      isOperator: true,
       gdiGroups: [
         GdiGroups(
           GdiGroupsEnum.controladoresDeAcesso.id,
@@ -99,6 +115,8 @@ class RestaurantModulesController extends GetxController {
     List<GdiGroups> currentGdiGroups,
   ) async {
     restaurantModulesList.removeWhere((button) {
+      if (button.isOperator == true && isOperator) return false;
+
       final hasProfile = button.availableFor.contains(currentProfile);
       if (!hasProfile) return true;
 
@@ -122,6 +140,7 @@ class RestaurantModules {
   final String page;
   final String? url;
   final bool? interrogation;
+  final bool? isOperator;
   final List<GdiGroups>? gdiGroups;
 
   const RestaurantModules({
@@ -131,6 +150,7 @@ class RestaurantModules {
     required this.page,
     this.url,
     this.interrogation,
+    this.isOperator,
     required this.gdiGroups,
   });
 }

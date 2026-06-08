@@ -7,23 +7,31 @@ import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/c
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/operator_transaction.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/operator_transaction_offline.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/repository/catraca_repository.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_google_model.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_google_repository.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'dart:async';
 
 class CatracaController extends GetxController {
   CatracaController();
 
-  late ExternalModulesServices service;
+  late ExternalModulesServices externalModulesServices;
+
   CatracaOnlineRepository repository = CatracaOnlineRepository();
+  UserGoogleRepository userGoogleRepository = UserGoogleRepository();
 
   RxBool isAreaBusy = false.obs;
   RxBool isTransactionBusy = false.obs;
   RxBool isReadQRCodeBusy = false.obs;
   RxBool isDetailResultBusy = false.obs;
   RxBool isManualValidationBusy = false.obs;
+
   RxBool isOfflineMode = false.obs;
   RxString statusMessage = 'catraca_online'.tr.obs;
+
   Rx<AreaModel> selectedArea = AreaModel().obs;
+
+  late UserGoogleModel _userGoogleModel;
 
   late RxList<AreaModel> areas = <AreaModel>[].obs;
 
@@ -39,7 +47,10 @@ class CatracaController extends GetxController {
   Rx<OperatorTransactionModel> selectedTransaction =
       OperatorTransactionModel().obs;
 
-  late final String iduff;
+  String? operatorIdUff;
+  String? operatorEmail;
+  String? identificador;
+
   late String? token;
 
   bool isTransactionValid = false;
@@ -52,25 +63,43 @@ class CatracaController extends GetxController {
   int secondsRefresh = 60;
 
   @override
-  void onInit() {
+  Future<void> onInit() async {
     super.onInit();
     _initAsync();
     _startInternetMonitoring();
   }
 
   Future<void> _initAsync() async {
-    service = Get.find<ExternalModulesServices>();
-    await service.initialize();
-    iduff = service.getUserIdUFF();
+    externalModulesServices = Get.find<ExternalModulesServices>();
+    await externalModulesServices.initialize();
+    _userGoogleModel =
+        (await userGoogleRepository.getUserGoogleModel()) ??
+        UserGoogleModel(email: '');
+
+    String iduff = externalModulesServices.getUserIdUFF();
+    String email = _userGoogleModel.email;
+
+    if (iduff == "" && email != "") {
+      identificador = email;
+      operatorEmail = email;
+    } else if (iduff != "" && email == "") {
+      identificador = iduff;
+      operatorIdUff = iduff;
+    } else if (iduff != "" && email != "") {
+      identificador = iduff;
+      operatorIdUff = iduff;
+      operatorEmail = email;
+    }
+
     await fetchAreas();
     update();
   }
 
   Future<void> fetchAreas() async {
     isAreaBusy.value = true;
-    token = await service.getAccessToken();
+    token = await externalModulesServices.getAccessToken();
     try {
-      areas.value = await repository.getAreas(iduff, token);
+      areas.value = await repository.getAreas(operatorIdUff ?? '', token);
       isOfflineMode.value = false;
       statusMessage.value = 'catraca_online'.tr;
     } catch (e) {
@@ -83,7 +112,7 @@ class CatracaController extends GetxController {
 
   Future<void> fetchOperatorTransactions() async {
     isTransactionBusy.value = true;
-    token = await service.getAccessToken();
+    token = await externalModulesServices.getAccessToken();
 
     try {
       operatorTransactionsOffline.value = await repository
@@ -94,15 +123,17 @@ class CatracaController extends GetxController {
 
     try {
       operatorTransactionsFromFirebase.value = await repository
-          .getOperatorTransactionsFromFirebase(iduff);
+          .getOperatorTransactionsFromFirebase(
+            operatorIdUff ?? operatorEmail ?? '',
+          );
     } catch (e) {
       debugPrint('Erro ao buscar transações offline do firebase: $e');
     }
 
     try {
       operatorTransactions.value = await repository.getOperatorTransactions(
-        iduff,
-        token!,
+        operatorIdUff ?? '',
+        token ?? '',
         selectedArea.value.id.toString(),
       );
     } catch (e) {
@@ -157,11 +188,11 @@ class CatracaController extends GetxController {
         try {
           statusMessage.value = 'catraca_online'.tr;
           isOfflineMode.value = false;
-          token = await service.getAccessToken();
+          token = await externalModulesServices.getAccessToken();
 
           Map responseMessage = await repository.validatePayment(
             qrCodeScanRes,
-            iduff,
+            operatorIdUff!,
             token!,
             selectedArea.value.id.toString(),
           );
@@ -198,38 +229,22 @@ class CatracaController extends GetxController {
           if (RegExp(r'^\d{11}$').hasMatch(idUffValue)) {
             OperatorTransactionOffline operatorTransactionOffline =
                 OperatorTransactionOffline(
-                  id: DateTime.now().millisecondsSinceEpoch.toString(),
                   idUffUser: idUffValue,
-                  idUffOperator: iduff,
+                  idUffOperator: identificador,
                   idCampus: selectedArea.value.id.toString(),
                   campus: selectedArea.value.nome,
                 );
 
-            bool saveOperatorTransactionsOffline = false;
             // Salvando no banco local
-              try {
-                await repository.saveOperatorTransactionsOffline(
-                  operatorTransactionOffline,
-                );
-                saveOperatorTransactionsOffline = true;
-              } catch (e) {
-                saveOperatorTransactionsOffline = false;
-                debugPrint('Erro ao salvar transação offline: $e');
-              }
 
-            if (saveOperatorTransactionsOffline ) {
-              transactionResultMessage =
-                  'transacao_offline_salva_sucesso'.tr;
-              transactionUsername = idUffValue;
-              isTransactionValid = true;
-              isQrCodeValid = true;
-            } else {
-              transactionResultMessage =
-                  'falha_salvar_transacao_offline'.tr;
-              isTransactionValid = false;
-              isQrCodeValid = false;
-              transactionUsername = idUffValue;
-            }
+            await repository.saveOperatorTransactionsOffline(
+              operatorTransactionOffline,
+            );
+
+            transactionResultMessage = 'transacao_offline_salva_sucesso'.tr;
+            transactionUsername = idUffValue;
+            isTransactionValid = true;
+            isQrCodeValid = true;
           } else {
             isTransactionValid = false;
             isQrCodeValid = false;
@@ -291,34 +306,24 @@ class CatracaController extends GetxController {
   Future<void> saveCpfValidationTransaction(String cpf) async {
     OperatorTransactionOffline operatorTransactionOffline =
         OperatorTransactionOffline(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
           idUffUser: cpf,
-          idUffOperator: iduff,
+          idUffOperator: identificador,
           idCampus: selectedArea.value.id.toString(),
           campus: selectedArea.value.nome,
         );
 
-    bool saveOperatorTransactionsOffline = false;
-
-   try {
-        await repository.saveOperatorTransactionsOffline(
-          operatorTransactionOffline,
-        );
-        saveOperatorTransactionsOffline = true;
-      } catch (e) {
-        saveOperatorTransactionsOffline = false;
-        debugPrint('Erro ao salvar transação offline: $e');
-      }
-
-    if (saveOperatorTransactionsOffline ) {
+    try {
+      await repository.saveOperatorTransactionsOffline(
+        operatorTransactionOffline,
+      );
       isOfflineMode = true.obs;
       statusMessage.value = "Catraca Online";
       transactionResultMessage = "Transação salva localmente com sucesso!";
       transactionUsername = cpf;
       isTransactionValid = true;
       isQrCodeValid = true;
-    } 
-    else {
+    } catch (e) {
+      debugPrint('Erro ao salvar transação offline: $e');
       transactionResultMessage =
           "Falha ao salvar a transação. Erro Interno. Tente novamente.";
       isTransactionValid = false;
@@ -379,7 +384,8 @@ class CatracaController extends GetxController {
       }
     });
   }
-   void _startTimer(int secondsRefresh) {
+
+  void _startTimer(int secondsRefresh) {
     _timer = Timer.periodic(Duration(seconds: secondsRefresh), (timer) {
       debugPrint('Sincronizando catraca...');
       syncOfflineTransactions();
@@ -387,10 +393,9 @@ class CatracaController extends GetxController {
   }
 
   @override
-  void onClose(){
+  void onClose() {
     _connectionSubscription?.cancel();
     _timer?.cancel();
     super.onClose();
   }
-
 }

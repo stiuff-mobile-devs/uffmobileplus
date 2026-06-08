@@ -24,6 +24,7 @@ class CarteirinhaValidadorController extends GetxController {
   Future<void> _validateCard(String qrCodeText) async {
     isBusy.value = true;
     try {
+      validationData = [];
       validationData = await repository.validateCard(qrCodeText, _auth);
       await _buildResult();
     }catch (e) {

@@ -175,10 +175,7 @@ class ExternalModulesController extends GetxController {
       url: '',
       interrogation: false,
       availableFor: everyoneLogged,
-      gdiGroups: [GdiGroups(
-          GdiGroupsEnum.testeDeMobile.id,
-          'Teste de Mobile',
-        ),]
+      gdiGroups: null,
     ),
   ]);
 
