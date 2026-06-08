@@ -30,7 +30,10 @@ class SosPage extends GetView<SosController> {
             SizedBox(height: Get.height * 0.1),
 
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: Get.width * 0.08,vertical: 20),
+              padding: EdgeInsets.symmetric(
+                horizontal: Get.width * 0.08,
+                vertical: 20,
+              ),
               child: Text(
                 "sos_descricao".tr,
                 textAlign: TextAlign.center,
@@ -65,13 +68,19 @@ class SosPage extends GetView<SosController> {
               }
               double buttonSize = (Get.width * 0.55).clamp(180.0, 300.0);
               return GestureDetector(
-                onTap: () => controller.sendSos(),
+                onTap: () {
+                  if (!controller.isTracking.value) {
+                    controller.sendSos();
+                  }
+                },
                 child: Container(
                   width: buttonSize,
                   height: buttonSize,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.red,
+                    color: controller.isTracking.value
+                        ? AppColors.darkBlue()
+                        : Colors.red,
                     boxShadow: [
                       BoxShadow(
                         color: Colors.red.withValues(alpha: 0.5),
@@ -88,25 +97,46 @@ class SosPage extends GetView<SosController> {
                     border: Border.all(color: AppColors.lightBlue(), width: 4),
                   ),
                   child: Center(
-                    child: Text(
-                      "SOS",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: buttonSize * 0.25,
-                        fontWeight: FontWeight.bold,
-                        shadows: [
-                          Shadow(
-                            blurRadius: 10,
-                            color: Colors.black45,
-                            offset: Offset(2, 2),
+                    child: controller.isTracking.value
+                        ? Icon(
+                            Icons.stop_rounded,
+                            color: Colors.white,
+                            size: buttonSize * 0.33,
+                          )
+                        : Text(
+                            "SOS",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: buttonSize * 0.25,
+                              fontWeight: FontWeight.bold,
+                              shadows: [
+                                Shadow(
+                                  blurRadius: 10,
+                                  color: Colors.black45,
+                                  offset: Offset(2, 2),
+                                ),
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
-                    ),
                   ),
                 ),
               );
             }),
+
+            Obx(
+              () => controller.isTracking.value
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: Icon(
+                        Icons.location_searching,
+                        color: AppColors.lightBlue(),
+                        size: 28,
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+
+            const SizedBox(height: 12),
 
             const Spacer(),
           ],
