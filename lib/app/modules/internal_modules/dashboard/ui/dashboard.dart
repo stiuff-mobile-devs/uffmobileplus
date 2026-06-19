@@ -39,7 +39,7 @@ class Dashboard extends GetView<DashboardController> {
           // Tela de Serviços
           PersistentBottomNavBarItem(
             icon: const Icon(Icons.apps_rounded),
-            title: 'Módulos'.tr,
+            title: 'servicos'.tr,
             activeColorPrimary: const Color(0xFF0B1424),
             inactiveColorPrimary: const Color(0xFFC9D3E4),
             activeColorSecondary: AppColors.lightBlue(),

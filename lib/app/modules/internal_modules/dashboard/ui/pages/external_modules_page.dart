@@ -3,14 +3,42 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/external_modules_controller.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
+import 'package:uffmobileplus/app/utils/custom_drawer.dart';
 
 // Página que exibe uma grade de serviços externos disponíveis no aplicativo
 class ExternalModulesPage extends GetView<ExternalModulesController> {
   const ExternalModulesPage({super.key});
 
+  AppBar _appBar() {
+    return AppBar(
+      foregroundColor: Colors.white,
+      title: Text('servicos'.tr),
+      centerTitle: true,
+      elevation: 8,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          bottom: Radius.circular(10),
+        ),
+      ),
+      flexibleSpace: Container(
+        decoration: BoxDecoration(
+          gradient: AppColors.appBarTopGradient(),
+        ),
+      ),
+      actions: <Widget>[
+        IconButton(
+          onPressed: () {},
+          icon: const Icon(Icons.question_mark),
+        ),
+      ],
+    ); 
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: CustomDrawer(),
+      appBar: _appBar(),
       body: Container(
         decoration: BoxDecoration(
           gradient: AppColors.darkBlueToBlackGradient(),
@@ -30,28 +58,7 @@ class ExternalModulesPage extends GetView<ExternalModulesController> {
 
               return CustomScrollView(
                 slivers: [
-                  SliverAppBar(
-                    foregroundColor: Colors.white,
-                    title: Text('servicos'.tr),
-                    centerTitle: true,
-                    elevation: 8,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(
-                        bottom: Radius.circular(10),
-                      ),
-                    ),
-                    flexibleSpace: Container(
-                      decoration: BoxDecoration(
-                        gradient: AppColors.appBarTopGradient(),
-                      ),
-                    ),
-                    actions: <Widget>[
-                      IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.question_mark),
-                      ),
-                    ],
-                  ),
+                  
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(16, 18, 16, 96),
                     sliver: SliverGrid(
