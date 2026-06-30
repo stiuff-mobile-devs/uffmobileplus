@@ -1,10 +1,11 @@
-import 'package:uffmobileplus/app/data/services/connections/cdc_service.dart';
+import 'package:uffmobileplus/app/data/services/connections/google_service.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_google_model.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/provider/user_google_provider.dart';
 
 class UserGoogleRepository {
   final UserGoogleProvider _provider = UserGoogleProvider();
-  final CdcService _cdcService = CdcService();
+  final GoogleService _googleService = GoogleService();
 
   Future<UserGoogleModel> createUserDoc(
     String email,
@@ -42,7 +43,15 @@ class UserGoogleRepository {
     return _provider.hasUserGoogle();
   }
 
-  Future<void> registerTokenCdc(String token, String tokenDevice, String device) async {
-    await _cdcService.registerToken(token, tokenDevice, device);
+  Future<void> registerTokenCdc(
+    String token,
+    String tokenDevice,
+    String device,
+  ) async {
+    await _googleService.registerToken(token, tokenDevice, device);
+  }
+
+  Future<GdiGroupsGoogle> getGdiGroupsGoogle(String token, String email) async {
+    return await _googleService.getGdiGroupsGoogle(token, email);
   }
 }

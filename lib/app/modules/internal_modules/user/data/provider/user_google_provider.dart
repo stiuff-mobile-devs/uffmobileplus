@@ -28,7 +28,7 @@ class UserGoogleProvider {
     UserGoogleModel user;
     if (query.docs.isNotEmpty) {
       // Usuário já existe, retorna o existente
-      final data = query.docs.first.data();
+      Map<String, dynamic> data = query.docs.first.data();
       user = UserGoogleModel(
         id: query.docs.first.id,
         name: data['name'] as String?,
@@ -47,14 +47,14 @@ class UserGoogleProvider {
         urlImage: urlImage,
         createdAt: DateTime.now(),
       );
-      await createUserDocInFirebase(user);
+      await _createUserDocInFirebase(user);
     }
 
     await saveUserGoogleModel(user);
     return user;
   }
 
-  Future<void> createUserDocInFirebase(UserGoogleModel user) async {
+  Future<void> _createUserDocInFirebase(UserGoogleModel user) async {
     DocumentReference docRef = await _firestore.collection('users').add({
       'name': user.name,
       'email': user.email,

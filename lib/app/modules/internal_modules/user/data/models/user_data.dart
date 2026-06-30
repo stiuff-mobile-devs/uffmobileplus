@@ -46,6 +46,9 @@ class UserData extends HiveObject {
   @HiveField(13)
   List<String>? shortcutRoutes;
 
+  @HiveField(14)
+  GdiGroupsGoogle? gdiGroupsGoogle;
+
   UserData({
     this.name,
     this.nomesocial,
@@ -61,6 +64,7 @@ class UserData extends HiveObject {
     this.gdiGroups,
     this.profileType,
     this.shortcutRoutes,
+    this.gdiGroupsGoogle,
   });
 
   factory UserData.fromJson(Map<String, dynamic> json) {
@@ -89,6 +93,9 @@ class UserData extends HiveObject {
       shortcutRoutes: json['shortcutRoutes'] != null
           ? List<String>.from(json['shortcutRoutes'] as List)
           : null,
+      gdiGroupsGoogle: json['gdiGroupsGoogle'] != null
+          ? GdiGroupsGoogle.fromJson(json['gdiGroupsGoogle'])
+          : null,
     );
   }
 
@@ -110,6 +117,7 @@ class UserData extends HiveObject {
           .toList(),
       'profileType': profileType?.toString().split('.').last,
       'shortcutRoutes': shortcutRoutes,
+      'gdiGroupsGoogle': gdiGroupsGoogle?.toJson(),
     };
   }
 }
@@ -131,5 +139,40 @@ class GdiGroups {
   @override
   String toString() {
     return "Group(gid: $gid, descicao: $description)";
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'gid': gid, 'descricao': description};
+  }
+}
+
+@HiveType(typeId: 33)
+class GdiGroupsGoogle {
+  @HiveField(0)
+  DateTime? lastUpdate;
+  @HiveField(1)
+  List<GdiGroups>? gdiGroups;
+
+  GdiGroupsGoogle(this.lastUpdate, this.gdiGroups);
+
+  GdiGroupsGoogle.fromJson(Map<String, dynamic> json) {
+    lastUpdate = json['lastUpdate'] != null
+        ? DateTime.parse(json['lastUpdate'])
+        : null;
+    gdiGroups = json['gdiGroups'] != null
+        ? (json['gdiGroups'] as List)
+              .map((group) => GdiGroups.fromJson(group))
+              .toList()
+        : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+
+    data['lastUpdate'] = lastUpdate?.toIso8601String();
+
+    data['gdiGroups'] = gdiGroups?.map((group) => group.toJson()).toList();
+
+    return data;
   }
 }
