@@ -31,13 +31,15 @@ class UserDataAdapter extends TypeAdapter<UserData> {
       gdiGroups: (fields[11] as List?)?.cast<GdiGroups>(),
       profileType: fields[12] as ProfileTypes?,
       shortcutRoutes: (fields[13] as List?)?.cast<String>(),
+      gdiGroupsGoogle: fields[14] as GdiGroupsGoogle?,
+      lastRegisteredTokenCdcUpdate: fields[15] as DateTime?,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserData obj) {
     writer
-      ..writeByte(14)
+      ..writeByte(16)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
@@ -65,7 +67,11 @@ class UserDataAdapter extends TypeAdapter<UserData> {
       ..writeByte(12)
       ..write(obj.profileType)
       ..writeByte(13)
-      ..write(obj.shortcutRoutes);
+      ..write(obj.shortcutRoutes)
+      ..writeByte(14)
+      ..write(obj.gdiGroupsGoogle)
+      ..writeByte(15)
+      ..write(obj.lastRegisteredTokenCdcUpdate);
   }
 
   @override
@@ -92,17 +98,26 @@ class GdiGroupsAdapter extends TypeAdapter<GdiGroups> {
     return GdiGroups(
       fields[0] as String?,
       fields[1] as String?,
+      fields[2] as String?,
+      fields[3] as String?,
+      fields[4] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, GdiGroups obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.gid)
       ..writeByte(1)
-      ..write(obj.description);
+      ..write(obj.description)
+      ..writeByte(2)
+      ..write(obj.name)
+      ..writeByte(3)
+      ..write(obj.email)
+      ..writeByte(4)
+      ..write(obj.directMembersCount);
   }
 
   @override
@@ -112,6 +127,43 @@ class GdiGroupsAdapter extends TypeAdapter<GdiGroups> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is GdiGroupsAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class GdiGroupsGoogleAdapter extends TypeAdapter<GdiGroupsGoogle> {
+  @override
+  final int typeId = 33;
+
+  @override
+  GdiGroupsGoogle read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return GdiGroupsGoogle(
+      fields[0] as DateTime?,
+      (fields[1] as List?)?.cast<GdiGroups>(),
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, GdiGroupsGoogle obj) {
+    writer
+      ..writeByte(2)
+      ..writeByte(0)
+      ..write(obj.lastUpdate)
+      ..writeByte(1)
+      ..write(obj.gdiGroups);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is GdiGroupsGoogleAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 class GoogleService {
   Future<GdiGroupsGoogle> getGdiGroupsGoogle(String token, String email) async {
     try {
+      DateTime now = DateTime.now();
       Uri url = Uri.https(
         Secrets.gdiGroupsGoogleHost,
         Secrets.gdiGroupsGooglePath,
@@ -23,11 +24,12 @@ class GoogleService {
       );
 
       if (response.statusCode == 200) {
-        final List<dynamic> jsonData = json.decode(response.body);
-        return jsonData
-            .map((json) => GdiGroupsGoogle.fromJson(json))
-            .toList()
-            .first;
+        final  jsonData = json.decode(response.body);
+        List<GdiGroups> gdiGroups = (jsonData['groups'].toList() as List)
+            .map((group) => GdiGroups.fromJson(group))
+            .toList();
+        GdiGroupsGoogle gdiGroupsGoogle = GdiGroupsGoogle(now, gdiGroups);
+        return gdiGroupsGoogle;
       } else {
         throw Exception('Falha ao buscar grupos GDI: ${response.statusCode}');
       }

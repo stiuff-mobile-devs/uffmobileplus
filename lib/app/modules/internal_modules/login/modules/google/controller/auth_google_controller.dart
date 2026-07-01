@@ -29,7 +29,7 @@ class AuthGoogleController extends GetxController {
       if (user != null) {
         String? token = await _authGoogle.getFirebaseIdToken();
         await _userRepository.saveUserGoogleModel(user);
-        await _registerTokenCdc();
+         await _registerTokenCdc();
         await _getGdiGroupsGoogle(token ?? '', user.email);
         Get.offNamed(Routes.HOME);
       } else {
@@ -52,7 +52,7 @@ class AuthGoogleController extends GetxController {
   tryLogin() async {
     UserGoogleModel? hasLogged = await _authGoogle.trySignInGoogle();
     if (hasLogged != null) {
-      await _registerTokenCdc();
+         await _registerTokenCdc();
       String? token = await _authGoogle.getFirebaseIdToken();
       await _getGdiGroupsGoogle(token ?? '', hasLogged.email);
       Get.offNamed(Routes.HOME);
@@ -68,23 +68,62 @@ class AuthGoogleController extends GetxController {
   }
 
   Future<void> _getGdiGroupsGoogle(String token, String email) async {
-    GdiGroupsGoogle gdiGroups = await _userRepository.getGdiGroupsGoogle(
-      token,
-      email,
-    );
-    UserData userData = UserData(gdiGroupsGoogle: gdiGroups);
-    _userDataRepository.saveUserData(userData);
+    try {
+      UserData user = await _userDataRepository.getUserData() ?? UserData();
+
+      if (user.gdiGroupsGoogle != null &&
+          user.gdiGroupsGoogle?.lastUpdate != null) {
+        if (DateTime.now()
+                .difference(user.gdiGroupsGoogle?.lastUpdate as DateTime)
+                .inDays <
+            90) {
+          debugPrint(
+            "GDI Groups Google já atualizado recentemente. Não é necessário atualizar.",
+          );
+          return;
+        }
+      }
+
+      GdiGroupsGoogle gdiGroups = await _userRepository.getGdiGroupsGoogle(
+        token,
+        email,
+      );
+      await _userDataRepository.updateGdiGroupsGoogle(gdiGroups);
+    } catch (e) {
+      debugPrint("Erro ao obter grupos GDI Google: $e");
+    }
   }
 
   Future<void> _registerTokenCdc() async {
-    bool isAndroid = Platform.isAndroid;
-    String device = isAndroid ? 'android' : 'ios';
-    String? tokenDevice = await getTokenDevice(isAndroid);
-    String? token = await _authGoogle.getFirebaseIdToken();
+    try {
+      UserData user = await _userDataRepository.getUserData() ?? UserData();
 
-    if (token != null && tokenDevice != null) {
-      await _userRepository.registerTokenCdc(token, tokenDevice, device);
+      if (user.lastRegisteredTokenCdcUpdate != null) {
+        if (DateTime.now()
+                .difference(user.lastRegisteredTokenCdcUpdate as DateTime)
+                .inDays <
+            90) {
+          debugPrint(
+            "Token CDC já atualizado recentemente. Não é necessário atualizar.",
+          );
+          return;
+        }
+      }
+      bool isAndroid = Platform.isAndroid;
+      String device = isAndroid ? 'android' : 'ios';
+      String? tokenDevice = await getTokenDevice(isAndroid);
+      String? token = await _authGoogle.getFirebaseIdToken();
+
+      if (token != null && tokenDevice != null) {
+        await _userRepository.registerTokenCdc(token, tokenDevice, device);
+      }
+
+      await _userDataRepository.lastRegisteredTokenCdcUpdate(DateTime.now());
+    } catch (e) {
+      debugPrint("Erro ao registrar token CDC: $e");
     }
+
+
   }
 
   Future<String?> getTokenDevice(bool isAndroid) async {

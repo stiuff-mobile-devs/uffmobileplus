@@ -18,7 +18,7 @@ class OperatorTransactionOfflineAdapter
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return OperatorTransactionOffline(
-      id: fields[0] as String,
+      id: fields[0] as String?,
       idCampus: fields[1] as String?,
       campus: fields[2] as String?,
       entryTime: fields[3] as DateTime?,

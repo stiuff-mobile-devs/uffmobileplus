@@ -49,6 +49,9 @@ class UserData extends HiveObject {
   @HiveField(14)
   GdiGroupsGoogle? gdiGroupsGoogle;
 
+  @HiveField(15)
+  DateTime? lastRegisteredTokenCdcUpdate;
+
   UserData({
     this.name,
     this.nomesocial,
@@ -65,6 +68,7 @@ class UserData extends HiveObject {
     this.profileType,
     this.shortcutRoutes,
     this.gdiGroupsGoogle,
+    this.lastRegisteredTokenCdcUpdate,
   });
 
   factory UserData.fromJson(Map<String, dynamic> json) {
@@ -96,6 +100,9 @@ class UserData extends HiveObject {
       gdiGroupsGoogle: json['gdiGroupsGoogle'] != null
           ? GdiGroupsGoogle.fromJson(json['gdiGroupsGoogle'])
           : null,
+      lastRegisteredTokenCdcUpdate: json['lastRegisteredTokenCdcUpdate'] != null
+          ? DateTime.parse(json['lastRegisteredTokenCdcUpdate'])
+          : null,
     );
   }
 
@@ -118,7 +125,14 @@ class UserData extends HiveObject {
       'profileType': profileType?.toString().split('.').last,
       'shortcutRoutes': shortcutRoutes,
       'gdiGroupsGoogle': gdiGroupsGoogle?.toJson(),
+      'lastRegisteredTokenCdcUpdate':
+          lastRegisteredTokenCdcUpdate?.toIso8601String(),
     };
+  }
+
+  @override
+  String toString() {
+    return 'UserData(name: $name, nomesocial: $nomesocial, matricula: $matricula, iduff: $iduff, curso: $curso, dataValidadeMatricula: $dataValidadeMatricula, bond: $bond, textoQrCodeCarteirinha: $textoQrCodeCarteirinha,  bondId: $bondId, gdiGroups: $gdiGroups, gdiGroupsGoogle: $gdiGroupsGoogle, lastRegisteredTokenCdcUpdate: $lastRegisteredTokenCdcUpdate)';
   }
 }
 
@@ -128,12 +142,21 @@ class GdiGroups {
   String? gid; //Id do grupo
   @HiveField(1)
   String? description;
+  @HiveField(2)
+  String? name;
+  @HiveField(3)
+  String? email;
+  @HiveField(4)
+  String? directMembersCount;
 
-  GdiGroups(this.gid, this.description);
+  GdiGroups(this.gid, this.description, this.name, this.email, this.directMembersCount);
 
   GdiGroups.fromJson(Map<String, dynamic> json) {
-    gid = json['gid'];
+    gid = json['gid'] ?? json['id'];
     description = json['descricao'];
+    name = json['name'];
+    email = json['email'];
+    directMembersCount = json['directMembersCount'];
   }
 
   @override
@@ -142,7 +165,7 @@ class GdiGroups {
   }
 
   Map<String, dynamic> toJson() {
-    return {'gid': gid, 'descricao': description};
+    return {'gid': gid, 'descricao': description, 'name': name, 'email': email, 'directMembersCount': directMembersCount};
   }
 }
 

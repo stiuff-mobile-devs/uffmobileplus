@@ -39,6 +39,8 @@ class SettingsController extends GetxController {
   }
 
   Future<void> reloadBondStates() async {
+    final userData = await userDataRepository.getUserData();
+    debugPrint(userData.toString());
     await _loginController.reloadBondStates();
   }
 

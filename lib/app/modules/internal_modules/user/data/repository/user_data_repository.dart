@@ -40,6 +40,14 @@ class UserDataRepository {
     return await _userDataProvider.updateShortcutRoutes(shortcutRoutes);
   }
 
+  Future<String> updateGdiGroupsGoogle(GdiGroupsGoogle gdiGroupsGoogle) async {
+    return await _userDataProvider.updateGdiGroupsGoogle(gdiGroupsGoogle);
+  }
+
+  Future<String> lastRegisteredTokenCdcUpdate(DateTime lastRegisteredTokenCdcUpdate) async {
+    return await _userDataProvider.lastRegisteredTokenCdcUpdate(lastRegisteredTokenCdcUpdate);
+  }
+
   Future<List<GdiGroups>> getGdiGroups(String iduff, String token) async {
     return await _userDataProvider.getGdiGroups(iduff, token);
   }

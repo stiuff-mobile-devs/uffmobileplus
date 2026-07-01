@@ -88,7 +88,7 @@ class RestaurantModulesController extends GetxController {
       gdiGroups: [
         GdiGroups(
           GdiGroupsEnum.controladoresDeAcesso.id,
-          'Controladores de Acesso',
+          'Controladores de Acesso', null, null, null
         ),
       ],
     ),

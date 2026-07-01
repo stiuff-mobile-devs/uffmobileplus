@@ -98,6 +98,42 @@ class UserDataProvider {
     }
   }
 
+  Future<String> updateGdiGroupsGoogle(GdiGroupsGoogle gdiGroupsGoogle) async {
+    try {
+      var box = await Hive.openBox<UserData>(_collectionPath);
+      UserData? user = box.get(_userKey);
+
+      if (user == null) {
+        return "Nenhuma informação de usuário encontrada";
+      }
+
+      // altera o campo diretamente e salva
+      user.gdiGroupsGoogle = gdiGroupsGoogle;
+      await user.save(); // persiste o objeto atualizado
+      return "success";
+    } catch (e) {
+      return "Erro ao atualizar grupos GDI Google no Hive: $e";
+    }
+  }
+
+  Future<String> lastRegisteredTokenCdcUpdate(DateTime lastRegisteredTokenCdcUpdate) async {
+    try {
+      var box = await Hive.openBox<UserData>(_collectionPath);
+      UserData? user = box.get(_userKey);
+
+      if (user == null) {
+        return "Nenhuma informação de usuário encontrada";
+      }
+
+      // altera o campo diretamente e salva
+      user.lastRegisteredTokenCdcUpdate = lastRegisteredTokenCdcUpdate;
+      await user.save(); // persiste o objeto atualizado
+      return "success";
+    } catch (e) {
+      return "Erro ao atualizar grupos GDI Google no Hive: $e";
+    }
+  }
+
   Future<List<GdiGroups>> getGdiGroups(String iduff, String token) async {
     final path = '${Secrets.gdiGroupsPath}/$iduff${Secrets.gdiGroupsQuery}';
     var uri = Uri.https(Secrets.gdiGroupsHost, path);
