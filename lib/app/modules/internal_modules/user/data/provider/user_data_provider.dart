@@ -14,15 +14,45 @@ class UserDataProvider {
     debugPrint("Started User Data provider");
   }
 
-  Future<String> saveUserData(UserData userData) async {
-    try {
-      var box = await Hive.openBox<UserData>(_collectionPath);
-      await box.put(_userKey, userData);
-      return "success";
-    } catch (e) {
-      throw Exception("Erro ao salvar dados do usuário no Hive: $e");
+ Future<String> saveUserData(UserData newUserData) async {
+  try {
+    var box = await Hive.openBox<UserData>(_collectionPath);
+    
+    UserData? existingData = box.get(_userKey);
+
+    UserData dataToSave;
+
+    if (existingData != null) {
+      dataToSave = existingData.copyWith(
+        name: newUserData.name ?? existingData.name,
+        nomesocial: newUserData.nomesocial ?? existingData.nomesocial,
+        matricula: newUserData.matricula ?? existingData.matricula,
+        iduff: newUserData.iduff ?? existingData.iduff,
+        curso: newUserData.curso ?? existingData.curso,
+        fotoUrl: newUserData.fotoUrl ?? existingData.fotoUrl,
+        dataValidadeMatricula: newUserData.dataValidadeMatricula ?? existingData.dataValidadeMatricula,
+        bond: newUserData.bond ?? existingData.bond,
+        textoQrCodeCarteirinha: newUserData.textoQrCodeCarteirinha ?? existingData.textoQrCodeCarteirinha,
+        accessToken: newUserData.accessToken ?? existingData.accessToken,
+        bondId: newUserData.bondId ?? existingData.bondId,
+        gdiGroups: newUserData.gdiGroups ?? existingData.gdiGroups,
+        profileType: newUserData.profileType ?? existingData.profileType,
+        shortcutRoutes: newUserData.shortcutRoutes ?? existingData.shortcutRoutes,
+        gdiGroupsGoogle: newUserData.gdiGroupsGoogle ?? existingData.gdiGroupsGoogle,
+        lastRegisteredTokenCdcUpdate: newUserData.lastRegisteredTokenCdcUpdate ?? existingData.lastRegisteredTokenCdcUpdate,
+        
+
+      );
+    } else {
+      dataToSave = newUserData;
     }
+
+    await box.put(_userKey, dataToSave);
+    return "success";
+  } catch (e) {
+    throw Exception("Erro ao salvar dados do usuário no Hive: $e");
   }
+}
 
   Future<UserData?> getUserData() async {
     try {
@@ -69,7 +99,8 @@ class UserDataProvider {
       UserData? user = box.get(_userKey);
 
       if (user == null) {
-        return "Nenhuma informação de usuário encontrada";
+        await saveUserData(UserData(textoQrCodeCarteirinha: textoQrCodeCarteirinha));
+        return "success";
       }
 
       // altera o campo diretamente e salva
@@ -87,7 +118,8 @@ class UserDataProvider {
       UserData? user = box.get(_userKey);
 
       if (user == null) {
-        return "Nenhuma informação de usuário encontrada";
+        await saveUserData(UserData(shortcutRoutes: List<String>.from(shortcutRoutes)));
+        return "success";
       }
 
       user.shortcutRoutes = List<String>.from(shortcutRoutes);
@@ -104,7 +136,8 @@ class UserDataProvider {
       UserData? user = box.get(_userKey);
 
       if (user == null) {
-        return "Nenhuma informação de usuário encontrada";
+        await saveUserData(  UserData(gdiGroupsGoogle: gdiGroupsGoogle));
+        return "success";
       }
 
       // altera o campo diretamente e salva
@@ -122,7 +155,8 @@ class UserDataProvider {
       UserData? user = box.get(_userKey);
 
       if (user == null) {
-        return "Nenhuma informação de usuário encontrada";
+        await saveUserData(UserData(lastRegisteredTokenCdcUpdate: lastRegisteredTokenCdcUpdate));
+        return "success";
       }
 
       // altera o campo diretamente e salva

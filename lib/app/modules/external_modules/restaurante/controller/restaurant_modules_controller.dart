@@ -30,6 +30,7 @@ class RestaurantModulesController extends GetxController {
     await filterButtonList(
       _usermodel.profileType ?? ProfileTypes.anonymous,
       _usermodel.gdiGroups ?? <GdiGroups>[],
+      _usermodel.gdiGroupsGoogle?.gdiGroups ?? <GdiGroups>[],
     );
   }
   Future<void> _isOperator() async {
@@ -84,7 +85,6 @@ class RestaurantModulesController extends GetxController {
       url: '',
       interrogation: false,
       availableFor: everyoneLogged,
-      isOperator: true,
       gdiGroups: [
         GdiGroups(
           GdiGroupsEnum.controladoresDeAcesso.id,
@@ -113,6 +113,7 @@ class RestaurantModulesController extends GetxController {
   Future<void> filterButtonList(
     ProfileTypes currentProfile,
     List<GdiGroups> currentGdiGroups,
+    List<GdiGroups> currentGdiGroupsGoogle,
   ) async {
     restaurantModulesList.removeWhere((button) {
       if (button.isOperator == true && isOperator) return false;
@@ -124,7 +125,8 @@ class RestaurantModulesController extends GetxController {
 
       final hasGroupMatch = button.gdiGroups!.any(
         (btnGroup) =>
-            currentGdiGroups.any((userGroup) => userGroup.gid == btnGroup.gid),
+            currentGdiGroups.any((userGroup) => userGroup.gid == btnGroup.gid) ||
+            currentGdiGroupsGoogle.any((userGroup) => userGroup.gid == btnGroup.gid),
       );
 
       return !hasGroupMatch;

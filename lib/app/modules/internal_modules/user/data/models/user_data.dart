@@ -71,6 +71,44 @@ class UserData extends HiveObject {
     this.lastRegisteredTokenCdcUpdate,
   });
 
+  UserData copyWith({
+    String? name,
+    String? nomesocial,
+    String? matricula,
+    String? iduff,
+    String? curso,
+    String? fotoUrl,  
+  String? dataValidadeMatricula,
+    String? bond,
+    String? textoQrCodeCarteirinha,
+    String? accessToken,
+    String? bondId,
+    List<GdiGroups>? gdiGroups,
+    ProfileTypes? profileType,
+    List<String>? shortcutRoutes,
+    GdiGroupsGoogle? gdiGroupsGoogle,
+    DateTime? lastRegisteredTokenCdcUpdate,
+  }) {
+    return UserData(
+     name: name ?? this.name,
+     nomesocial: nomesocial ?? this.nomesocial,
+     matricula: matricula ?? this.matricula,
+     iduff: iduff ?? this.iduff,
+     curso: curso ?? this.curso,
+     fotoUrl: fotoUrl ?? this.fotoUrl,
+     dataValidadeMatricula: dataValidadeMatricula ?? this.dataValidadeMatricula,
+     bond: bond ?? this.bond,
+     textoQrCodeCarteirinha: textoQrCodeCarteirinha ?? this.textoQrCodeCarteirinha,
+     accessToken: accessToken ?? this.accessToken,
+     bondId: bondId ?? this.bondId,
+     gdiGroups: gdiGroups ?? this.gdiGroups,
+     profileType: profileType ?? this.profileType,
+     shortcutRoutes: shortcutRoutes ?? this.shortcutRoutes,
+     gdiGroupsGoogle: gdiGroupsGoogle as GdiGroupsGoogle? ?? this.gdiGroupsGoogle,
+     lastRegisteredTokenCdcUpdate: lastRegisteredTokenCdcUpdate ?? this.lastRegisteredTokenCdcUpdate,
+    );
+  }
+
   factory UserData.fromJson(Map<String, dynamic> json) {
     return UserData(
       name: json['name'] as String?,
