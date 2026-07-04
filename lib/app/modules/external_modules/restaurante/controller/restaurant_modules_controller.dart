@@ -1,9 +1,6 @@
 import 'package:get/get.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/services/firebase_users_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_google_model.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_google_repository.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/gdi_groups.dart';
 import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
@@ -11,31 +8,21 @@ import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
 class RestaurantModulesController extends GetxController {
   RestaurantModulesController();
 
-  bool isOperator = false;
-  late UserData _usermodel;
-  late UserGoogleModel _userGoogleModel;
-  UserDataRepository userDataRepository = UserDataRepository();
-  UserGoogleRepository userGoogleRepository = UserGoogleRepository();
-  FirebaseUsersService firebaseUsersService = FirebaseUsersService();
+  UserData _usermodel = UserData();
+
+  final UserDataRepository _userDataRepository = UserDataRepository();
 
   @override
   Future<void> onInit() async {
     super.onInit();
 
-    _usermodel = (await userDataRepository.getUserData()) ?? UserData();
-    _userGoogleModel = (await userGoogleRepository.getUserGoogleModel()) ?? UserGoogleModel(email: '');
-
-    await _isOperator();
+    _usermodel = (await _userDataRepository.getUserData()) ?? UserData();
 
     await filterButtonList(
       _usermodel.profileType ?? ProfileTypes.anonymous,
       _usermodel.gdiGroups ?? <GdiGroups>[],
       _usermodel.gdiGroupsGoogle?.gdiGroups ?? <GdiGroups>[],
     );
-  }
-  Future<void> _isOperator() async {
-    final operatorsEmails = await firebaseUsersService.getOperators();
-    isOperator = operatorsEmails.contains(_userGoogleModel.email);
   }
 
   final RxList<RestaurantModules> restaurantModulesList = RxList([
@@ -68,6 +55,7 @@ class RestaurantModulesController extends GetxController {
       availableFor: everyoneLogged,
       gdiGroups: null,
     ),
+
     RestaurantModules(
       iconSrc: 'assets/restaurant/icons/saldo-extrato.svg',
       subtitle: 'Saldo e Extrato'.tr,
@@ -84,11 +72,14 @@ class RestaurantModulesController extends GetxController {
       page: Routes.CATRACA_ONLINE,
       url: '',
       interrogation: false,
-      availableFor: everyoneLogged,
+      availableFor: everyone,
       gdiGroups: [
         GdiGroups(
           GdiGroupsEnum.controladoresDeAcesso.id,
-          'Controladores de Acesso', null, null, null
+          'Controladores de Acesso',
+          null,
+          null,
+          null,
         ),
       ],
     ),
@@ -116,17 +107,29 @@ class RestaurantModulesController extends GetxController {
     List<GdiGroups> currentGdiGroupsGoogle,
   ) async {
     restaurantModulesList.removeWhere((button) {
-      if (button.isOperator == true && isOperator) return false;
-
-      final hasProfile = button.availableFor.contains(currentProfile);
+      bool hasProfile = button.availableFor.contains(currentProfile);
       if (!hasProfile) return true;
 
       if (button.gdiGroups == null) return false;
 
-      final hasGroupMatch = button.gdiGroups!.any(
+      if (button.gdiGroups!.any(
+        (btnGroup) => btnGroup.gid == GdiGroupsEnum.controladoresDeAcesso.id,
+      )) {
+        if (currentGdiGroupsGoogle.any(
+          (userGroup) =>
+              userGroup.email == 'controladores-de-acesso-ru.proaes@id.uff.br',
+        )) {
+          return false;
+        }
+      }
+      bool hasGroupMatch = button.gdiGroups!.any(
         (btnGroup) =>
-            currentGdiGroups.any((userGroup) => userGroup.gid == btnGroup.gid) ||
-            currentGdiGroupsGoogle.any((userGroup) => userGroup.gid == btnGroup.gid),
+            currentGdiGroups.any(
+              (userGroup) => userGroup.gid == btnGroup.gid,
+            ) ||
+            currentGdiGroupsGoogle.any(
+              (userGroup) => userGroup.gid == btnGroup.gid,
+            ),
       );
 
       return !hasGroupMatch;
@@ -142,7 +145,6 @@ class RestaurantModules {
   final String page;
   final String? url;
   final bool? interrogation;
-  final bool? isOperator;
   final List<GdiGroups>? gdiGroups;
 
   const RestaurantModules({
@@ -152,7 +154,6 @@ class RestaurantModules {
     required this.page,
     this.url,
     this.interrogation,
-    this.isOperator,
     required this.gdiGroups,
   });
 }

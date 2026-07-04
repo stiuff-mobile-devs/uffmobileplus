@@ -34,8 +34,7 @@ class SettingsController extends GetxController {
   }
 
   void changeMatricula() async {
-    String? iduff = await userIduffRepository.getIduff();
-    Get.offAllNamed(Routes.CHOOSE_PROFILE, arguments: iduff);
+    Get.offAllNamed(Routes.CHOOSE_PROFILE);
   }
 
   Future<void> reloadBondStates() async {

@@ -8,7 +8,7 @@ import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/s
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 
 class AuthIduffController extends GetxController {
-  final AuthIduffService _authIduffService = Get.find<AuthIduffService>();
+  late final AuthIduffService _authIduffService;
 
   UserIduffRepository userIduffRepository = UserIduffRepository();
 
@@ -18,6 +18,7 @@ class AuthIduffController extends GetxController {
 
   @override
   void onInit() {
+    _authIduffService = Get.find<AuthIduffService>();
     isLogin = Get.arguments as bool? ?? false;
     if (isLogin) {
       _login();
@@ -152,9 +153,8 @@ class AuthIduffController extends GetxController {
   }
 
   Future<void> loginSuccessful() async {
-    String? iduff = await userIduffRepository.getIduff();
     isLoading.value = false;
-    Get.offAllNamed(Routes.CHOOSE_PROFILE, arguments: iduff);
+    Get.offAllNamed(Routes.CHOOSE_PROFILE);
   }
 
   Future<void> _login() async {

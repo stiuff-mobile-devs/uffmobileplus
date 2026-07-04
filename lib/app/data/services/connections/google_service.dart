@@ -24,11 +24,14 @@ class GoogleService {
       );
 
       if (response.statusCode == 200) {
-        final  jsonData = json.decode(response.body);
+        final jsonData = json.decode(response.body);
         List<GdiGroups> gdiGroups = (jsonData['groups'].toList() as List)
             .map((group) => GdiGroups.fromJson(group))
             .toList();
         GdiGroupsGoogle gdiGroupsGoogle = GdiGroupsGoogle(now, gdiGroups);
+        debugPrint(
+          "Grupos GDI obtidos com sucesso: ${gdiGroupsGoogle.gdiGroups}",
+        );
         return gdiGroupsGoogle;
       } else {
         throw Exception('Falha ao buscar grupos GDI: ${response.statusCode}');

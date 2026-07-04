@@ -29,7 +29,7 @@ class AuthGoogleController extends GetxController {
       if (user != null) {
         String? token = await _authGoogle.getFirebaseIdToken();
         await _userRepository.saveUserGoogleModel(user);
-         await _registerTokenCdc();
+        await _registerTokenCdc();
         await _getGdiGroupsGoogle(token ?? '', user.email);
         Get.offNamed(Routes.HOME);
       } else {
@@ -52,7 +52,7 @@ class AuthGoogleController extends GetxController {
   tryLogin() async {
     UserGoogleModel? hasLogged = await _authGoogle.trySignInGoogle();
     if (hasLogged != null) {
-         await _registerTokenCdc();
+      await _registerTokenCdc();
       String? token = await _authGoogle.getFirebaseIdToken();
       await _getGdiGroupsGoogle(token ?? '', hasLogged.email);
       Get.offNamed(Routes.HOME);
@@ -122,8 +122,6 @@ class AuthGoogleController extends GetxController {
     } catch (e) {
       debugPrint("Erro ao registrar token CDC: $e");
     }
-
-
   }
 
   Future<String?> getTokenDevice(bool isAndroid) async {

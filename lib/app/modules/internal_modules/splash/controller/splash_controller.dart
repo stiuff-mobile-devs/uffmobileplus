@@ -1,10 +1,13 @@
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:flutter/foundation.dart'; // Add this import for kDebugMode
 import 'package:uffmobileplus/app/modules/internal_modules/lock_develop_mode/controller/lock_develop_mode_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/controller/auth_iduff_controller.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 
-class SplashController extends GetxController {
+class SplashController extends GetxController
+    with GetSingleTickerProviderStateMixin {
+  late AnimationController animationController;
   late final LockDevelopModeController _lockController;
   late final AuthIduffController _authController;
 
@@ -12,18 +15,17 @@ class SplashController extends GetxController {
   void onInit() {
     _lockController = Get.find<LockDevelopModeController>();
     _authController = Get.find<AuthIduffController>();
+    _initAnimation();
     super.onInit();
   }
 
   double animatedMargin = 0.0;
-  bool visibleStrip = false;
 
   bool _isDevMode = false;
   bool _login = false;
 
   @override
   Future<void> onReady() async {
-    visibleStrip = true;
     animatedMargin = 80.0;
 
     _isDevMode = await _lockController.updateDevMode();
@@ -43,7 +45,6 @@ class SplashController extends GetxController {
     } else {
       try {
         _login = await _authController.tryLogin();
-        debugPrint("Auto Login result: $_login");
         if (_login) {
           debugPrint("Auto Login successful");
           await _authController.loginSuccessful();
@@ -67,5 +68,20 @@ class SplashController extends GetxController {
   double findIconSize() {
     double padding = 2.0;
     return ((Get.height - findLogoSize() - padding * 2 * 10) / 10);
+  }
+
+  void _initAnimation() {
+    animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+
+    animationController.repeat(reverse: true);
+  }
+
+  @override
+  void onClose() {
+    animationController.dispose();
+    super.onClose();
   }
 }
