@@ -27,6 +27,9 @@ class OperatorTransactionOffline {
   @HiveField(6)
   bool processed;
 
+  @HiveField(7)
+  bool? isSynced;
+
   OperatorTransactionOffline({
     String? id,
     this.idCampus,
@@ -35,6 +38,7 @@ class OperatorTransactionOffline {
     this.idUffOperator,
     this.idUffUser,
     this.processed = false,
+    this.isSynced = false,
   }) : id = id ?? Uuid().v4(),
        entryTime = entryTime ?? DateTime.now();
 
@@ -49,6 +53,7 @@ class OperatorTransactionOffline {
           : null,
       idUffUser: json['idUffUser'] != null ? json['idUffUser'] as String : null,
       processed: json['processed'] == true || json['processed'] == 1,
+      isSynced: json['isSynced'] == true || json['isSynced'] == 1,
     );
   }
 
@@ -85,6 +90,29 @@ class OperatorTransactionOffline {
       'idUffOperator': idUffOperator,
       'idUffUser': idUffUser,
       'processed': processed,
+      'isSynced': isSynced,
     };
+  }
+
+  OperatorTransactionOffline copyWith({
+    String? id,
+    String? idCampus,
+    String? campus,
+    DateTime? entryTime,
+    String? idUffOperator,
+    String? idUffUser,
+    bool? processed,
+    bool? isSynced,
+  }) {
+    return OperatorTransactionOffline(
+      id: id ?? this.id,
+      idCampus: idCampus ?? this.idCampus,
+      campus: campus ?? this.campus,
+      entryTime: entryTime ?? this.entryTime,
+      idUffOperator: idUffOperator ?? this.idUffOperator,
+      idUffUser: idUffUser ?? this.idUffUser,
+      processed: processed ?? this.processed,
+      isSynced: isSynced ?? this.isSynced,
+    );
   }
 }

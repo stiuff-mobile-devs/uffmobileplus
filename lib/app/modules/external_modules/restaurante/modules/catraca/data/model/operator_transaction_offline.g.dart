@@ -25,13 +25,14 @@ class OperatorTransactionOfflineAdapter
       idUffOperator: fields[4] as String?,
       idUffUser: fields[5] as String?,
       processed: fields[6] as bool,
+      isSynced: fields[7] as bool?,
     );
   }
 
   @override
   void write(BinaryWriter writer, OperatorTransactionOffline obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -45,7 +46,9 @@ class OperatorTransactionOfflineAdapter
       ..writeByte(5)
       ..write(obj.idUffUser)
       ..writeByte(6)
-      ..write(obj.processed);
+      ..write(obj.processed)
+      ..writeByte(7)
+      ..write(obj.isSynced);
   }
 
   @override

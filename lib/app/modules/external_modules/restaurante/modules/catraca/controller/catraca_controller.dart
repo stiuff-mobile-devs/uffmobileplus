@@ -20,6 +20,8 @@ class CatracaController extends GetxController {
   CatracaOnlineRepository repository = CatracaOnlineRepository();
   UserGoogleRepository userGoogleRepository = UserGoogleRepository();
 
+  UserGoogleModel _userGoogleModel = UserGoogleModel(email: '');
+
   RxBool isAreaBusy = false.obs;
   RxBool isTransactionBusy = false.obs;
   RxBool isReadQRCodeBusy = false.obs;
@@ -30,8 +32,6 @@ class CatracaController extends GetxController {
   RxString statusMessage = 'catraca_online'.tr.obs;
 
   Rx<AreaModel> selectedArea = AreaModel().obs;
-
-  late UserGoogleModel _userGoogleModel;
 
   late RxList<AreaModel> areas = <AreaModel>[].obs;
 
@@ -51,7 +51,7 @@ class CatracaController extends GetxController {
   String? operatorEmail;
   String? identificador;
 
-  late String? token;
+  String? token;
 
   bool isTransactionValid = false;
   bool isQrCodeValid = true;
@@ -97,6 +97,7 @@ class CatracaController extends GetxController {
 
   Future<void> fetchAreas() async {
     isAreaBusy.value = true;
+    await repository.cleanMore24hTransactionsOffline();
     token = await externalModulesServices.getAccessToken();
     try {
       areas.value = await repository.getAreas(operatorIdUff ?? '', token);
@@ -112,6 +113,7 @@ class CatracaController extends GetxController {
 
   Future<void> fetchOperatorTransactions() async {
     isTransactionBusy.value = true;
+    await repository.cleanMore24hTransactionsOffline();
     token = await externalModulesServices.getAccessToken();
 
     try {
@@ -123,9 +125,7 @@ class CatracaController extends GetxController {
 
     try {
       operatorTransactionsFromFirebase.value = await repository
-          .getOperatorTransactionsFromFirebase(
-            operatorIdUff ?? operatorEmail ?? '',
-          );
+          .getOperatorTransactionsFromFirebase(identificador ?? '');
     } catch (e) {
       debugPrint('Erro ao buscar transações offline do firebase: $e');
     }
@@ -235,16 +235,28 @@ class CatracaController extends GetxController {
                   campus: selectedArea.value.nome,
                 );
 
-            // Salvando no banco local
-
-            await repository.saveOperatorTransactionsOffline(
-              operatorTransactionOffline,
+            bool isDuplicate = await repository.isTransactionDuplicated(
+              operatorTransactionOffline.idUffUser ?? '',
+              operatorTransactionOffline.entryTime,
             );
 
-            transactionResultMessage = 'transacao_offline_salva_sucesso'.tr;
-            transactionUsername = idUffValue;
-            isTransactionValid = true;
-            isQrCodeValid = true;
+            if (isDuplicate) {
+              transactionResultMessage = 'transacao_duplicada'.tr;
+              transactionUsername = idUffValue;
+              isTransactionValid = false;
+              isQrCodeValid = true;
+            } else {
+              // Salvando no banco local
+
+              await repository.saveOperatorTransactionsOffline(
+                operatorTransactionOffline,
+              );
+
+              transactionResultMessage = 'transacao_offline_salva_sucesso'.tr;
+              transactionUsername = idUffValue;
+              isTransactionValid = true;
+              isQrCodeValid = true;
+            }
           } else {
             isTransactionValid = false;
             isQrCodeValid = false;
@@ -311,24 +323,34 @@ class CatracaController extends GetxController {
           idCampus: selectedArea.value.id.toString(),
           campus: selectedArea.value.nome,
         );
-
-    try {
-      await repository.saveOperatorTransactionsOffline(
-        operatorTransactionOffline,
-      );
-      isOfflineMode = true.obs;
-      statusMessage.value = "Catraca Online";
-      transactionResultMessage = "Transação salva localmente com sucesso!";
+    bool isDuplicate = await repository.isTransactionDuplicated(
+      operatorTransactionOffline.idUffUser ?? '',
+      operatorTransactionOffline.entryTime,
+    );
+    if (isDuplicate) {
+      transactionResultMessage = 'transacao_duplicada'.tr;
       transactionUsername = cpf;
-      isTransactionValid = true;
-      isQrCodeValid = true;
-    } catch (e) {
-      debugPrint('Erro ao salvar transação offline: $e');
-      transactionResultMessage =
-          "Falha ao salvar a transação. Erro Interno. Tente novamente.";
       isTransactionValid = false;
-      isQrCodeValid = false;
-      transactionUsername = cpf;
+      isQrCodeValid = true;
+    } else {
+      try {
+        await repository.saveOperatorTransactionsOffline(
+          operatorTransactionOffline,
+        );
+        isOfflineMode = true.obs;
+        statusMessage.value = "Catraca Online";
+        transactionResultMessage = "Transação salva localmente com sucesso!";
+        transactionUsername = cpf;
+        isTransactionValid = true;
+        isQrCodeValid = true;
+      } catch (e) {
+        debugPrint('Erro ao salvar transação offline: $e');
+        transactionResultMessage =
+            "Falha ao salvar a transação. Erro Interno. Tente novamente.";
+        isTransactionValid = false;
+        isQrCodeValid = false;
+        transactionUsername = cpf;
+      }
     }
   }
 
@@ -341,27 +363,38 @@ class CatracaController extends GetxController {
   }
 
   /// Tenta enviar transações salvas no Hive ao Firebase (timeout 5s).
-  /// Ao enviar com sucesso, remove a transação local.
   Future<void> syncOfflineTransactions() async {
     try {
-      final pending = await repository
-          .getOperatorTransactionsOffline(); // retorna List<OperatorTransactionOffline>
+      List<OperatorTransactionOffline> allTransactions = await repository
+          .getOperatorTransactionsOffline();
+
+      // Filtra apenas o que ainda NÃO foi sincronizado
+      List<OperatorTransactionOffline> pending = allTransactions
+          .where((tx) => tx.isSynced == false)
+          .toList();
+
       if (pending.isEmpty) return;
 
-      for (final tx in pending) {
+      for (OperatorTransactionOffline tx in pending) {
         try {
+          // Envia para o Firebase
           await repository
               .saveOperatorTransactionToFirebase(tx)
               .timeout(const Duration(seconds: 5));
-          // remover local após sucesso no Firebase
+
+          // Atualiza o status localmente para sincronizado
           try {
-            await repository.deleteOperatorTransactionOffline(tx.id);
+            // Cria uma cópia ou nova instância alterando apenas a flag
+            final updatedTx = tx.copyWith(isSynced: true);
+
+            // Salva por cima do registro antigo no Hive usando o id
+            await repository.saveOperatorTransactionsOffline(updatedTx);
           } catch (e) {
-            debugPrint('Erro ao apagar transação local: $e');
+            debugPrint('Erro ao atualizar status de sincronização local: $e');
           }
         } catch (e) {
           debugPrint('Erro ao enviar transação ao Firebase: $e');
-          // se falhar, mantém no Hive para tentar novamente na próxima execução
+          // Se falhar (timeout ou sem rede), continua isSynced = false para tentar na próxima
         }
       }
     } catch (e) {

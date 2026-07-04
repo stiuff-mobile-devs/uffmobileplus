@@ -56,8 +56,25 @@ class CatracaOnlineRepository {
     return await catracaOnlineProvider.deleteOperatorTransactionOffline(id);
   }
 
-  Future<List<OperatorTransactionOffline>>
-  getOperatorTransactionsFromFirebase(String iduffOperator) async {
-    return await catracaOnlineProvider.getOperatorTransactionsFromFirebase(iduffOperator);
+  Future<List<OperatorTransactionOffline>> getOperatorTransactionsFromFirebase(
+    String iduffOperator,
+  ) async {
+    return await catracaOnlineProvider.getOperatorTransactionsFromFirebase(
+      iduffOperator,
+    );
+  }
+
+  Future<void> cleanMore24hTransactionsOffline() async {
+    return await catracaOnlineProvider.cleanMore24hTransactionsOffline();
+  }
+
+  Future<bool> isTransactionDuplicated(
+    String id,
+    DateTime dateTimeToCheck,
+  ) async {
+    return await catracaOnlineProvider.isTransactionDuplicated(
+      id,
+      dateTimeToCheck,
+    );
   }
 }
