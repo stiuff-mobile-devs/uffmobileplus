@@ -29,6 +29,8 @@ class LoginController extends GetxController {
   RxBool hasActiveIduffBondObs = false.obs;
   RxBool hasActiveGoogleBondObs = false.obs;
 
+  RxBool isLoading = false.obs;
+
   @override
   Future<void> onInit() async {
     _loginGoogleController = Get.find<AuthGoogleController>();
@@ -44,18 +46,17 @@ class LoginController extends GetxController {
   }
 
   Future<bool> hasActiveGoogleBond() async {
-    try{
-    final currentUser = fb.FirebaseAuth.instanceFor(
-      app: Firebase.app('uffmobileplus'),
-    ).currentUser;
-    final storedUser = await userGoogleRepository.getUserGoogleModel();
-    final hasStoredUser = storedUser != null && storedUser.email.isNotEmpty;
-    return currentUser != null && hasStoredUser;
-    }
-    catch(e){
+    try {
+      final currentUser = fb.FirebaseAuth.instanceFor(
+        app: Firebase.app('uffmobileplus'),
+      ).currentUser;
+      final storedUser = await userGoogleRepository.getUserGoogleModel();
+      final hasStoredUser = storedUser != null && storedUser.email.isNotEmpty;
+      return currentUser != null && hasStoredUser;
+    } catch (e) {
       debugPrint("Error checking Google bond: $e");
       return false;
-  }
+    }
   }
 
   Future<bool> hasActiveIduffBond() async {
@@ -102,8 +103,15 @@ class LoginController extends GetxController {
     ); //Esse argumento é para iniciar a função de login automaticamente apenas quando o usuario aperta em login com iduff
   }
 
-  void loginGoogle() {
-    _loginGoogleController.loginGoogle();
+  Future<void> loginGoogle() async {
+    isLoading.value = true;
+    try {
+      await _loginGoogleController.loginGoogle();
+    } catch (e) {
+      debugPrint("Erro no login google");
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void goToCarteirinhaPage() {

@@ -22,7 +22,7 @@ class AuthGoogleController extends GetxController {
     super.onInit();
   }
 
-  void loginGoogle() async {
+  Future<void> loginGoogle() async {
     try {
       UserGoogleModel? user = await _authGoogle.signInGoogle();
 
