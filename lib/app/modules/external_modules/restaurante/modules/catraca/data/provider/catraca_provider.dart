@@ -16,7 +16,10 @@ class CatracaOnlineProvider {
     OperatorTransactionOffline operatorTransactionOffline,
   ) async {
     try {
-      var box = await Hive.openBox<OperatorTransactionOffline>(_collectionPath);
+      final box = Hive.isBoxOpen(_collectionPath)
+          ? Hive.box<OperatorTransactionOffline>(_collectionPath)
+          : await Hive.openBox<OperatorTransactionOffline>(_collectionPath);
+
       await box.put(operatorTransactionOffline.id, operatorTransactionOffline);
     } catch (e) {
       throw Exception("Erro ao salvar dados do usuário no Hive: $e");
@@ -26,7 +29,9 @@ class CatracaOnlineProvider {
   Future<List<OperatorTransactionOffline>>
   getOperatorTransactionsOffline() async {
     try {
-      var box = await Hive.openBox<OperatorTransactionOffline>(_collectionPath);
+      final box = Hive.isBoxOpen(_collectionPath)
+          ? Hive.box<OperatorTransactionOffline>(_collectionPath)
+          : await Hive.openBox<OperatorTransactionOffline>(_collectionPath);
       return box.values.toList();
     } catch (e) {
       return [];
@@ -34,7 +39,7 @@ class CatracaOnlineProvider {
   }
 
   Future<List<OperatorTransactionOffline>> getOperatorTransactionsFromFirebase(
-    String iduffOperator,
+    String operatorEmail,
   ) async {
     try {
       final now = DateTime.now();
@@ -42,7 +47,7 @@ class CatracaOnlineProvider {
 
       final snapshot = await _firestore
           .collection(_collectionPathFirebase)
-          .where('idUffOperator', isEqualTo: iduffOperator)
+          .where('idUffOperator', isEqualTo: operatorEmail)
           .where('entryTime', isGreaterThan: Timestamp.fromDate(limite24Horas))
           .get();
 
@@ -88,7 +93,9 @@ class CatracaOnlineProvider {
 
   Future<String> deleteOperatorTransactionOffline(String id) async {
     try {
-      var box = await Hive.openBox<OperatorTransactionOffline>(_collectionPath);
+      final box = Hive.isBoxOpen(_collectionPath)
+          ? Hive.box<OperatorTransactionOffline>(_collectionPath)
+          : await Hive.openBox<OperatorTransactionOffline>(_collectionPath);
       await box.delete(id);
       return "success";
     } catch (e) {
@@ -99,7 +106,9 @@ class CatracaOnlineProvider {
 
   Future<void> cleanMore24hTransactionsOffline() async {
     try {
-      var box = await Hive.openBox<OperatorTransactionOffline>(_collectionPath);
+      final box = Hive.isBoxOpen(_collectionPath)
+          ? Hive.box<OperatorTransactionOffline>(_collectionPath)
+          : await Hive.openBox<OperatorTransactionOffline>(_collectionPath);
       DateTime now = DateTime.now();
       DateTime limite24Horas = now.subtract(const Duration(hours: 24));
 
@@ -156,8 +165,9 @@ class CatracaOnlineProvider {
       int inicioJanta = 16; // 16:00
       int fimJanta = 20; // 19:59
 
-      var box = await Hive.openBox<OperatorTransactionOffline>(_collectionPath);
-
+      final box = Hive.isBoxOpen(_collectionPath)
+          ? Hive.box<OperatorTransactionOffline>(_collectionPath)
+          : await Hive.openBox<OperatorTransactionOffline>(_collectionPath);
       //Descobre em qual turno a tentativa atual se encaixa
       int horaAtual = dateTimeToCheck.hour;
       bool noAlmoco =

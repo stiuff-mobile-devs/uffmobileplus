@@ -1,10 +1,8 @@
-import 'dart:math' as math;
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/controller/login_controller.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.dart';
 
 class LoginPage extends GetView<LoginController> {
   const LoginPage({super.key});
@@ -14,138 +12,161 @@ class LoginPage extends GetView<LoginController> {
     final double height = Get.height;
     final double width = Get.width;
     return Scaffold(
-      body: Stack(
-        children: [
-          _AnimatedLoginBackdrop(width: width, height: height),
-          SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 16,
-                ),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 420),
-                  child: Column(
-                    children: [
-                      _BreathingLogoBox(height: 76, width: 228),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Universidade Federal Fluminense',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.4,
+      body: Obx(
+        () => controller.isLoading.value
+            ? Center(child: CustomProgressDisplay())
+            : Stack(
+                children: [
+                  _AnimatedLoginBackdrop(width: width, height: height),
+                  SafeArea(
+                    child: Center(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 16,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 26),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.42),
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(
-                            color: const Color(0xFF2EA1FF).withOpacity(0.6),
-                            width: 1,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF2EA1FF).withOpacity(0.18),
-                              blurRadius: 30,
-                              spreadRadius: 2,
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'escolha_método_login'.tr,
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.9),
-                                fontWeight: FontWeight.w800,
-                                fontSize: 18,
-                                letterSpacing: 0.9,
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 420),
+                          child: Column(
+                            children: [
+                              _BreathingLogoBox(height: 76, width: 228),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Universidade Federal Fluminense',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.9),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.4,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                            ),
-                            const SizedBox(height: 16),
-                            Column(
-                              children: [
-                                Obx(
-                                  () => _LoginOptionButton(
-                                    text: 'IdUFF',
-                                    color:
-                                        controller.hasActiveIduffBondObs.value
-                                        ? Colors.blueAccent
-                                        : Colors.grey,
-                                    image: 'assets/images/uff_background2.png',
-                                    onTap: controller.loginIDUFF,
+                              const SizedBox(height: 26),
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.fromLTRB(
+                                  18,
+                                  18,
+                                  18,
+                                  16,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.42),
+                                  borderRadius: BorderRadius.circular(24),
+                                  border: Border.all(
+                                    color: const Color(
+                                      0xFF2EA1FF,
+                                    ).withOpacity(0.6),
+                                    width: 1,
                                   ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(
+                                        0xFF2EA1FF,
+                                      ).withOpacity(0.18),
+                                      blurRadius: 30,
+                                      spreadRadius: 2,
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 12),
-                                Obx(
-                                  () => _LoginOptionButton(
-                                    text: 'Google',
-                                    color:
-                                        controller.hasActiveGoogleBondObs.value
-                                        ? Colors.redAccent
-                                        : Colors.grey,
-                                    image: 'assets/icons/google-icon.svg',
-                                    onTap: controller.loginGoogle,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'escolha_método_login'.tr,
+                                      style: TextStyle(
+                                        color: Colors.white.withOpacity(0.9),
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 18,
+                                        letterSpacing: 0.9,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Column(
+                                      children: [
+                                        Obx(
+                                          () => _LoginOptionButton(
+                                            text: 'IdUFF',
+                                            color:
+                                                controller
+                                                    .hasActiveIduffBondObs
+                                                    .value
+                                                ? Colors.blueAccent
+                                                : Colors.grey,
+                                            image:
+                                                'assets/images/uff_background2.png',
+                                            onTap: controller.loginIDUFF,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 12),
+                                        Obx(
+                                          () => _LoginOptionButton(
+                                            text: 'Google',
+                                            color:
+                                                controller
+                                                    .hasActiveGoogleBondObs
+                                                    .value
+                                                ? Colors.redAccent
+                                                : Colors.grey,
+                                            image:
+                                                'assets/icons/google-icon.svg',
+                                            onTap: controller.loginGoogle,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 12),
+                                        _LoginOptionButton(
+                                          text: 'sem_login'.tr,
+                                          color: Colors.green,
+                                          image:
+                                              'assets/icons/no-login-icon.svg',
+                                          svgColor: Colors.white,
+                                          onTap: controller.loginAnonimous,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              Wrap(
+                                alignment: WrapAlignment.center,
+                                spacing: 12,
+                                runSpacing: 12,
+                                children: [
+                                  _QuickActionChip(
+                                    tooltip: 'qr_code_carteirinha'.tr,
+                                    icon: Icons.qr_code_2,
+                                    label: 'carteirinha_digital'.tr,
+                                    onTap: controller.goToCarteirinhaPage,
                                   ),
+                                  Obx(
+                                    () => controller.hasAdminPermission.value
+                                        ? _QuickActionChip(
+                                            tooltip: 'qr_code_catraca'.tr,
+                                            icon: Icons.qr_code_scanner,
+                                            label: 'Catraca'.tr,
+                                            onTap: controller
+                                                .goToCatracaOnlinePage,
+                                          )
+                                        : const SizedBox.shrink(),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 22),
+                              Text(
+                                controller.versionCode,
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.7),
                                 ),
-                                const SizedBox(height: 12),
-                                _LoginOptionButton(
-                                  text: 'sem_login'.tr,
-                                  color: Colors.green,
-                                  image: 'assets/icons/no-login-icon.svg',
-                                  svgColor: Colors.white,
-                                  onTap: controller.loginAnonimous,
-                                ),
-                              ],
-                            ),
-                          ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      Wrap(
-                        alignment: WrapAlignment.center,
-                        spacing: 12,
-                        runSpacing: 12,
-                        children: [
-                          _QuickActionChip(
-                            tooltip: 'qr_code_carteirinha'.tr,
-                            icon: Icons.qr_code_2,
-                            label: 'carteirinha_digital'.tr,
-                            onTap: controller.goToCarteirinhaPage,
-                          ),
-                          Obx(
-                            () => controller.hasAdminPermission.value
-                                ? _QuickActionChip(
-                                    tooltip: 'qr_code_catraca'.tr,
-                                    icon: Icons.qr_code_scanner,
-                                    label: 'Catraca'.tr,
-                                    onTap: controller.goToCatracaOnlinePage,
-                                  )
-                                : const SizedBox.shrink(),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 22),
-                      Text(
-                        controller.versionCode,
-                        style: TextStyle(color: Colors.white.withOpacity(0.7)),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
-            ),
-          ),
-        ],
       ),
     );
   }
