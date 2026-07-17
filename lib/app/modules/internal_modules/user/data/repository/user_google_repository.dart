@@ -1,4 +1,4 @@
-import 'package:uffmobileplus/app/data/services/connections/google_service.dart';
+import 'package:uffmobileplus/app/data/connections/google_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_google_model.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/provider/user_google_provider.dart';

@@ -60,7 +60,7 @@ class _TransactionListState extends State<TransactionList> {
           Flexible(
             fit: FlexFit.tight,
             child: Text(
-              tx.idUffUser ?? '',
+              tx.idUser ?? '',
               style: TextStyle(color: textColor),
               overflow: TextOverflow.ellipsis,
             ),
@@ -108,8 +108,7 @@ class _TransactionListState extends State<TransactionList> {
 
   @override
   Widget build(BuildContext context) {
-    final CatracaController controller =
-        Get.find<CatracaController>();
+    final CatracaController controller = Get.find<CatracaController>();
 
     final offlineList = widget.operatorTransactionsOffline;
     final firebaseList = widget.operatorTransactionsFromFirebase;

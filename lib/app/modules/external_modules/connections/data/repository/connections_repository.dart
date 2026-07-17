@@ -1,16 +1,13 @@
-
-import 'package:uffmobileplus/app/data/services/connections/saci_service.dart';
-import 'package:uffmobileplus/app/data/services/connections/sctm_service.dart';
-import 'package:uffmobileplus/app/data/services/connections/umm_service.dart';
+import 'package:uffmobileplus/app/data/connections/saci_service.dart';
+import 'package:uffmobileplus/app/data/connections/sctm_service.dart';
+import 'package:uffmobileplus/app/data/connections/umm_service.dart';
 
 class ConnectionsRepository {
+  ConnectionsRepository();
 
-
-ConnectionsRepository();
-
-final SctmService _sctmService = SctmService();
-final UmmService _ummService = UmmService();
-final SaciService _saciService = SaciService();
+  final SctmService _sctmService = SctmService();
+  final UmmService _ummService = UmmService();
+  final SaciService _saciService = SaciService();
 
   Future<bool> getSctmStatus() async {
     return await _sctmService.getStatus();
@@ -23,5 +20,4 @@ final SaciService _saciService = SaciService();
   Future<bool> getSaciStatus() async {
     return await _saciService.getStatus();
   }
-
 }

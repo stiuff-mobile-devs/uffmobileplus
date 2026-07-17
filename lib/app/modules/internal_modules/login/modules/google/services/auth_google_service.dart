@@ -25,6 +25,11 @@ class AuthGoogleService {
     app: _harpiaApp,
   );
 
+  final FirebaseApp _catracaApp = Firebase.app('catraca');
+  late final fb.FirebaseAuth _catracaAuth = fb.FirebaseAuth.instanceFor(
+    app: _catracaApp,
+  );
+
   AuthGoogleService();
 
   Future<UserGoogleModel?> signInGoogle() async {
@@ -55,6 +60,17 @@ class AuthGoogleService {
         );
         debugPrint(
           'Logado com sucesso no Firebase Harpia: ${userCredentialHarpia.user?.uid}',
+        );
+      } catch (e) {
+        debugPrint('Error logging into other Firebase apps: $e');
+      }
+
+      try {
+        var userCredentialCatraca = await _catracaAuth.signInWithCredential(
+          authCredential,
+        );
+        debugPrint(
+          'Logado com sucesso no Firebase Catraca: ${userCredentialCatraca.user?.uid}',
         );
       } catch (e) {
         debugPrint('Error logging into other Firebase apps: $e');
