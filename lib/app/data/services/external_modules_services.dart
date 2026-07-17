@@ -2,13 +2,19 @@ import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_google_model.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_google_repository.dart';
 import 'package:uffmobileplus/app/utils/gdi_groups.dart';
 
 class ExternalModulesServices extends GetxService {
   late UserDataController _userDataController;
   UserDataRepository userDataRepository = UserDataRepository();
+  UserGoogleRepository userGoogleRepository = UserGoogleRepository();
+
+  UserGoogleModel _userGoogleModel = UserGoogleModel(email: '');
   UserData _userData = UserData();
+
   late AuthIduffService _auth;
 
   bool isExpired = false;
@@ -26,6 +32,9 @@ class ExternalModulesServices extends GetxService {
     _auth = Get.find<AuthIduffService>();
 
     _userData = (await userDataRepository.getUserData()) ?? UserData();
+    _userGoogleModel =
+        (await userGoogleRepository.getUserGoogleModel()) ??
+        UserGoogleModel(email: '');
   }
 
   Future<String> getEmail() async {
@@ -82,6 +91,10 @@ class ExternalModulesServices extends GetxService {
     return _userData.gdiGroups;
   }
 
+  String getUserEmailGoogle() {
+    return _userGoogleModel.email;
+  }
+
   bool isInGroup(GdiGroupsEnum gdiGroup) {
     final groupsList = getUserGdiGroups();
     if (groupsList == null) return false;
@@ -94,6 +107,6 @@ class ExternalModulesServices extends GetxService {
   }
 
   List<String>? getShortcutRoutes() {
-    return _userData.shortcutRoutes;    
+    return _userData.shortcutRoutes;
   }
 }

@@ -18,55 +18,45 @@ class UserGoogleProvider {
     String uid,
     String urlImage,
   ) async {
-    // Verifica se já existe um usuário com este email no Firestore
-    final query = await _firestore
-        .collection('users')
-        .where('email', isEqualTo: email)
-        .limit(1)
-        .get();
-
     UserGoogleModel user;
-    if (query.docs.isNotEmpty) {
-      // Usuário já existe, retorna o existente
-      Map<String, dynamic> data = query.docs.first.data();
-      user = UserGoogleModel(
-        id: query.docs.first.id,
-        name: data['name'] as String?,
-        email: data['email'] as String,
-        urlImage: data['urlImage'] as String?,
-        createdAt: data['createdAt'] != null
-            ? DateTime.tryParse(data['createdAt'])
-            : null,
-      );
-    } else {
-      // Usuário não existe, cria novo
-      user = UserGoogleModel(
-        name: name,
-        email: email,
-        id: uid,
-        urlImage: urlImage,
-        createdAt: DateTime.now(),
-      );
-      await _createUserDocInFirebase(user);
-    }
+    try {
+      final docSnapshot = await _firestore.collection('users').doc(uid).get();
 
-    await saveUserGoogleModel(user);
+      if (docSnapshot.exists) {
+        final data = docSnapshot.data();
+        user = UserGoogleModel.fromJson(data!);
+      } else {
+        user = UserGoogleModel(
+          name: name,
+          email: email,
+          id: uid,
+          urlImage: urlImage,
+          createdAt: DateTime.now(),
+        );
+        await _createUserDocInFirebase(user);
+      }
+
+      await saveUserGoogleModel(user);
+    } catch (e) {
+      throw Exception("Erro ao criar usuario no firebase");
+    }
     return user;
   }
 
   Future<void> _createUserDocInFirebase(UserGoogleModel user) async {
-    DocumentReference docRef = await _firestore.collection('users').add({
-      'name': user.name,
-      'email': user.email,
-      'urlImage': user.urlImage,
-      'createdAt': user.createdAt?.toIso8601String(),
-    });
-    user.id = docRef.id;
+    await _firestore.collection('users').doc(user.id).set(user.toJson());
   }
 
   Future<String> saveUserGoogleModel(UserGoogleModel user) async {
     try {
-      var box = await Hive.openBox<UserGoogleModel>(_hiveBox);
+      late Box<UserGoogleModel> box;
+
+      if (Hive.isBoxOpen(_hiveBox)) {
+        box = Hive.box<UserGoogleModel>(_hiveBox);
+      } else {
+        box = await Hive.openBox<UserGoogleModel>(_hiveBox);
+      }
+
       await box.put(_hiveKey, user);
       return "success";
     } catch (e) {

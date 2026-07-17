@@ -57,10 +57,10 @@ class CatracaOnlineRepository {
   }
 
   Future<List<OperatorTransactionOffline>> getOperatorTransactionsFromFirebase(
-    String iduffOperator,
+    String operatorEmail,
   ) async {
     return await catracaOnlineProvider.getOperatorTransactionsFromFirebase(
-      iduffOperator,
+      operatorEmail,
     );
   }
 
