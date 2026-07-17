@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart' hide Path;
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/google_groups_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/permissions_controller.dart';
@@ -462,7 +463,7 @@ class MonitoraUFFPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      "Última atualização: ${user.timestamp}",
+                      "Última atualização: ${DateFormat('dd/MM/yyyy HH:mm').format(user.timestamp!)}",
                       style: const TextStyle(
                         fontSize: 12,
                         color: Colors.white70,
