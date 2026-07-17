@@ -6,10 +6,10 @@ import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/c
 
 class CatracaOnlineProvider {
   final String _collectionPath = "operator_transactions";
-  final String _collectionPathFirebase = "meals"; // para testes user meals_test
+  final String _collectionPathFirebase =
+      "meals_test"; // para testes user meals_test
   final FirebaseFirestore _firestore = FirebaseFirestore.instanceFor(
-    app: Firebase.app("uffmobileplus"),
-    databaseId: 'catraca',
+    app: Firebase.app("catraca"),
   );
 
   Future<void> saveOperatorTransactionsOffline(
@@ -23,6 +23,27 @@ class CatracaOnlineProvider {
       await box.put(operatorTransactionOffline.id, operatorTransactionOffline);
     } catch (e) {
       throw Exception("Erro ao salvar dados do usuário no Hive: $e");
+    }
+  }
+
+  Future<void> saveOperatorTransactionsOfflineBatch(
+    List<OperatorTransactionOffline> transactions,
+  ) async {
+    try {
+      if (transactions.isEmpty) return;
+
+      final box = Hive.isBoxOpen(_collectionPath)
+          ? Hive.box<OperatorTransactionOffline>(_collectionPath)
+          : await Hive.openBox<OperatorTransactionOffline>(_collectionPath);
+
+      final Map<String, OperatorTransactionOffline> transactionsMap = {
+        for (var tx in transactions) tx.id: tx,
+      };
+
+      // Salva tudo no disco em uma única operação!
+      await box.putAll(transactionsMap);
+    } catch (e) {
+      throw Exception("Erro ao salvar lote de transações no Hive: $e");
     }
   }
 
@@ -47,7 +68,7 @@ class CatracaOnlineProvider {
 
       final snapshot = await _firestore
           .collection(_collectionPathFirebase)
-          .where('idUffOperator', isEqualTo: operatorEmail)
+          .where('idOperator', isEqualTo: operatorEmail)
           .where('entryTime', isGreaterThan: Timestamp.fromDate(limite24Horas))
           .get();
 
@@ -183,7 +204,7 @@ class CatracaOnlineProvider {
       // Varre o Hive procurando se o ID já passou HOJE neste mesmo turno
       bool existeDuplicado = box.values.any((transaction) {
         // Verifica se é o mesmo IdUff do usuário
-        if (transaction.idUffUser == idUffUser) {
+        if (transaction.idUser == idUffUser) {
           DateTime dataRegistro = transaction.entryTime;
 
           bool mesmoDia =

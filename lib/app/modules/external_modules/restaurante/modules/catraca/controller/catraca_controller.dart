@@ -217,14 +217,14 @@ class CatracaController extends GetxController {
           if (RegExp(r'^[0-9a-zA-Z]+$').hasMatch(idIdentificacaoIduff ?? '')) {
             OperatorTransactionOffline operatorTransactionOffline =
                 OperatorTransactionOffline(
-                  idUffUser: idIdentificacaoIduff,
-                  idUffOperator: operatorEmailGoogle ?? operatorEmailUff ?? '',
+                  idUser: idIdentificacaoIduff,
+                  idOperator: operatorEmailGoogle ?? operatorEmailUff ?? '',
                   idCampus: selectedArea.value.id.toString(),
                   campus: selectedArea.value.nome,
                 );
 
             bool isDuplicate = await repository.isTransactionDuplicated(
-              operatorTransactionOffline.idUffUser ?? '',
+              operatorTransactionOffline.idUser ?? '',
               operatorTransactionOffline.entryTime,
             );
 
@@ -314,13 +314,14 @@ class CatracaController extends GetxController {
   Future<void> saveCpfValidationTransaction(String cpf) async {
     OperatorTransactionOffline operatorTransactionOffline =
         OperatorTransactionOffline(
-          idUffUser: cpf,
-          idUffOperator: operatorEmailGoogle ?? operatorEmailUff ?? '',
+          idUser: cpf,
+          idOperator: operatorEmailGoogle ?? operatorEmailUff ?? '',
           idCampus: selectedArea.value.id.toString(),
           campus: selectedArea.value.nome,
+          isIduff: true,
         );
     bool isDuplicate = await repository.isTransactionDuplicated(
-      operatorTransactionOffline.idUffUser ?? '',
+      operatorTransactionOffline.idUser ?? '',
       operatorTransactionOffline.entryTime,
     );
     if (isDuplicate) {
@@ -370,26 +371,41 @@ class CatracaController extends GetxController {
 
       if (pending.isEmpty) return;
 
-      for (OperatorTransactionOffline tx in pending) {
+      List<OperatorTransactionOffline> syncedTransactionsToUpdate = [];
+
+      // Cria a lista de tarefas para rodar o envio de internet EM PARALELO
+      final tarefas = pending.map((tx) async {
         try {
-          // Envia para o Firebase
           await repository
               .saveOperatorTransactionToFirebase(tx)
               .timeout(const Duration(seconds: 5));
 
-          // Atualiza o status localmente para sincronizado
-          try {
-            // Cria uma cópia ou nova instância alterando apenas a flag
-            final updatedTx = tx.copyWith(isSynced: true);
-
-            // Salva por cima do registro antigo no Hive usando o id
-            await repository.saveOperatorTransactionsOffline(updatedTx);
-          } catch (e) {
-            debugPrint('Erro ao atualizar status de sincronização local: $e');
-          }
+          final updatedTx = tx.copyWith(isSynced: true);
+          syncedTransactionsToUpdate.add(updatedTx);
         } catch (e) {
-          debugPrint('Erro ao enviar transação ao Firebase: $e');
-          // Se falhar (timeout ou sem rede), continua isSynced = false para tentar na próxima
+          debugPrint('Erro ao enviar transação ${tx.id} ao Firebase: $e');
+        }
+      });
+
+      // Aguarda todas as requisições de internet rodarem juntas
+      await Future.wait(tarefas);
+
+      // Atualiza o Hive local em lote de uma só vez com o que deu certo
+      if (syncedTransactionsToUpdate.isNotEmpty) {
+        try {
+          await repository.saveOperatorTransactionsOfflineBatch(
+            syncedTransactionsToUpdate,
+          );
+          debugPrint(
+            '${syncedTransactionsToUpdate.length} transações atualizadas em lote!',
+          );
+          debugPrint(
+            '${syncedTransactionsToUpdate.length} transações sincronizadas com sucesso!',
+          );
+        } catch (e) {
+          debugPrint(
+            'Erro ao atualizar status de sincronização local no Hive: $e',
+          );
         }
       }
     } catch (e) {
