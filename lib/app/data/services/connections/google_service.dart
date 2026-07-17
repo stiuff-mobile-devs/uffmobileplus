@@ -42,6 +42,36 @@ class GoogleService {
     }
   }
 
+  /// Busca todos os membros de um grupo Google.
+  /// 
+  /// Retorna a lista bruta de membros (Map) conforme retornado pela API.
+  /// Cada membro possui: id, email, role, type (USER ou GROUP), status.
+  Future<List<Map<String, dynamic>>> getGroupMembers(String token, String groupEmail) async {
+    try {
+      Uri url = Uri.https(Secrets.gdiGroupsGoogleHost, Secrets.gdiGroupMembers, {'email': groupEmail});
+
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        //debugPrint("Membros do grupo $groupEmail obtidos com sucesso:");
+        final List<dynamic> members = jsonData['members'] as List;
+        return members.cast<Map<String, dynamic>>();
+      } else {
+        throw Exception('Falha ao buscar membros do grupo: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint("Erro ao obter membros do grupo $groupEmail: $e");
+      return [];
+    }
+  }
+
   Future<void> registerToken(
     String firebaseIdToken,
     String devicetoken,
