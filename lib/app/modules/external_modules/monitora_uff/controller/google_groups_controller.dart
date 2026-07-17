@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:uffmobileplus/app/data/services/connections/google_service.dart';
+import 'package:uffmobileplus/app/data/connections/google_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/google_group_member_model.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/google_group_model.dart';
 
