@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_instance/src/extension_instance.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/controller/auth_google_controller.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 
 class HarpiaAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -11,6 +9,10 @@ class HarpiaAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () => Get.back(),
+      ),
       flexibleSpace: Container(
         decoration: BoxDecoration(gradient: AppColors.appBarBottomGradient()),
       ),
@@ -19,36 +21,13 @@ class HarpiaAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 8,
       foregroundColor: Colors.white,
       actions: [
-        PopupMenuButton(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Builder(builder: (context) {
-              final user = FirebaseAuth.instance.currentUser;
-              return CircleAvatar(
-                backgroundImage:
-                    user?.photoURL != null ? NetworkImage(user!.photoURL!) : null,
-              );
-            }),
+        Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu, color: Colors.white),
+            tooltip: 'Abrir menu',
+            onPressed: () => Scaffold.of(context).openDrawer(),
           ),
-          onSelected: (value) {
-            if (value == 'sair') {
-              Get.find<AuthGoogleController>().logout();
-            }
-          },
-          itemBuilder: (BuildContext context) => [
-            const PopupMenuItem<String>(
-              value: 'sair',
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.logout, color: Colors.red),
-                  SizedBox(width: 8),
-                  Text('Sair', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-                ],
-              ),
-            )
-          ],
-        )
+        ),
       ],
     );
   }

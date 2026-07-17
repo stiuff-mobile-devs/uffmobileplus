@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart' as fb;
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/data/services/connections/google_service.dart';
@@ -7,7 +8,9 @@ import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/g
 
 class GoogleGroupsController extends GetxController {
   final GoogleService _googleService = GoogleService();
-  final fb.FirebaseAuth _auth = fb.FirebaseAuth.instance;
+  final fb.FirebaseAuth _auth = fb.FirebaseAuth.instanceFor(
+    app: Firebase.app('uffmobileplus')
+  );
 
   RxString observedGroup = RxString('Nenhum');
   RxList<GoogleGroupMember> observedMembers = RxList();

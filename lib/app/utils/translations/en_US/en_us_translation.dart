@@ -158,7 +158,7 @@ final Map<String, String> enUS = {
     'maps': 'Maps',
     'Minhas Vinculações': 'My Links',
     'Módulos': 'Modules',
-    'monitora_uff': 'Eagle',
+    'monitora_uff': 'Harpia',
     'nao_foi_possivel_carregar_dados': 'Could not load data',
     'nome_versao': 'Version name',
     'Pagar Restaurante': 'Pay Restaurant',

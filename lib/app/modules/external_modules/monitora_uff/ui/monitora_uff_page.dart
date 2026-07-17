@@ -1,16 +1,18 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart' hide Path;
-import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
-import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/tracking_controller.dart';
+import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/google_groups_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/permissions_controller.dart';
+import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/tracking_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/user_controller.dart';
+import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/ui/widgets/group_selector.dart';
+import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/ui/widgets/harpia_app_bar.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
-import 'package:uffmobileplus/app/routes/app_routes.dart';
 
 class MonitoraUFFPage extends StatelessWidget {
   const MonitoraUFFPage({super.key});
@@ -19,28 +21,20 @@ class MonitoraUFFPage extends StatelessWidget {
   PermissionsController get permissionsCtrl =>
       Get.find<PermissionsController>();
   TrackingController get trackingCtrl => Get.find<TrackingController>();
+  GoogleGroupsController get googleGroupsController => Get.find<GoogleGroupsController>();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: _appBar(), body: _body(context));
-  }
-
-  AppBar _appBar() {
-    return AppBar(
-      title: const Text('Águia'),
-      centerTitle: true,
-      elevation: 8,
-      foregroundColor: Colors.white,
-      flexibleSpace: Container(
-        decoration: BoxDecoration(gradient: AppColors.appBarBottomGradient()),
-      ),
-      leading: IconButton(onPressed: Get.back, icon: Icon(Icons.arrow_back)),
+    return Scaffold(
+      appBar: HarpiaAppBar(),
+      drawer: GroupSelector(),//_groupSelector(),
+      body: _body(context),
     );
   }
 
   Widget _centralizeButton() {
     return Obx(
-      () => permissionsCtrl.arePermissionsGranted() && userCtrl.isMonitor()
+      () => permissionsCtrl.arePermissionsGranted() && userCtrl.isTrackable()
           ? Positioned(
               bottom: 16,
               right: 16,
@@ -61,9 +55,10 @@ class MonitoraUFFPage extends StatelessWidget {
         return const Center(child: CircularProgressIndicator());
       }
 
+      // TODO
       if (userCtrl.isAdmin()) {
         return _adminDashboard(context);
-      } else if (userCtrl.isMonitor()) {
+      } else if (userCtrl.isTrackable() & !kIsWeb) {
         return _monitorPage(context);
       }
 
@@ -301,14 +296,18 @@ class MonitoraUFFPage extends StatelessWidget {
 
     return Obx(
       () => MarkerLayer(
-        markers: trackingCtrl.firebaseUsers.map((user) {
+        markers: trackingCtrl.firebaseUsers
+        .where((user) {
+          // Filtro: apenas usuários que estão na intersecção entre `observedMembers` e `firebaseUsers`
+          // serão mostrados na camada de marcadores.
+          final observedMembersEmails = googleGroupsController.observedMembers.map((member) => member.email);
+          return observedMembersEmails.contains(user.email);
+        })
+        .map((user) {
           final isCurrentUser = user.email == trackingCtrl.userCtrl.user?.email;
           // Usa a posição animada se disponível, caso contrário usa a posição atual
           final animatedPos = trackingCtrl.animatedMarkerPositions[user.email];
-          final position = animatedPos ?? LatLng(
-            user.lat ?? 0.0,
-            user.lng ?? 0.0,
-          );
+          final position = animatedPos ?? LatLng(user.lat ?? 0.0, user.lng ?? 0.0);
 
           return Marker(
             point: position,
@@ -341,7 +340,9 @@ class MonitoraUFFPage extends StatelessWidget {
                     onTap: () => trackingCtrl.openFirebaseUserDetails(user),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: trackingCtrl.setMarkerColor(user),
+                        color: user.isTracked == false || DateTime.now().difference(user.timestamp!) >= Duration(minutes: 2)  
+                          ? trackingCtrl.setMarkerColor(user).withAlpha(100)
+                          : trackingCtrl.setMarkerColor(user),
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white, width: 3),
                         boxShadow: const [
@@ -477,7 +478,7 @@ class MonitoraUFFPage extends StatelessWidget {
   }
 
   Widget toggleButton() {
-    return userCtrl.isMonitor()
+    return userCtrl.isTrackable()
         ? Positioned(
             top: 16,
             right: 16,
@@ -503,152 +504,52 @@ class MonitoraUFFPage extends StatelessWidget {
   Widget _adminDashboard(BuildContext context) {
     return Container(
       decoration: BoxDecoration(gradient: AppColors.darkBlueToBlackGradient()),
-      child: PersistentTabView(
-        context,
-        screens: [mapa(context), _adminPage()],
-        items: [
-          PersistentBottomNavBarItem(
-            icon: Icon(Icons.map, color: Colors.white),
-          ),
-          PersistentBottomNavBarItem(
-            icon: Icon(
-              Icons.admin_panel_settings_outlined,
-              color: Colors.white,
-            ),
-          ),
-        ],
-        backgroundColor: Colors.transparent,
-      ),
-    );
-  }
-
-  Widget _adminPage() {
-    return Container(
-      decoration: BoxDecoration(gradient: AppColors.darkBlueToBlackGradient()),
-      child: Column(
-        children: [
-          Expanded(child: _usersList()),
-          _addNewUserButton(),
-        ],
-      ),
-    );
-  }
-
-  Widget _usersList() {
-    return Obx(
-      () => ListView(
-        children: userCtrl.allFirebaseUsers
-            .map(
-              (user) => Container(
-                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            user.nome ?? user.email,
-                            style: TextStyle(color: AppColors.darkBlue()),
-                          ),
-                          Text(
-                            user.funcao,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppColors.mediumBlue(),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => Get.toNamed(
-                        Routes.MONITORA_UFF_FORM,
-                        arguments: user,
-                      ),
-                      child: Icon(Icons.edit, color: Colors.blueAccent),
-                    ),
-                    const SizedBox(width: 16),
-                    GestureDetector(
-                      onTap: () {
-                        Get.dialog(_deleteUserPopUp(user.email));
-                      },
-                      child: Icon(Icons.delete, color: Colors.red),
-                    ),
-                  ],
-                ),
-              ),
-            )
-            .toList(),
-      ),
-    );
-  }
-
-  Widget _deleteUserPopUp(String email) {
-    return AlertDialog(
-      title: Text("Atenção"),
-      content: Text("Deseja mesmo remover esse usuário?"),
-      actions: [
-        TextButton(
-          onPressed: () {
-            userCtrl.deleteUser(email);
-            Get.back();
-          },
-          child: const Text("Deletar"),
-        ),
-        TextButton(onPressed: Get.back, child: const Text("Cancelar")),
-      ],
-    );
-  }
-
-  Widget _addNewUserButton() {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => Get.toNamed(Routes.MONITORA_UFF_FORM),
-          child: Center(
-            child: Icon(Icons.add, size: 32, color: AppColors.darkBlue()),
-          ),
-        ),
-      ),
+      child: mapa(context),
     );
   }
 
   Widget _monitorPage(BuildContext context) {
     return Obx(
-      () =>
-          permissionsCtrl.arePermissionsGranted()
-              ? mapa(context)
-              : permissionScreen(),
+      () => permissionsCtrl.arePermissionsGranted()
+          ? mapa(context)
+          : permissionScreen(),
     );
   }
 
   Widget _unauthorizedPage() {
     return Center(
-      child: Text("Você não tem permissão para utilizar este serviço."),
+      child: Column(
+        children: [
+          Center(
+            child: Text("Você não tem permissão para utilizar este serviço."),
+          ),
+          // TODO: criar widget separado para esse botão
+          //Center(
+          //    child: ConstrainedBox(
+          //      constraints: const BoxConstraints(maxWidth: 420),
+          //      child: SizedBox(
+          //        width: double.infinity,
+          //        child: ElevatedButton.icon(
+          //          style: ElevatedButton.styleFrom(
+          //            backgroundColor: Colors.redAccent,
+          //            foregroundColor: Colors.white,
+          //            padding: const EdgeInsets.symmetric(
+          //              vertical: 14,
+          //            ),
+          //            shape: RoundedRectangleBorder(
+          //              borderRadius: BorderRadius.circular(14),
+          //            ),
+          //          ),
+          //          onPressed: () =>
+          //              Get.find<AuthGoogleController>().logout(),
+          //          icon: const Icon(Icons.logout),
+          //          label: const Text('Logout'),
+          //        ),
+          //      ),
+          //    ),
+          //  )
+        ],
+      ),
     );
   }
 }
