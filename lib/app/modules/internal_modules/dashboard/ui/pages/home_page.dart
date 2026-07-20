@@ -207,46 +207,38 @@ class HomePage extends GetView<HomePageController> {
                               ),
                             ),
                           ),
-                          if (savedShortcuts.isEmpty)
-                            SliverPadding(
-                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                              sliver: SliverToBoxAdapter(
-                                child: _buildEmptyShortcutsPrompt(),
-                              ),
-                            )
-                          else
-                            SliverPadding(
-                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                              sliver: SliverGrid(
-                                delegate: SliverChildBuilderDelegate(
-                                  (context, index) {
-                                    final item = savedShortcuts[index];
-                                    return _ShortcutCard(
-                                      key: ValueKey(item.page),
-                                      item: item,
-                                      layoutSpec: layoutSpec,
-                                      isRemoveMode: isRemoving,
-                                      onTap: () {
-                                        if (isRemoving) {
-                                          controller.removeShortcut(item);
-                                          return;
-                                        }
+                          SliverPadding(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                            sliver: SliverGrid(
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) {
+                                  final item = savedShortcuts[index];
+                                  return _ShortcutCard(
+                                    key: ValueKey(item.page),
+                                    item: item,
+                                    layoutSpec: layoutSpec,
+                                    isRemoveMode: isRemoving,
+                                    onTap: () {
+                                      if (isRemoving) {
+                                        controller.removeShortcut(item);
+                                        return;
+                                      }
 
-                                        controller.openShortcut(item);
-                                      },
-                                    );
-                                  },
-                                  childCount: savedShortcuts.length,
-                                ),
-                                gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: layoutSpec.crossAxisCount,
-                                  crossAxisSpacing: layoutSpec.crossAxisSpacing,
-                                  mainAxisSpacing: layoutSpec.mainAxisSpacing,
-                                  childAspectRatio: layoutSpec.childAspectRatio,
-                                ),
+                                      controller.openShortcut(item);
+                                    },
+                                  );
+                                },
+                                childCount: savedShortcuts.length,
+                              ),
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: layoutSpec.crossAxisCount,
+                                crossAxisSpacing: layoutSpec.crossAxisSpacing,
+                                mainAxisSpacing: layoutSpec.mainAxisSpacing,
+                                childAspectRatio: layoutSpec.childAspectRatio,
                               ),
                             ),
+                          ),
                           SliverPadding(
                             padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
                             sliver: SliverToBoxAdapter(
@@ -408,37 +400,6 @@ class HomePage extends GetView<HomePageController> {
     );
   }
 
-  Widget _buildEmptyShortcutsPrompt() {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: controller.goToServicesTab,
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(16),
-          decoration: _cardDecoration(),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'Você ainda não tem atalhos. Toque para escolher serviços.',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.85),
-                    fontSize: 13.5,
-                    height: 1.4,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              const Icon(Icons.chevron_right, color: Colors.white),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildRestauranteSection() {
     return Obx(() {
       final meals = controller.campusMeals.toList(growable: false);
@@ -449,25 +410,67 @@ class HomePage extends GetView<HomePageController> {
         children: [
           _buildSectionTitle('Restaurante'),
           const SizedBox(height: 8),
-          Text(
-            'Prato principal de hoje em cada campus.',
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.92),
-              fontSize: 13,
-              height: 1.4,
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Prato principal de hoje em cada campus.',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.92),
+                    fontSize: 13,
+                    height: 1.4,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.swipe,
+                color: Colors.white.withOpacity(0.55),
+                size: 18,
+              ),
+            ],
           ),
           const SizedBox(height: 14),
           SizedBox(
             height: 150,
             child: isLoading
                 ? const Center(child: CustomProgressDisplay())
-                : ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: meals.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 12),
-                    itemBuilder: (context, index) =>
-                        _CampusMealCard(data: meals[index]),
+                : Stack(
+                    children: [
+                      ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: meals.length,
+                        separatorBuilder: (_, __) => const SizedBox(width: 12),
+                        itemBuilder: (context, index) =>
+                            _CampusMealCard(data: meals[index]),
+                      ),
+                      if (meals.length > 1)
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          bottom: 0,
+                          child: IgnorePointer(
+                            child: Container(
+                              width: 36,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    Colors.transparent,
+                                    AppColors.darkBlue().withOpacity(0.85),
+                                  ],
+                                ),
+                              ),
+                              alignment: Alignment.center,
+                              child: Icon(
+                                Icons.chevron_right,
+                                color: Colors.white.withOpacity(0.85),
+                                size: 22,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
           ),
         ],

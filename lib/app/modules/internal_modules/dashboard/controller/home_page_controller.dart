@@ -14,7 +14,6 @@ import 'package:uffmobileplus/app/modules/external_modules/study_plan/data/model
 import 'package:uffmobileplus/app/modules/external_modules/study_plan/data/repository/study_plan_repository.dart';
 import 'package:uffmobileplus/app/modules/external_modules/transcript/data/models/transcript_model.dart';
 import 'package:uffmobileplus/app/modules/external_modules/transcript/data/repository/transcript_repository.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/dashboard_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/external_modules_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
@@ -241,10 +240,6 @@ class HomePageController extends GetxController {
       shortcutRoutes.assignAll(saved.where(validRoutes.contains));
       _rebuildShortcutCaches();
     } catch (_) {}
-  }
-
-  void goToServicesTab() {
-    Get.find<DashboardController>().tabController.jumpToTab(1);
   }
 
   Future<void> _persistShortcuts() async {
