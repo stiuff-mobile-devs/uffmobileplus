@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/data/services/responsive_layout_service.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/menu/ui/pages/menu_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/study_plan/data/models/discipline_model.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/home_page_controller.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
@@ -206,8 +208,7 @@ class HomePage extends GetView<HomePageController> {
                             ),
                           ),
                           SliverPadding(
-                            padding:
-                                EdgeInsets.fromLTRB(16, 0, 16, bottomPadding),
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                             sliver: SliverGrid(
                               delegate: SliverChildBuilderDelegate(
                                 (context, index) {
@@ -236,6 +237,35 @@ class HomePage extends GetView<HomePageController> {
                                 mainAxisSpacing: layoutSpec.mainAxisSpacing,
                                 childAspectRatio: layoutSpec.childAspectRatio,
                               ),
+                            ),
+                          ),
+                          SliverPadding(
+                            padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                            sliver: SliverToBoxAdapter(
+                              child: _buildRestauranteSection(),
+                            ),
+                          ),
+                          SliverPadding(
+                            padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                            sliver: SliverToBoxAdapter(
+                              child: _buildStudyPlanSection(),
+                            ),
+                          ),
+                          SliverPadding(
+                            padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                            sliver: SliverToBoxAdapter(
+                              child: _buildHistoricoSection(),
+                            ),
+                          ),
+                          SliverPadding(
+                            padding: EdgeInsets.fromLTRB(
+                              16,
+                              24,
+                              16,
+                              bottomPadding,
+                            ),
+                            sliver: SliverToBoxAdapter(
+                              child: _buildNoticiasSection(),
                             ),
                           ),
                         ],
@@ -344,6 +374,233 @@ class HomePage extends GetView<HomePageController> {
     );
   }
 
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 20,
+        fontWeight: FontWeight.w700,
+      ),
+    );
+  }
+
+  BoxDecoration _cardDecoration() {
+    return BoxDecoration(
+      borderRadius: BorderRadius.circular(16),
+      gradient: LinearGradient(
+        colors: [
+          Colors.white.withOpacity(0.12),
+          Colors.white.withOpacity(0.06),
+        ],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      border: Border.all(color: Colors.white.withOpacity(0.08)),
+    );
+  }
+
+  Widget _buildRestauranteSection() {
+    return Obx(() {
+      final meals = controller.campusMeals.toList(growable: false);
+      final isLoading = controller.isLoadingCampusMeals.value;
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionTitle('Restaurante'),
+          const SizedBox(height: 8),
+          Text(
+            'Prato principal de hoje em cada campus.',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.92),
+              fontSize: 13,
+              height: 1.4,
+            ),
+          ),
+          const SizedBox(height: 14),
+          SizedBox(
+            height: 150,
+            child: isLoading
+                ? const Center(child: CustomProgressDisplay())
+                : ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: meals.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 12),
+                    itemBuilder: (context, index) =>
+                        _CampusMealCard(data: meals[index]),
+                  ),
+          ),
+        ],
+      );
+    });
+  }
+
+  Widget _buildStudyPlanSection() {
+    return Obx(() {
+      final classes = controller.todayClasses.toList(growable: false);
+      final isLoading = controller.isLoadingTodayClasses.value;
+
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () => Get.toNamed(Routes.STUDY_PLAN),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: _cardDecoration(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSectionTitle('Plano de Estudos'),
+                const SizedBox(height: 12),
+                if (isLoading)
+                  const Center(child: CustomProgressDisplay())
+                else if (classes.isEmpty)
+                  Text(
+                    'Nenhuma aula hoje.',
+                    style: TextStyle(color: Colors.white.withOpacity(0.7)),
+                  )
+                else
+                  Column(
+                    children: classes
+                        .map((discipline) => _buildDisciplineRow(discipline))
+                        .toList(),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      );
+    });
+  }
+
+  Widget _buildDisciplineRow(Discipline discipline) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              discipline.title ?? '-',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '${discipline.startTime ?? ''} - ${discipline.endTime ?? ''}',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.68),
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHistoricoSection() {
+    return Obx(() {
+      final stats = controller.transcriptStats.value;
+      final isLoading = controller.isLoadingTranscript.value;
+      final chCursada = stats?.chCursada ?? 0;
+      final chTotal = stats?.chTotal ?? 0;
+      final progress =
+          chTotal > 0 ? (chCursada / chTotal).clamp(0.0, 1.0) : 0.0;
+
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () => Get.toNamed(Routes.HISTORICO),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: _cardDecoration(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSectionTitle('Histórico'),
+                const SizedBox(height: 12),
+                if (isLoading)
+                  const Center(child: CustomProgressDisplay())
+                else if (stats == null)
+                  Text(
+                    'Dados indisponíveis no momento.',
+                    style: TextStyle(color: Colors.white.withOpacity(0.7)),
+                  )
+                else ...[
+                  Text(
+                    '$chCursada h cursadas de $chTotal h totais',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(999),
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      minHeight: 8,
+                      backgroundColor: Colors.white.withOpacity(0.12),
+                      valueColor: const AlwaysStoppedAnimation(Colors.white),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      );
+    });
+  }
+
+  Widget _buildNoticiasSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle('Notícias'),
+        const SizedBox(height: 12),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: _cardDecoration(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Em breve: notícias da UFF',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Estamos preparando esta seção para trazer as últimas notícias da universidade.',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.75),
+                  fontSize: 12.5,
+                  height: 1.4,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Future<void> _showAddShortcutSheet(BuildContext context) async {
     await showModalBottomSheet<void>(
       context: context,
@@ -433,6 +690,86 @@ class HomePage extends GetView<HomePageController> {
   }
 
 
+}
+
+class _CampusMealCard extends StatelessWidget {
+  const _CampusMealCard({required this.data});
+
+  final TodayCampusMeal data;
+
+  @override
+  Widget build(BuildContext context) {
+    final meal = data.meal;
+    final hasDish = meal?.main?.isNotEmpty ?? false;
+    final subtitle = hasDish
+        ? meal!.main!
+        : (data.shiftLabel == null
+            ? 'Fechado agora'
+            : 'Cardápio não disponível');
+    final isOpen = data.shiftLabel != null;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => Get.to(
+          () => MenuPage(location: data.campus),
+          transition: Transition.rightToLeft,
+        ),
+        child: Container(
+          width: 168,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              colors: [
+                Colors.white.withOpacity(0.12),
+                Colors.white.withOpacity(0.06),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            border: Border.all(color: Colors.white.withOpacity(0.08)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                data.campus.name,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                isOpen ? data.shiftLabel! : 'Fechado',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.68),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Expanded(
+                child: Text(
+                  subtitle,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.92),
+                    fontSize: 13,
+                    height: 1.3,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _ShortcutCard extends StatelessWidget {
