@@ -207,38 +207,46 @@ class HomePage extends GetView<HomePageController> {
                               ),
                             ),
                           ),
-                          SliverPadding(
-                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                            sliver: SliverGrid(
-                              delegate: SliverChildBuilderDelegate(
-                                (context, index) {
-                                  final item = savedShortcuts[index];
-                                  return _ShortcutCard(
-                                    key: ValueKey(item.page),
-                                    item: item,
-                                    layoutSpec: layoutSpec,
-                                    isRemoveMode: isRemoving,
-                                    onTap: () {
-                                      if (isRemoving) {
-                                        controller.removeShortcut(item);
-                                        return;
-                                      }
-
-                                      controller.openShortcut(item);
-                                    },
-                                  );
-                                },
-                                childCount: savedShortcuts.length,
+                          if (savedShortcuts.isEmpty)
+                            SliverPadding(
+                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                              sliver: SliverToBoxAdapter(
+                                child: _buildEmptyShortcutsPrompt(),
                               ),
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: layoutSpec.crossAxisCount,
-                                crossAxisSpacing: layoutSpec.crossAxisSpacing,
-                                mainAxisSpacing: layoutSpec.mainAxisSpacing,
-                                childAspectRatio: layoutSpec.childAspectRatio,
+                            )
+                          else
+                            SliverPadding(
+                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                              sliver: SliverGrid(
+                                delegate: SliverChildBuilderDelegate(
+                                  (context, index) {
+                                    final item = savedShortcuts[index];
+                                    return _ShortcutCard(
+                                      key: ValueKey(item.page),
+                                      item: item,
+                                      layoutSpec: layoutSpec,
+                                      isRemoveMode: isRemoving,
+                                      onTap: () {
+                                        if (isRemoving) {
+                                          controller.removeShortcut(item);
+                                          return;
+                                        }
+
+                                        controller.openShortcut(item);
+                                      },
+                                    );
+                                  },
+                                  childCount: savedShortcuts.length,
+                                ),
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: layoutSpec.crossAxisCount,
+                                  crossAxisSpacing: layoutSpec.crossAxisSpacing,
+                                  mainAxisSpacing: layoutSpec.mainAxisSpacing,
+                                  childAspectRatio: layoutSpec.childAspectRatio,
+                                ),
                               ),
                             ),
-                          ),
                           SliverPadding(
                             padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
                             sliver: SliverToBoxAdapter(
@@ -397,6 +405,37 @@ class HomePage extends GetView<HomePageController> {
         end: Alignment.bottomRight,
       ),
       border: Border.all(color: Colors.white.withOpacity(0.08)),
+    );
+  }
+
+  Widget _buildEmptyShortcutsPrompt() {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: controller.goToServicesTab,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: _cardDecoration(),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Você ainda não tem atalhos. Toque para escolher serviços.',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.85),
+                    fontSize: 13.5,
+                    height: 1.4,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Icon(Icons.chevron_right, color: Colors.white),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -701,11 +740,7 @@ class _CampusMealCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final meal = data.meal;
     final hasDish = meal?.main?.isNotEmpty ?? false;
-    final subtitle = hasDish
-        ? meal!.main!
-        : (data.shiftLabel == null
-            ? 'Fechado agora'
-            : 'Cardápio não disponível');
+    final subtitle = hasDish ? meal!.main! : 'Prato não definido hoje';
     final isOpen = data.shiftLabel != null;
 
     return Material(
