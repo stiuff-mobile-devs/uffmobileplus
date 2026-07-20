@@ -45,7 +45,7 @@ class StudyPlanProvider {
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $accessToken'},
-      );
+      ).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonResponse = jsonDecode(response.body);

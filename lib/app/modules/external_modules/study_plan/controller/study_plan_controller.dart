@@ -17,17 +17,21 @@ class StudyPlanController extends GetxController {
   }
 
   void _fetchStudyPlan(bool isRefresh) async {
-    studyPlan = await _repository.getStudyPlan(isRefresh);
-    if (studyPlan != null) {
-      final plan = studyPlan?.plan;
+    try {
+      studyPlan = await _repository.getStudyPlan(isRefresh);
+      if (studyPlan != null) {
+        final plan = studyPlan?.plan;
 
-      studyPlan?.plan = Map.fromEntries(
-        plan!.entries.where((e) => (e.value?.isNotEmpty ?? false)),
-      ).map((key, value) => MapEntry(key, value!));
+        studyPlan?.plan = Map.fromEntries(
+          plan!.entries.where((e) => (e.value?.isNotEmpty ?? false)),
+        ).map((key, value) => MapEntry(key, value!));
+      }
+    } catch (_) {
+      studyPlan = null;
+    } finally {
+      isLoading = false;
+      update();
     }
-
-    isLoading = false;
-    update();
   }
 
   StudyPlanModel? getStudyPlan() {

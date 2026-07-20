@@ -424,8 +424,8 @@ class HomePage extends GetView<HomePageController> {
               ),
               Icon(
                 Icons.swipe,
-                color: Colors.white.withOpacity(0.55),
-                size: 18,
+                color: Colors.white.withOpacity(0.65),
+                size: 28,
               ),
             ],
           ),
@@ -434,43 +434,12 @@ class HomePage extends GetView<HomePageController> {
             height: 150,
             child: isLoading
                 ? const Center(child: CustomProgressDisplay())
-                : Stack(
-                    children: [
-                      ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: meals.length,
-                        separatorBuilder: (_, __) => const SizedBox(width: 12),
-                        itemBuilder: (context, index) =>
-                            _CampusMealCard(data: meals[index]),
-                      ),
-                      if (meals.length > 1)
-                        Positioned(
-                          right: 0,
-                          top: 0,
-                          bottom: 0,
-                          child: IgnorePointer(
-                            child: Container(
-                              width: 36,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                  colors: [
-                                    Colors.transparent,
-                                    AppColors.darkBlue().withOpacity(0.85),
-                                  ],
-                                ),
-                              ),
-                              alignment: Alignment.center,
-                              child: Icon(
-                                Icons.chevron_right,
-                                color: Colors.white.withOpacity(0.85),
-                                size: 22,
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
+                : ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: meals.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 12),
+                    itemBuilder: (context, index) =>
+                        _CampusMealCard(data: meals[index]),
                   ),
           ),
         ],
