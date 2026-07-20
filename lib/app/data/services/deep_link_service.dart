@@ -62,7 +62,6 @@ class DeepLinkService {
 
     // Monitora UFF
     'monitora': Routes.MONITORA_UFF,
-    'monitora/formulario': Routes.MONITORA_UFF_FORM,
 
     // Repositório Institucional
     'repositorio': Routes.REPOSITORIO_INSTITUCIONAL,

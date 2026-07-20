@@ -129,7 +129,6 @@ class FirebaseProvider {
   Future<void> updateLocationAndTimestamp({
     required String email,
     required String nome,
-    required String funcao,
     required double lat,
     required double lng,
     required DateTime timestamp,
@@ -138,7 +137,6 @@ class FirebaseProvider {
       await collectionRef.doc(email).update({
         'email': email,
         'nome': nome,
-        'funcao': funcao,
         'lat': lat,
         'lng': lng,
         'timestamp': timestamp,
