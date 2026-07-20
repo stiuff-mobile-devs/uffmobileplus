@@ -126,6 +126,7 @@ abstract class AppPages {
         AuthGoogleBindings(),
         UserDataBindings(),
         RestauranteBindings(),
+        MenuBindings(),
       ],
     ),
 
