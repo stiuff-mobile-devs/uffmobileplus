@@ -712,7 +712,9 @@ class _CampusMealCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final meal = data.meal;
     final hasDish = meal?.main?.isNotEmpty ?? false;
-    final subtitle = hasDish ? meal!.main! : 'Prato não definido hoje';
+    final subtitle = hasDish
+        ? meal!.main!
+        : 'Ainda não há refeições disponíveis para este refeitório.';
     final isOpen = data.shiftLabel != null;
 
     return Material(

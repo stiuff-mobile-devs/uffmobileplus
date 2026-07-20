@@ -235,9 +235,21 @@ class HomePageController extends GetxController {
     try {
       final userData = await userDataRepository.getUserData();
       final saved = userData?.shortcutRoutes ?? <String>[];
-
       final validRoutes = allShortcutRoutes;
-      shortcutRoutes.assignAll(saved.where(validRoutes.contains));
+      final filteredSaved = saved.where(validRoutes.contains).toList();
+
+      // Corrige contas que ficaram com todos os serviços marcados como atalho
+      // por um bug anterior que pré-selecionava tudo por padrão.
+      final looksAutoSeeded = validRoutes.isNotEmpty &&
+          filteredSaved.length == validRoutes.length;
+
+      if (looksAutoSeeded) {
+        shortcutRoutes.clear();
+        await _persistShortcuts();
+      } else {
+        shortcutRoutes.assignAll(filteredSaved);
+      }
+
       _rebuildShortcutCaches();
     } catch (_) {}
   }
