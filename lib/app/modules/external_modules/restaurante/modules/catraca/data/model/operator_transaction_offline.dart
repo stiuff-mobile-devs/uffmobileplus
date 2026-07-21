@@ -19,36 +19,45 @@ class OperatorTransactionOffline {
   DateTime entryTime;
 
   @HiveField(4)
-  String? idUffOperator;
+  String? idOperator;
 
   @HiveField(5)
-  String? idUffUser;
+  String? idUser;
 
   @HiveField(6)
-  bool processed;
+  bool? processed;
+
+  @HiveField(7)
+  bool? isSynced;
+
+  @HiveField(8)
+  bool? isIduff;
 
   OperatorTransactionOffline({
     String? id,
     this.idCampus,
     this.campus,
     DateTime? entryTime,
-    this.idUffOperator,
-    this.idUffUser,
+    this.idOperator,
+    this.idUser,
     this.processed = false,
+    this.isSynced = false,
+    this.isIduff = false,
   }) : id = id ?? Uuid().v4(),
        entryTime = entryTime ?? DateTime.now();
 
   factory OperatorTransactionOffline.fromJson(Map<String, dynamic> json) {
     return OperatorTransactionOffline(
-      id: (json['id'] as String?) ?? Uuid().v4(),
+      id: json['id'],
       idCampus: json['idCampus'] != null ? json['idCampus'] as String : null,
       campus: json['campus'] != null ? json['campus'] as String : null,
       entryTime: _parseEntryTime(json['entryTime']),
-      idUffOperator: json['idUffOperator'] != null
-          ? json['idUffOperator'] as String
+      idOperator: json['idOperator'] != null
+          ? json['idOperator'] as String
           : null,
-      idUffUser: json['idUffUser'] != null ? json['idUffUser'] as String : null,
+      idUser: json['idUser'] != null ? json['idUser'] as String : null,
       processed: json['processed'] == true || json['processed'] == 1,
+      isIduff: json['isIduff'] == true || json['isIduff'] == 1,
     );
   }
 
@@ -82,9 +91,34 @@ class OperatorTransactionOffline {
       'idCampus': idCampus,
       'campus': campus,
       'entryTime': entryTime,
-      'idUffOperator': idUffOperator,
-      'idUffUser': idUffUser,
+      'idOperator': idOperator,
+      'idUser': idUser,
       'processed': processed,
+      'isIduff': isIduff,
     };
+  }
+
+  OperatorTransactionOffline copyWith({
+    String? id,
+    String? idCampus,
+    String? campus,
+    DateTime? entryTime,
+    String? idOperator,
+    String? idUser,
+    bool? processed,
+    bool? isSynced,
+    bool? isIduff,
+  }) {
+    return OperatorTransactionOffline(
+      id: id ?? this.id,
+      idCampus: idCampus ?? this.idCampus,
+      campus: campus ?? this.campus,
+      entryTime: entryTime ?? this.entryTime,
+      idOperator: idOperator ?? this.idOperator,
+      idUser: idUser ?? this.idUser,
+      processed: processed ?? this.processed,
+      isSynced: isSynced ?? this.isSynced,
+      isIduff: isIduff ?? this.isIduff,
+    );
   }
 }

@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/data/services/responsive_layout_service.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/menu/ui/pages/menu_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/study_plan/data/models/discipline_model.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/home_page_controller.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/dashboard/utils/custom_drawer.dart';
 import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.dart';
 
 class HomePage extends GetView<HomePageController> {
   const HomePage({super.key});
 
-  static const ResponsiveGridConfig _shortcutGridConfig =
-      ResponsiveGridConfig(
+  static const ResponsiveGridConfig _shortcutGridConfig = ResponsiveGridConfig(
     breakpoints: [
       ResponsiveGridBreakpoint(
         maxWidth: 360,
@@ -80,12 +82,12 @@ class HomePage extends GetView<HomePageController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: _buildDrawer(context),
+      drawer: CustomDrawer(), //_buildDrawer(context),
       appBar: AppBar(
         centerTitle: true,
         elevation: 8,
         foregroundColor: Colors.white,
-        title: const Text('UFF +'),
+        title: const Text('UFF+'),
         actions: [
           IconButton(
             icon: const Icon(Icons.help_outline),
@@ -103,12 +105,14 @@ class HomePage extends GetView<HomePageController> {
       body: Obx(() {
         final layoutService = controller.layoutService;
         final safeBottom = MediaQuery.of(context).padding.bottom;
-        final bottomPadding =
-            layoutService.bottomPadding(safeBottom: safeBottom);
+        final bottomPadding = layoutService.bottomPadding(
+          safeBottom: safeBottom,
+        );
         final isLoading = controller.isLoading.value;
         final isRemoving = controller.isRemovingShortcuts.value;
-        final savedShortcuts =
-            controller.savedShortcuts.toList(growable: false);
+        final savedShortcuts = controller.savedShortcuts.toList(
+          growable: false,
+        );
 
         return Container(
           width: double.infinity,
@@ -131,13 +135,23 @@ class HomePage extends GetView<HomePageController> {
                         physics: const BouncingScrollPhysics(),
                         slivers: [
                           SliverPadding(
+                            padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                            sliver: SliverToBoxAdapter(
+                              child: _buildStudyPlanSection(),
+                            ),
+                          ),
+                          SliverPadding(
+                            padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                            sliver: SliverToBoxAdapter(
+                              child: _buildRestauranteSection(),
+                            ),
+                          ),
+                          SliverPadding(
                             padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
                             sliver: SliverToBoxAdapter(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  _buildUpdateBanner(),
-                                  const SizedBox(height: 18),
                                   Row(
                                     children: [
                                       Expanded(
@@ -157,10 +171,12 @@ class HomePage extends GetView<HomePageController> {
                                         icon: Container(
                                           padding: const EdgeInsets.all(4),
                                           decoration: BoxDecoration(
-                                            color:
-                                                Colors.white.withOpacity(0.12),
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            color: Colors.white.withOpacity(
+                                              0.12,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
                                           ),
                                           child: const Icon(
                                             Icons.add,
@@ -178,9 +194,12 @@ class HomePage extends GetView<HomePageController> {
                                           decoration: BoxDecoration(
                                             color: isRemoving
                                                 ? Colors.red.withOpacity(0.25)
-                                                : Colors.white.withOpacity(0.12),
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                                : Colors.white.withOpacity(
+                                                    0.12,
+                                                  ),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
                                           ),
                                           child: const Icon(
                                             Icons.remove,
@@ -205,36 +224,54 @@ class HomePage extends GetView<HomePageController> {
                             ),
                           ),
                           SliverPadding(
-                            padding:
-                                EdgeInsets.fromLTRB(16, 0, 16, bottomPadding),
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                             sliver: SliverGrid(
-                              delegate: SliverChildBuilderDelegate(
-                                (context, index) {
-                                  final item = savedShortcuts[index];
-                                  return _ShortcutCard(
-                                    key: ValueKey(item.page),
-                                    item: item,
-                                    layoutSpec: layoutSpec,
-                                    isRemoveMode: isRemoving,
-                                    onTap: () {
-                                      if (isRemoving) {
-                                        controller.removeShortcut(item);
-                                        return;
-                                      }
+                              delegate: SliverChildBuilderDelegate((
+                                context,
+                                index,
+                              ) {
+                                final item = savedShortcuts[index];
+                                return _ShortcutCard(
+                                  key: ValueKey(item.page),
+                                  item: item,
+                                  layoutSpec: layoutSpec,
+                                  isRemoveMode: isRemoving,
+                                  onTap: () {
+                                    if (isRemoving) {
+                                      controller.removeShortcut(item);
+                                      return;
+                                    }
 
-                                      controller.openShortcut(item);
-                                    },
-                                  );
-                                },
-                                childCount: savedShortcuts.length,
-                              ),
+                                    controller.openShortcut(item);
+                                  },
+                                );
+                              }, childCount: savedShortcuts.length),
                               gridDelegate:
                                   SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: layoutSpec.crossAxisCount,
-                                crossAxisSpacing: layoutSpec.crossAxisSpacing,
-                                mainAxisSpacing: layoutSpec.mainAxisSpacing,
-                                childAspectRatio: layoutSpec.childAspectRatio,
-                              ),
+                                    crossAxisCount: layoutSpec.crossAxisCount,
+                                    crossAxisSpacing:
+                                        layoutSpec.crossAxisSpacing,
+                                    mainAxisSpacing: layoutSpec.mainAxisSpacing,
+                                    childAspectRatio:
+                                        layoutSpec.childAspectRatio,
+                                  ),
+                            ),
+                          ),
+                          SliverPadding(
+                            padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                            sliver: SliverToBoxAdapter(
+                              child: _buildHistoricoSection(),
+                            ),
+                          ),
+                          SliverPadding(
+                            padding: EdgeInsets.fromLTRB(
+                              16,
+                              24,
+                              16,
+                              bottomPadding,
+                            ),
+                            sliver: SliverToBoxAdapter(
+                              child: _buildNoticiasSection(),
                             ),
                           ),
                         ],
@@ -343,6 +380,245 @@ class HomePage extends GetView<HomePageController> {
     );
   }
 
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 20,
+        fontWeight: FontWeight.w700,
+      ),
+    );
+  }
+
+  BoxDecoration _cardDecoration() {
+    return BoxDecoration(
+      borderRadius: BorderRadius.circular(16),
+      gradient: LinearGradient(
+        colors: [
+          Colors.white.withOpacity(0.12),
+          Colors.white.withOpacity(0.06),
+        ],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      border: Border.all(color: Colors.white.withOpacity(0.08)),
+    );
+  }
+
+  Widget _buildRestauranteSection() {
+    return Obx(() {
+      final meals = controller.campusMeals.toList(growable: false);
+      final isLoading = controller.isLoadingCampusMeals.value;
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionTitle('Restaurante'),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Prato principal de hoje em cada campus.',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.92),
+                    fontSize: 13,
+                    height: 1.4,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.swipe,
+                color: Colors.white.withOpacity(0.65),
+                size: 28,
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          SizedBox(
+            height: 150,
+            child: isLoading
+                ? const Center(child: CustomProgressDisplay())
+                : ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: meals.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 12),
+                    itemBuilder: (context, index) =>
+                        _CampusMealCard(data: meals[index]),
+                  ),
+          ),
+        ],
+      );
+    });
+  }
+
+  Widget _buildStudyPlanSection() {
+    return Obx(() {
+      final classes = controller.todayClasses.toList(growable: false);
+      final isLoading = controller.isLoadingTodayClasses.value;
+
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () => Get.toNamed(Routes.STUDY_PLAN),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: _cardDecoration(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSectionTitle('Plano de Estudos'),
+                const SizedBox(height: 12),
+                if (isLoading)
+                  const Center(child: CustomProgressDisplay())
+                else if (classes.isEmpty)
+                  Text(
+                    'Nenhuma aula hoje.',
+                    style: TextStyle(color: Colors.white.withOpacity(0.7)),
+                  )
+                else
+                  Column(
+                    children: classes
+                        .map((discipline) => _buildDisciplineRow(discipline))
+                        .toList(),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      );
+    });
+  }
+
+  Widget _buildDisciplineRow(Discipline discipline) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              discipline.title ?? '-',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '${discipline.startTime ?? ''} - ${discipline.endTime ?? ''}',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.68),
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHistoricoSection() {
+    return Obx(() {
+      final stats = controller.transcriptStats.value;
+      final isLoading = controller.isLoadingTranscript.value;
+      final chCursada = stats?.chCursada ?? 0;
+      final chTotal = stats?.chTotal ?? 0;
+      final progress = chTotal > 0
+          ? (chCursada / chTotal).clamp(0.0, 1.0)
+          : 0.0;
+
+      return Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () => Get.toNamed(Routes.HISTORICO),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: _cardDecoration(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSectionTitle('Histórico'),
+                const SizedBox(height: 12),
+                if (isLoading)
+                  const Center(child: CustomProgressDisplay())
+                else if (stats == null)
+                  Text(
+                    'Dados indisponíveis no momento.',
+                    style: TextStyle(color: Colors.white.withOpacity(0.7)),
+                  )
+                else ...[
+                  Text(
+                    '$chCursada h cursadas de $chTotal h totais',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(999),
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      minHeight: 8,
+                      backgroundColor: Colors.white.withOpacity(0.12),
+                      valueColor: const AlwaysStoppedAnimation(Colors.white),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      );
+    });
+  }
+
+  Widget _buildNoticiasSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle('Notícias'),
+        const SizedBox(height: 12),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: _cardDecoration(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Em breve: notícias da UFF',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Estamos preparando esta seção para trazer as últimas notícias da universidade.',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.75),
+                  fontSize: 12.5,
+                  height: 1.4,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Future<void> _showAddShortcutSheet(BuildContext context) async {
     await showModalBottomSheet<void>(
       context: context,
@@ -353,12 +629,14 @@ class HomePage extends GetView<HomePageController> {
       ),
       builder: (context) {
         return Obx(() {
-          final remainingServices =
-              controller.availableToAdd.toList(growable: false);
+          final remainingServices = controller.availableToAdd.toList(
+            growable: false,
+          );
           final layoutService = controller.layoutService;
           final safeBottom = MediaQuery.of(context).padding.bottom;
-          final bottomPadding =
-              layoutService.bottomPadding(safeBottom: safeBottom);
+          final bottomPadding = layoutService.bottomPadding(
+            safeBottom: safeBottom,
+          );
 
           return SafeArea(
             bottom: false,
@@ -430,149 +708,80 @@ class HomePage extends GetView<HomePageController> {
       },
     );
   }
+}
 
-  Drawer _buildDrawer(BuildContext context) {
-    return Drawer(
-      backgroundColor: Colors.transparent,
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: AppColors.darkBlueToBlackGradient(),
+class _CampusMealCard extends StatelessWidget {
+  const _CampusMealCard({required this.data});
+
+  final TodayCampusMeal data;
+
+  @override
+  Widget build(BuildContext context) {
+    final meal = data.meal;
+    final hasDish = meal?.main?.isNotEmpty ?? false;
+    final subtitle = hasDish
+        ? meal!.main!
+        : 'Ainda não há refeições disponíveis para este refeitório.';
+    final isOpen = data.shiftLabel != null;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => Get.to(
+          () => MenuPage(location: data.campus),
+          transition: Transition.rightToLeft,
         ),
-        child: SafeArea(
+        child: Container(
+          width: 168,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            gradient: LinearGradient(
+              colors: [
+                Colors.white.withOpacity(0.12),
+                Colors.white.withOpacity(0.06),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            border: Border.all(color: Colors.white.withOpacity(0.08)),
+          ),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildDrawerProfileHeader(),
+              Text(
+                data.campus.name,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                isOpen ? data.shiftLabel! : 'Fechado',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.68),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 10),
               Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
-                  children: [
-                    _DrawerTile(
-                      icon: Icons.settings_outlined,
-                      title: 'configuracoes'.tr,
-                      subtitle: 'ajustes_do_aplicativo'.tr,
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        Get.toNamed(Routes.SETTINGS);
-                      },
-                    ),
-                    _DrawerTile(
-                      icon: Icons.wifi,
-                      title: 'conexoes'.tr,
-                      subtitle: 'informacoes_sobre_infraestruturas'.tr,
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        Get.toNamed(Routes.CONNECTIONS);
-                      },
-                    ),
-                    _DrawerTile(
-                      icon: Icons.info_outline,
-                      title: 'sobre'.tr,
-                      subtitle: 'informacoes_app_versao'.tr,
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        Get.toNamed(Routes.ABOUT);
-                      },
-                    ),
-                  ],
+                child: Text(
+                  subtitle,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.92),
+                    fontSize: 13,
+                    height: 1.3,
+                  ),
                 ),
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDrawerProfileHeader() {
-    return Obx(
-      () => Container(
-        margin: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          gradient: LinearGradient(
-            colors: [
-              AppColors.mediumBlue().withOpacity(0.95),
-              AppColors.darkBlue().withOpacity(0.95),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              height: 56,
-              width: 56,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.12),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: controller.userPhotoUrl.value.isNotEmpty
-                  ? Image.network(
-                      controller.userPhotoUrl.value,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const Icon(
-                        Icons.person_outline,
-                        color: Colors.white,
-                        size: 28,
-                      ),
-                    )
-                  : const Icon(
-                      Icons.person_outline,
-                      color: Colors.white,
-                      size: 28,
-                    ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    controller.userName.value,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.96),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Matrícula: ${controller.userMatricula.value}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.82),
-                      fontSize: 12,
-                    ),
-                  ),
-                  Text(
-                    controller.userEmail.value,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.82),
-                      fontSize: 12,
-                    ),
-                  ),
-                  Text(
-                    controller.userCourse.value,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.72),
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
         ),
       ),
     );
@@ -621,10 +830,7 @@ class _ShortcutCard extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _ServiceIcon(
-                    iconSrc: item.iconSrc,
-                    layoutSpec: layoutSpec,
-                  ),
+                  _ServiceIcon(iconSrc: item.iconSrc, layoutSpec: layoutSpec),
                   SizedBox(height: layoutSpec.iconLabelSpacing),
                   Text(
                     item.subtitle,
@@ -694,66 +900,6 @@ class _ServiceIcon extends StatelessWidget {
                 fit: BoxFit.contain,
               )
             : Image.asset(iconSrc, color: Colors.white, fit: BoxFit.contain),
-      ),
-    );
-  }
-}
-
-class _DrawerTile extends StatelessWidget {
-  const _DrawerTile({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Material(
-        color: Colors.white.withOpacity(0.06),
-        borderRadius: BorderRadius.circular(18),
-        child: ListTile(
-          onTap: onTap,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 14,
-            vertical: 4,
-          ),
-          leading: Container(
-            height: 40,
-            width: 40,
-            decoration: BoxDecoration(
-              color: AppColors.lightBlue().withOpacity(0.12),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: AppColors.lightBlue(), size: 20),
-          ),
-          title: Text(
-            title,
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.95),
-              fontWeight: FontWeight.w700,
-              fontSize: 14,
-            ),
-          ),
-          subtitle: Text(
-            subtitle,
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.62),
-              fontSize: 12,
-            ),
-          ),
-          trailing: Icon(
-            Icons.chevron_right,
-            color: Colors.white.withOpacity(0.45),
-          ),
-        ),
       ),
     );
   }

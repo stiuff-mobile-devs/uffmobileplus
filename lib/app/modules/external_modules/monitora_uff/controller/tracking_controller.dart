@@ -16,7 +16,6 @@ import 'package:flutter/material.dart'
     TextButtonThemeData,
     TextStyle,
     Theme,
-    ThemeData,
     WidgetState,
     WidgetStateColor,
     WidgetsBindingObserver,
@@ -110,7 +109,7 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
     }
 
     // TODO: encapsular em um método
-    if (userCtrl.isMonitor()) {
+    if (userCtrl.isTrackable()) {
       position = await Geolocator.getCurrentPosition();
     }
 
@@ -393,7 +392,6 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
       _service.invoke("setUserInfo", {
         "email": userCtrl.user!.email,
         "name": userCtrl.getUserName(),
-        "funcao": userCtrl.user!.funcao, //_currentUser.funcao,
       });
     });
 

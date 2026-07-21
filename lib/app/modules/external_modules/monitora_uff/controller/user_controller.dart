@@ -1,63 +1,85 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
+import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/google_groups_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/data/provider/firebase_provider.dart';
+import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/google_group_member_model.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_model.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_google_repository.dart';
 
 class UserController extends GetxController {
   final _user = Rxn<UserModel>();
   UserModel? get user => _user.value;
+
   String? _googleName;
 
   final allFirebaseUsers = <UserModel>[].obs;
-
   final isLoading = true.obs;
-
-  late final ExternalModulesServices _externalModulesServices;
 
   @override
   Future<void> onInit() async {
     super.onInit();
-    _loadInitialData();
+    await loadCurrentUser();
     allFirebaseUsers.bindStream(FirebaseProvider().streamAllUsers());
   }
 
-  Future<void> _loadInitialData() async {
+  Future<void> loadCurrentUser() async {
+    isLoading.value = true;
     try {
-      _externalModulesServices = Get.find<ExternalModulesServices>();
-      await _externalModulesServices.initialize();
+      final googleUser = await UserGoogleRepository().getUserGoogleModel();
+      debugPrint('Hive user: ${googleUser?.email} / ${googleUser?.name}');
+      _googleName = googleUser?.name;
+      final email = googleUser?.email ?? "";
 
-      try {
-        final googleUser = await UserGoogleRepository().getUserGoogleModel();
-        _googleName = googleUser?.name;
-      } catch (e) {
-        // Ignora caso não tenha usuário google
+      if (email.isEmpty) {
+        _user.value = null;
+        return;
       }
 
-      _user.value = await _initializeUser();
+      // Tentar carregar do Firestore
+      var firestoreUser = await _initializeUser();
+      if (firestoreUser != null) {
+        _user.value = firestoreUser;
+      } else {
+        // Criar documento no Firestore
+        await FirebaseProvider().setUser(UserModel(
+          email: email,
+          nome: _googleName,
+        ));
+        _user.value = await _initializeUser();
+      }
     } finally {
       isLoading.value = false;
     }
   }
 
   Future<UserModel?> _initializeUser() async {
-    // final email = await _externalModulesServices.getEmail();
     final googleUser = await UserGoogleRepository().getUserGoogleModel();
     final email = googleUser?.email ?? "";
+    debugPrint('Email usado no lookup: $email');
     if (email.isEmpty) return null;
 
-    return await FirebaseProvider().getUserByEmail(email);
+    final user = await FirebaseProvider().getUserByEmail(email);
+    return user;
   }
 
-  bool isAdmin() => _user.value?.funcao == 'administrador';
+  bool isTrackable() {
+    final googleGroupsCtrl = Get.find<GoogleGroupsController>();
+    final currentUserEmail = _user.value?.email;
 
-  bool isMonitor() => _user.value?.funcao == 'monitor';
+    if (currentUserEmail == null) return false;
 
-  void deleteUser(String email) => FirebaseProvider().deleteUserByEmail(email);
+    // Procura o usuário logado entre os membros do grupo observado
+    final member = googleGroupsCtrl.observedMembers.firstWhereOrNull(
+      (m) => m.email == currentUserEmail,
+    );
+
+    // Retorna true se for manager ou member (owner não conta como trackable)
+    return member?.role == GoogleGroupRole.manager
+      || member?.role == GoogleGroupRole.member;
+  }
 
   String getUserName() {
     return user!.nome ??
-        //_externalModulesServices.getUserName() ??
         _googleName ??
         "Nome não informado";
   }

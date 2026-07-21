@@ -3,7 +3,7 @@ description: "A new Flutter project."
 
 publish_to: 'none' 
 
-version: 6.8.3+626
+version: 6.9.1+629
 
 environment:
   sdk: ^3.9.0
@@ -68,7 +68,7 @@ dependencies:
   flutter_compass: ^0.8.1
   android_intent_plus: ^6.0.0
   internet_connection_checker_plus: ^3.0.0
-  screen_protector: ^1.5.1
+  screen_protector: ^1.5.2
   external_app_launcher: ^4.0.3
   firebase_messaging: ^16.2.2
   uuid: ^4.5.3

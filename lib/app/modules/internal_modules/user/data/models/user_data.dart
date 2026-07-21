@@ -46,6 +46,12 @@ class UserData extends HiveObject {
   @HiveField(13)
   List<String>? shortcutRoutes;
 
+  @HiveField(14)
+  GdiGroupsGoogle? gdiGroupsGoogle;
+
+  @HiveField(15)
+  DateTime? lastRegisteredTokenCdcUpdate;
+
   UserData({
     this.name,
     this.nomesocial,
@@ -61,7 +67,47 @@ class UserData extends HiveObject {
     this.gdiGroups,
     this.profileType,
     this.shortcutRoutes,
+    this.gdiGroupsGoogle,
+    this.lastRegisteredTokenCdcUpdate,
   });
+
+  UserData copyWith({
+    String? name,
+    String? nomesocial,
+    String? matricula,
+    String? iduff,
+    String? curso,
+    String? fotoUrl,  
+  String? dataValidadeMatricula,
+    String? bond,
+    String? textoQrCodeCarteirinha,
+    String? accessToken,
+    String? bondId,
+    List<GdiGroups>? gdiGroups,
+    ProfileTypes? profileType,
+    List<String>? shortcutRoutes,
+    GdiGroupsGoogle? gdiGroupsGoogle,
+    DateTime? lastRegisteredTokenCdcUpdate,
+  }) {
+    return UserData(
+     name: name ?? this.name,
+     nomesocial: nomesocial ?? this.nomesocial,
+     matricula: matricula ?? this.matricula,
+     iduff: iduff ?? this.iduff,
+     curso: curso ?? this.curso,
+     fotoUrl: fotoUrl ?? this.fotoUrl,
+     dataValidadeMatricula: dataValidadeMatricula ?? this.dataValidadeMatricula,
+     bond: bond ?? this.bond,
+     textoQrCodeCarteirinha: textoQrCodeCarteirinha ?? this.textoQrCodeCarteirinha,
+     accessToken: accessToken ?? this.accessToken,
+     bondId: bondId ?? this.bondId,
+     gdiGroups: gdiGroups ?? this.gdiGroups,
+     profileType: profileType ?? this.profileType,
+     shortcutRoutes: shortcutRoutes ?? this.shortcutRoutes,
+     gdiGroupsGoogle: gdiGroupsGoogle as GdiGroupsGoogle? ?? this.gdiGroupsGoogle,
+     lastRegisteredTokenCdcUpdate: lastRegisteredTokenCdcUpdate ?? this.lastRegisteredTokenCdcUpdate,
+    );
+  }
 
   factory UserData.fromJson(Map<String, dynamic> json) {
     return UserData(
@@ -89,6 +135,12 @@ class UserData extends HiveObject {
       shortcutRoutes: json['shortcutRoutes'] != null
           ? List<String>.from(json['shortcutRoutes'] as List)
           : null,
+      gdiGroupsGoogle: json['gdiGroupsGoogle'] != null
+          ? GdiGroupsGoogle.fromJson(json['gdiGroupsGoogle'])
+          : null,
+      lastRegisteredTokenCdcUpdate: json['lastRegisteredTokenCdcUpdate'] != null
+          ? DateTime.parse(json['lastRegisteredTokenCdcUpdate'])
+          : null,
     );
   }
 
@@ -110,7 +162,15 @@ class UserData extends HiveObject {
           .toList(),
       'profileType': profileType?.toString().split('.').last,
       'shortcutRoutes': shortcutRoutes,
+      'gdiGroupsGoogle': gdiGroupsGoogle?.toJson(),
+      'lastRegisteredTokenCdcUpdate':
+          lastRegisteredTokenCdcUpdate?.toIso8601String(),
     };
+  }
+
+  @override
+  String toString() {
+    return 'UserData(name: $name, nomesocial: $nomesocial, matricula: $matricula, iduff: $iduff, curso: $curso, dataValidadeMatricula: $dataValidadeMatricula, bond: $bond, textoQrCodeCarteirinha: $textoQrCodeCarteirinha,  bondId: $bondId, gdiGroups: $gdiGroups, gdiGroupsGoogle: $gdiGroupsGoogle, lastRegisteredTokenCdcUpdate: $lastRegisteredTokenCdcUpdate)';
   }
 }
 
@@ -120,16 +180,60 @@ class GdiGroups {
   String? gid; //Id do grupo
   @HiveField(1)
   String? description;
+  @HiveField(2)
+  String? name;
+  @HiveField(3)
+  String? email;
+  @HiveField(4)
+  String? directMembersCount;
 
-  GdiGroups(this.gid, this.description);
+  GdiGroups(this.gid, this.description, this.name, this.email, this.directMembersCount);
 
   GdiGroups.fromJson(Map<String, dynamic> json) {
-    gid = json['gid'];
+    gid = json['gid'] ?? json['id'];
     description = json['descricao'];
+    name = json['name'];
+    email = json['email'];
+    directMembersCount = json['directMembersCount'];
   }
 
   @override
   String toString() {
     return "Group(gid: $gid, descicao: $description)";
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'gid': gid, 'descricao': description, 'name': name, 'email': email, 'directMembersCount': directMembersCount};
+  }
+}
+
+@HiveType(typeId: 33)
+class GdiGroupsGoogle {
+  @HiveField(0)
+  DateTime? lastUpdate;
+  @HiveField(1)
+  List<GdiGroups>? gdiGroups;
+
+  GdiGroupsGoogle(this.lastUpdate, this.gdiGroups);
+
+  GdiGroupsGoogle.fromJson(Map<String, dynamic> json) {
+    lastUpdate = json['lastUpdate'] != null
+        ? DateTime.parse(json['lastUpdate'])
+        : null;
+    gdiGroups = json['gdiGroups'] != null
+        ? (json['gdiGroups'] as List)
+              .map((group) => GdiGroups.fromJson(group))
+              .toList()
+        : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+
+    data['lastUpdate'] = lastUpdate?.toIso8601String();
+
+    data['gdiGroups'] = gdiGroups?.map((group) => group.toJson()).toList();
+
+    return data;
   }
 }

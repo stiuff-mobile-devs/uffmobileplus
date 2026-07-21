@@ -114,10 +114,11 @@ class UserDataController extends GetxController {
         accessToken: accessToken,
         profileType: profileType,
         shortcutRoutes: existingUserData?.shortcutRoutes,
+        gdiGroupsGoogle: existingUserData?.gdiGroupsGoogle,
       );
       return await _userDataRepository.saveUserData(userData);
     } catch (e) {
-      throw Exception("Erro ao salvar dados do usuário: $e"); 
+      throw Exception("Erro ao salvar dados do usuário: $e");
     }
   }
 
@@ -130,13 +131,18 @@ class UserDataController extends GetxController {
     return groups;
   }
 
-   Future<String> updateQrData() async {
+  Future<String> updateQrData() async {
     String? token = await _auth.getAccessToken();
     String? iduffUsuario = await userIduffRepository.getIduff();
 
-    var textoQrCode = await _userDataRepository.getSaciData(token, iduffUsuario, _auth) ;
+    var textoQrCode = await _userDataRepository.getSaciData(
+      token,
+      iduffUsuario,
+      _auth,
+    );
     return await _userDataRepository.updateQrData(textoQrCode[0]);
   }
+
   //Se ele não achar tem que colocar um -
   int? _findActiveBond(UserUmmModel userUmm, String targetMatricula) {
     final bondsList = userUmm.activeBond?.objects?.outerObject?[1].innerObjects;

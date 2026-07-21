@@ -29,6 +29,7 @@ class HiveService {
       Hive.registerAdapter(TranscriptAdapter());
       Hive.registerAdapter(TranscriptDisciplineAdapter());
       Hive.registerAdapter(OperatorTransactionOfflineAdapter());
+      Hive.registerAdapter(GdiGroupsGoogleAdapter());
     } catch (e, st) {
       debugPrint('Hive init/register adapters error: $e\n$st');
     }

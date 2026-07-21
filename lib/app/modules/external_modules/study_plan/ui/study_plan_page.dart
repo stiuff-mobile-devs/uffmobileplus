@@ -35,7 +35,8 @@ class StudyPlanPage extends GetView<StudyPlanController> {
         ),
         body: controller.isLoading
             ? Center(child: CustomProgressDisplay())
-            : (controller.studyPlan?.plan == null
+            : ((controller.studyPlan?.plan == null ||
+                      controller.studyPlan!.plan!.isEmpty)
                   ? Center(child: Text('no_study_plan_info'.tr,
                                   style: TextStyle(color: Colors.white)))
                   : _tabViewWidget(controller.getStudyPlan())),

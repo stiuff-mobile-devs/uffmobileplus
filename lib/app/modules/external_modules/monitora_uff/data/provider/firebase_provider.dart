@@ -5,19 +5,16 @@ import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/l
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_model.dart';
 
 class FirebaseProvider {
-  final String firebaseAppName = 'uffmobileplus';
-  final String firestoreDatabaseId = 'monitora-uff';
+  final String firebaseAppName = 'harpia';
 
   CollectionReference get collectionRef => FirebaseFirestore.instanceFor(
     app: Firebase.app(firebaseAppName),
-    databaseId: firestoreDatabaseId,
   ).collection('usuarios');
 
   Future<void> adicionarDados(UserModel userLocation) async {
     // 1. Instanciar o Firestore com o app específico e banco de dados
     FirebaseFirestore firestore = FirebaseFirestore.instanceFor(
       app: Firebase.app(firebaseAppName),
-      databaseId: firestoreDatabaseId,
     );
 
     // 2. Referenciar a coleção e adicionar dados
@@ -41,14 +38,11 @@ class FirebaseProvider {
   Future<void> setUser(UserModel user) async {
     FirebaseFirestore firestore = FirebaseFirestore.instanceFor(
       app: Firebase.app(firebaseAppName),
-      databaseId: firestoreDatabaseId,
     );
 
     try {
       await firestore.collection('usuarios').doc(user.email).set(user.toMap());
-
-      // TODO: um print é o melhor aqui?
-      if (kDebugMode) print("Usuário criado com sucesso!");
+      debugPrint("Usuário criado com sucesso!");
     } catch (e) {
       throw Exception("Erro ao criar usuário!");
     }
@@ -82,6 +76,22 @@ class FirebaseProvider {
     }
   }
 
+  Stream<List<UserModel>> getAllUsers() {
+    try {
+      return collectionRef.snapshots().map((QuerySnapshot query) {
+        List<UserModel> users = [];
+        for (var doc in query.docs) {
+          final user = UserModel.fromMap(doc.data() as Map<String, dynamic>);
+          if (user.timestamp == null) continue;
+          users.add(user);
+        }
+        return users;
+      });
+    } catch (e) {
+      throw Exception("Erro ao buscar todos os usuários: $e");
+    }
+  }
+
   Future<UserModel?> getUserByEmail(String email) async {
     try {
       final DocumentSnapshot doc = await collectionRef.doc(email).get();
@@ -101,9 +111,7 @@ class FirebaseProvider {
   Future<void> updateIsTracked(String email, bool isTracked) async {
     try {
       await collectionRef.doc(email).update({'isTracked': isTracked});
-      if (kDebugMode) {
-        print("Campo isTracked atualizado com sucesso!");
-      }
+      debugPrint("Campo isTracked atualizado com sucesso!");
     } catch (e) {
       throw Exception("Erro ao atualizar isTracked: $e");
     }
@@ -112,20 +120,15 @@ class FirebaseProvider {
   Future<void> updateHeartbeat(String email) async {
     try {
       await collectionRef.doc(email).update({'timestamp': DateTime.now()});
-      if (kDebugMode) {
-        print("Heartbeat atualizado com sucesso!");
-      }
+      debugPrint("Heartbeat atualizado com sucesso!");
     } catch (e) {
-      if (kDebugMode) {
-        print("Erro ao atualizar heartbeat: $e");
-      }
+      debugPrint("Erro ao atualizar heartbeat: $e");
     }
   }
 
   Future<void> updateLocationAndTimestamp({
     required String email,
     required String nome,
-    required String funcao,
     required double lat,
     required double lng,
     required DateTime timestamp,
@@ -134,7 +137,6 @@ class FirebaseProvider {
       await collectionRef.doc(email).update({
         'email': email,
         'nome': nome,
-        'funcao': funcao,
         'lat': lat,
         'lng': lng,
         'timestamp': timestamp,

@@ -46,12 +46,12 @@ class ChooseProfileController extends GetxController {
   void onInit() async {
     super.onInit();
     _userDataController = Get.find<UserDataController>();
-    iduff = Get.arguments;
-    await getUserData();
+    iduff = await userIduffRepository.getIduff();
+    await _getUserData();
     await fetchData();
   }
 
-  Future<void> getUserData() async {
+  Future<void> _getUserData() async {
     _user = (await userDataRepository.getUserData()) ?? UserData();
     _userDataLoaded.value = true;
     _checkControlPermission();
@@ -236,10 +236,7 @@ class ChooseProfileController extends GetxController {
       colorText: Colors.white,
       borderRadius: 12,
       margin: const EdgeInsets.all(12),
-      icon: const Icon(
-        Icons.error_outline,
-        color: Colors.redAccent,
-      ),
+      icon: const Icon(Icons.error_outline, color: Colors.redAccent),
     );
   }
 
@@ -254,7 +251,6 @@ class ChooseProfileController extends GetxController {
   void _logoutIduff() {
     userIduffRepository.deleteUserIduffModel();
     userUmmRepository.deleteUserUmmModel();
-    userDataRepository.clearAllUserData();
     Get.offAllNamed(Routes.LOGIN);
   }
 }

@@ -1,4 +1,4 @@
-import 'package:uffmobileplus/app/data/services/connections/sctm_service.dart';
+import 'package:uffmobileplus/app/data/connections/sctm_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/area.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/operator_transaction.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/operator_transaction_offline.dart';
@@ -56,8 +56,33 @@ class CatracaOnlineRepository {
     return await catracaOnlineProvider.deleteOperatorTransactionOffline(id);
   }
 
-  Future<List<OperatorTransactionOffline>>
-  getOperatorTransactionsFromFirebase(String iduffOperator) async {
-    return await catracaOnlineProvider.getOperatorTransactionsFromFirebase(iduffOperator);
+  Future<List<OperatorTransactionOffline>> getOperatorTransactionsFromFirebase(
+    String operatorEmail,
+  ) async {
+    return await catracaOnlineProvider.getOperatorTransactionsFromFirebase(
+      operatorEmail,
+    );
+  }
+
+  Future<void> cleanMore24hTransactionsOffline() async {
+    return await catracaOnlineProvider.cleanMore24hTransactionsOffline();
+  }
+
+  Future<bool> isTransactionDuplicated(
+    String id,
+    DateTime dateTimeToCheck,
+  ) async {
+    return await catracaOnlineProvider.isTransactionDuplicated(
+      id,
+      dateTimeToCheck,
+    );
+  }
+
+  Future<void> saveOperatorTransactionsOfflineBatch(
+    List<OperatorTransactionOffline> transactions,
+  ) async {
+    return await catracaOnlineProvider.saveOperatorTransactionsOfflineBatch(
+      transactions,
+    );
   }
 }

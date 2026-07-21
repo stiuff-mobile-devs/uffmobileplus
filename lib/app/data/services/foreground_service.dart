@@ -8,6 +8,9 @@ import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/data/pro
 import 'package:uffmobileplus/firebase_options_uffmobileplus.dart';
 
 Timer? _heartbeatTimer;
+int interval = 5;
+int distance = 10;
+int heartbeatInterval = 5;
 
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
@@ -23,7 +26,7 @@ void onStart(ServiceInstance service) async {
 
   service.on('setUserInfo').listen((event) {
     if (event != null) {
-      updateLocation(service, event['email'], event['name'], event['funcao']);
+      updateLocation(service, event['email'], event['name']);
     }
   });
 
@@ -38,33 +41,33 @@ Future<bool> onIosBackground(ServiceInstance service) async {
 }
 
 // TODO: passar UserModel para essa função em vez de email, nome.
-void updateLocation(ServiceInstance service, String email, String name, String funcao) {
+void updateLocation(ServiceInstance service, String email, String name) {
   // Configuração do GPS
   late LocationSettings locationSettings;
 
   if (Platform.isAndroid) {
     locationSettings = AndroidSettings(
-      accuracy: LocationAccuracy.high, // TODO: testar outros valores aqui
-      distanceFilter: 10, // Só atualiza se mover mais de 10 metros
-      intervalDuration: Duration(seconds: 5),
+      accuracy: LocationAccuracy.high,
+      distanceFilter: distance, // Só atualiza se mover mais de `distance` metros
+      intervalDuration: Duration(minutes: interval),
     );
   } else if (Platform.isIOS) {
     locationSettings = AppleSettings(
       accuracy: LocationAccuracy.high,
       activityType: ActivityType.other,
-      distanceFilter: 10,
+      distanceFilter: distance,
       pauseLocationUpdatesAutomatically: true,
       showBackgroundLocationIndicator: true,
     );
   } else {
     locationSettings = LocationSettings(
       accuracy: LocationAccuracy.high,
-      distanceFilter: 10,
+      distanceFilter: distance,
     );
   }
 
   _heartbeatTimer?.cancel();
-  _heartbeatTimer = Timer.periodic(const Duration(minutes: 1), (timer) async {
+  _heartbeatTimer = Timer.periodic(Duration(minutes: heartbeatInterval), (timer) async {
     if (await FirebaseProvider().doesDocumentExist(email)) {
       await FirebaseProvider().updateHeartbeat(email);
     }
@@ -82,7 +85,6 @@ void updateLocation(ServiceInstance service, String email, String name, String f
       await FirebaseProvider().updateLocationAndTimestamp(
         email: email,
         nome: name,
-        funcao: funcao,
         lat: position.latitude,
         lng: position.longitude,
         timestamp: DateTime.now(),

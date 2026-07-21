@@ -15,8 +15,20 @@ class AuthGoogleService {
   );
   final UserGoogleRepository _userRepository = UserGoogleRepository();
 
-  final FirebaseApp _app = Firebase.app('uffmobileplus');
-  late final fb.FirebaseAuth _auth = fb.FirebaseAuth.instanceFor(app: _app);
+  final FirebaseApp _uffMobileapp = Firebase.app('uffmobileplus');
+  late final fb.FirebaseAuth _uffMobileAuth = fb.FirebaseAuth.instanceFor(
+    app: _uffMobileapp,
+  );
+
+  final FirebaseApp _harpiaApp = Firebase.app('harpia');
+  late final fb.FirebaseAuth _harpiaAuth = fb.FirebaseAuth.instanceFor(
+    app: _harpiaApp,
+  );
+
+  final FirebaseApp _catracaApp = Firebase.app('catraca');
+  late final fb.FirebaseAuth _catracaAuth = fb.FirebaseAuth.instanceFor(
+    app: _catracaApp,
+  );
 
   AuthGoogleService();
 
@@ -37,7 +49,32 @@ class AuthGoogleService {
       final authCredential = fb.GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
       );
-      var userCredential = await _auth.signInWithCredential(authCredential);
+
+      var userCredential = await _uffMobileAuth.signInWithCredential(
+        authCredential,
+      );
+      //Loga nos outros firebaes
+      try {
+        var userCredentialHarpia = await _harpiaAuth.signInWithCredential(
+          authCredential,
+        );
+        debugPrint(
+          'Logado com sucesso no Firebase Harpia: ${userCredentialHarpia.user?.uid}',
+        );
+      } catch (e) {
+        debugPrint('Error logging into other Firebase apps: $e');
+      }
+
+      try {
+        var userCredentialCatraca = await _catracaAuth.signInWithCredential(
+          authCredential,
+        );
+        debugPrint(
+          'Logado com sucesso no Firebase Catraca: ${userCredentialCatraca.user?.uid}',
+        );
+      } catch (e) {
+        debugPrint('Error logging into other Firebase apps: $e');
+      }
 
       return await _createUserDoc(userCredential);
     } catch (e) {
@@ -81,17 +118,18 @@ class AuthGoogleService {
 
   Future<void> logoutGoogle() async {
     await _googleSignIn.signOut();
-    await _auth.signOut();
+    await _uffMobileAuth.signOut();
+    await _harpiaAuth.signOut();
   }
 
   Future<String?> getFirebaseIdToken() async {
-  // Pega o usuário logado atualmente no Firebase
-  final user = _auth.currentUser;
-  
-  if (user != null) {
-    // getIdToken(true) força a atualização do token caso ele esteja expirado
-    return await user.getIdToken(true); 
+    // Pega o usuário logado atualmente no Firebase
+    final user = _uffMobileAuth.currentUser;
+
+    if (user != null) {
+      // getIdToken(true) força a atualização do token caso ele esteja expirado
+      return await user.getIdToken(true);
+    }
+    return null;
   }
-  return null;
-}
 }

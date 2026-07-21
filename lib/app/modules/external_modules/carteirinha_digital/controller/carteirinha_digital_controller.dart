@@ -19,7 +19,7 @@ class CarteirinhaDigitalController extends GetxController {
   String getUserMatricula() => _externalModulesServices.getUserMatricula();
   String getUserIdUFF() => _externalModulesServices.getUserIdUFF();
   String getUserCourse() => _externalModulesServices.getUserCourse();
-  String getUserPhotoUrl() => _externalModulesServices.getUserPhotoUrl();
+  String? getUserPhotoUrl() => _externalModulesServices.getUserPhotoUrl();
   String getUserValidity() => _externalModulesServices.getUserValidity();
   String getUserBond() => _externalModulesServices.getUserBond();
   Future<String> getQrCodeData() => _externalModulesServices.getQrCodeData();

@@ -96,7 +96,7 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                       SizedBox(
                         height: 140,
                         child: CachedNetworkImage(
-                          imageUrl: controller.getUserPhotoUrl(),
+                          imageUrl: controller.getUserPhotoUrl() ?? "",
                           progressIndicatorBuilder:
                               (context, url, downloadProgress) =>
                                   CircularProgressIndicator(
@@ -277,11 +277,9 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
         Obx(
           () => controller.isQrCodeLoading.value
               ? Center(child: CircularProgressIndicator())
-              :
-              controller.qrCodeData.isEmpty
-                  ? SizedBox.shrink()
-                  : 
-              QrImageView(
+              : controller.qrCodeData.isEmpty
+              ? SizedBox.shrink()
+              : QrImageView(
                   data: controller.qrCodeData,
                   version: QrVersions.auto,
                 ),
