@@ -59,8 +59,8 @@ class ExternalModulesServices extends GetxService {
     return _userData.curso ?? "";
   }
 
-  String getUserPhotoUrl() {
-    return _userData.fotoUrl ?? "";
+  String? getUserPhotoUrl() {
+    return _userData.fotoUrl;
   }
 
   String getUserValidity() {
@@ -91,8 +91,16 @@ class ExternalModulesServices extends GetxService {
     return _userData.gdiGroups;
   }
 
-  String getUserEmailGoogle() {
+  String? getUserEmailGoogle() {
     return _userGoogleModel.email;
+  }
+
+  String? getUserNameGoogle() {
+    return _userGoogleModel.name ?? "";
+  }
+
+  String? getUserPhotoUrlGoogle() {
+    return _userGoogleModel.urlImage ?? "";
   }
 
   bool isInGroup(GdiGroupsEnum gdiGroup) {

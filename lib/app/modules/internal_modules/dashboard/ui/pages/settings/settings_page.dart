@@ -19,15 +19,8 @@ class SettingsPage extends StatelessWidget {
             child: CustomScrollView(
               slivers: [
                 _sliverAppBar('configuracoes'.tr),
+
                 // TODO: substituir por SettingsItem
-                _settingsItem(
-                  Icons.info_outline,
-                  'sobre'.tr,
-                  'sobre_descricao'.tr,
-                  onTap: () {
-                    Get.toNamed(Routes.ABOUT);
-                  },
-                ),
                 SettingsItem(
                   icon: Icon(Icons.language, color: Colors.white),
                   main: DropdownButton<Locale>(

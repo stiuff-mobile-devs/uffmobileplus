@@ -36,7 +36,7 @@ class PayRestaurantController extends GetxController {
 
     userName = externalModulesServices.getUserName() ?? "";
     userIdUFF = externalModulesServices.getUserIdUFF();
-    userImageUrl = externalModulesServices.getUserPhotoUrl();
+    userImageUrl = externalModulesServices.getUserPhotoUrl() ?? "";
 
     getUserBalance();
 

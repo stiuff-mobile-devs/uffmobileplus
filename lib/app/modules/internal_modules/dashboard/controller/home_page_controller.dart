@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:googleapis/driveactivity/v2.dart';
 import 'package:uffmobileplus/app/data/services/app_availability_service.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/data/services/deep_link_service.dart';
@@ -15,18 +14,27 @@ import 'package:uffmobileplus/app/modules/external_modules/study_plan/data/repos
 import 'package:uffmobileplus/app/modules/external_modules/transcript/data/models/transcript_model.dart';
 import 'package:uffmobileplus/app/modules/external_modules/transcript/data/repository/transcript_repository.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/external_modules_controller.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
 import 'package:uffmobileplus/app/ui/widgets/app_recommendation_dialog.dart';
 
 class HomePageController extends GetxController {
+  UserDataRepository userDataRepository = UserDataRepository();
+  final StudyPlanRepository _studyPlanRepository = StudyPlanRepository();
+  final TranscriptRepository _transcriptRepository = TranscriptRepository();
+
+  late ExternalModulesServices _externalModulesServices;
+  late ResponsiveLayoutService _layoutService;
+
+  late ExternalModulesController _externalModulesController;
+  late RestaurantModulesController _restaurantModulesController;
+  late RestaurantsController _restaurantsController;
 
   RxBool isLoading = false.obs;
 
-  final userName = '-'.obs;
-  final userMatricula = '-'.obs;
-  final userEmail = '-'.obs;
-  final userCourse = '-'.obs;
+  final userName = ''.obs;
+  final userMatricula = ''.obs;
+  final userEmail = ''.obs;
+  final userCourse = ''.obs;
   final userPhotoUrl = ''.obs;
 
   final shortcutRoutes = <String>[].obs;
@@ -43,63 +51,9 @@ class HomePageController extends GetxController {
   final RxBool isLoadingCampusMeals = true.obs;
   final RxList<TodayCampusMeal> campusMeals = <TodayCampusMeal>[].obs;
 
-  late ExternalModulesServices _externalModulesServices;
-  late ExternalModulesController _externalModulesController;
-  UserDataRepository userDataRepository = UserDataRepository();
-  late RestaurantModulesController _restaurantModulesController;
-  late RestaurantsController _restaurantsController;
-  late ResponsiveLayoutService _layoutService;
-
-  final StudyPlanRepository _studyPlanRepository = StudyPlanRepository();
-  final TranscriptRepository _transcriptRepository = TranscriptRepository();
-
   late Worker _servicesWorker;
 
   ResponsiveLayoutService get layoutService => _layoutService;
-
-  List<DashboardShortcut> get allShortcutItems {
-    final byRoute = <String, DashboardShortcut>{};
-
-    for (final service in allServices) {
-      byRoute[service.page] = DashboardShortcut(
-        iconSrc: service.iconSrc,
-        subtitle: service.subtitle,
-        page: service.page,
-        url: service.url,
-        interrogation: service.interrogation,
-      );
-    }
-
-    for (final module in restaurantModules) {
-      byRoute[module.page] = DashboardShortcut(
-        iconSrc: module.iconSrc,
-        subtitle: module.subtitle,
-        page: module.page,
-        url: module.url,
-        interrogation: module.interrogation,
-      );
-    }
-
-    return byRoute.values.toList(growable: false);
-  }
-
-  Set<String> get allShortcutRoutes => allShortcutItems
-      .map((shortcut) => shortcut.page)
-      .toSet();
-
-  Map<String, DashboardShortcut> get shortcutsByRoute => {
-    for (final item in allShortcutItems) item.page: item,
-  };
-
-  List<ExternalModules> get allServices => List<ExternalModules>.from(
-    _externalModulesController.externalModulesList,
-  );
-
-  List<RestaurantModules> get restaurantModules => List<RestaurantModules>.from(
-    _restaurantModulesController.restaurantModulesList,
-  );
-
-
 
   @override
   void onInit() {
@@ -116,6 +70,17 @@ class HomePageController extends GetxController {
       _loadTodayClasses();
       _loadTranscriptStats();
     });
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      DeepLinkService().consumePendingNavigation();
+    });
+
+    _showAppRecommendationDialog();
   }
 
   WeekDay? _weekDayForToday() {
@@ -192,7 +157,8 @@ class HomePageController extends GetxController {
             final mealDate = DateTime.tryParse(meal.date.toString());
             if (mealDate == null) continue;
 
-            final isToday = mealDate.year == now.year &&
+            final isToday =
+                mealDate.year == now.year &&
                 mealDate.month == now.month &&
                 mealDate.day == now.day;
 
@@ -215,13 +181,10 @@ class HomePageController extends GetxController {
   void _bindServicesCatalog() {
     _syncShortcutsWithServices();
     // O worker é reativo à lista de serviços externos, garantindo que os atalhos sejam atualizados sempre que a lista de serviços mudar
-    _servicesWorker = everAll(
-      [
-        _externalModulesController.externalModulesList,
-        _restaurantModulesController.restaurantModulesList,
-      ],
-      (_) => _syncShortcutsWithServices(),
-    );
+    _servicesWorker = everAll([
+      _externalModulesController.externalModulesList,
+      _restaurantModulesController.restaurantModulesList,
+    ], (_) => _syncShortcutsWithServices());
   }
 
   // Sincroniza as rotas dos atalhos com os serviços disponíveis
@@ -238,13 +201,18 @@ class HomePageController extends GetxController {
       final validRoutes = allShortcutRoutes;
       final filteredSaved = saved.where(validRoutes.contains).toList();
 
+      const defaultShortcuts = <String>[
+        '/carteirinha_digital',
+        '/pay_restaurant',
+      ];
+
       // Corrige contas que ficaram com todos os serviços marcados como atalho
       // por um bug anterior que pré-selecionava tudo por padrão.
-      final looksAutoSeeded = validRoutes.isNotEmpty &&
-          filteredSaved.length == validRoutes.length;
+      final looksAutoSeeded =
+          validRoutes.isNotEmpty && filteredSaved.length == validRoutes.length;
 
-      if (looksAutoSeeded) {
-        shortcutRoutes.clear();
+      if (looksAutoSeeded || filteredSaved.isEmpty) {
+        shortcutRoutes.assignAll(defaultShortcuts);
         await _persistShortcuts();
       } else {
         shortcutRoutes.assignAll(filteredSaved);
@@ -260,19 +228,29 @@ class HomePageController extends GetxController {
     } catch (_) {}
   }
 
-   Future<void> _loadProfileData() async {
+  Future<void> _loadProfileData() async {
     try {
       isLoading.value = true;
       _externalModulesServices = Get.find<ExternalModulesServices>();
-      await _externalModulesServices.initialize();
 
-      userName.value = _externalModulesServices.getUserName() ?? '-';
+      String email = '';
+
+      userName.value =
+          _externalModulesServices.getUserName() ??
+          _externalModulesServices.getUserNameGoogle() ??
+          "";
       userMatricula.value = _externalModulesServices.getUserMatricula();
       userCourse.value = _externalModulesServices.getUserCourse();
-      userPhotoUrl.value = _externalModulesServices.getUserPhotoUrl();
-
-      final email = await _externalModulesServices.getEmail();
-      userEmail.value = email.isNotEmpty ? email : '-';
+      userPhotoUrl.value =
+          _externalModulesServices.getUserPhotoUrl() ??
+          _externalModulesServices.getUserPhotoUrlGoogle() ??
+          "";
+      try {
+        email = await _externalModulesServices.getEmail();
+      } catch (e) {}
+      userEmail.value = email.isNotEmpty
+          ? email
+          : _externalModulesServices.getUserEmailGoogle() ?? "";
     } catch (_) {
       userName.value = '-';
       userMatricula.value = '-';
@@ -318,19 +296,6 @@ class HomePageController extends GetxController {
     );
   }
 
- 
-
-  @override
-  void onReady() {
-    super.onReady();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      DeepLinkService().consumePendingNavigation();
-    });
-
-    _showAppRecommendationDialog();
-  }
-
   Future<void> _showAppRecommendationDialog() async {
     final result = await AppAvailabilityService.checkBoth();
 
@@ -339,12 +304,6 @@ class HomePageController extends GetxController {
         await AppRecommendationDialog.show(result);
       }
     } catch (_) {}
-  }
-
-  @override
-  void onClose() {
-    _servicesWorker.dispose();
-    super.onClose();
   }
 
   void _rebuildShortcutCaches() {
@@ -364,6 +323,53 @@ class HomePageController extends GetxController {
         .where((service) => !shortcutRoutes.contains(service.page))
         .toList(growable: false);
     availableToAdd.assignAll(available);
+  }
+
+  List<DashboardShortcut> get allShortcutItems {
+    final byRoute = <String, DashboardShortcut>{};
+
+    for (final service in allServices) {
+      byRoute[service.page] = DashboardShortcut(
+        iconSrc: service.iconSrc,
+        subtitle: service.subtitle,
+        page: service.page,
+        url: service.url,
+        interrogation: service.interrogation,
+      );
+    }
+
+    for (final module in restaurantModules) {
+      byRoute[module.page] = DashboardShortcut(
+        iconSrc: module.iconSrc,
+        subtitle: module.subtitle,
+        page: module.page,
+        url: module.url,
+        interrogation: module.interrogation,
+      );
+    }
+
+    return byRoute.values.toList(growable: false);
+  }
+
+  Set<String> get allShortcutRoutes =>
+      allShortcutItems.map((shortcut) => shortcut.page).toSet();
+
+  Map<String, DashboardShortcut> get shortcutsByRoute => {
+    for (final item in allShortcutItems) item.page: item,
+  };
+
+  List<ExternalModules> get allServices => List<ExternalModules>.from(
+    _externalModulesController.externalModulesList,
+  );
+
+  List<RestaurantModules> get restaurantModules => List<RestaurantModules>.from(
+    _restaurantModulesController.restaurantModulesList,
+  );
+
+  @override
+  void onClose() {
+    _servicesWorker.dispose();
+    super.onClose();
   }
 }
 

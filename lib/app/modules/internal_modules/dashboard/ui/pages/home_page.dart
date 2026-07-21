@@ -7,14 +7,13 @@ import 'package:uffmobileplus/app/modules/external_modules/study_plan/data/model
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/home_page_controller.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
-import 'package:uffmobileplus/app/utils/custom_drawer.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/dashboard/utils/custom_drawer.dart';
 import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.dart';
 
 class HomePage extends GetView<HomePageController> {
   const HomePage({super.key});
 
-  static const ResponsiveGridConfig _shortcutGridConfig =
-      ResponsiveGridConfig(
+  static const ResponsiveGridConfig _shortcutGridConfig = ResponsiveGridConfig(
     breakpoints: [
       ResponsiveGridBreakpoint(
         maxWidth: 360,
@@ -83,7 +82,7 @@ class HomePage extends GetView<HomePageController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: CustomDrawer(),//_buildDrawer(context),
+      drawer: CustomDrawer(), //_buildDrawer(context),
       appBar: AppBar(
         centerTitle: true,
         elevation: 8,
@@ -106,12 +105,14 @@ class HomePage extends GetView<HomePageController> {
       body: Obx(() {
         final layoutService = controller.layoutService;
         final safeBottom = MediaQuery.of(context).padding.bottom;
-        final bottomPadding =
-            layoutService.bottomPadding(safeBottom: safeBottom);
+        final bottomPadding = layoutService.bottomPadding(
+          safeBottom: safeBottom,
+        );
         final isLoading = controller.isLoading.value;
         final isRemoving = controller.isRemovingShortcuts.value;
-        final savedShortcuts =
-            controller.savedShortcuts.toList(growable: false);
+        final savedShortcuts = controller.savedShortcuts.toList(
+          growable: false,
+        );
 
         return Container(
           width: double.infinity,
@@ -134,13 +135,23 @@ class HomePage extends GetView<HomePageController> {
                         physics: const BouncingScrollPhysics(),
                         slivers: [
                           SliverPadding(
+                            padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                            sliver: SliverToBoxAdapter(
+                              child: _buildStudyPlanSection(),
+                            ),
+                          ),
+                          SliverPadding(
+                            padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+                            sliver: SliverToBoxAdapter(
+                              child: _buildRestauranteSection(),
+                            ),
+                          ),
+                          SliverPadding(
                             padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
                             sliver: SliverToBoxAdapter(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  _buildUpdateBanner(),
-                                  const SizedBox(height: 18),
                                   Row(
                                     children: [
                                       Expanded(
@@ -160,10 +171,12 @@ class HomePage extends GetView<HomePageController> {
                                         icon: Container(
                                           padding: const EdgeInsets.all(4),
                                           decoration: BoxDecoration(
-                                            color:
-                                                Colors.white.withOpacity(0.12),
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                            color: Colors.white.withOpacity(
+                                              0.12,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
                                           ),
                                           child: const Icon(
                                             Icons.add,
@@ -181,9 +194,12 @@ class HomePage extends GetView<HomePageController> {
                                           decoration: BoxDecoration(
                                             color: isRemoving
                                                 ? Colors.red.withOpacity(0.25)
-                                                : Colors.white.withOpacity(0.12),
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+                                                : Colors.white.withOpacity(
+                                                    0.12,
+                                                  ),
+                                            borderRadius: BorderRadius.circular(
+                                              10,
+                                            ),
                                           ),
                                           child: const Icon(
                                             Icons.remove,
@@ -210,45 +226,35 @@ class HomePage extends GetView<HomePageController> {
                           SliverPadding(
                             padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                             sliver: SliverGrid(
-                              delegate: SliverChildBuilderDelegate(
-                                (context, index) {
-                                  final item = savedShortcuts[index];
-                                  return _ShortcutCard(
-                                    key: ValueKey(item.page),
-                                    item: item,
-                                    layoutSpec: layoutSpec,
-                                    isRemoveMode: isRemoving,
-                                    onTap: () {
-                                      if (isRemoving) {
-                                        controller.removeShortcut(item);
-                                        return;
-                                      }
+                              delegate: SliverChildBuilderDelegate((
+                                context,
+                                index,
+                              ) {
+                                final item = savedShortcuts[index];
+                                return _ShortcutCard(
+                                  key: ValueKey(item.page),
+                                  item: item,
+                                  layoutSpec: layoutSpec,
+                                  isRemoveMode: isRemoving,
+                                  onTap: () {
+                                    if (isRemoving) {
+                                      controller.removeShortcut(item);
+                                      return;
+                                    }
 
-                                      controller.openShortcut(item);
-                                    },
-                                  );
-                                },
-                                childCount: savedShortcuts.length,
-                              ),
+                                    controller.openShortcut(item);
+                                  },
+                                );
+                              }, childCount: savedShortcuts.length),
                               gridDelegate:
                                   SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: layoutSpec.crossAxisCount,
-                                crossAxisSpacing: layoutSpec.crossAxisSpacing,
-                                mainAxisSpacing: layoutSpec.mainAxisSpacing,
-                                childAspectRatio: layoutSpec.childAspectRatio,
-                              ),
-                            ),
-                          ),
-                          SliverPadding(
-                            padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-                            sliver: SliverToBoxAdapter(
-                              child: _buildRestauranteSection(),
-                            ),
-                          ),
-                          SliverPadding(
-                            padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-                            sliver: SliverToBoxAdapter(
-                              child: _buildStudyPlanSection(),
+                                    crossAxisCount: layoutSpec.crossAxisCount,
+                                    crossAxisSpacing:
+                                        layoutSpec.crossAxisSpacing,
+                                    mainAxisSpacing: layoutSpec.mainAxisSpacing,
+                                    childAspectRatio:
+                                        layoutSpec.childAspectRatio,
+                                  ),
                             ),
                           ),
                           SliverPadding(
@@ -523,8 +529,9 @@ class HomePage extends GetView<HomePageController> {
       final isLoading = controller.isLoadingTranscript.value;
       final chCursada = stats?.chCursada ?? 0;
       final chTotal = stats?.chTotal ?? 0;
-      final progress =
-          chTotal > 0 ? (chCursada / chTotal).clamp(0.0, 1.0) : 0.0;
+      final progress = chTotal > 0
+          ? (chCursada / chTotal).clamp(0.0, 1.0)
+          : 0.0;
 
       return Material(
         color: Colors.transparent,
@@ -622,12 +629,14 @@ class HomePage extends GetView<HomePageController> {
       ),
       builder: (context) {
         return Obx(() {
-          final remainingServices =
-              controller.availableToAdd.toList(growable: false);
+          final remainingServices = controller.availableToAdd.toList(
+            growable: false,
+          );
           final layoutService = controller.layoutService;
           final safeBottom = MediaQuery.of(context).padding.bottom;
-          final bottomPadding =
-              layoutService.bottomPadding(safeBottom: safeBottom);
+          final bottomPadding = layoutService.bottomPadding(
+            safeBottom: safeBottom,
+          );
 
           return SafeArea(
             bottom: false,
@@ -699,8 +708,6 @@ class HomePage extends GetView<HomePageController> {
       },
     );
   }
-
-
 }
 
 class _CampusMealCard extends StatelessWidget {
@@ -823,10 +830,7 @@ class _ShortcutCard extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _ServiceIcon(
-                    iconSrc: item.iconSrc,
-                    layoutSpec: layoutSpec,
-                  ),
+                  _ServiceIcon(iconSrc: item.iconSrc, layoutSpec: layoutSpec),
                   SizedBox(height: layoutSpec.iconLabelSpacing),
                   Text(
                     item.subtitle,

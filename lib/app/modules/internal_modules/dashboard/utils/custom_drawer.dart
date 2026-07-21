@@ -8,7 +8,6 @@ import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 
-
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
 
@@ -73,15 +72,17 @@ class CustomDrawer extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    'Matrícula: ${controller.userMatricula.value}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.82),
-                      fontSize: 12,
+                  if (controller.userMatricula.value.isNotEmpty ||
+                      controller.userMatricula.value != '')
+                    Text(
+                      'Matrícula: ${controller.userMatricula.value}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.82),
+                        fontSize: 12,
+                      ),
                     ),
-                  ),
                   Text(
                     controller.userEmail.value,
                     maxLines: 1,
@@ -91,15 +92,17 @@ class CustomDrawer extends StatelessWidget {
                       fontSize: 12,
                     ),
                   ),
-                  Text(
-                    controller.userCourse.value,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.72),
-                      fontSize: 12,
+                  if (controller.userCourse.value.isNotEmpty ||
+                      controller.userCourse.value != '')
+                    Text(
+                      controller.userCourse.value,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.72),
+                        fontSize: 12,
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
