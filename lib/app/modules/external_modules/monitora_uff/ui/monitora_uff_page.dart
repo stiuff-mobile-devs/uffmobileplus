@@ -318,6 +318,7 @@ class MonitoraUFFPage extends StatelessWidget {
               children: [
                 if (isCurrentUser)
                   Obx(() {
+                    if (!trackingCtrl.isTrackingEnabled.value) return const SizedBox.shrink();
                     final heading = trackingCtrl.heading.value;
                     if (heading == null) return const SizedBox.shrink();
 
