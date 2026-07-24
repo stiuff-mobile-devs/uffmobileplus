@@ -121,7 +121,7 @@ class HomePage extends GetView<HomePageController> {
             gradient: AppColors.darkBlueToBlackGradient(),
           ),
           child: isLoading
-              ? const Center(child: CustomProgressDisplay())
+              ? const SizedBox.expand(child: CustomProgressDisplay())
               : SafeArea(
                   bottom: false,
                   child: LayoutBuilder(
@@ -284,102 +284,6 @@ class HomePage extends GetView<HomePageController> {
     );
   }
 
-  Widget _buildUpdateBanner() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: const LinearGradient(
-          colors: [Color(0xFF5EE5FF), Color(0xFF2EA1FF), Color(0xFF0B4CD8)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x5533AAFF),
-            blurRadius: 20,
-            offset: Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            top: -24,
-            right: -20,
-            child: Container(
-              height: 90,
-              width: 90,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.20),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: -28,
-            left: -16,
-            child: Container(
-              height: 84,
-              width: 84,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.14),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(999),
-                    color: const Color(0xFF031B53).withOpacity(0.35),
-                  ),
-                  child: const Text(
-                    'NOVA ATUALIZACAO',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.9,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'Bem-vindo a nova atualizacao do UFF Mobile Plus',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    height: 1.2,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Atalhos mais inteligentes, visual renovado e uma navegacao mais rapida para voce.',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.92),
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w500,
-                    height: 1.35,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
@@ -408,8 +312,10 @@ class HomePage extends GetView<HomePageController> {
 
   Widget _buildRestauranteSection() {
     return Obx(() {
-      final meals = controller.campusMeals.toList(growable: false);
-      final isLoading = controller.isLoadingCampusMeals.value;
+      // Proteção contra nulos na lista e no boolean
+      final mealsList = controller.campusMeals;
+      final meals = mealsList != null ? mealsList.toList(growable: false) : [];
+      final isLoading = controller.isLoadingCampusMeals.value ?? false;
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -438,8 +344,9 @@ class HomePage extends GetView<HomePageController> {
           const SizedBox(height: 14),
           SizedBox(
             height: 150,
+            // Substituído SizedBox.expand por Center para evitar quebra de layout
             child: isLoading
-                ? const Center(child: CustomProgressDisplay())
+                ? const Center(child: CustomProgressDisplay(height: 50))
                 : ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: meals.length,
@@ -455,8 +362,12 @@ class HomePage extends GetView<HomePageController> {
 
   Widget _buildStudyPlanSection() {
     return Obx(() {
-      final classes = controller.todayClasses.toList(growable: false);
-      final isLoading = controller.isLoadingTodayClasses.value;
+      // Proteção contra nulos na lista e no boolean
+      final classesList = controller.todayClasses;
+      final classes = classesList != null
+          ? classesList.toList(growable: false)
+          : [];
+      final isLoading = controller.isLoadingTodayClasses.value ?? false;
 
       return Material(
         color: Colors.transparent,
@@ -473,7 +384,11 @@ class HomePage extends GetView<HomePageController> {
                 _buildSectionTitle('Plano de Estudos'),
                 const SizedBox(height: 12),
                 if (isLoading)
-                  const Center(child: CustomProgressDisplay())
+                  // Substituído SizedBox.expand por tamanho fixo dentro da Column
+                  const SizedBox(
+                    height: 100,
+                    child: Center(child: CustomProgressDisplay(height: 50)),
+                  )
                 else if (classes.isEmpty)
                   Text(
                     'Nenhuma aula hoje.',
@@ -494,6 +409,7 @@ class HomePage extends GetView<HomePageController> {
   }
 
   Widget _buildDisciplineRow(Discipline discipline) {
+    // Esse já estava seguro, os nulos já estavam sendo tratados com ??
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -526,7 +442,9 @@ class HomePage extends GetView<HomePageController> {
   Widget _buildHistoricoSection() {
     return Obx(() {
       final stats = controller.transcriptStats.value;
-      final isLoading = controller.isLoadingTranscript.value;
+      // Proteção contra boolean nulo
+      final isLoading = controller.isLoadingTranscript.value ?? false;
+
       final chCursada = stats?.chCursada ?? 0;
       final chTotal = stats?.chTotal ?? 0;
       final progress = chTotal > 0
@@ -548,7 +466,11 @@ class HomePage extends GetView<HomePageController> {
                 _buildSectionTitle('Histórico'),
                 const SizedBox(height: 12),
                 if (isLoading)
-                  const Center(child: CustomProgressDisplay())
+                  // Substituído SizedBox.expand por altura fixa para não explodir a Column
+                  const SizedBox(
+                    height: 80,
+                    child: Center(child: CustomProgressDisplay(height: 50)),
+                  )
                 else if (stats == null)
                   Text(
                     'Dados indisponíveis no momento.',
@@ -583,6 +505,7 @@ class HomePage extends GetView<HomePageController> {
   }
 
   Widget _buildNoticiasSection() {
+    // Essa seção é completamente estática, não há risco de erros nela!
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
