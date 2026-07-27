@@ -81,7 +81,7 @@ class GoogleGroupsController extends GetxController {
       for (final subgroup in subgroups) {
         final groupEmail = subgroup['email'] ?? 'Email indisponível';
         final groupName = subgroup['name'] ?? 'Nome indisponível';
-        final groupDescription = subgroup['description'];// ?? 'Descrição indisponível';
+        final groupDescription = subgroup['description'] ?? 'Descrição indisponível';
         final groupMembers = await _googleService.getGroupEntities(token, groupEmail);
         final isMember = groupMembers.any(
           (m) => m['email']?.toString().trim().toLowerCase() == userEmail.trim().toLowerCase()
