@@ -12,6 +12,9 @@ class GoogleGroupsController extends GetxController {
     app: Firebase.app('uffmobileplus')
   );
 
+  final RxString _loadError = RxString('');
+  RxString get loadError => _loadError;
+
   RxString observedGroup = RxString('Nenhum');
   RxList<GoogleGroupMember> observedMembers = RxList();
 
@@ -22,8 +25,8 @@ class GoogleGroupsController extends GetxController {
 
   /// Lista de grupos que o usuário logado pode observar.
   /// Representa os subgrupos (type == GROUP) de [rootGroupEmail].
-  final RxList<GoogleGroupModel> _googleGroups = RxList<GoogleGroupModel>();
-  List<GoogleGroupModel> get googleGroups => _googleGroups;
+  final RxList<GoogleGroupModel> _observableGoogleGroups = RxList<GoogleGroupModel>();
+  List<GoogleGroupModel> get googleGroups => _observableGoogleGroups;
 
   /// Indica se o carregamento dos grupos já foi concluído.
   final RxBool isLoading = RxBool(true);
@@ -35,9 +38,11 @@ class GoogleGroupsController extends GetxController {
   }
 
   Future<void> _loadGroups() async {
+    _loadError.value = '';
     try {
       final user = _auth.currentUser;
       if (user == null) {
+        _loadError.value = 'not_authenticated';
         debugPrint("Usuário não autenticado.");
         isLoading.value = false;
         return;
@@ -45,6 +50,7 @@ class GoogleGroupsController extends GetxController {
 
       final token = await user.getIdToken(true);
       if (token == null) {
+        _loadError.value = 'no_token';
         debugPrint("Token não disponível.");
         isLoading.value = false;
         return;
@@ -53,6 +59,7 @@ class GoogleGroupsController extends GetxController {
       final userEmail = user.email;
       if (userEmail == null) {
         debugPrint("Email do usuário não disponível.");
+        _loadError.value = 'no_email';
         isLoading.value = false;
         return;
       }
@@ -60,54 +67,45 @@ class GoogleGroupsController extends GetxController {
       // 1. Buscar todas as entidades do grupo raiz 'grupos.harpia@id.uff.br'
       final entities = await _googleService.getGroupEntities(token, rootGroupEmail);
 
-      // 2. Filtrar subgrupos (type == GROUP) de GH
+      // 2. Filtrar entidades para manter apenas subgrupos, i.e.,
+      // ficar apenas com as entidades cujo 'type' == 'GROUP'
+      // e cujo 'email' não começa com 'space/'.
       final subgroups = entities
-        .where((m) => m['type'] == 'GROUP' && !(m['email']?.startsWith('space/')))
+        .where((e) => e['type'] == 'GROUP' && (e['email'] as String?)?.startsWith('space/') != true)
         .toList();
 
       // 3. Para cada subgrupo, verificar se o usuário logado é membro
-      final List<GoogleGroupModel> finalGroups = [];
-      for (final entity in subgroups) {
-        final groupEmail = entity['email'] as String;
-        final groupName = _extractNameFromEmail(groupEmail);
+      // e, se for, adicioná-lo a lista a ser 'finalGroups' que é exibida
+      // na aba de grupos da interface.
+      //final List<GoogleGroupModel> finalGroups = [];
+      for (final subgroup in subgroups) {
+        final groupEmail = subgroup['email'] ?? 'Email indisponível';
+        final groupName = subgroup['name'] ?? 'Nome indisponível';
+        final groupDescription = subgroup['description'] ?? 'Descrição indisponível';
         final groupMembers = await _googleService.getGroupEntities(token, groupEmail);
-        final isMember = groupMembers.any((m) =>
-            m['email'] == userEmail && m['type'] == 'USER');
+        final isMember = groupMembers.any(
+          (m) => m['email']?.toString().trim().toLowerCase() == userEmail.trim().toLowerCase()
+        );
         if (isMember) {
-          finalGroups.add(GoogleGroupModel(
+          _observableGoogleGroups.add(GoogleGroupModel(
             name: groupName,
             email: groupEmail,
-            description: '',
-            members: [],
-            subgroups: [],
+            description: groupDescription,
+            members: [], // TODO
+            subgroups: [], // TODO
           ));
         }
       }
 
-      _googleGroups.assignAll(finalGroups);
-      debugPrint("Usuário é membro de ${finalGroups.length} subgrupo(s).");
-    } catch (e) {
-      debugPrint("Erro ao carregar grupos: $e");
-      _googleGroups.clear();
+      //_observableGoogleGroups.assignAll(finalGroups);
+      //debugPrint("Usuário é membro de ${finalGroups.length} subgrupo(s).");
+    } catch(e, stack) {
+      debugPrint('$e\n$stack');
+      _loadError.value = '$e';
+      _observableGoogleGroups.clear();
     } finally {
       isLoading.value = false;
     }
-  }
-
-  /// Extrai um nome legível a partir do email do grupo.
-  /// Ex: "bombeiros.harpia@id.uff.br" -> "Bombeiros Harpia"
-  String _extractNameFromEmail(String email) {
-    final localPart = email.split('@').first;
-    // Substituir separadores comuns por espaço e capitalizar
-    final words = localPart
-        .replaceAll('.', ' ')
-        .replaceAll('-', ' ')
-        .replaceAll('_', ' ')
-        .split(' ')
-        .where((w) => w.isNotEmpty)
-        .map((w) => w[0].toUpperCase() + w.substring(1))
-        .toList();
-    return words.join(' ');
   }
 
   /// Mapeia o role da API para [GoogleGroupRole].
@@ -135,22 +133,24 @@ class GoogleGroupsController extends GetxController {
       if (token == null) return;
 
       // Buscar membros do grupo selecionado
-      final members = await _googleService.getGroupEntities(token, selectedGroup.email);
+      final entities = await _googleService.getGroupEntities(token, selectedGroup.email);
+
+      final users = entities
+        .where((e) => e['type'] == 'USER')
+        .toList();
 
       // Filtrar apenas usuários e mapear para GoogleGroupMember
       // O name fica vazio (string vazia) pois será preenchido a partir
       // dos dados do Firebase quando for exibido na UI.
-      final userMembers = members
+      observedMembers.value = users
           .where((m) => m['type'] == 'USER')
           .map((m) => GoogleGroupMember(
-              name: '', // TODO: substituir por m['name'] quando a API ficar pronta.
+              name: m['name'] as String,
               email: m['email'] as String,
               role: _parseRole(m['role'] as String),
             )
           )
           .toList();
-
-      observedMembers.value = userMembers;
     } catch (e) {
       debugPrint("Erro ao buscar membros do grupo ${selectedGroup.email}: $e");
       observedMembers.clear();

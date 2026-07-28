@@ -18,7 +18,7 @@ import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/
 import 'package:uffmobileplus/app/ui/widgets/app_recommendation_dialog.dart';
 
 class HomePageController extends GetxController {
-  UserDataRepository userDataRepository = UserDataRepository();
+  final UserDataRepository _userDataRepository = UserDataRepository();
   final StudyPlanRepository _studyPlanRepository = StudyPlanRepository();
   final TranscriptRepository _transcriptRepository = TranscriptRepository();
 
@@ -31,16 +31,17 @@ class HomePageController extends GetxController {
 
   RxBool isLoading = false.obs;
 
-  final userName = ''.obs;
+  final userName = '--'.obs;
   final userMatricula = ''.obs;
   final userEmail = ''.obs;
   final userCourse = ''.obs;
   final userPhotoUrl = ''.obs;
 
   final shortcutRoutes = <String>[].obs;
-  final isRemovingShortcuts = false.obs;
   final savedShortcuts = <DashboardShortcut>[].obs;
   final availableToAdd = <DashboardShortcut>[].obs;
+
+  final isRemovingShortcuts = false.obs;
 
   final RxBool isLoadingTodayClasses = true.obs;
   final RxList<Discipline> todayClasses = <Discipline>[].obs;
@@ -56,20 +57,25 @@ class HomePageController extends GetxController {
   ResponsiveLayoutService get layoutService => _layoutService;
 
   @override
-  void onInit() {
+  Future<void> onInit() async {
     super.onInit();
+    isLoading.value = true;
+
     _externalModulesController = Get.find<ExternalModulesController>();
     _restaurantModulesController = Get.find<RestaurantModulesController>();
     _restaurantsController = Get.find<RestaurantsController>();
     _layoutService = Get.find<ResponsiveLayoutService>();
+    _externalModulesServices = Get.find<ExternalModulesServices>();
+    await _externalModulesServices.initialize();
 
-    _bindServicesCatalog();
-    _loadSavedShortcuts();
-    _loadCampusMeals();
-    _loadProfileData().then((_) {
-      _loadTodayClasses();
-      _loadTranscriptStats();
+    await _loadProfileData().then((_) async {
+      await _loadTodayClasses();
+      await _loadTranscriptStats();
     });
+    await _bindServicesCatalog();
+    await _loadSavedShortcuts();
+    await _loadCampusMeals();
+    isLoading.value = false;
   }
 
   @override
@@ -83,22 +89,42 @@ class HomePageController extends GetxController {
     _showAppRecommendationDialog();
   }
 
-  WeekDay? _weekDayForToday() {
-    switch (DateTime.now().weekday) {
-      case DateTime.monday:
-        return WeekDay.monday;
-      case DateTime.tuesday:
-        return WeekDay.tuesday;
-      case DateTime.wednesday:
-        return WeekDay.wednesday;
-      case DateTime.thursday:
-        return WeekDay.thursday;
-      case DateTime.friday:
-        return WeekDay.friday;
-      case DateTime.saturday:
-        return WeekDay.saturday;
-      default:
-        return null; // Domingo: sem aulas no plano de estudos.
+  Future<void> _loadProfileData() async {
+    try {
+      String email = '';
+
+      userName.value =
+          _externalModulesServices.getUserName() ??
+          _externalModulesServices.getUserNameGoogle() ??
+          "";
+      userMatricula.value = _externalModulesServices.getUserMatricula();
+      userCourse.value = _externalModulesServices.getUserCourse();
+      userPhotoUrl.value =
+          _externalModulesServices.getUserPhotoUrl() ??
+          _externalModulesServices.getUserPhotoUrlGoogle() ??
+          "";
+      try {
+        email = await _externalModulesServices.getEmail();
+      } catch (e) {}
+      userEmail.value = email.isNotEmpty
+          ? email
+          : _externalModulesServices.getUserEmailGoogle() ?? "";
+
+      debugPrint('''
+        👤 --- DADOS DO PERFIL ---
+        📛 Nome:      ${userName.value}
+        🎓 Matrícula: ${userMatricula.value}
+        📚 Curso:     ${userCourse.value}
+        ✉️ Email:     ${userEmail.value}
+        🖼️ Foto URL:  ${userPhotoUrl.value}
+        ---------------------------
+        ''');
+    } catch (_) {
+      userName.value = '-';
+      userMatricula.value = '-';
+      userEmail.value = '-';
+      userCourse.value = '-';
+      userPhotoUrl.value = '';
     }
   }
 
@@ -124,6 +150,25 @@ class HomePageController extends GetxController {
     } catch (_) {
     } finally {
       isLoadingTranscript.value = false;
+    }
+  }
+
+  WeekDay? _weekDayForToday() {
+    switch (DateTime.now().weekday) {
+      case DateTime.monday:
+        return WeekDay.monday;
+      case DateTime.tuesday:
+        return WeekDay.tuesday;
+      case DateTime.wednesday:
+        return WeekDay.wednesday;
+      case DateTime.thursday:
+        return WeekDay.thursday;
+      case DateTime.friday:
+        return WeekDay.friday;
+      case DateTime.saturday:
+        return WeekDay.saturday;
+      default:
+        return null; // Domingo: sem aulas no plano de estudos.
     }
   }
 
@@ -178,7 +223,7 @@ class HomePageController extends GetxController {
     );
   }
 
-  void _bindServicesCatalog() {
+  Future<void> _bindServicesCatalog() async {
     _syncShortcutsWithServices();
     // O worker é reativo à lista de serviços externos, garantindo que os atalhos sejam atualizados sempre que a lista de serviços mudar
     _servicesWorker = everAll([
@@ -196,7 +241,7 @@ class HomePageController extends GetxController {
 
   Future<void> _loadSavedShortcuts() async {
     try {
-      final userData = await userDataRepository.getUserData();
+      final userData = await _userDataRepository.getUserData();
       final saved = userData?.shortcutRoutes ?? <String>[];
       final validRoutes = allShortcutRoutes;
       final filteredSaved = saved.where(validRoutes.contains).toList();
@@ -224,42 +269,8 @@ class HomePageController extends GetxController {
 
   Future<void> _persistShortcuts() async {
     try {
-      await userDataRepository.updateShortcutRoutes(shortcutRoutes.toList());
+      await _userDataRepository.updateShortcutRoutes(shortcutRoutes.toList());
     } catch (_) {}
-  }
-
-  Future<void> _loadProfileData() async {
-    try {
-      isLoading.value = true;
-      _externalModulesServices = Get.find<ExternalModulesServices>();
-
-      String email = '';
-
-      userName.value =
-          _externalModulesServices.getUserName() ??
-          _externalModulesServices.getUserNameGoogle() ??
-          "";
-      userMatricula.value = _externalModulesServices.getUserMatricula();
-      userCourse.value = _externalModulesServices.getUserCourse();
-      userPhotoUrl.value =
-          _externalModulesServices.getUserPhotoUrl() ??
-          _externalModulesServices.getUserPhotoUrlGoogle() ??
-          "";
-      try {
-        email = await _externalModulesServices.getEmail();
-      } catch (e) {}
-      userEmail.value = email.isNotEmpty
-          ? email
-          : _externalModulesServices.getUserEmailGoogle() ?? "";
-    } catch (_) {
-      userName.value = '-';
-      userMatricula.value = '-';
-      userEmail.value = '-';
-      userCourse.value = '-';
-      userPhotoUrl.value = '';
-    } finally {
-      isLoading.value = false;
-    }
   }
 
   void addShortcut(DashboardShortcut service) {

@@ -1,17 +1,67 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:get/get_state_manager/src/simple/get_view.dart';
 import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/home_page_controller.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 
-class CustomDrawer extends StatelessWidget {
+class CustomDrawer extends GetView<HomePageController> {
   const CustomDrawer({super.key});
-
-  HomePageController get controller => Get.find<HomePageController>();
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      backgroundColor: Colors.transparent,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: AppColors.darkBlueToBlackGradient(),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              _profileHeader(),
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
+                  children: [
+                    _DrawerTile(
+                      icon: Icons.settings_outlined,
+                      title: 'configuracoes'.tr,
+                      subtitle: 'ajustes_do_aplicativo'.tr,
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        Get.toNamed(Routes.SETTINGS);
+                      },
+                    ),
+                    _DrawerTile(
+                      icon: Icons.wifi,
+                      title: 'conexoes'.tr,
+                      subtitle: 'informacoes_sobre_infraestruturas'.tr,
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        Get.toNamed(Routes.CONNECTIONS);
+                      },
+                    ),
+                    _DrawerTile(
+                      icon: Icons.info_outline,
+                      title: 'sobre'.tr,
+                      subtitle: 'informacoes_app_versao'.tr,
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        Get.toNamed(Routes.ABOUT);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   Widget _profileHeader() {
     return Obx(
@@ -107,59 +157,6 @@ class CustomDrawer extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Drawer(
-      backgroundColor: Colors.transparent,
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: AppColors.darkBlueToBlackGradient(),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              _profileHeader(),
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
-                  children: [
-                    _DrawerTile(
-                      icon: Icons.settings_outlined,
-                      title: 'configuracoes'.tr,
-                      subtitle: 'ajustes_do_aplicativo'.tr,
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        Get.toNamed(Routes.SETTINGS);
-                      },
-                    ),
-                    _DrawerTile(
-                      icon: Icons.wifi,
-                      title: 'conexoes'.tr,
-                      subtitle: 'informacoes_sobre_infraestruturas'.tr,
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        Get.toNamed(Routes.CONNECTIONS);
-                      },
-                    ),
-                    _DrawerTile(
-                      icon: Icons.info_outline,
-                      title: 'sobre'.tr,
-                      subtitle: 'informacoes_app_versao'.tr,
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        Get.toNamed(Routes.ABOUT);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );

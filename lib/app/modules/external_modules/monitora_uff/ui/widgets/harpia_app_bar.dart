@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get.dart';
+import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/google_groups_controller.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 
 class HarpiaAppBar extends StatelessWidget implements PreferredSizeWidget {
   const HarpiaAppBar({super.key});
+
+  GoogleGroupsController get googleGroupsController => Get.find<GoogleGroupsController>();
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +18,10 @@ class HarpiaAppBar extends StatelessWidget implements PreferredSizeWidget {
       flexibleSpace: Container(
         decoration: BoxDecoration(gradient: AppColors.appBarBottomGradient()),
       ),
-      title: const Text('Harpia'),
+      title: Obx(() => Text(
+        'Harpia - Grupo observado: ${googleGroupsController.observedGroup}', 
+        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)
+      )),
       centerTitle: true,
       elevation: 8,
       foregroundColor: Colors.white,

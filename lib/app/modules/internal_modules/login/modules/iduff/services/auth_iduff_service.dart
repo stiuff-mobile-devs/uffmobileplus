@@ -76,7 +76,6 @@ class AuthIduffService {
     debugPrint("calling authorize");
 
     try {
-
       String? refreshToken = await userIduffRepository.getRefreshToken();
 
       //Troca o refresh token por um novo access token quando o atual expira, sem precisar fazer login completo novamente.
@@ -90,7 +89,7 @@ class AuthIduffService {
         debugPrint("Primeiro Acesso!");
 
         authorizationResponse = await _getAuthorization();
-        
+
         if (authorizationResponse == null) {
           return AuthResult(false, ErrorMessage.erro001);
         }
@@ -98,7 +97,7 @@ class AuthIduffService {
         bool accessTokenTimeOut = false;
 
         tokenResponse = await _getAccessToken(authorizationResponse).timeout(
-          Duration(seconds: 10),
+          Duration(seconds: 30),
           onTimeout: () {
             accessTokenTimeOut = true;
             return null;
@@ -181,7 +180,7 @@ class AuthIduffService {
   //Renova automaticamente o access token usando o refresh token salvo, mantendo o usuário logado.
   Future<bool> refreshToken() async {
     TokenResponse? tokenResponse;
-      String? refreshToken = await userIduffRepository.getRefreshToken();
+    String? refreshToken = await userIduffRepository.getRefreshToken();
 
     if (refreshToken == null) return false;
 
@@ -233,10 +232,8 @@ class AuthIduffService {
         authData: authInfo,
       );
 
-     await userIduffRepository.saveUserIduffModel(
-        userAuth,
-      );
-     
+      await userIduffRepository.saveUserIduffModel(userAuth);
+
       return AuthResult(true, "success");
     } catch (e) {
       debugPrint("Erro em Authorize: $e");
@@ -288,7 +285,7 @@ class AuthIduffService {
     try {
       Uri uri = Uri.https(baseUrl, Secrets.userInfoPath);
       http.Response response = await client!.get(uri);
-      
+
       if (response.statusCode == 200) {
         debugPrint("user info:");
         debugPrint(response.body);
