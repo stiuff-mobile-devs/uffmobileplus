@@ -17,11 +17,14 @@ class GoogleGroupsController extends GetxController {
 
   RxString observedGroup = RxString('Nenhum');
   RxList<GoogleGroupMember> observedMembers = RxList();
+    
+  final _highlightedObservedUsers = <GoogleGroupMember>[].obs;
+  RxList<GoogleGroupMember> get highlightedObservedUsers => _highlightedObservedUsers;
 
   /// Email do grupo raiz que contém os subgrupos do Harpia.
   /// Em debug, usa um grupo de teste; em release, o grupo de produção.
   static String get rootGroupEmail => 
-      kReleaseMode ? 'grupos.harpia@id.uff.br' : 'harpiateste@id.uff.br';
+      kReleaseMode ? 'grupos.harpia@id.uff.br' : 'grupos.harpia@id.uff.br';
 
   /// Lista de grupos que o usuário logado pode observar.
   /// Representa os subgrupos (type == GROUP) de [rootGroupEmail].
@@ -106,6 +109,18 @@ class GoogleGroupsController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  void toggleHighlight(GoogleGroupMember member) {
+    if (_highlightedObservedUsers.any((m) => m.email == member.email)) {
+      _highlightedObservedUsers.removeWhere((m) => m.email == member.email);
+    } else {
+      _highlightedObservedUsers.add(member);
+    }
+  }
+
+  bool isHighlighted(GoogleGroupMember member) {
+    return _highlightedObservedUsers.any((m) => m.email == member.email);
   }
 
   /// Mapeia o role da API para [GoogleGroupRole].
