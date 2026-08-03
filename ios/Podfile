@@ -28,7 +28,6 @@ require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelpe
 flutter_ios_podfile_setup
 
 target 'Runner' do
-
   use_frameworks!
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
@@ -40,16 +39,5 @@ end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
-    target.build_configurations.each do |config|
-      # Isso força todos os plugins a usarem o iOS 15.0
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
-
-      # Ativa as permissões do permission_handler para o iOS
-      config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
-        '$(inherited)',
-        'PERMISSION_NOTIFICATIONS=1', # Permissão de Notificações
-        'PERMISSION_LOCATION=1',      # Permissão de Localização (Quando em Uso e Sempre)
-      ]
-    end
   end
 end
