@@ -7,7 +7,7 @@ import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/c
 class CatracaOnlineProvider {
   final String _collectionPath = "operator_transactions";
   final String _collectionPathFirebase =
-      "meals_test"; // para testes user meals_test
+      "meals"; // para testes user meals_test
   final FirebaseFirestore _firestore = FirebaseFirestore.instanceFor(
     app: Firebase.app("catraca"),
   );
