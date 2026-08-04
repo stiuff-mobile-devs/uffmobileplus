@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/calendar_controller.dart';
+import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/call_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/google_groups_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/tracking_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/permissions_controller.dart';
@@ -15,5 +16,6 @@ class MonitoraUffBindings implements Bindings {
     Get.lazyPut(() => AuthGoogleController()); 
     Get.lazyPut(() => GoogleGroupsController()); 
     Get.lazyPut(() => CalendarController());
+    Get.lazyPut(() => CallController());
   }
 }
