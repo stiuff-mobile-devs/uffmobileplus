@@ -7,6 +7,8 @@ import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/provider/ideia_api_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/provider/usuario_api_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/modules/home/ui/widgets/user_destination.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 
 class BancoDeIdeiasController extends GetxController {
@@ -15,10 +17,14 @@ class BancoDeIdeiasController extends GetxController {
     CrudApiService? crudApiService,
     IdeiaApiService? ideiaApiService,
     UsuarioApiService? usuarioApiService,
+    UserDataRepository? userDataRepository,
   }) : authService = authService ?? Get.find<AuthService>(),
        crudApiService = crudApiService ?? Get.find<CrudApiService>(),
        ideiaApiService = ideiaApiService ?? Get.find<IdeiaApiService>(),
-       usuarioApiService = usuarioApiService ?? Get.find<UsuarioApiService>();
+       usuarioApiService = usuarioApiService ?? Get.find<UsuarioApiService>(),
+       userDataRepository = userDataRepository ?? UserDataRepository();
+
+  static const accessGroupEmail = 'banco-de-ideias.ic@id.uff.br';
 
   static const destinations = [
     UserDestination(
@@ -42,8 +48,10 @@ class BancoDeIdeiasController extends GetxController {
   final CrudApiService crudApiService;
   final IdeiaApiService ideiaApiService;
   final UsuarioApiService usuarioApiService;
+  final UserDataRepository userDataRepository;
 
   Future<UsuarioAtual?>? usuarioFuture;
+  Future<bool>? accessFuture;
   String? loadedUid;
   int selectedIndex = 0;
   int refreshToken = 0;
@@ -51,6 +59,19 @@ class BancoDeIdeiasController extends GetxController {
   UserDestination get selectedDestination => destinations[selectedIndex];
 
   bool get mostrarBotaoNovaIdeia => selectedIndex == 0 || selectedIndex == 1;
+
+  Future<bool> checkModuleAccess() {
+    return accessFuture ??= _loadModuleAccess();
+  }
+
+  Future<bool> _loadModuleAccess() async {
+    final user = (await userDataRepository.getUserData()) ?? UserData();
+    final googleGroups = user.gdiGroupsGoogle?.gdiGroups ?? <GdiGroups>[];
+
+    return googleGroups.any(
+      (group) => group.email?.toLowerCase() == accessGroupEmail,
+    );
+  }
 
   void prepareLoggedUser(String uid) {
     if (loadedUid == uid && usuarioFuture != null) {

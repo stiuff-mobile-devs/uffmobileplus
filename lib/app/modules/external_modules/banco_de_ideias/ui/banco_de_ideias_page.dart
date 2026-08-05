@@ -12,46 +12,60 @@ class BancoDeIdeiasPage extends GetView<BancoDeIdeiasController> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: controller.authService.authStateChanges(),
-      builder: (context, snapshot) {
-        final user = snapshot.data;
-
-        if (snapshot.connectionState == ConnectionState.waiting) {
+    return FutureBuilder<bool>(
+      future: controller.checkModuleAccess(),
+      builder: (context, accessSnapshot) {
+        if (accessSnapshot.connectionState == ConnectionState.waiting) {
           return const _BancoDeIdeiasLoading();
         }
 
-        if (user == null) {
-          controller.loadedUid = null;
-          controller.usuarioFuture = null;
-          return const LoginPage();
+        if (accessSnapshot.data != true) {
+          return const _BancoDeIdeiasRestrictedAccess();
         }
 
-        controller.prepareLoggedUser(user.uid);
+        return StreamBuilder(
+          stream: controller.authService.authStateChanges(),
+          builder: (context, snapshot) {
+            final user = snapshot.data;
 
-        return GetBuilder<BancoDeIdeiasController>(
-          builder: (controller) => FutureBuilder<UsuarioAtual?>(
-            future: controller.usuarioFuture,
-            builder: (context, usuarioSnapshot) {
-              if (usuarioSnapshot.connectionState == ConnectionState.waiting) {
-                return const _BancoDeIdeiasLoading();
-              }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const _BancoDeIdeiasLoading();
+            }
 
-              if (usuarioSnapshot.hasError) {
-                return _BancoDeIdeiasError(
-                  error: usuarioSnapshot.error,
-                  onRetry: controller.reloadUsuario,
-                  onSignOut: controller.signOut,
-                );
-              }
+            if (user == null) {
+              controller.loadedUid = null;
+              controller.usuarioFuture = null;
+              return const LoginPage();
+            }
 
-              if (usuarioSnapshot.data == null) {
-                return const RegistrationPage();
-              }
+            controller.prepareLoggedUser(user.uid);
 
-              return const BancoDeIdeiasHomePage();
-            },
-          ),
+            return GetBuilder<BancoDeIdeiasController>(
+              builder: (controller) => FutureBuilder<UsuarioAtual?>(
+                future: controller.usuarioFuture,
+                builder: (context, usuarioSnapshot) {
+                  if (usuarioSnapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return const _BancoDeIdeiasLoading();
+                  }
+
+                  if (usuarioSnapshot.hasError) {
+                    return _BancoDeIdeiasError(
+                      error: usuarioSnapshot.error,
+                      onRetry: controller.reloadUsuario,
+                      onSignOut: controller.signOut,
+                    );
+                  }
+
+                  if (usuarioSnapshot.data == null) {
+                    return const RegistrationPage();
+                  }
+
+                  return const BancoDeIdeiasHomePage();
+                },
+              ),
+            );
+          },
         );
       },
     );
@@ -70,6 +84,80 @@ class _BancoDeIdeiasLoading extends GetView<BancoDeIdeiasController> {
         ),
         child: Center(
           child: CircularProgressIndicator(color: AppColors.lightBlue()),
+        ),
+      ),
+    );
+  }
+}
+
+class _BancoDeIdeiasRestrictedAccess extends StatelessWidget {
+  const _BancoDeIdeiasRestrictedAccess();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Banco de Ideias'),
+        foregroundColor: Colors.white,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
+        ),
+      ),
+      body: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          gradient: AppColors.darkBlueToBlackGradient(),
+        ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 440),
+              child: Container(
+                padding: const EdgeInsets.all(22),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.12),
+                  ),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Icon(
+                      Icons.lock_outline_rounded,
+                      size: 52,
+                      color: AppColors.lightBlue(),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Acesso restrito',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Você não possui permissão para acessar o Banco de Ideias.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white70, height: 1.35),
+                    ),
+                    const SizedBox(height: 20),
+                    FilledButton.icon(
+                      onPressed: Get.back,
+                      icon: const Icon(Icons.arrow_back_rounded),
+                      label: const Text('Voltar'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
