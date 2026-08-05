@@ -2,13 +2,27 @@ import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
+import 'package:uffmobileplus/app/utils/gdi_groups.dart';
 import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
 
 class ExternalModulesController extends GetxController {
   ExternalModulesController();
 
+  
   UserDataRepository userDataRepository = UserDataRepository();
-  late UserData _usermodel;
+  UserData _usermodel = UserData();
+  
+   @override
+  Future<void> onInit() async {
+    super.onInit();
+    _usermodel = (await userDataRepository.getUserData()) ?? UserData();
+
+    await filterButtonList(
+      _usermodel.profileType ?? ProfileTypes.anonymous,
+      _usermodel.gdiGroups ?? <GdiGroups>[],
+      _usermodel.gdiGroupsGoogle?.gdiGroups ?? <GdiGroups>[],
+    );
+  }
 
   final RxList<ExternalModules> externalModulesList = RxList([
     ExternalModules(
@@ -118,7 +132,15 @@ class ExternalModulesController extends GetxController {
       url: '',
       interrogation: false,
       availableFor: everyone,
-      gdiGroups: null,
+      gdiGroups:  [
+        GdiGroups(
+          null,
+          null,
+          null,
+          null,
+          null,
+        ),
+      ],
     ),
 
     ExternalModules(
@@ -182,16 +204,7 @@ class ExternalModulesController extends GetxController {
     ),
   ]);
 
-  @override
-  Future<void> onInit() async {
-    super.onInit();
-    _usermodel = (await userDataRepository.getUserData()) ?? UserData();
-
-    await filterButtonList(
-      _usermodel.profileType ?? ProfileTypes.anonymous,
-      _usermodel.gdiGroups ?? <GdiGroups>[],
-    );
-  }
+ 
 
   // TODO: parece redundante; melhor usar Get.toNamed direto?
   void navigateTo(
@@ -213,6 +226,7 @@ class ExternalModulesController extends GetxController {
   Future<void> filterButtonList(
     ProfileTypes currentProfile,
     List<GdiGroups> currentGdiGroups,
+    List<GdiGroups> currentGdiGroupsGoogle
   ) async {
     externalModulesList.removeWhere((button) {
       final hasProfile = button.availableFor.contains(currentProfile);
@@ -220,6 +234,13 @@ class ExternalModulesController extends GetxController {
 
       if (button.gdiGroups == null) return false;
 
+       if (currentGdiGroupsGoogle.any(
+          (userGroup) =>
+              userGroup.email == 'grupos.harpia@id.uff.br' || userGroup.email == 'bombeiros.harpia@id.uff.br' || userGroup.email == 'campo-monitorauff.harpia@id.uff.br'
+        )) {
+          return false;
+        }
+        
       final hasGroupMatch = button.gdiGroups!.any(
         (btnGroup) =>
             currentGdiGroups.any((userGroup) => userGroup.gid == btnGroup.gid),
