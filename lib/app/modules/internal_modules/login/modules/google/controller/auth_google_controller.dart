@@ -30,7 +30,7 @@ class AuthGoogleController extends GetxController {
         String? token = await _authGoogle.getFirebaseIdToken();
         await _userRepository.saveUserGoogleModel(user);
         await _registerTokenCdc();
-        await _getGdiGroupsGoogle(token ?? '', user.email);
+        await getGdiGroupsGoogle(token ?? '', user.email,false);
         Get.offNamed(Routes.HOME);
       } else {
         Get.snackbar(
@@ -54,24 +54,24 @@ class AuthGoogleController extends GetxController {
     if (hasLogged != null) {
       await _registerTokenCdc();
       String? token = await _authGoogle.getFirebaseIdToken();
-      await _getGdiGroupsGoogle(token ?? '', hasLogged.email);
+      await getGdiGroupsGoogle(token ?? '', hasLogged.email, false);
       Get.offNamed(Routes.HOME);
     } else {
       Get.offNamed(Routes.LOGIN);
     }
   }
 
-  void logout() {
-    _authGoogle.logoutGoogle();
-    _userRepository.deleteUserGoogleModel();
+  Future<void> logout() async {
+    await _authGoogle.logoutGoogle();
+    await _userRepository.deleteUserGoogleModel();
     Get.offAllNamed(Routes.LOGIN);
   }
 
-  Future<void> _getGdiGroupsGoogle(String token, String email) async {
+  Future<void> getGdiGroupsGoogle(String token, String email, bool forceUpdate) async {
     try {
       UserData user = await _userDataRepository.getUserData() ?? UserData();
-
-      if (user.gdiGroupsGoogle != null &&
+      if(!forceUpdate){
+        if (user.gdiGroupsGoogle != null &&
           user.gdiGroupsGoogle?.lastUpdate != null) {
         if (DateTime.now()
                 .difference(user.gdiGroupsGoogle?.lastUpdate as DateTime)
@@ -83,7 +83,8 @@ class AuthGoogleController extends GetxController {
           return;
         }
       }
-
+      }
+      
       GdiGroupsGoogle gdiGroups = await _userRepository.getGdiGroupsGoogle(
         token,
         email,
@@ -152,5 +153,11 @@ class AuthGoogleController extends GetxController {
       return null;
     }
     return null;
+  }
+
+   Future<String?> getFirebaseIdToken() async {
+    // Pega o usuário logado atualmente no Firebase
+    return await _authGoogle.getFirebaseIdToken();
+    
   }
 }

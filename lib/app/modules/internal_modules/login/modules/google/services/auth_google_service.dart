@@ -120,6 +120,7 @@ class AuthGoogleService {
     await _googleSignIn.signOut();
     await _uffMobileAuth.signOut();
     await _harpiaAuth.signOut();
+    await _catracaAuth.signOut();
   }
 
   Future<String?> getFirebaseIdToken() async {

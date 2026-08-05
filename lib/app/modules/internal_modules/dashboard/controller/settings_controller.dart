@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/controller/login_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/controller/auth_google_controller.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_google_model.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_google_repository.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_iduff_repository.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 
@@ -10,27 +12,25 @@ class SettingsController extends GetxController {
   SettingsController();
   UserIduffRepository userIduffRepository = UserIduffRepository();
   UserDataRepository userDataRepository = UserDataRepository();
-  late final LoginController _loginController;
+  UserGoogleRepository userGoogleRepository = UserGoogleRepository();
+
+  late final LoginController loginController;
   late final AuthGoogleController _authGoogleController;
 
-  late RxBool hasActiveIduffBondObs;
-  late RxBool hasActiveGoogleBondObs;
 
   @override
-  onInit() {
-    _loginController = Get.find<LoginController>();
+  onInit() async {
+    loginController = Get.find<LoginController>();
     _authGoogleController = Get.find<AuthGoogleController>();
-
-    hasActiveIduffBondObs = _loginController.hasActiveIduffBondObs;
-    hasActiveGoogleBondObs = _loginController.hasActiveGoogleBondObs;
+    await reloadBondStates();
+    
     super.onInit();
   }
 
-  void logoutIduff() {
-    userIduffRepository.deleteUserIduffModel();
-    _loginController.logoutGoogle();
-    userDataRepository.clearAllUserData();
-    Get.offAllNamed(Routes.LOGIN);
+  Future<void> logout() async {
+    await userIduffRepository.deleteUserIduffModel();
+    await userDataRepository.clearAllUserData();
+     loginController.logoutGoogle();
   }
 
   void changeMatricula() async {
@@ -38,13 +38,14 @@ class SettingsController extends GetxController {
   }
 
   Future<void> reloadBondStates() async {
-    final userData = await userDataRepository.getUserData();
-    debugPrint(userData.toString());
-    await _loginController.reloadBondStates();
+    
+    await loginController.reloadBondStates();
+    
   }
 
   void handleIduffBondTap() async {
-    if (hasActiveIduffBondObs.value) {
+    await reloadBondStates();
+    if (loginController.hasActiveIduffBondObs.value) {
       _showIduffLogoutConfirmation();
     } else {
       _showIduffLoginConfirmation();
@@ -52,13 +53,31 @@ class SettingsController extends GetxController {
   }
 
   void handleGoogleBondTap() async {
-    if (hasActiveGoogleBondObs.value) {
+    await reloadBondStates();
+
+    if (loginController.hasActiveGoogleBondObs.value) {
       _showGoogleLogoutConfirmation();
     } else {
       _showGoogleLoginConfirmation();
     }
   }
+  Future<void> updateGoogleData() async{
+    try{
+      final token = await _authGoogleController.getFirebaseIdToken();
+      UserGoogleModel? user = await userGoogleRepository.getUserGoogleModel();
+      await _authGoogleController.getGdiGroupsGoogle(token!, user!.email, true);
+    }
+    catch(e){
+      Get.snackbar(
+        "Erro ao atualizar dados do Google",
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+    
 
+
+  }
   void _showIduffLoginConfirmation() {
     Get.dialog(
       AlertDialog(
@@ -82,7 +101,7 @@ class SettingsController extends GetxController {
           TextButton(
             onPressed: () {
               Get.back();
-              _loginController.loginIDUFF();
+              loginController.loginIDUFF();
             },
             child: Text(
               'Continuar',
@@ -117,7 +136,7 @@ class SettingsController extends GetxController {
           TextButton(
             onPressed: () {
               Get.back();
-              logoutIduff();
+              logout();
             },
             child: Text(
               'Desconectar',
@@ -152,7 +171,7 @@ class SettingsController extends GetxController {
           TextButton(
             onPressed: () {
               Get.back();
-              _loginController.loginGoogle();
+              loginController.loginGoogle();
             },
             child: Text('Continuar', style: TextStyle(color: Colors.redAccent)),
           ),
@@ -195,4 +214,6 @@ class SettingsController extends GetxController {
       ),
     );
   }
+
+
 }

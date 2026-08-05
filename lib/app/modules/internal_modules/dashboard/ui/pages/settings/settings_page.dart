@@ -1,128 +1,148 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/settings_controller.dart';
-import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 
-class SettingsPage extends StatelessWidget {
+
+class SettingsPage extends GetView<SettingsController> {
   const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GetBuilder<SettingsController>(
-        builder: (SettingsController controller) {
-          return Container(
-            decoration: BoxDecoration(
-              gradient: AppColors.darkBlueToBlackGradient(),
-            ),
-            child: CustomScrollView(
-              slivers: [
-                _sliverAppBar('configuracoes'.tr),
+      body: Container(
+        decoration: BoxDecoration(
+          // Supondo que AppColors.darkBlueToBlackGradient() retorna um LinearGradient
+          gradient: AppColors.darkBlueToBlackGradient(),
+        ),
+        // Envolvemos o CustomScrollView em um Obx para que a tela reaja 
+        // automaticamente quando as variáveis .value (.obs) mudarem
+        child: Obx(() => CustomScrollView(
+          slivers: [
+            _sliverAppBar('configuracoes'.tr),
 
-                // TODO: substituir por SettingsItem
-                SettingsItem(
-                  icon: Icon(Icons.language, color: Colors.white),
-                  main: DropdownButton<Locale>(
-                    value: Get.locale,
-                    dropdownColor: Colors.grey[800],
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    underline: Container(), // Remove underline
-                    // Ao suportar um novo idioma, adicionar novo par
-                    // na lista abaixo
-                    // TODO: extrair essa lista para algum outro lugar?
-                    items:
-                        [
-                          {
-                            'locale': Locale('pt', 'BR'),
-                            'display': 'Português (BR)',
-                          },
-                          {
-                            'locale': Locale('en', 'US'),
-                            'display': 'English (US)',
-                          },
-                          {
-                            'locale': Locale('it', 'IT'),
-                            'display': 'Italiano (IT)',
-                          },
-                        ].map((item) {
-                          Locale locale = item['locale'] as Locale;
-                          String displayString = item['display'] as String;
+            // TODO: substituir por SettingsItem
+            SettingsItem(
+              icon: Icon(Icons.language, color: Colors.white),
+              main: DropdownButton<Locale>(
+                value: Get.locale,
+                dropdownColor: Colors.grey[800],
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+                underline: Container(), // Remove underline
+                // Ao suportar um novo idioma, adicionar novo par na lista abaixo
+                items: [
+                  {
+                    'locale': Locale('pt', 'BR'),
+                    'display': 'Português (BR)',
+                  },
+                  {
+                    'locale': Locale('en', 'US'),
+                    'display': 'English (US)',
+                  },
+                  {
+                    'locale': Locale('it', 'IT'),
+                    'display': 'Italiano (IT)',
+                  },
+                ].map((item) {
+                  Locale locale = item['locale'] as Locale;
+                  String displayString = item['display'] as String;
 
-                          return DropdownMenuItem<Locale>(
-                            value: locale,
-                            child: Text(displayString),
-                          );
-                        }).toList(),
-                    onChanged: (Locale? newValue) {
-                      if (newValue != null) Get.updateLocale(newValue);
-                    },
-                  ),
-                  description: 'ling_descricao'.tr,
-                  trailing: null, // No chevron needed since it's a dropdown
-                ),
-                SettingsItem(
-                  icon: Icon(Icons.change_circle, color: Colors.white),
-                  main: Text(
-                    'Trocar Matricula',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  description: 'Alterar a matrícula vinculada ao usuário atual',
-                  trailing: null,
-                  onTap: () {
-                    controller.changeMatricula();
-                  },
-                ),
-                SettingsItem(
-                  icon: Icon(Icons.link, color: Colors.white),
-                  main: Text(
-                    'Minhas Vinculações'.tr,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  description: 'Ver minhas autenticações ativas'.tr,
-                  trailing: null,
-                  onTap: () async {
-                    await controller.reloadBondStates();
-                    _showBondsDialog(context, controller);
-                  },
-                ),
-                // Botão de logout
-                SettingsItem(
-                  icon: Icon(Icons.logout, color: Colors.white),
-                  main: Text(
-                    'sair'.tr,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  description: 'sair_descricao'.tr,
-                  trailing: null,
-                  onTap: () {
-                    controller.logoutIduff();
-                  },
-                ),
-              ],
+                  return DropdownMenuItem<Locale>(
+                    value: locale,
+                    child: Text(displayString),
+                  );
+                }).toList(),
+                onChanged: (Locale? newValue) {
+                  if (newValue != null) Get.updateLocale(newValue);
+                },
+              ),
+              description: 'ling_descricao'.tr,
+              trailing: null, // No chevron needed since it's a dropdown
             ),
-          );
-        },
+
+            // O Obx fará com que este item apareça/suma automaticamente 
+            // caso a vinculação mude
+            if (controller.loginController.hasActiveIduffBondObs.value)
+              SettingsItem(
+                icon: Icon(Icons.change_circle, color: Colors.white),
+                main: Text(
+                  'Trocar Matricula',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                description: 'Alterar a matrícula vinculada ao usuário atual',
+                trailing: null,
+                onTap: () {
+                  controller.changeMatricula();
+                },
+              ),
+
+            SettingsItem(
+              icon: Icon(Icons.link, color: Colors.white),
+              main: Text(
+                'Minhas Vinculações'.tr,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              description: 'Ver minhas autenticações ativas'.tr,
+              trailing: null,
+              onTap: () async {
+                await controller.reloadBondStates();
+                _showBondsDialog(context, controller);
+              },
+            ),
+
+            // Mesma coisa aqui, o Obx escuta essa variável em tempo real
+            if (controller.loginController.hasActiveGoogleBondObs.value)
+              SettingsItem(
+                icon: Icon(Icons.update_rounded, color: Colors.white),
+                main: Text(
+                  'Atualizar seus dados Google'.tr,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                description: 'Atualizar seus dados Google'.tr,
+                trailing: null,
+                onTap: () {
+                  controller.updateGoogleData();
+                },
+              ),
+
+            // Botão de logout
+            SettingsItem(
+              icon: Icon(Icons.logout, color: Colors.white),
+              main: Text(
+                'sair'.tr,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              description: 'sair_descricao'.tr,
+              trailing: null,
+              onTap: () {
+                controller.logout();
+              },
+            ),
+          ],
+        )),
       ),
     );
   }
-
   // TODO: app bar identica à utilizada na página Sobre, extrair para um componente reutilizável
   Widget _sliverAppBar(String title) {
     return SliverAppBar(
@@ -145,39 +165,6 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _settingsItem(
-    IconData icon,
-    String title,
-    String description, {
-    VoidCallback? onTap,
-  }) {
-    return SliverToBoxAdapter(
-      child: Container(
-        margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        child: ListTile(
-          leading: Icon(icon, color: Colors.white),
-          title: Text(
-            title,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          subtitle: Text(
-            description,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-              color: Colors.white70,
-            ),
-          ),
-          trailing: Icon(Icons.chevron_right, color: Colors.white70),
-          onTap: onTap,
-        ),
-      ),
-    );
-  }
 
   void _showBondsDialog(BuildContext context, SettingsController controller) {
     showDialog(
@@ -211,7 +198,7 @@ class SettingsPage extends StatelessWidget {
                           _BondStatusCard(
                             name: 'IdUFF',
                             hasActiveIduffBond:
-                                controller.hasActiveIduffBondObs,
+                                controller.loginController.hasActiveIduffBondObs,
                             color: Colors.blueAccent,
                             onTap: () => controller.handleIduffBondTap(),
                           ),
@@ -219,7 +206,7 @@ class SettingsPage extends StatelessWidget {
                           _BondStatusCard(
                             name: 'Google',
                             hasActiveIduffBond:
-                                controller.hasActiveGoogleBondObs,
+                                controller.loginController.hasActiveGoogleBondObs,
                             color: Colors.redAccent,
                             onTap: () => controller.handleGoogleBondTap(),
                           ),

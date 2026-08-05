@@ -46,18 +46,36 @@ class LoginController extends GetxController {
   }
 
   Future<bool> hasActiveGoogleBond() async {
-    try {
-      final currentUser = fb.FirebaseAuth.instanceFor(
-        app: Firebase.app('uffmobileplus'),
-      ).currentUser;
-      final storedUser = await userGoogleRepository.getUserGoogleModel();
-      final hasStoredUser = storedUser != null && storedUser.email.isNotEmpty;
-      return currentUser != null && hasStoredUser;
-    } catch (e) {
-      debugPrint("Error checking Google bond: $e");
-      return false;
+  try {
+    final currentUser = fb.FirebaseAuth.instanceFor(
+      app: Firebase.app('uffmobileplus'),
+    ).currentUser;
+
+    // Se não há usuário atual no Firebase, o vínculo não está ativo
+    if (currentUser == null) return false;
+
+    // Obtém o resultado do token atual (tenta renovar automaticamente se necessário)
+    final tokenResult = await currentUser.getIdTokenResult();
+    
+    // Verifica explicitamente se a data atual já passou da data de expiração do token
+    final expirationTime = tokenResult.expirationTime;
+    final isTokenExpired = expirationTime != null && DateTime.now().isAfter(expirationTime);
+
+    if (isTokenExpired) {
+      debugPrint("Google bond: Token is expired.");
+      return false; 
     }
+
+    // Verifica os dados armazenados localmente
+    final storedUser = await userGoogleRepository.getUserGoogleModel();
+    final hasStoredUser = storedUser?.email.isNotEmpty ?? false;
+
+    return hasStoredUser;
+  } catch (e) {
+    debugPrint("Error checking Google bond: $e");
+    return false;
   }
+}
 
   Future<bool> hasActiveIduffBond() async {
     try {
