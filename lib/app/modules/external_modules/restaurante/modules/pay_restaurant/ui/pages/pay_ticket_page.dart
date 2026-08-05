@@ -10,6 +10,8 @@ import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.da
 class PayTicketPage extends GetView<PayRestaurantController> {
   const PayTicketPage({super.key});
 
+  static const double _qrSize = 230;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +27,6 @@ class PayTicketPage extends GetView<PayRestaurantController> {
           decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
         ),
       ),
-
       body: Obx(
         () => controller.isPaymentProcessing.value
             ? Center(child: CustomProgressDisplay())
@@ -33,25 +34,20 @@ class PayTicketPage extends GetView<PayRestaurantController> {
                 decoration: BoxDecoration(
                   gradient: AppColors.darkBlueToBlackGradient(),
                 ),
-                alignment: Alignment.center,
-                child: Stack(
-                  children: <Widget>[
-                    Align(
-                      alignment: Alignment.topCenter,
-                      child: Padding(
-                        padding: EdgeInsets.only(top: 40),
-                        child: IdCard(
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        IdCard(
                           userImageUrl: controller.userImageUrl,
                           username: controller.userName,
                           iduff: controller.userIdUFF,
                         ),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.topCenter,
-                      child: Container(
-                        margin: EdgeInsets.only(top: 250),
-                        child: Text(
+                        const SizedBox(height: 28),
+                        Text(
                           "Aponte o código para a leitora",
                           textAlign: TextAlign.center,
                           style: TextStyle(
@@ -61,14 +57,11 @@ class PayTicketPage extends GetView<PayRestaurantController> {
                             color: Colors.blue[100],
                           ),
                         ),
-                      ),
-                    ),
-
-                    Center(
-                      child: SizedBox(
-                        height: 180,
-                        width: 180,
-                        child: Container(
+                        const Spacer(),
+                        Container(
+                          height: _qrSize,
+                          width: _qrSize,
+                          padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(12.0),
@@ -76,71 +69,53 @@ class PayTicketPage extends GetView<PayRestaurantController> {
                           child: QrImageView(
                             data: controller.paymentCode["texto_qr_code"],
                             version: QrVersions.auto,
+                            size: _qrSize,
                           ),
                         ),
-                      ),
-                    ),
-                    Obx(
-                      () => Visibility(
-                        visible: controller.isExpired.value,
-                        child: Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Container(
-                            margin: EdgeInsets.only(bottom: 74.0),
-                            child: Text(
-                              'Código expirado',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 18.0,
-                                color: Colors.blue[100],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Obx(
-                      () => Visibility(
-                        visible: !controller.isExpired.value,
-                        child: Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Container(
-                            margin: EdgeInsets.only(bottom: 74.0),
-                            child: RichText(
-                              textAlign: TextAlign.center,
-                              text: TextSpan(
-                                text: 'Expira em ',
-                                style: TextStyle(
-                                  fontSize: 18.0,
-                                  color: Colors.blue[100],
-                                ),
-                                children: <TextSpan>[
-                                  TextSpan(
-                                    text: TimeHelper.expirationRemainingTime(
-                                      controller.remainingTime.value,
-                                    ),
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                        const Spacer(),
+                        Obx(
+                          () => controller.isExpired.value
+                              ? Text(
+                                  'Código expirado',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 18.0,
+                                    color: Colors.blue[100],
                                   ),
-                                ],
-                              ),
-                            ),
-                          ),
+                                )
+                              : RichText(
+                                  textAlign: TextAlign.center,
+                                  text: TextSpan(
+                                    text: 'Expira em ',
+                                    style: TextStyle(
+                                      fontSize: 18.0,
+                                      color: Colors.blue[100],
+                                    ),
+                                    children: <TextSpan>[
+                                      TextSpan(
+                                        text: TimeHelper
+                                            .expirationRemainingTime(
+                                          controller.remainingTime.value,
+                                        ),
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                         ),
-                      ),
-                    ),
-                    Obx(
-                      () => Visibility(
-                        visible: controller.isExpired.value,
-                        child: Align(
-                          alignment: Alignment.bottomCenter,
-                          child: GestureDetector(
-                            onTap: () {
-                              controller.refresh();
-                            },
-                            child: Container(
-                              margin: EdgeInsets.only(bottom: 30.0),
+                        const SizedBox(height: 12),
+                        Obx(
+                          () => Visibility(
+                            visible: controller.isExpired.value,
+                            maintainSize: true,
+                            maintainAnimation: true,
+                            maintainState: true,
+                            child: GestureDetector(
+                              onTap: () {
+                                controller.refresh();
+                              },
                               child: Icon(
                                 Icons.refresh,
                                 color: Colors.blue[100],
@@ -149,9 +124,10 @@ class PayTicketPage extends GetView<PayRestaurantController> {
                             ),
                           ),
                         ),
-                      ),
+                        const SizedBox(height: 8),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
       ),
