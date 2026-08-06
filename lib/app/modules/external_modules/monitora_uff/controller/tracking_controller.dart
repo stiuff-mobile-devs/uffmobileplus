@@ -77,6 +77,9 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
   final Map<String, StreamSubscription<List<LocationPoint>>>
       _highlightedTrajectorySubscriptions = {};
 
+  StreamSubscription? _readySubscription;
+  StreamSubscription? _locationSubscription;
+
   /// Timer para debounce do listener de highlightedObservedUsers.
   Timer? _highlightedUsersDebounce;
 
@@ -489,6 +492,10 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
   }
 
   Future<void> _stopService() async {
+    await _readySubscription?.cancel();
+    _readySubscription = null;
+    await _locationSubscription?.cancel();
+    _locationSubscription = null;
     _service.invoke("stopService");
     isTrackingEnabled.value = false;
     FirebaseProvider().updateIsTracked(userCtrl.user!.email, false);
@@ -497,6 +504,8 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
   @override
   void onClose() {
     _compassSubscription?.cancel();
+    _readySubscription?.cancel();
+    _locationSubscription?.cancel();
     _markerAnimationTimer?.cancel();
     mapController.dispose();
     super.onClose();
