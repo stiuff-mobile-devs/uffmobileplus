@@ -265,6 +265,10 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
 
   Future<void> centerMapOnCurrentLocation() async {
     try {
+      if (!position.latitude.isFinite || !position.longitude.isFinite) {
+        return;
+      }
+
       mapController.move(LatLng(position.latitude, position.longitude), 15.0);
     } catch (e) {
       if (kDebugMode) print('Error moving map: $e');
