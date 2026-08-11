@@ -112,6 +112,53 @@ class CatracaOnlineProvider {
     }
   }
 
+ Future<void> saveOperatorTransactionsToFirebaseBatch(
+  List<OperatorTransactionOffline> transactions,
+) async {
+  try {
+    final WriteBatch batch = _firestore.batch();
+    List<String> allIds = transactions.map((tx) => tx.id).toList();
+    Set<String> existingIds = {};
+
+    // Descobre quem JÁ EXISTE no Firebase (de 30 em 30)
+    for (int i = 0; i < allIds.length; i += 30) {
+      int end = (i + 30 < allIds.length) ? i + 30 : allIds.length;
+      List<String> chunkIds = allIds.sublist(i, end);
+
+      final querySnapshot = await _firestore
+          .collection(_collectionPathFirebase)
+          .where(FieldPath.documentId, whereIn: chunkIds)
+          .get();
+
+      for (var doc in querySnapshot.docs) {
+        existingIds.add(doc.id); // Guarda os IDs que já estão na nuvem
+      }
+    }
+
+    int itemsAddedToBatch = 0;
+    
+    // Adiciona ao lote APENAS os dados inexistentes no Firebase
+    for (var tx in transactions) {
+      if (!existingIds.contains(tx.id)) {
+        final docRef = _firestore.collection(_collectionPathFirebase).doc(tx.id);
+        
+        batch.set(docRef, tx.toJson()); 
+        itemsAddedToBatch++;
+      } else {
+        debugPrint("Transação ${tx.id} preservada: já existe no Firebase.");
+      }
+    }
+
+    // Se houver itens para salvar, executa o commit do lote
+    if (itemsAddedToBatch > 0) {
+      await batch.commit();
+    }
+
+  } catch (e) {
+    throw Exception("Erro ao salvar lote no Firebase: $e");
+  }
+}
+
   Future<String> deleteOperatorTransactionOffline(String id) async {
     try {
       final box = Hive.isBoxOpen(_collectionPath)
@@ -126,55 +173,45 @@ class CatracaOnlineProvider {
   }
 
   Future<void> cleanMore24hTransactionsOffline() async {
-    try {
-      final box = Hive.isBoxOpen(_collectionPath)
-          ? Hive.box<OperatorTransactionOffline>(_collectionPath)
-          : await Hive.openBox<OperatorTransactionOffline>(_collectionPath);
-      DateTime now = DateTime.now();
-      DateTime limite24Horas = now.subtract(const Duration(hours: 24));
+  try {
+    final box = Hive.isBoxOpen(_collectionPath)
+        ? Hive.box<OperatorTransactionOffline>(_collectionPath)
+        : await Hive.openBox<OperatorTransactionOffline>(_collectionPath);
+        
+    DateTime now = DateTime.now();
+    DateTime limite24Horas = now.subtract(const Duration(hours: 24));
 
-      //  Filtra apenas as chaves das transações com mais de 24 horas
-      List<dynamic> keysToDelete = box.keys.where((key) {
-        OperatorTransactionOffline? transaction = box.get(key);
-        if (transaction != null) {
-          return transaction.entryTime.isBefore(limite24Horas);
-        }
-        return false;
-      }).toList();
+    List<dynamic> keysToDelete = [];
+    List<OperatorTransactionOffline> transactionsToSync = [];
 
-      // Processa uma a uma antes de deletar
-      for (var key in keysToDelete) {
-        OperatorTransactionOffline? transaction = box.get(key);
-
-        if (transaction != null) {
-          String transactionId = transaction.id;
-
-          // Consulta o Firebase para ver se o ID já existe lá
-          DocumentSnapshot<Map<String, dynamic>> docSnapshot = await _firestore
-              .collection(_collectionPathFirebase)
-              .doc(transactionId)
-              .get();
-
-          if (!docSnapshot.exists) {
-            try {
-              // Se NÃO estiver no Firebase, faz o upload antes de apagar do Hive
-              await saveOperatorTransactionToFirebase(transaction);
-            } catch (e) {
-              debugPrint(
-                "Erro ao salvar transação no Firebase antes de deletar do Hive: $e",
-              );
-              continue; // Pula para a próxima transação sem deletar esta
-            }
-          }
-
-          // 3. Agora que está garantido no Firebase (ou já existia), deleta do Hive
-          await box.delete(key);
-        }
+    // Separa quem passou de 24h (pegando a chave e o objeto)
+    for (var key in box.keys) {
+      OperatorTransactionOffline? transaction = box.get(key);
+      if (transaction != null && transaction.entryTime.isBefore(limite24Horas)) {
+        keysToDelete.add(key);
+        transactionsToSync.add(transaction);
       }
-    } catch (e) {
-      throw Exception("Erro ao sincronizar e limpar transações offline: $e");
     }
+
+    if (keysToDelete.isEmpty) return;
+
+    try {
+      // Tenta garantir que todos os dados estejam na nuvem.
+    
+      await saveOperatorTransactionsToFirebaseBatch(transactionsToSync);
+
+      await box.deleteAll(keysToDelete);
+      
+      debugPrint('${keysToDelete.length} transações antigas foram sincronizadas e limpas do Hive.');
+
+    } catch (e) {
+      debugPrint("Sem internet ou erro no Firebase. Nenhuma transação apagada para evitar perda de dados: $e");
+    }
+
+  } catch (e) {
+    debugPrint("Erro geral ao limpar transações offline: $e");
   }
+}
 
   Future<bool> isTransactionDuplicated(
     String idUffUser,

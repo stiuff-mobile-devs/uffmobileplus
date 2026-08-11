@@ -55,7 +55,7 @@ class CatracaController extends GetxController {
 
   StreamSubscription<InternetStatus>? _connectionSubscription;
   Timer? _timer;
-  int secondsRefresh = 60;
+  int secondsRefresh = 300; // 5 minutos
 
   @override
   Future<void> onInit() async {
@@ -82,11 +82,22 @@ class CatracaController extends GetxController {
 
   Future<void> fetchAreas() async {
     isAreaBusy.value = true;
-    await repository.cleanMore24hTransactionsOffline();
+    try {
+      await repository.cleanMore24hTransactionsOffline();
+    } catch (e) {
+      debugPrint('Erro ao tentar limpar dados: $e');
+    }
     token = await externalModulesServices.getAccessToken();
     try {
-      areas.value = await repository.getAreas(operatorIdUff ?? '', token);
+      areas.value = await repository
+          .getAreas(operatorIdUff ?? '', token)
+          .timeout(const Duration(seconds: 5));
+          
       _updateStatusMessage(true);
+    } on TimeoutException catch (_) {
+      debugPrint('A conexão demorou muito para responder.');
+      areas.value = await getOffLineAreas();
+      _updateStatusMessage(false);
     } catch (e) {
       areas.value = await getOffLineAreas();
       _updateStatusMessage(false);
@@ -96,7 +107,6 @@ class CatracaController extends GetxController {
 
   Future<void> fetchOperatorTransactions() async {
     isTransactionBusy.value = true;
-    await repository.cleanMore24hTransactionsOffline();
     token = await externalModulesServices.getAccessToken();
 
     try {
@@ -124,21 +134,14 @@ class CatracaController extends GetxController {
     } catch (e) {
       debugPrint('Erro ao buscar transações online: $e');
     }
-
+    
+    try{
+      await syncOfflineTransactions();
+    }
+    catch(e){
+      debugPrint('Erro ao sincronizar transações offline: $e');
+    }
     isTransactionBusy.value = false;
-    syncOfflineTransactions();
-  }
-
-  void selectArea(int index) {
-    selectedArea.value = areas[index];
-    fetchOperatorTransactions();
-    Get.toNamed(Routes.VALIDAR_PAGAMENTO);
-  }
-
-  void readCode() async {
-    await loadingQrCodeData();
-    isTransactionBusy.value = false;
-    Get.toNamed(Routes.RESULTADO_PAGE);
   }
 
   Future<void> loadingQrCodeData() async {
@@ -283,19 +286,6 @@ class CatracaController extends GetxController {
     return;
   }
 
-  Future<String?> _scanQRCode() async {
-    final result = await Get.toNamed(Routes.LEITOR_QRCODE);
-    return result as String?;
-  }
-
-  void goToDetalhado(OperatorTransactionModel transaction) {
-    selectedTransaction.value = transaction;
-    Get.toNamed(
-      Routes.RESULTADO_DETALHADO_PAGE,
-      arguments: {'operatorTransaction': transaction},
-    );
-  }
-
   Future<List<AreaModel>> getOffLineAreas() async {
     return [
       AreaModel(id: 4, nome: 'R.U. do Gragoatá'),
@@ -350,6 +340,24 @@ class CatracaController extends GetxController {
     }
   }
 
+  void selectArea(int index) {
+    selectedArea.value = areas[index];
+    fetchOperatorTransactions();
+    Get.toNamed(Routes.VALIDAR_PAGAMENTO);
+  }
+
+  void readCode() async {
+    await loadingQrCodeData();
+    isTransactionBusy.value = false;
+    Get.toNamed(Routes.RESULTADO_PAGE);
+  }
+
+
+  Future<String?> _scanQRCode() async {
+    final result = await Get.toNamed(Routes.LEITOR_QRCODE);
+    return result as String?;
+  }
+
   void manualValidation() {
     Get.toNamed(Routes.VALIDAR_MANUALMENTE);
   }
@@ -358,60 +366,59 @@ class CatracaController extends GetxController {
     Get.toNamed(Routes.RESULTADO_PAGE);
   }
 
-  /// Tenta enviar transações salvas no Hive ao Firebase (timeout 5s).
-  Future<void> syncOfflineTransactions() async {
-    try {
-      List<OperatorTransactionOffline> allTransactions = await repository
-          .getOperatorTransactionsOffline();
-
-      // Filtra apenas o que ainda NÃO foi sincronizado
-      List<OperatorTransactionOffline> pending = allTransactions
-          .where((tx) => tx.isSynced == false)
-          .toList();
-
-      if (pending.isEmpty) return;
-
-      List<OperatorTransactionOffline> syncedTransactionsToUpdate = [];
-
-      // Cria a lista de tarefas para rodar o envio de internet EM PARALELO
-      final tarefas = pending.map((tx) async {
-        try {
-          await repository
-              .saveOperatorTransactionToFirebase(tx)
-              .timeout(const Duration(seconds: 5));
-
-          final updatedTx = tx.copyWith(isSynced: true);
-          syncedTransactionsToUpdate.add(updatedTx);
-        } catch (e) {
-          debugPrint('Erro ao enviar transação ${tx.id} ao Firebase: $e');
-        }
-      });
-
-      // Aguarda todas as requisições de internet rodarem juntas
-      await Future.wait(tarefas);
-
-      // Atualiza o Hive local em lote de uma só vez com o que deu certo
-      if (syncedTransactionsToUpdate.isNotEmpty) {
-        try {
-          await repository.saveOperatorTransactionsOfflineBatch(
-            syncedTransactionsToUpdate,
-          );
-          debugPrint(
-            '${syncedTransactionsToUpdate.length} transações atualizadas em lote!',
-          );
-          debugPrint(
-            '${syncedTransactionsToUpdate.length} transações sincronizadas com sucesso!',
-          );
-        } catch (e) {
-          debugPrint(
-            'Erro ao atualizar status de sincronização local no Hive: $e',
-          );
-        }
-      }
-    } catch (e) {
-      debugPrint('Erro na sincronização offline: $e');
-    }
+   void goToDetalhado(OperatorTransactionModel transaction) {
+    selectedTransaction.value = transaction;
+    Get.toNamed(
+      Routes.RESULTADO_DETALHADO_PAGE,
+      arguments: {'operatorTransaction': transaction},
+    );
   }
+
+  Future<void> syncOfflineTransactions() async {
+  try {
+    List<OperatorTransactionOffline> allTransactions = await repository
+        .getOperatorTransactionsOffline();
+
+    // Filtra apenas as transações que ainda não foram sincronizadas
+    List<OperatorTransactionOffline> pending = allTransactions
+        .where((tx) => tx.isSynced == false)
+        .toList();
+
+    if (pending.isEmpty) return;
+
+    const int batchSize = 400; 
+    
+    // Divide as transações pendentes em lotes e processa cada lote
+    for (int i = 0; i < pending.length; i += batchSize) {
+      int end = (i + batchSize < pending.length) 
+          ? i + batchSize 
+          : pending.length;
+          
+      List<OperatorTransactionOffline> currentBatch = pending.sublist(i, end);
+
+      try {
+        // Tenta enviar o lote atual para o Firebase
+        await repository.saveOperatorTransactionsToFirebaseBatch(currentBatch)
+            .timeout(const Duration(seconds: 15)); 
+
+        // Se a sincronização for bem-sucedida, marca as transações como sincronizadas
+        List<OperatorTransactionOffline> syncedBatch = currentBatch
+            .map((tx) => tx.copyWith(isSynced: true))
+            .toList();
+
+        // Atualiza o status das transações no banco local
+        await repository.saveOperatorTransactionsOfflineBatch(syncedBatch);
+        
+        debugPrint('Batch of ${currentBatch.length} transactions synced successfully!');
+        
+      } catch (e) {
+        debugPrint('Error syncing batch ($i to $end): $e');
+      }
+    }
+  } catch (e) {
+    debugPrint('General error in offline synchronization: $e');
+  }
+}
 
   void _startInternetMonitoring() {
     // Escuta as mudanças de status da internet
@@ -420,9 +427,11 @@ class CatracaController extends GetxController {
     ) {
       switch (status) {
         case InternetStatus.connected:
+          debugPrint('Sincronizando catraca...');
           _startTimer(secondsRefresh);
           break;
         case InternetStatus.disconnected:
+        debugPrint('Desconectado da internet. Disconectando catraca...');
           _timer?.cancel();
           break;
       }
@@ -431,7 +440,7 @@ class CatracaController extends GetxController {
 
   void _startTimer(int secondsRefresh) {
     _timer = Timer.periodic(Duration(seconds: secondsRefresh), (timer) {
-      debugPrint('Sincronizando catraca...');
+      
       syncOfflineTransactions();
     });
   }

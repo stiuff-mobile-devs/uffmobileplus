@@ -85,4 +85,14 @@ class CatracaOnlineRepository {
       transactions,
     );
   }
+
+   Future<void> saveOperatorTransactionsToFirebaseBatch(
+  List<OperatorTransactionOffline> transactions,
+) async {
+  return await catracaOnlineProvider.saveOperatorTransactionsToFirebaseBatch(
+    transactions,
+  );
+}
+
+  
 }

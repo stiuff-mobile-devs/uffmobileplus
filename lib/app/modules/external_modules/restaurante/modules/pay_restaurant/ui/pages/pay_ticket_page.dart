@@ -31,6 +31,8 @@ class PayTicketPage extends GetView<PayRestaurantController> {
         () => controller.isPaymentProcessing.value
             ? Center(child: CustomProgressDisplay())
             : Container(
+              width: double.infinity,
+  height: double.infinity, 
                 decoration: BoxDecoration(
                   gradient: AppColors.darkBlueToBlackGradient(),
                 ),
