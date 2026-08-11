@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:flutter/foundation.dart'; // Add this import for kDebugMode
+import 'package:uffmobileplus/app/data/services/update_version_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/lock_develop_mode/controller/lock_develop_mode_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/controller/auth_iduff_controller.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
@@ -10,6 +11,8 @@ class SplashController extends GetxController
   late AnimationController animationController;
   late final LockDevelopModeController _lockController;
   late final AuthIduffController _authController;
+  final UpdateVersionService _updateService = UpdateVersionService();
+
 
   @override
   void onInit() {
@@ -26,6 +29,7 @@ class SplashController extends GetxController
 
   @override
   Future<void> onReady() async {
+    await _checkAppUpdate();
     animatedMargin = 80.0;
 
     _isDevMode = await _lockController.updateDevMode();
@@ -77,6 +81,14 @@ class SplashController extends GetxController
     );
 
     animationController.repeat(reverse: true);
+  }
+
+   Future<void> _checkAppUpdate() async {
+    await _updateService.initialize();
+
+    if (Get.context != null) {
+      await _updateService.checkForUpdates(Get.context!);
+    }
   }
 
   @override
