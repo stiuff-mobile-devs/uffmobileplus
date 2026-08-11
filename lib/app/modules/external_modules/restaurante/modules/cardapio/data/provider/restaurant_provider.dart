@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/menu/data/provider/restaurant_api.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/cardapio/data/provider/restaurant_api.dart';
 
 import '../models/meal_model.dart';
 import '../models/user_meal_model.dart';

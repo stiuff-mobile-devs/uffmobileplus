@@ -1,4 +1,4 @@
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/menu/data/provider/user_meal_resource.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/cardapio/data/provider/user_meal_resource.dart';
 
 import 'meal_resource.dart';
 
