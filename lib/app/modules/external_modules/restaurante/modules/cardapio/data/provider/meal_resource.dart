@@ -5,8 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/menu/data/provider/restaurant_api.dart';
-import 'package:xml/xml.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/cardapio/data/provider/restaurant_api.dart';
 import '../models/meal_model.dart';
 
 class MealResource {

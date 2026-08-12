@@ -28,6 +28,7 @@ import 'package:uffmobileplus/app/modules/external_modules/papers/bindings/paper
 import 'package:uffmobileplus/app/modules/external_modules/papers/ui/papers_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/balance_statement/bindings/balance_statement_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/balance_statement/ui/balance_statement_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/cardapio/bindings/cardapio_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/bindings/pay_restaurant_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/ui/pages/pay_help_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/ui/pages/pay_ticket_page.dart';
@@ -46,8 +47,6 @@ import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/c
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/ui/pages/validar_manualmente_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/ui/pages/validar_pagamento_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/utils/leitor_qr_code.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/menu/bindings/menu_bindings.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/menu/ui/pages/restaurants_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/ui/restaurant_modules_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/uniteve/bindings/uniteve_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/uniteve/ui/uniteve_contato_page.dart';
@@ -79,6 +78,7 @@ import 'package:uffmobileplus/app/modules/internal_modules/lock_develop_mode/ui/
 import 'package:uffmobileplus/app/modules/internal_modules/web_view/ui/webview_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/sos/ui/sos_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/sos/bindings/sos_binding.dart';
+import '../modules/external_modules/restaurante/modules/cardapio/ui/pages/restaurants_page.dart';
 
 abstract class AppPages {
   static final pages = [
@@ -126,7 +126,7 @@ abstract class AppPages {
         AuthGoogleBindings(),
         UserDataBindings(),
         RestauranteBindings(),
-        MenuBindings(),
+        CardapioBindings(),
       ],
     ),
 
@@ -176,7 +176,7 @@ abstract class AppPages {
     GetPage(
       name: Routes.BANDEJAPP,
       page: () => RestaurantsPage(),
-      bindings: [MenuBindings()],
+      bindings: [CardapioBindings()],
     ),
 
     // Pay Restaurant

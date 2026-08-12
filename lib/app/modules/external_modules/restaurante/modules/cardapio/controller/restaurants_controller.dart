@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/utils/gdi_groups.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/cardapio/controller/google_groups_controller.dart';
 import '../data/models/campus_model.dart';
 import '../data/repository/restaurant_repository.dart';
 
@@ -11,6 +12,7 @@ class RestaurantsController extends GetxController {
 
   RestaurantRepository restaurantRepository = Get.put(RestaurantRepository());
   ExternalModulesServices menuService = Get.find<ExternalModulesServices>();
+  GoogleGroupsController googleGroupsController = Get.put(GoogleGroupsController());
 
   final evenDarkerBlue = const Color.fromRGBO(13, 19, 33, 1);
   final darkBlue = const Color.fromRGBO(26, 38, 64, 1.0);
@@ -30,11 +32,10 @@ class RestaurantsController extends GetxController {
   get stats => null;
 
   bool? isAdminModeEnabled() {
-    return menuService.isInGroup(
-              GdiGroupsEnum.adminCardapioRestauranteUniversitario,
-            ) &&
-            !isDebugActive ||
-        (isDebugActive && debugMode == 1);
+    final bool? isAdmin = googleGroupsController.isAdmin.value;
+    if (isAdmin == null) return null;
+
+    return isAdmin && !isDebugActive || (isDebugActive && debugMode == 1);
   }
 
   @override

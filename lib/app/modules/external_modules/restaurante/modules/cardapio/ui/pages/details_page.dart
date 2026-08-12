@@ -1,10 +1,8 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/menu/ui/widgets/custom_polygon.dart';
-import '../../../../../../../routes/app_routes.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/cardapio/ui/widgets/custom_polygon.dart';
 import '../../../../../../../utils/color_pallete.dart';
-import '../../../../../../../utils/ui_components/custom_app_bar.dart';
 import '../../controller/details_controller.dart';
 import '../../data/models/campus_model.dart';
 import '../../data/models/meal_model.dart';
