@@ -11,8 +11,7 @@ import '../models/meal_model.dart';
 class MealResource {
   final ExternalModulesServices _menuService = Get.find<ExternalModulesServices>();
   final FirebaseFirestore _firestore = FirebaseFirestore.instanceFor(
-    app: Firebase.app("uffmobileplus"),
-    databaseId: 'cardapio-ru',
+    app: Firebase.app("cardapio")
   );
   late String? accessToken;
 

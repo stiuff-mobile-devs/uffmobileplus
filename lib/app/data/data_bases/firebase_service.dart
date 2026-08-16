@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:uffmobileplus/firebase_options_cardapio.dart';
 import 'package:uffmobileplus/firebase_options_catraca.dart';
 import 'package:uffmobileplus/firebase_options_harpia.dart';
 import 'package:uffmobileplus/firebase_options_uffmobileplus.dart';
@@ -23,5 +24,11 @@ class FirebaseService {
       options: FirebaseOptionsCatraca.currentPlatform,
     );
     debugPrint('✅ Firebase catraca app initialized');
+
+    await Firebase.initializeApp(
+      name: 'cardapio',
+      options: FirebaseOptionsCardapio.currentPlatform,
+    );
+    debugPrint('✅ Firebase cardapio app initialized');
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uffmobileplus/app/data/services/app_availability_service.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/data/services/deep_link_service.dart';
@@ -172,12 +173,31 @@ class HomePageController extends GetxController {
     }
   }
 
+  final RxBool hasDefaultRestaurant = false.obs;
+
+  Future<void> reloadCampusMeals() async {
+    isLoadingCampusMeals.value = true;
+    await _loadCampusMeals();
+  }
+
   Future<void> _loadCampusMeals() async {
     try {
-      final results = await Future.wait(
-        _restaurantsController.locations.map(_fetchCampusMeal),
-      );
-      campusMeals.assignAll(results);
+      final prefs = await SharedPreferences.getInstance();
+      final defaultRes = prefs.getString('default_restaurant');
+
+      if (defaultRes != null && defaultRes.isNotEmpty) {
+        hasDefaultRestaurant.value = true;
+        
+        final campus = _restaurantsController.locations.firstWhere(
+            (c) => c.name == defaultRes, 
+            orElse: () => _restaurantsController.locations.first);
+            
+        final result = await _fetchCampusMeal(campus);
+        campusMeals.assignAll([result]);
+      } else {
+        hasDefaultRestaurant.value = false;
+        campusMeals.clear();
+      }
     } catch (_) {
     } finally {
       isLoadingCampusMeals.value = false;
@@ -186,39 +206,70 @@ class HomePageController extends GetxController {
 
   Future<TodayCampusMeal> _fetchCampusMeal(Campus campus) async {
     final sigla = Campus.getSigla(campus.name);
-    final isOpenNow = Campus.isActive(sigla);
-    final currentShift = Campus.getShift(DateTime.now());
+    final now = DateTime.now();
+
+    bool isOpenOrSoon = false;
+    if (now.weekday != 6 && now.weekday != 7) {
+      final schedule = Campus.getSchedule(sigla);
+      for (int i = 0; i < schedule.length; i += 2) {
+        if (schedule[i] == 'null') continue;
+        final openTime = DateTime.parse(schedule[i]);
+        final closeTime = DateTime.parse(schedule[i + 1]);
+        final oneHourBefore = openTime.subtract(const Duration(hours: 1));
+        if (now.isAfter(oneHourBefore) && now.isBefore(closeTime)) {
+          isOpenOrSoon = true;
+          break;
+        }
+      }
+    }
+
+    if (!isOpenOrSoon) {
+      return TodayCampusMeal(
+        campus: campus,
+        shiftLabel: null,
+        meal: null,
+      );
+    }
 
     MealModel? todaysMeal;
-    if (isOpenNow && currentShift != 'undefined') {
-      try {
-        final meals = await _restaurantsController.restaurantRepository
-            .getMealsByCampus(sigla)
-            .timeout(const Duration(seconds: 8), onTimeout: () => null);
-        final now = DateTime.now();
+    String? mealShift;
 
-        if (meals != null) {
-          for (final meal in meals) {
-            final mealDate = DateTime.tryParse(meal.date.toString());
-            if (mealDate == null) continue;
+    try {
+      final meals = await _restaurantsController.restaurantRepository
+          .getMealsByCampus(sigla)
+          .timeout(const Duration(seconds: 8), onTimeout: () => <MealModel>[]);
 
-            final isToday =
-                mealDate.year == now.year &&
-                mealDate.month == now.month &&
-                mealDate.day == now.day;
+      if (meals != null && meals.isNotEmpty) {
+        final todayMeals = meals.where((meal) {
+          final mealDate = DateTime.tryParse(meal.date.toString());
+          if (mealDate == null) return false;
+          return mealDate.year == now.year &&
+              mealDate.month == now.month &&
+              mealDate.day == now.day;
+        }).toList();
 
-            if (isToday && Campus.getShift(mealDate) == currentShift) {
-              todaysMeal = meal;
-              break;
-            }
+        if (todayMeals.isNotEmpty) {
+          todayMeals.sort((a, b) => DateTime.parse(a.date.toString()).compareTo(DateTime.parse(b.date.toString())));
+          todaysMeal = todayMeals.firstWhere(
+            (m) {
+              final d = DateTime.parse(m.date.toString());
+              return d.hour >= now.hour;
+            },
+            orElse: () => todayMeals.last,
+          );
+          
+          final d = DateTime.parse(todaysMeal!.date.toString());
+          mealShift = Campus.getShift(d);
+          if (mealShift == 'undefined') {
+             mealShift = (d.hour < 15) ? 'Almoço' : 'Jantar';
           }
         }
-      } catch (_) {}
-    }
+      }
+    } catch (_) {}
 
     return TodayCampusMeal(
       campus: campus,
-      shiftLabel: isOpenNow ? currentShift : null,
+      shiftLabel: mealShift ?? (Campus.isActive(sigla) ? Campus.getShift(now) : null),
       meal: todaysMeal,
     );
   }

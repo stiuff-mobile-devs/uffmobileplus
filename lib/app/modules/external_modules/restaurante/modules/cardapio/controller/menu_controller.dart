@@ -259,6 +259,7 @@ class MenuListController extends GetxController {
       'Quinta-feira',
       'Sexta-feira',
       'Sábado',
+      'Domingo',
     ];
     return diasDaSemana[day - 1];
   }

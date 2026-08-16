@@ -312,10 +312,10 @@ class HomePage extends GetView<HomePageController> {
 
   Widget _buildRestauranteSection() {
     return Obx(() {
-      // Proteção contra nulos na lista e no boolean
       final mealsList = controller.campusMeals;
       final meals = mealsList != null ? mealsList.toList(growable: false) : [];
       final isLoading = controller.isLoadingCampusMeals.value ?? false;
+      final hasDefault = controller.hasDefaultRestaurant.value;
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -326,7 +326,9 @@ class HomePage extends GetView<HomePageController> {
             children: [
               Expanded(
                 child: Text(
-                  'Prato principal de hoje em cada campus.',
+                  hasDefault 
+                      ? 'Cardápio de hoje.'
+                      : 'Defina seu restaurante padrão.',
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.92),
                     fontSize: 13,
@@ -334,27 +336,64 @@ class HomePage extends GetView<HomePageController> {
                   ),
                 ),
               ),
-              Icon(
-                Icons.swipe,
-                color: Colors.white.withOpacity(0.65),
-                size: 28,
-              ),
             ],
           ),
           const SizedBox(height: 14),
-          SizedBox(
-            height: 150,
-            // Substituído SizedBox.expand por Center para evitar quebra de layout
-            child: isLoading
-                ? const Center(child: CustomProgressDisplay(height: 50))
-                : ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: meals.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 12),
-                    itemBuilder: (context, index) =>
-                        _CampusMealCard(data: meals[index]),
+          if (!hasDefault && !isLoading)
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: () => Get.toNamed(Routes.BANDEJAPP),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                  decoration: _cardDecoration(),
+                  child: Column(
+                    children: [
+                      const Icon(Icons.restaurant, color: Colors.white, size: 32),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'Defina seu restaurante padrão',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Clique aqui para escolher seu refeitório',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
                   ),
-          ),
+                ),
+              ),
+            )
+          else if (isLoading)
+            const SizedBox(
+              height: 150,
+              child: Center(child: CustomProgressDisplay(height: 50)),
+            )
+          else if (meals.isNotEmpty)
+            SizedBox(
+              height: 150,
+              child: _CampusMealCard(data: meals.first),
+            )
+          else
+            const SizedBox(
+              height: 150,
+              child: Center(
+                child: Text(
+                  'Cardápio indisponível no momento.',
+                  style: TextStyle(color: Colors.white70),
+                ),
+              ),
+            ),
         ],
       );
     });
@@ -642,9 +681,18 @@ class _CampusMealCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final meal = data.meal;
     final hasDish = meal?.main?.isNotEmpty ?? false;
-    final subtitle = hasDish
-        ? meal!.main!
-        : 'Ainda não há refeições disponíveis para este refeitório.';
+    
+    String subtitle = 'Ainda não há refeições disponíveis para este refeitório.';
+    if (hasDish) {
+      final items = [meal!.main, meal.garnish, meal.side]
+          .where((item) => item != null && item.trim().isNotEmpty)
+          .map((item) => '• ${item!.trim()}')
+          .toList();
+      if (items.isNotEmpty) {
+        subtitle = items.join('\n');
+      }
+    }
+    
     final isOpen = data.shiftLabel != null;
 
     return Material(
@@ -656,7 +704,7 @@ class _CampusMealCard extends StatelessWidget {
           transition: Transition.rightToLeft,
         ),
         child: Container(
-          width: 168,
+          width: double.infinity,
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
@@ -694,11 +742,11 @@ class _CampusMealCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   subtitle,
-                  maxLines: 3,
+                  maxLines: 4,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.92),
-                    fontSize: 13,
+                    fontSize: 15,
                     height: 1.3,
                   ),
                 ),

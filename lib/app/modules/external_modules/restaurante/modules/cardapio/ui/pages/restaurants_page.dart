@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/home_page_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/cardapio/ui/widgets/custom_polygon.dart';
 import '../../../../../../../utils/color_pallete.dart';
 import '../../../../../../../utils/ui_components/custom_alert_dialog.dart';
@@ -38,7 +39,60 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
 
   Future<void> _loadPrefs() async {
     prefs = await SharedPreferences.getInstance();
-    setState(() {});
+    
+    String? defaultRes = prefs!.getString('default_restaurant');
+    if (defaultRes == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _showDefaultRestaurantDialog();
+      });
+    }
+    
+    if (mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() {});
+      });
+    }
+  }
+
+  void _showDefaultRestaurantDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: prefs?.getString('default_restaurant') != null,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Restaurante Padrão'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: restaurantsController.locations.map((loc) {
+                bool isDefault = prefs?.getString('default_restaurant') == loc.name;
+                return ListTile(
+                  title: Text(
+                    loc.name,
+                    style: TextStyle(
+                      fontWeight: isDefault ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  ),
+                  trailing: isDefault
+                      ? const Icon(Icons.check_circle, color: Colors.green)
+                      : null,
+                  onTap: () async {
+                    await prefs!.setString('default_restaurant', loc.name);
+                    setState(() {});
+                    
+                    if (Get.isRegistered<HomePageController>()) {
+                      Get.find<HomePageController>().reloadCampusMeals();
+                    }
+                    
+                    Navigator.of(context).pop();
+                  },
+                );
+              }).toList(),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   void _showGdiFailureSign() {
@@ -386,6 +440,20 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
     );
   }
 
+  List<Campus> _getSortedLocations() {
+    if (prefs == null) return restaurantsController.locations;
+    List<Campus> locs = List.from(restaurantsController.locations);
+    String? defaultRes = prefs!.getString('default_restaurant');
+    if (defaultRes != null) {
+      locs.sort((a, b) {
+        if (a.name == defaultRes) return -1;
+        if (b.name == defaultRes) return 1;
+        return 0;
+      });
+    }
+    return locs;
+  }
+
   @override
   Widget build(BuildContext context) {
     return GetBuilder<RestaurantsController>(
@@ -408,6 +476,13 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
                 gradient: AppColors.appBarTopGradient(),
               ),
             ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.settings),
+                onPressed: _showDefaultRestaurantDialog,
+                tooltip: 'Trocar Restaurante Padrão',
+              ),
+            ],
           ),
           body: restaurantsController.isLoading
               ? const Center(
@@ -425,7 +500,7 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
                 alignment: Alignment.topCenter,
                 child: SingleChildScrollView(
                   child: Column(
-                    children: restaurantsController.locations
+                    children: _getSortedLocations()
                         .asMap()
                         .entries
                         .map((entry) {

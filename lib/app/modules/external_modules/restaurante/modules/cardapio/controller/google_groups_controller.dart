@@ -56,7 +56,14 @@ class GoogleGroupsController extends GetxController {
         return;
       }
 
+      debugPrint("USER EMAIL $userEmail");
       final entities = await _googleService.getGroupEntities(token, rootGroupEmail);
+      debugPrint("=== Membros do Grupo ===");
+      for (var member in entities) {
+        debugPrint("- ${member['email']} (${member['role']})");
+      }
+      debugPrint("========================");
+
       final isMember = entities.any(
               (m) => m['email']?.toString().trim().toLowerCase() == userEmail.trim().toLowerCase()
       );
