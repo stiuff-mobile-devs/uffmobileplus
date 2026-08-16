@@ -62,11 +62,26 @@ class _DetailsPageState extends State<DetailsPage> {
                   }),
                   builder:
                       (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                    return (snapshot.connectionState == ConnectionState.waiting)
-                        ? const CircularProgressIndicator(
-                            color: Colors.amber,
-                          )
-                        : Container(
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator(
+                        color: Colors.amber,
+                      );
+                    }
+                    if (snapshot.hasError) {
+                      debugPrint('Error generating menu visualizer: ${snapshot.error}');
+                      return Text(
+                        'Erro ao carregar detalhes: ${snapshot.error}',
+                        style: const TextStyle(color: Colors.white),
+                        textAlign: TextAlign.center,
+                      );
+                    }
+                    if (!snapshot.hasData || snapshot.data == null) {
+                      return const Text(
+                        'Nenhum dado disponível',
+                        style: TextStyle(color: Colors.white),
+                      );
+                    }
+                    return Container(
                             decoration: const BoxDecoration(
                               color: Colors.white,
                               borderRadius:

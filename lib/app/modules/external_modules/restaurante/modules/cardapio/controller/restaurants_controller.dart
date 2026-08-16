@@ -32,11 +32,10 @@ class RestaurantsController extends GetxController {
   get stats => null;
 
   bool? isAdminModeEnabled() {
-    return true;
-    // final bool? isAdmin = googleGroupsController.isAdmin.value;
-    // if (isAdmin == null) return null;
-    //
-    // return isAdmin && !isDebugActive || (isDebugActive && debugMode == 1);
+    final bool? isAdmin = googleGroupsController.isAdmin.value;
+    if (isAdmin == null) return null;
+
+    return isAdmin && !isDebugActive || (isDebugActive && debugMode == 1);
   }
 
   @override
