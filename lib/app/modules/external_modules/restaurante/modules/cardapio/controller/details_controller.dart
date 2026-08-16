@@ -49,7 +49,7 @@ class DetailsController extends GetxController {
   }
 
   Future<void> shareImage(MealModel meal) async {
-    DateTime data = DateTime.parse(meal.createdAt.toString());
+    DateTime data = _parseDate(meal.createdAt);
     String formattedDate = intl.DateFormat('yyyy-MM-dd_HH:mm:ss').format(data);
 
     var imgId = (meal.id as int) + 918323;
@@ -119,6 +119,26 @@ class DetailsController extends GetxController {
     return textField;
   }
 
+  DateTime _parseDate(dynamic dateObj) {
+    if (dateObj == null) return DateTime.now();
+    if (dateObj is DateTime) return dateObj;
+    
+    try {
+      return (dateObj as dynamic).toDate();
+    } catch (_) {}
+    
+    String dateStr = dateObj.toString();
+    if (dateStr.startsWith('Timestamp(seconds=')) {
+      final match = RegExp(r'seconds=(\d+)').firstMatch(dateStr);
+      if (match != null) {
+        final seconds = int.parse(match.group(1)!);
+        return DateTime.fromMillisecondsSinceEpoch(seconds * 1000);
+      }
+    }
+    
+    return DateTime.parse(dateStr);
+  }
+
   Future<ui.Image> _createTextOverImage(img.Image originalImage, MealModel meal,
       double scale, double width, double height, String fontFamily) async {
     final recorder = ui.PictureRecorder();
@@ -132,13 +152,13 @@ class DetailsController extends GetxController {
 
     canvas.drawImage(backgroundUiImage, const Offset(0, 0), Paint());
 
-    DateTime data = DateTime.parse(meal.date.toString());
+    DateTime data = _parseDate(meal.date);
 
-    final hasSideIngr = (meal.sideIngr!.length <= 1) ? -20 : 0;
+    final hasSideIngr = (meal.sideIngr == null || meal.sideIngr!.length <= 1) ? -20 : 0;
 
-    final hasMainIngr = (meal.mainIngr!.length <= 1) ? -20 : 0;
+    final hasMainIngr = (meal.mainIngr == null || meal.mainIngr!.length <= 1) ? -20 : 0;
 
-    final hasGarnishIngr = (meal.garnishIngr!.length <= 1) ? -20 : 0;
+    final hasGarnishIngr = (meal.garnishIngr == null || meal.garnishIngr!.length <= 1) ? -20 : 0;
 
     final textFields = [
       _TextFieldData(
@@ -146,7 +166,7 @@ class DetailsController extends GetxController {
           10,
           13 * scale),
       _TextFieldData(
-          Campus.getName(meal.campus!).toUpperCase(), 19, 42.5 * scale, true),
+          Campus.getName(meal.campus ?? '').toUpperCase(), 19, 42.5 * scale, true),
       _TextFieldData('CARDÁPIO do:', 16, 82.5 * scale),
       _TextFieldData(
           data.hour == 12 || (data.hour == 11 && data.minute == 15)
@@ -156,18 +176,18 @@ class DetailsController extends GetxController {
           102.5 * scale,
           true),
       _TextFieldData('PRATO PRINCIPAL:', 10, (132.5) * scale),
-      _TextFieldData(meal.main!.toUpperCase(), 10, (147.5) * scale, true),
-      _TextFieldData(meal.mainIngr!, 9, (162.5) * scale),
+      _TextFieldData((meal.main ?? '').toUpperCase(), 10, (147.5) * scale, true),
+      _TextFieldData(meal.mainIngr ?? '', 9, (162.5) * scale),
       _TextFieldData('GUARNIÇÃO:', 10, (202.5 + hasMainIngr) * scale),
       _TextFieldData(
-          meal.garnish!.toUpperCase(), 10, (217.5 + hasMainIngr) * scale, true),
-      _TextFieldData(meal.garnishIngr!, 9, (232.5 + hasMainIngr) * scale),
+          (meal.garnish ?? '').toUpperCase(), 10, (217.5 + hasMainIngr) * scale, true),
+      _TextFieldData(meal.garnishIngr ?? '', 9, (232.5 + hasMainIngr) * scale),
       _TextFieldData('ACOMPANHAMENTO:', 10,
           (272.5 + hasGarnishIngr + hasMainIngr) * scale),
-      _TextFieldData(meal.side!.toUpperCase(), 10,
+      _TextFieldData((meal.side ?? '').toUpperCase(), 10,
           (287.5 + hasGarnishIngr + hasMainIngr) * scale, true),
       _TextFieldData(
-          meal.sideIngr!, 9, (302.5 + hasGarnishIngr + hasMainIngr) * scale),
+          meal.sideIngr ?? '', 9, (302.5 + hasGarnishIngr + hasMainIngr) * scale),
       _TextFieldData(
           'SALADA 1:',
           10,
@@ -175,7 +195,7 @@ class DetailsController extends GetxController {
           false,
           width / 2),
       _TextFieldData(
-          meal.salad1!.toUpperCase(),
+          (meal.salad1 ?? '').toUpperCase(),
           10,
           (357.5 + hasSideIngr + hasMainIngr + hasGarnishIngr) * scale,
           true,
@@ -187,16 +207,16 @@ class DetailsController extends GetxController {
           false,
           width * 3 / 2),
       _TextFieldData(
-          meal.salad2!.toUpperCase(),
+          (meal.salad2 ?? '').toUpperCase(),
           10,
           (357.5 + hasSideIngr + hasMainIngr + hasGarnishIngr) * scale,
           true,
           width * 3 / 2),
       _TextFieldData('SOBREMESA:', 10,
           (387.5 + hasSideIngr + hasMainIngr + hasGarnishIngr) * scale),
-      _TextFieldData(meal.dessert!.toUpperCase(), 10,
+      _TextFieldData((meal.dessert ?? '').toUpperCase(), 10,
           (402.5 + hasSideIngr + hasMainIngr + hasGarnishIngr) * scale, true),
-      _TextFieldData(meal.observ!.toUpperCase(), 10, 426.5 * scale, true),
+      _TextFieldData((meal.observ ?? '').toUpperCase(), 10, 426.5 * scale, true),
       _TextFieldData('Cardápio sujeito a alterações.', 9, 471.5 * scale)
     ];
 
@@ -231,7 +251,7 @@ class DetailsController extends GetxController {
   }
 
   Future<List<int>> createMealMenuVisualizer(MealModel meal) async {
-    DateTime mData = DateTime.parse(meal.createdAt.toString());
+    DateTime mData = _parseDate(meal.createdAt);
     //DateTime mData = DateTime.parse(meal.createdAt);
     String formattedDate = intl.DateFormat('yyyy-MM-dd_HH:mm:ss').format(mData);
 

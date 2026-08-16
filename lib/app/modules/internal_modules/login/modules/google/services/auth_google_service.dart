@@ -30,6 +30,11 @@ class AuthGoogleService {
     app: _catracaApp,
   );
 
+  final FirebaseApp _cardapioApp = Firebase.app('cardapio');
+  late final fb.FirebaseAuth _cardapioAuth = fb.FirebaseAuth.instanceFor(
+    app: _cardapioApp,
+  );
+
   AuthGoogleService();
 
   Future<UserGoogleModel?> signInGoogle() async {
@@ -74,6 +79,17 @@ class AuthGoogleService {
         );
       } catch (e) {
         debugPrint('Error logging into other Firebase apps: $e');
+      }
+
+      try {
+        var userCredentialCardapio = await _cardapioAuth.signInWithCredential(
+          authCredential,
+        );
+        debugPrint(
+          'Logado com sucesso no Firebase Cardapio: ${userCredentialCardapio.user?.uid}',
+        );
+      } catch (e) {
+        debugPrint('Error logging into cardapio Firebase apps: $e');
       }
 
       return await _createUserDoc(userCredential);
@@ -121,6 +137,7 @@ class AuthGoogleService {
     await _uffMobileAuth.signOut();
     await _harpiaAuth.signOut();
     await _catracaAuth.signOut();
+    await _cardapioAuth.signOut();
   }
 
   Future<String?> getFirebaseIdToken() async {
