@@ -64,14 +64,20 @@ class AuthGoogleService {
         authCredential,
       );
       //Loga nos outros firebaes
-      try {
-        var userCredentialHarpia = await _harpiaAuth.signInWithCredential(
+
+      try{
+         var userCredentialHarpia = await _harpiaAuth.signInWithCredential(
           authCredential,
         );
         debugPrint(
           'Logado com sucesso no Firebase Harpia: ${userCredentialHarpia.user?.uid}',
         );
+      }
+      catch(e){
+        debugPrint('Error logging into other Harpia Firebase app: $e');
+      }
 
+      try {
         var userCredentialBancoDeIdeias = await _bancoDeIdeiasAuth.signInWithCredential(
           authCredential,
         );
@@ -79,7 +85,7 @@ class AuthGoogleService {
           'Logado com sucesso no Firebase Banco de Ideias: ${userCredentialBancoDeIdeias.user?.uid}',
         );
       } catch (e) {
-        debugPrint('Error logging into other Firebase apps: $e');
+        debugPrint('Error logging into Banco de Ideias Firebase apps: $e');
       }
 
       try {
@@ -90,7 +96,7 @@ class AuthGoogleService {
           'Logado com sucesso no Firebase Catraca: ${userCredentialCatraca.user?.uid}',
         );
       } catch (e) {
-        debugPrint('Error logging into other Firebase apps: $e');
+        debugPrint('Error logging into Catraca Firebase apps: $e');
       }
 
       try {
@@ -150,6 +156,8 @@ class AuthGoogleService {
     await _harpiaAuth.signOut();
     await _catracaAuth.signOut();
     await _cardapioAuth.signOut();
+    await _bancoDeIdeiasAuth.signOut();
+    debugPrint('✅ User logged out from all Firebase apps');
   }
 
   Future<String?> getFirebaseIdToken() async {
