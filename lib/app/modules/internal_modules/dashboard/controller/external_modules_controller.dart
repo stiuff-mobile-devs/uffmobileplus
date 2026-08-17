@@ -96,6 +96,16 @@ class ExternalModulesController extends GetxController {
     ),
 
     ExternalModules(
+      iconSrc: 'assets/icons/banco_de_ideias.svg',
+      subtitle: 'Banco de Ideias',
+      page: Routes.BANCO_DE_IDEIAS,
+      url: '',
+      interrogation: false,
+      availableFor: everyone,
+      gdiGroups: null,
+    ),
+
+    ExternalModules(
       iconSrc: 'assets/radio/icons/radio.svg',
       subtitle: 'radio_pop_goiaba'.tr,
       page: Routes.RADIO,

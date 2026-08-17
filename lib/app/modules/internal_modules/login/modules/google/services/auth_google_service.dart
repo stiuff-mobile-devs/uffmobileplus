@@ -35,6 +35,11 @@ class AuthGoogleService {
     app: _cardapioApp,
   );
 
+  final FirebaseApp _bancoDeIdeiasApp = Firebase.app('banco_de_ideias');
+  late final fb.FirebaseAuth _bancoDeIdeiasAuth = fb.FirebaseAuth.instanceFor(
+    app: _bancoDeIdeiasApp,
+  );
+
   AuthGoogleService();
 
   Future<UserGoogleModel?> signInGoogle() async {
@@ -65,6 +70,13 @@ class AuthGoogleService {
         );
         debugPrint(
           'Logado com sucesso no Firebase Harpia: ${userCredentialHarpia.user?.uid}',
+        );
+
+        var userCredentialBancoDeIdeias = await _bancoDeIdeiasAuth.signInWithCredential(
+          authCredential,
+        );
+        debugPrint(
+          'Logado com sucesso no Firebase Banco de Ideias: ${userCredentialBancoDeIdeias.user?.uid}',
         );
       } catch (e) {
         debugPrint('Error logging into other Firebase apps: $e');
