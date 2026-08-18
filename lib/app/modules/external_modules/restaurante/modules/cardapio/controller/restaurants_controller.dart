@@ -12,7 +12,7 @@ class RestaurantsController extends GetxController {
 
   RestaurantRepository restaurantRepository = Get.put(RestaurantRepository());
   ExternalModulesServices menuService = Get.find<ExternalModulesServices>();
-  GoogleGroupsController googleGroupsController = Get.put(GoogleGroupsController());
+  CardapioGoogleGroupsController googleGroupsController = Get.put(CardapioGoogleGroupsController());
 
   final evenDarkerBlue = const Color.fromRGBO(13, 19, 33, 1);
   final darkBlue = const Color.fromRGBO(26, 38, 64, 1.0);

@@ -63,7 +63,7 @@ class UserController extends GetxController {
   }
 
   bool isTrackable() {
-    final googleGroupsCtrl = Get.find<GoogleGroupsController>();
+    final googleGroupsCtrl = Get.find<HarpiaGoogleGroupsController>();
     final currentUserEmail = _user.value?.email;
 
     if (currentUserEmail == null) return false;

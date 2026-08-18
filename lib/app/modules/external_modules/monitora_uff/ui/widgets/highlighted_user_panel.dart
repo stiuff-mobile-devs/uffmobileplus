@@ -11,7 +11,7 @@ class HighlightedUserPanel extends StatelessWidget {
   const HighlightedUserPanel({super.key});
 
   TrackingController get trackingCtrl => Get.find<TrackingController>();
-  GoogleGroupsController get googleGroupsCtrl => Get.find<GoogleGroupsController>();
+  HarpiaGoogleGroupsController get googleGroupsCtrl => Get.find<HarpiaGoogleGroupsController>();
   CallController get callCtrl => Get.find<CallController>();
 
   @override

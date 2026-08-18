@@ -7,7 +7,7 @@ import 'package:uffmobileplus/app/utils/color_pallete.dart';
 class GroupSelector extends StatelessWidget {
   const GroupSelector({super.key});
 
-  GoogleGroupsController get googleGroupsController => Get.find<GoogleGroupsController>();
+  HarpiaGoogleGroupsController get googleGroupsController => Get.find<HarpiaGoogleGroupsController>();
 
   Widget _group(GoogleGroupModel group) {
     return ListTile(
@@ -48,13 +48,21 @@ class GroupSelector extends StatelessWidget {
         children: [
           DrawerHeader(
             decoration: BoxDecoration(color: AppColors.darkBlue()),
-            child: Column(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Grupos', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 24)),
+                IconButton(
+                  icon: const Icon(Icons.refresh, color: Colors.white),
+                  onPressed: () {
+                    googleGroupsController.refreshGroups();
+                  },
+                  tooltip: 'Atualizar grupos',
+                ),
               ],
             ),
           ),
-
           // Lista dos grupos carregados dinamicamente da API
           Obx(() {
             if (googleGroupsController.isLoading.value) {
