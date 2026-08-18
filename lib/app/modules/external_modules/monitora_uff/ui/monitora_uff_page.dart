@@ -23,7 +23,7 @@ class MonitoraUFFPage extends StatelessWidget {
   UserController get userCtrl => Get.find<UserController>();
   PermissionsController get permissionsCtrl => Get.find<PermissionsController>();
   TrackingController get trackingCtrl => Get.find<TrackingController>();
-  GoogleGroupsController get googleGroupsController => Get.find<GoogleGroupsController>();
+  HarpiaGoogleGroupsController get googleGroupsController => Get.find<HarpiaGoogleGroupsController>();
 
   @override
   Widget build(BuildContext context) {

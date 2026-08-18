@@ -6,7 +6,7 @@ import 'package:uffmobileplus/app/utils/color_pallete.dart';
 class HarpiaAppBar extends StatelessWidget implements PreferredSizeWidget {
   const HarpiaAppBar({super.key});
 
-  GoogleGroupsController get googleGroupsController => Get.find<GoogleGroupsController>();
+  HarpiaGoogleGroupsController get googleGroupsController => Get.find<HarpiaGoogleGroupsController>();
 
   @override
   Widget build(BuildContext context) {

@@ -24,6 +24,6 @@ class CardapioBindings implements Bindings {
     Get.put<MealFormController>(MealFormController());
     Get.put<DetailsController>(DetailsController());
 
-    Get.lazyPut(() => GoogleGroupsController());
+    Get.lazyPut(() => CardapioGoogleGroupsController());
   }
 }

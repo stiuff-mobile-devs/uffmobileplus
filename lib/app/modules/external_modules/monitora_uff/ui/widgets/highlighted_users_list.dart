@@ -6,7 +6,7 @@ import 'package:uffmobileplus/app/utils/color_pallete.dart';
 class HighlightedObservedUsersList extends StatelessWidget {
   const HighlightedObservedUsersList({super.key});
 
-  GoogleGroupsController get googleGroupsCtrl => Get.find<GoogleGroupsController>();
+  HarpiaGoogleGroupsController get googleGroupsCtrl => Get.find<HarpiaGoogleGroupsController>();
 
   @override
   Widget build(BuildContext context) {

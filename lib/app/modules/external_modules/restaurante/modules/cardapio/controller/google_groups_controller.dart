@@ -6,7 +6,7 @@ import 'package:uffmobileplus/app/data/connections/google_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/google_group_member_model.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/google_group_model.dart';
 
-class GoogleGroupsController extends GetxController {
+class CardapioGoogleGroupsController extends GetxController {
   final GoogleService _googleService = GoogleService();
   final fb.FirebaseAuth _auth = fb.FirebaseAuth.instanceFor(
       app: Firebase.app('uffmobileplus')

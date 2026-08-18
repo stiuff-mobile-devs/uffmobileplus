@@ -14,7 +14,7 @@ class MonitoraUffBindings implements Bindings {
     Get.lazyPut<TrackingController>(() => TrackingController());
     Get.lazyPut<PermissionsController>(() => PermissionsController());
     Get.lazyPut(() => AuthGoogleController()); 
-    Get.lazyPut(() => GoogleGroupsController()); 
+    Get.lazyPut(() => HarpiaGoogleGroupsController()); 
     Get.lazyPut(() => CalendarController());
     Get.lazyPut(() => CallController());
   }

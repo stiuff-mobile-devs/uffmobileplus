@@ -86,7 +86,7 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
   /// Inicia o worker que observa mudanças em highlightedObservedUsers.
   void _setupHighlightedUsersListener() {
     ever(
-      Get.find<GoogleGroupsController>().highlightedObservedUsers,
+      Get.find<HarpiaGoogleGroupsController>().highlightedObservedUsers,
       (_) {
         // Debounce para evitar múltiplas reações quando toggleHighlight
         // é chamado rapidamente (adiciona/remove um item por vez)
@@ -102,7 +102,7 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
     /// Sincroniza as subscriptions de trajetórias com a lista atual de
   /// highlightedObservedUsers.
   void _syncHighlightedTrajectories() {
-    final googleGroupsCtrl = Get.find<GoogleGroupsController>();
+    final googleGroupsCtrl = Get.find<HarpiaGoogleGroupsController>();
     final calendarCtrl = Get.find<CalendarController>();
     final day = calendarCtrl.observedDay.value;
     final members = googleGroupsCtrl.highlightedObservedUsers;
@@ -147,7 +147,7 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
     _highlightedTrajectorySubscriptions.clear();
     highlightedTrajectories.clear();
 
-    final googleGroupsCtrl = Get.find<GoogleGroupsController>();
+    final googleGroupsCtrl = Get.find<HarpiaGoogleGroupsController>();
     for (final member in googleGroupsCtrl.highlightedObservedUsers) {
       _subscribeToHighlightedTrajectory(member.email, day);
     }
@@ -162,7 +162,7 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
   /// vindas do stream de `firebaseUsers`. Quando é um dia passado, busca a
   /// última localização conhecida de cada usuário observado no histórico.
   Future<void> _refreshMarkersForObservedDay(DateTime day) async {
-    final googleGroupsCtrl = Get.find<GoogleGroupsController>();
+    final googleGroupsCtrl = Get.find<HarpiaGoogleGroupsController>();
     final observedEmails =
         googleGroupsCtrl.observedMembers.map((m) => m.email).toSet();
 
@@ -306,7 +306,7 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
     });
 
     // Observa mudanças nos membros observados para atualizar marcadores ao trocar de grupo
-    ever(Get.find<GoogleGroupsController>().observedMembers, (_) {
+    ever(Get.find<HarpiaGoogleGroupsController>().observedMembers, (_) {
       final day = Get.find<CalendarController>().observedDay.value;
       _refreshMarkersForObservedDay(day);
     });
