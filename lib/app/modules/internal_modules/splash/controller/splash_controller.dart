@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:flutter/foundation.dart'; // Add this import for kDebugMode
@@ -44,6 +45,8 @@ class SplashController extends GetxController
       return;
     }
 
+    await _requestNotificationPermission();
+
     if (_isDevMode && !kDebugMode) {
       Get.offAllNamed(Routes.YOU_SHALL_NOT_PASS);
     } else {
@@ -88,6 +91,35 @@ class SplashController extends GetxController
 
     if (Get.context != null) {
       await _updateService.checkForUpdates(Get.context!);
+    }
+  }
+
+  Future<void> _requestNotificationPermission() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+    try {
+      // O método requestPermission invoca o pop-up nativo do sistema
+      NotificationSettings settings = await messaging.requestPermission(
+        alert: true,       // Exibir notificação na tela
+        badge: true,       // Mostrar o número no ícone do app
+        sound: true,       // Tocar som
+        announcement: false,
+        carPlay: false,
+        criticalAlert: false,
+        provisional: false,
+      );
+
+      // Verificando a resposta do usuário
+      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+        debugPrint('Permissão concedida: O usuário aceitou as notificações.');
+
+      } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+        debugPrint('Permissão provisória concedida (Apenas iOS).');
+      } else {
+        debugPrint('Permissão negada: O usuário recusou as notificações.');
+      }
+    } catch (e) {
+      debugPrint('Erro ao solicitar permissão de notificação: $e');
     }
   }
 

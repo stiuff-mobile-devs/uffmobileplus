@@ -30,8 +30,11 @@ class AuthGoogleController extends GetxController {
         String? token = await _authGoogle.getFirebaseIdToken();
         await _userRepository.saveUserGoogleModel(user);
         await _registerTokenCdc();
-        await getGdiGroupsGoogle(token ?? '', user.email,false);
-        Get.offNamed(Routes.HOME);
+        await getGdiGroupsGoogle(token ?? '', user.email, false);
+        
+        // Chama a função auxiliar passando o e-mail
+        _verifyEmailAndNavigate(user.email);
+
       } else {
         Get.snackbar(
           "Erro de Login",
@@ -46,6 +49,32 @@ class AuthGoogleController extends GetxController {
         snackPosition: SnackPosition.BOTTOM,
       );
       rethrow;
+    }
+  }
+
+  void _verifyEmailAndNavigate(String email) {
+    if (email.endsWith('@id.uff.br')) {
+      // Se for acadêmico, vai direto para a Home
+      Get.offNamed(Routes.HOME);
+    } else {
+      // Se não for, exibe o pop-up
+      Get.defaultDialog(
+        title: "Atenção",
+        middleText: "Você não entrou com um e-mail institucional (@id.uff.br). Algumas funcionalidades podem estar indisponíveis.\n\nDeseja continuar mesmo assim?",
+        textConfirm: "Continuar",
+        textCancel: "Refazer Login",
+        confirmTextColor: Colors.white,
+        barrierDismissible: false,
+        onConfirm: () {
+          Get.back(); // Fecha o dialog
+          Get.offNamed(Routes.HOME); // Vai para a Home
+        },
+        onCancel: () async {
+          // Desloga o usuário para ele poder escolher outra conta do Google
+          logout();
+          debugPrint("Usuário cancelou. Inserir lógica de logout aqui.");
+        },
+      );
     }
   }
 
