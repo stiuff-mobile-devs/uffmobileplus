@@ -96,28 +96,29 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
   }
 
   void _showGdiFailureSign() {
-    if (prefs == null) return;
-
-    bool hasShownGdiFailureWarning =
-        prefs!.getBool('hasShownGdiFailureWarning') ?? false;
-    if (!hasShownGdiFailureWarning &&
-        restaurantsController.isAdminModeEnabled() == null) {
-      Future.delayed(const Duration(milliseconds: 500), () async {
-        await customAlertDialog(
-          Get.context!,
-          title: "O GDI Falhou! :(",
-          desc:
-          "O serviço de Gestão de Identidade apresentou instabilidade. Algumas funções do módulo podem estar indisponíveis.",
-          onConfirm: () {
-            prefs!.setBool('hasShownGdiFailureWarning', true);
-          },
-          btnConfirmColor: const Color.fromARGB(255, 91, 45, 199),
-          btnConfirmText: "Estou ciente e desejo continuar.",
-          dismissOnTouchOutside: true,
-          dismissOnBackKeyPress: true,
-        ).show();
-      });
-    }
+    return;
+    // if (prefs == null) return;
+    //
+    // bool hasShownGdiFailureWarning =
+    //     prefs!.getBool('hasShownGdiFailureWarning') ?? false;
+    // if (!hasShownGdiFailureWarning &&
+    //     restaurantsController.isAdminModeEnabled() == null) {
+    //   Future.delayed(const Duration(milliseconds: 500), () async {
+    //     await customAlertDialog(
+    //       Get.context!,
+    //       title: "O GDI Falhou! :(",
+    //       desc:
+    //       "O serviço de Gestão de Identidade apresentou instabilidade. Algumas funções do módulo podem estar indisponíveis.",
+    //       onConfirm: () {
+    //         prefs!.setBool('hasShownGdiFailureWarning', true);
+    //       },
+    //       btnConfirmColor: const Color.fromARGB(255, 91, 45, 199),
+    //       btnConfirmText: "Estou ciente e desejo continuar.",
+    //       dismissOnTouchOutside: true,
+    //       dismissOnBackKeyPress: true,
+    //     ).show();
+    //   });
+    // }
   }
 
   Widget _buildLocationCard(
