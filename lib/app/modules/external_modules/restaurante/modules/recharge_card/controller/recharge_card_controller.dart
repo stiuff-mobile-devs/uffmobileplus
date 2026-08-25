@@ -30,6 +30,53 @@ class RechargeCardController extends GetxController {
     "7,00",
   ]);
 
+  /// Contador de refeições avulsas (começa em 10 = R$ 7,00)
+  RxInt mealCount = 10.obs;
+
+  static const double pricePerMeal = 0.70;
+
+  String get mealCountPrice {
+    final value = mealCount.value * pricePerMeal;
+    return NumberFormat.currency(
+      locale: 'pt_BR',
+      symbol: '',
+      decimalDigits: 2,
+    ).format(value).trim();
+  }
+
+  void incrementMealCount() {
+    mealCount.value++;
+    _applyMealCountToField();
+    _clearGridSelection();
+  }
+
+  void decrementMealCount() {
+    if (mealCount.value > 1) {
+      mealCount.value--;
+      _applyMealCountToField();
+      _clearGridSelection();
+    }
+  }
+
+  void selectMealCountButton() {
+    _clearGridSelection();
+    _applyMealCountToField();
+  }
+
+  void _applyMealCountToField() {
+    priceFieldController.text = mealCountPrice;
+    priceFieldController.selection = TextSelection.fromPosition(
+      TextPosition(offset: priceFieldController.text.length),
+    );
+  }
+
+  void _clearGridSelection() {
+    for (int j = 0; j < selectedValues.length; j++) {
+      selectedValues[j] = false;
+    }
+    selectedValues.refresh();
+  }
+
   TextEditingController priceFieldController = TextEditingController();
 
   String paymentUrl = "";
@@ -74,7 +121,7 @@ class RechargeCardController extends GetxController {
   }
 
   void goToPayment() async {
-    isLoading.value = true;
+   isLoading.value = true;
     String userAcessToken =
         await externalModulesServices.getAccessToken() ?? "";
     try {
@@ -83,9 +130,7 @@ class RechargeCardController extends GetxController {
         userIdUFF,
         userAcessToken,
       );
-    } catch (e, stackTrace) {
-      print(e);
-      print(stackTrace);
+    } catch (e) {
       await MessageDialogs.showErrorDialog(Get.context);
     } finally {
       isLoading.value = false;
