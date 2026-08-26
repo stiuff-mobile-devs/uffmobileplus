@@ -39,6 +39,13 @@ class StudyPlanModel extends HiveObject {
         json['disciplinas'].forEach((value) {
           disciplines.add(Discipline.fromJson(value));
         });
+        
+        disciplines.sort((a, b) {
+          if (a.startTime == null && b.startTime == null) return 0;
+          if (a.startTime == null) return 1;
+          if (b.startTime == null) return -1;
+          return a.startTime!.compareTo(b.startTime!);
+        });
       }
     } catch (e) {
       debugPrint("Error on decoding Discipline list json: $e");

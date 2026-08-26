@@ -1,7 +1,5 @@
 import 'package:get/get.dart';
-import '../data/models/discipline_model.dart';
 import '../data/models/study_plan_model.dart';
-import '../data/models/weekday_model.dart';
 import '../data/repository/study_plan_repository.dart';
 
 class StudyPlanController extends GetxController {
@@ -24,7 +22,15 @@ class StudyPlanController extends GetxController {
 
         studyPlan?.plan = Map.fromEntries(
           plan!.entries.where((e) => (e.value?.isNotEmpty ?? false)),
-        ).map((key, value) => MapEntry(key, value!));
+        ).map((key, value) {
+          value!.sort((a, b) {
+            if (a.startTime == null && b.startTime == null) return 0;
+            if (a.startTime == null) return 1;
+            if (b.startTime == null) return -1;
+            return a.startTime!.compareTo(b.startTime!);
+          });
+          return MapEntry(key, value);
+        });
       }
     } catch (_) {
       studyPlan = null;

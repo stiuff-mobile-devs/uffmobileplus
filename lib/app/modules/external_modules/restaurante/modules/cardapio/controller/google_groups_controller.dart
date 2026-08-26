@@ -3,8 +3,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/data/connections/google_service.dart';
-import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/google_group_member_model.dart';
-import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/google_group_model.dart';
 
 class CardapioGoogleGroupsController extends GetxController {
   final GoogleService _googleService = GoogleService();
@@ -56,14 +54,7 @@ class CardapioGoogleGroupsController extends GetxController {
         return;
       }
 
-      debugPrint("USER EMAIL $userEmail");
       final entities = await _googleService.getGroupEntities(token, rootGroupEmail);
-      debugPrint("=== Membros do Grupo ===");
-      for (var member in entities) {
-        debugPrint("- ${member['email']} (${member['role']})");
-      }
-      debugPrint("========================");
-
       final isMember = entities.any(
               (m) => m['email']?.toString().trim().toLowerCase() == userEmail.trim().toLowerCase()
       );

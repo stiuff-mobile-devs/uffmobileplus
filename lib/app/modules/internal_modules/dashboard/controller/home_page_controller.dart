@@ -136,6 +136,12 @@ class HomePageController extends GetxController {
       List<Discipline>? disciplines;
       if (weekday != null) {
         disciplines = plan?.plan?[weekday];
+        disciplines?.sort((a, b) {
+          if (a.startTime == null && b.startTime == null) return 0;
+          if (a.startTime == null) return 1;
+          if (b.startTime == null) return -1;
+          return a.startTime!.compareTo(b.startTime!);
+        });
       }
       todayClasses.assignAll(disciplines ?? const <Discipline>[]);
     } catch (_) {
