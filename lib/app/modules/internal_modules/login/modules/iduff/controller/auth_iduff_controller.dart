@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_iduff_repository.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
@@ -11,6 +12,7 @@ class AuthIduffController extends GetxController {
   late final AuthIduffService _authIduffService;
 
   UserIduffRepository userIduffRepository = UserIduffRepository();
+  UserDataRepository userDataRepository = UserDataRepository();
 
   RxBool isLoading = false.obs;
   late final bool isLogin;
@@ -154,7 +156,11 @@ class AuthIduffController extends GetxController {
 
   Future<void> loginSuccessful() async {
     isLoading.value = false;
-    Get.offAllNamed(Routes.CHOOSE_PROFILE);
+    if (await userDataRepository.hasUserData()) {
+      Get.offAllNamed(Routes.HOME);
+    } else {
+      Get.offAllNamed(Routes.CHOOSE_PROFILE);
+    }
   }
 
   Future<void> _login() async {
