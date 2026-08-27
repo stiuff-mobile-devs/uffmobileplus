@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/controller/login_controller.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:uffmobileplus/app/ui/widgets/responsive_uff_logo.dart';
 import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.dart';
 
 class LoginPage extends GetView<LoginController> {
@@ -318,11 +319,9 @@ class _BreathingLogoBoxState extends State<_BreathingLogoBox>
           scale: _scaleAnimation.value,
           child: Opacity(
             opacity: _opacityAnimation.value,
-            child: Image.asset(
-              'assets/logos/mini_logo_um+.png',
-              fit: BoxFit.contain,
-              height: widget.height,
+            child: ResponsiveUffLogo(
               width: widget.width,
+              height: widget.height,
             ),
           ),
         );

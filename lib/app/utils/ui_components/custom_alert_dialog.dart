@@ -1,5 +1,6 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:uffmobileplus/app/ui/widgets/responsive_uff_logo.dart';
 
 AwesomeDialog customAlertDialog(BuildContext ctx,
   {String? title,
@@ -102,7 +103,7 @@ AwesomeDialog idUffAlertDialog(BuildContext ctx,
                 shape: BoxShape.circle,
             ),
             child: Center(
-                child: Image.asset("assets/logos/logo_um+.png", height: 45),
+                child: ResponsiveUffLogo(height: 45),
             ),
         ),
         context: ctx,
