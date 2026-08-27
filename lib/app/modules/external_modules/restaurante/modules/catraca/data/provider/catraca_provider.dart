@@ -59,38 +59,18 @@ class CatracaOnlineProvider {
     }
   }
 
-  Future<List<OperatorTransactionOffline>> getOperatorTransactionsFromFirebase(
-    String operatorEmail,
-  ) async {
+  Future<List<OperatorTransactionOffline>>
+  getOperatorTransactionsSynced() async {
     try {
-      final now = DateTime.now();
-      final limite24Horas = now.subtract(const Duration(hours: 24));
+      final box = Hive.isBoxOpen(_collectionPath)
+          ? Hive.box<OperatorTransactionOffline>(_collectionPath)
+          : await Hive.openBox<OperatorTransactionOffline>(_collectionPath);
 
-      final snapshot = await _firestore
-          .collection(_collectionPathFirebase)
-          .where('idOperator', isEqualTo: operatorEmail)
-          .where('entryTime', isGreaterThan: Timestamp.fromDate(limite24Horas))
-          .get();
-
-      return snapshot.docs
-          .map((doc) {
-            try {
-              final data = doc.data();
-              return OperatorTransactionOffline.fromJson(
-                Map<String, dynamic>.from(data),
-              );
-            } catch (e) {
-              // ignora documentos com formato inválido
-              debugPrint('Erro ao converter documento individual: $e');
-              return null;
-            }
-          })
-          .where((t) => t != null)
-          .cast<OperatorTransactionOffline>()
+      return box.values
+          .where((tx) => tx.isSynced == true)
           .toList();
     } catch (e) {
-      debugPrint('Erro ao buscar transações do Firebase: $e');
-      // Em caso de erro, retorna lista vazia
+      debugPrint('Erro ao buscar transações sincronizadas do Hive: $e');
       return [];
     }
   }
