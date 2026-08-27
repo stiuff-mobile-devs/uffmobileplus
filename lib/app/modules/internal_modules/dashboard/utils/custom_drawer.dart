@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
-import 'package:get/get_state_manager/src/simple/get_view.dart';
-import 'package:get/get_utils/src/extensions/internacionalization.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/home_page_controller.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
+import 'package:uffmobileplus/app/ui/widgets/language_selector_bottom_sheet.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
+import 'package:uffmobileplus/app/utils/translations/language_service.dart';
 
 class CustomDrawer extends GetView<HomePageController> {
   const CustomDrawer({super.key});
@@ -26,6 +25,11 @@ class CustomDrawer extends GetView<HomePageController> {
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
                   children: [
+                    _LanguageDrawerTile(
+                      onTap: () {
+                        LanguageSelectorBottomSheet.show(context);
+                      },
+                    ),
                     _DrawerTile(
                       icon: Icons.settings_outlined,
                       title: 'configuracoes'.tr,
@@ -222,3 +226,69 @@ class _DrawerTile extends StatelessWidget {
     );
   }
 }
+
+class _LanguageDrawerTile extends StatelessWidget {
+  const _LanguageDrawerTile({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final currentLanguage = LanguageService.getCurrentLanguage();
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Material(
+        color: Colors.white.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(18),
+        child: ListTile(
+          onTap: onTap,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 4,
+          ),
+          leading: Container(
+            height: 40,
+            width: 40,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: AppColors.lightBlue().withOpacity(0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: SizedBox(
+                width: 24,
+                height: 16,
+                child: SvgPicture.asset(
+                  currentLanguage.flagAsset,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          title: Text(
+            currentLanguage.nativeName,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.95),
+              fontWeight: FontWeight.w700,
+              fontSize: 14,
+            ),
+          ),
+          subtitle: Text(
+            'ling_descricao'.tr,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.62),
+              fontSize: 12,
+            ),
+          ),
+          trailing: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: Colors.white.withOpacity(0.6),
+          ),
+        ),
+      ),
+    );
+  }
+}
+

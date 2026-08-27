@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/settings_controller.dart';
+import 'package:uffmobileplus/app/ui/widgets/language_selector_bottom_sheet.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
-
+import 'package:uffmobileplus/app/utils/translations/language_service.dart';
 
 class SettingsPage extends GetView<SettingsController> {
   const SettingsPage({super.key});
@@ -12,57 +14,50 @@ class SettingsPage extends GetView<SettingsController> {
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          // Supondo que AppColors.darkBlueToBlackGradient() retorna um LinearGradient
           gradient: AppColors.darkBlueToBlackGradient(),
         ),
-        // Envolvemos o CustomScrollView em um Obx para que a tela reaja 
-        // automaticamente quando as variáveis .value (.obs) mudarem
-        child: Obx(() => CustomScrollView(
-          slivers: [
-            _sliverAppBar('configuracoes'.tr),
+        child: Obx(() {
+          final currentLang = LanguageService.getCurrentLanguage();
 
-            // TODO: substituir por SettingsItem
-            SettingsItem(
-              icon: Icon(Icons.language, color: Colors.white),
-              main: DropdownButton<Locale>(
-                value: Get.locale,
-                dropdownColor: Colors.grey[800],
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+          return CustomScrollView(
+            slivers: [
+              _sliverAppBar('configuracoes'.tr),
+
+              SettingsItem(
+                icon: Icon(Icons.language, color: Colors.white),
+                main: Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: SizedBox(
+                        width: 26,
+                        height: 18,
+                        child: SvgPicture.asset(
+                          currentLang.flagAsset,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      currentLang.nativeName,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
-                underline: Container(), // Remove underline
-                // Ao suportar um novo idioma, adicionar novo par na lista abaixo
-                items: [
-                  {
-                    'locale': Locale('pt', 'BR'),
-                    'display': 'Português (BR)',
-                  },
-                  {
-                    'locale': Locale('en', 'US'),
-                    'display': 'English (US)',
-                  },
-                  {
-                    'locale': Locale('it', 'IT'),
-                    'display': 'Italiano (IT)',
-                  },
-                ].map((item) {
-                  Locale locale = item['locale'] as Locale;
-                  String displayString = item['display'] as String;
-
-                  return DropdownMenuItem<Locale>(
-                    value: locale,
-                    child: Text(displayString),
-                  );
-                }).toList(),
-                onChanged: (Locale? newValue) {
-                  if (newValue != null) Get.updateLocale(newValue);
+                description: 'ling_descricao'.tr,
+                trailing: const Icon(
+                  Icons.keyboard_arrow_down_rounded,
+                  color: Colors.white70,
+                ),
+                onTap: () {
+                  LanguageSelectorBottomSheet.show(context);
                 },
               ),
-              description: 'ling_descricao'.tr,
-              trailing: null, // No chevron needed since it's a dropdown
-            ),
 
             // O Obx fará com que este item apareça/suma automaticamente 
             // caso a vinculação mude
