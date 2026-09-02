@@ -60,7 +60,7 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
       barrierDismissible: prefs?.getString('default_restaurant') != null,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Restaurante Padrão'),
+          title: Text('restaurante_padrao'.tr),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -481,7 +481,7 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
               IconButton(
                 icon: const Icon(Icons.settings),
                 onPressed: _showDefaultRestaurantDialog,
-                tooltip: 'Trocar Restaurante Padrão',
+                tooltip: 'trocar_restaurante_padrao'.tr,
               ),
             ],
           ),

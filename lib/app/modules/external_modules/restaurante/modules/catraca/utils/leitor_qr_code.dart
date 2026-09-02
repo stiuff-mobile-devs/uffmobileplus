@@ -34,7 +34,7 @@ class LeitorQrCodePage extends GetView<LeitorQrCodeController> {
         centerTitle: true,
         elevation: 8,
         foregroundColor: Colors.white,
-        title: const Text("Catraca - Leitor QR Code"),
+        title: Text('catraca_leitor_qr_code'.tr),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
         ),
@@ -62,7 +62,7 @@ class LeitorQrCodePage extends GetView<LeitorQrCodeController> {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Aponte o QR Code para o centro do quadrado',
+                  'aponte_qr_code_centro'.tr,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 22,

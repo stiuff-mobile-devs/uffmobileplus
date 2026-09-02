@@ -30,7 +30,7 @@ class RegistrationErrorState extends GetView<BancoDeIdeiasController> {
       OutlinedButton.icon(
         onPressed: onRetry,
         icon: const Icon(Icons.refresh_rounded),
-        label: const Text('Tentar novamente'),
+        label: Text('tentar_novamente'.tr),
       ),
     ],
   );

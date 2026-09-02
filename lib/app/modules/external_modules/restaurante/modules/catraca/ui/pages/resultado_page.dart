@@ -55,8 +55,8 @@ class ResultadoPage extends GetView<CatracaController> {
                             size: 18,
                             color: Colors.white,
                           ),
-                          label: const Text(
-                            "Ler código",
+                          label: Text(
+                            'ler_codigo'.tr,
                             style: TextStyle(color: Colors.white, fontSize: 18),
                           ),
                           onPressed: () {
@@ -79,8 +79,8 @@ class ResultadoPage extends GetView<CatracaController> {
                           size: 18,
                           color: Colors.white,
                         ),
-                        label: const Text(
-                          "Validar Manualmente",
+                        label: Text(
+                          'validar_manualmente'.tr,
                           style: TextStyle(color: Colors.white, fontSize: 18),
                         ),
                         onPressed: () {

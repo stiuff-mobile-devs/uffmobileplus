@@ -14,7 +14,7 @@ class PayHelpPage extends GetView<PayRestaurantController> {
         centerTitle: true,
         elevation: 8,
         foregroundColor: Colors.white,
-        title: Text("Acesso ao Restaurante"),
+        title: Text('acesso_ao_restaurante'.tr),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
         ),
@@ -32,11 +32,12 @@ class PayHelpPage extends GetView<PayRestaurantController> {
                 ),
                 child: ListView(
                   children: [
-                    const Padding(
-                      padding: EdgeInsets.only(top: 40, left: 30, right: 30),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          top: 40, left: 30, right: 30),
                       child: Text(
-                        "1. Aumente o brilho da tela do seu aparelho e aponte o codigo para a leitora na posição e distância indicadas nas imagens:\n",
-                        style: TextStyle(
+                        'ajuda_passo_1_brilho'.tr,
+                        style: const TextStyle(
                           color: Color.fromARGB(255, 198, 238, 253),
                           fontSize: 15,
                         ),
@@ -54,7 +55,7 @@ class PayHelpPage extends GetView<PayRestaurantController> {
                     Padding(
                       padding: EdgeInsets.only(left: 30, right: 30),
                       child: Text(
-                        "\n2. Aguarde o bipe da leitora e verifique se o acesso foi liberado na tela da catraca.",
+                        'ajuda_passo_2_bipe'.tr,
                         style: TextStyle(
                           color: Color.fromARGB(255, 198, 238, 253),
                           fontSize: 15,
@@ -65,7 +66,7 @@ class PayHelpPage extends GetView<PayRestaurantController> {
                     Padding(
                       padding: EdgeInsets.only(left: 30, right: 30),
                       child: Text(
-                        "\nPronto! Agora voce pode acessar o Restaurante Universitário!",
+                        'ajuda_passo_3_pronto'.tr,
                         style: TextStyle(
                           color: Color.fromARGB(255, 253, 255, 187),
                           fontSize: 15,

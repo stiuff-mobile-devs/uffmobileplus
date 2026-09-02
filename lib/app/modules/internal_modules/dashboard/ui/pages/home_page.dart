@@ -156,7 +156,7 @@ class HomePage extends GetView<HomePageController> {
                                     children: [
                                       Expanded(
                                         child: Text(
-                                          'Atalhos rápidos',
+                                          'atalhos_rapidos'.tr,
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontSize: 20,
@@ -167,7 +167,7 @@ class HomePage extends GetView<HomePageController> {
                                       IconButton(
                                         onPressed: () =>
                                             _showAddShortcutSheet(context),
-                                        tooltip: 'Adicionar atalho',
+                                        tooltip: 'adicionar_atalho'.tr,
                                         icon: Container(
                                           padding: const EdgeInsets.all(4),
                                           decoration: BoxDecoration(
@@ -188,7 +188,7 @@ class HomePage extends GetView<HomePageController> {
                                       IconButton(
                                         onPressed:
                                             controller.toggleRemoveShortcutMode,
-                                        tooltip: 'Remover atalho',
+                                        tooltip: 'remover_atalho'.tr,
                                         icon: Container(
                                           padding: const EdgeInsets.all(4),
                                           decoration: BoxDecoration(
@@ -211,7 +211,7 @@ class HomePage extends GetView<HomePageController> {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'Acesso direto aos serviços mais usados no seu dia a dia.',
+                                    'atalhos_rapidos_descricao'.tr,
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 13,
@@ -320,15 +320,15 @@ class HomePage extends GetView<HomePageController> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionTitle('Restaurante'),
+          _buildSectionTitle('restaurante'.tr),
           const SizedBox(height: 8),
           Row(
             children: [
               Expanded(
                 child: Text(
-                  hasDefault 
-                      ? 'Cardápio de hoje.'
-                      : 'Defina seu restaurante padrão.',
+                  hasDefault
+                      ? 'cardapio_de_hoje'.tr
+                      : 'defina_restaurante_padrao_desc'.tr,
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.92),
                     fontSize: 13,
@@ -353,8 +353,8 @@ class HomePage extends GetView<HomePageController> {
                     children: [
                       const Icon(Icons.restaurant, color: Colors.white, size: 32),
                       const SizedBox(height: 12),
-                      const Text(
-                        'Defina seu restaurante padrão',
+                      Text(
+                        'defina_restaurante_padrao'.tr,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 15,
@@ -363,7 +363,7 @@ class HomePage extends GetView<HomePageController> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Clique aqui para escolher seu refeitório',
+                        'clique_escolher_refeitorio'.tr,
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.7),
                           fontSize: 13,
@@ -385,12 +385,12 @@ class HomePage extends GetView<HomePageController> {
               child: _CampusMealCard(data: meals.first),
             )
           else
-            const SizedBox(
+            SizedBox(
               height: 150,
               child: Center(
                 child: Text(
-                  'Cardápio indisponível no momento.',
-                  style: TextStyle(color: Colors.white70),
+                  'cardapio_indisponivel'.tr,
+                  style: const TextStyle(color: Colors.white70),
                 ),
               ),
             ),
@@ -420,7 +420,7 @@ class HomePage extends GetView<HomePageController> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildSectionTitle('Plano de Estudos'),
+                _buildSectionTitle('plano_estudos'.tr),
                 const SizedBox(height: 12),
                 if (isLoading)
                   // Substituído SizedBox.expand por tamanho fixo dentro da Column
@@ -430,7 +430,7 @@ class HomePage extends GetView<HomePageController> {
                   )
                 else if (classes.isEmpty)
                   Text(
-                    'Nenhuma aula hoje.',
+                    'nenhuma_aula_hoje'.tr,
                     style: TextStyle(color: Colors.white.withOpacity(0.7)),
                   )
                 else
@@ -502,7 +502,7 @@ class HomePage extends GetView<HomePageController> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildSectionTitle('Histórico'),
+                _buildSectionTitle('historico'.tr),
                 const SizedBox(height: 12),
                 if (isLoading)
                   // Substituído SizedBox.expand por altura fixa para não explodir a Column
@@ -512,12 +512,15 @@ class HomePage extends GetView<HomePageController> {
                   )
                 else if (stats == null)
                   Text(
-                    'Dados indisponíveis no momento.',
+                    'dados_indisponiveis'.tr,
                     style: TextStyle(color: Colors.white.withOpacity(0.7)),
                   )
                 else ...[
                   Text(
-                    '$chCursada h cursadas de $chTotal h totais',
+                    'horas_cursadas_status'.trParams({
+                      'cursada': '$chCursada',
+                      'total': '$chTotal',
+                    }),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,
@@ -548,7 +551,7 @@ class HomePage extends GetView<HomePageController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle('Notícias'),
+        _buildSectionTitle('noticias'.tr),
         const SizedBox(height: 12),
         Container(
           width: double.infinity,
@@ -557,8 +560,8 @@ class HomePage extends GetView<HomePageController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Em breve: notícias da UFF',
+              Text(
+                'noticias_em_breve'.tr,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 14,
@@ -567,7 +570,7 @@ class HomePage extends GetView<HomePageController> {
               ),
               const SizedBox(height: 6),
               Text(
-                'Estamos preparando esta seção para trazer as últimas notícias da universidade.',
+                'noticias_preparando_desc'.tr,
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.75),
                   fontSize: 12.5,
@@ -608,7 +611,7 @@ class HomePage extends GetView<HomePageController> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Adicionar atalho',
+                    'adicionar_atalho'.tr,
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.96),
                       fontSize: 18,
@@ -617,7 +620,7 @@ class HomePage extends GetView<HomePageController> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Serviços ainda não salvos na sua grade.',
+                    'servicos_nao_salvos_desc'.tr,
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.68),
                       fontSize: 13,
@@ -628,7 +631,7 @@ class HomePage extends GetView<HomePageController> {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 20),
                       child: Text(
-                        'Todos os serviços já estão na sua grade.',
+                        'todos_servicos_salvos'.tr,
                         style: TextStyle(color: Colors.white.withOpacity(0.8)),
                       ),
                     )
@@ -682,7 +685,7 @@ class _CampusMealCard extends StatelessWidget {
     final meal = data.meal;
     final hasDish = meal?.main?.isNotEmpty ?? false;
     
-    String subtitle = 'Ainda não há refeições disponíveis para este refeitório.';
+    String subtitle = 'refeicoes_indisponiveis_refeitorio'.tr;
     if (hasDish) {
       final items = [meal!.main, meal.garnish, meal.side]
           .where((item) => item != null && item.trim().isNotEmpty)
@@ -731,7 +734,7 @@ class _CampusMealCard extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                isOpen ? data.shiftLabel! : 'Fechado',
+                isOpen ? data.shiftLabel! : 'fechado'.tr,
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.68),
                   fontSize: 11,

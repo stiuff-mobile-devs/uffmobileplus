@@ -35,7 +35,7 @@ class ProfileContent extends GetView<BancoDeIdeiasController> {
 
         final usuario = snapshot.data;
         if (usuario == null) {
-          return const EmptyState(message: 'Usuario nao cadastrado.');
+          return EmptyState(message: 'bdi_usuario_nao_cadastrado'.tr);
         }
 
         return ProfileCard(
@@ -63,7 +63,7 @@ class ProfileCard extends GetView<BancoDeIdeiasController> {
   @override
   Widget build(BuildContext context) {
     final raw = usuario.raw;
-    final nome = raw['nome']?.toString() ?? '(sem nome)';
+    final nome = raw['nome']?.toString() ?? 'bdi_sem_nome'.tr;
     final email = raw['email']?.toString() ?? '';
     final perfil = _nomeDe(raw['perfil']);
     final curso = _nomeDe(raw['curso']);
@@ -110,11 +110,12 @@ class ProfileCard extends GetView<BancoDeIdeiasController> {
               ],
             ),
             const SizedBox(height: 18),
-            ProfileField(label: 'Email', value: email),
-            ProfileField(label: 'Perfil', value: perfil),
-            if (curso.isNotEmpty) ProfileField(label: 'Curso', value: curso),
+            ProfileField(label: 'email'.tr, value: email),
+            ProfileField(label: 'bdi_perfil'.tr, value: perfil),
+            if (curso.isNotEmpty)
+              ProfileField(label: 'curso'.tr, value: curso),
             if (departamento.isNotEmpty)
-              ProfileField(label: 'Departamento', value: departamento),
+              ProfileField(label: 'departamento'.tr, value: departamento),
             const SizedBox(height: 8),
             Wrap(
               spacing: 12,
@@ -124,12 +125,12 @@ class ProfileCard extends GetView<BancoDeIdeiasController> {
                   FilledButton.icon(
                     onPressed: onOpenAdminPanel,
                     icon: const Icon(Icons.admin_panel_settings_rounded),
-                    label: const Text('Menu administrativo'),
+                    label: Text('bdi_menu_administrativo'.tr),
                   ),
                 OutlinedButton.icon(
                   onPressed: onSignOut,
                   icon: const Icon(Icons.logout_rounded),
-                  label: const Text('Sair'),
+                  label: Text('sair'.tr),
                 ),
               ],
             ),

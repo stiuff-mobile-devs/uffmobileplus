@@ -8,7 +8,7 @@ class RadioController extends GetxController {
   final Rx<PlaybackState> playbackState = PlaybackState.paused.obs;
   set playbackState(value) => playbackState.value = value;
 
-  final metadata = Metadata(artist: 'Unknown song', title: 'Unknown artist').obs;
+  final metadata = Metadata(artist: 'radio_artista_desconhecido'.tr, title: 'radio_faixa_desconhecida'.tr).obs;
   set metadata(value) => metadata.value = value;
 
   StreamSubscription? _playbackStateSubscription;

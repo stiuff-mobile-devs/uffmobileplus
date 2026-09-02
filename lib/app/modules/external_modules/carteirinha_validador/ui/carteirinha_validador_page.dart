@@ -14,7 +14,7 @@ class CarteirinhaValidadorPage extends GetView<CarteirinhaValidadorController> {
         centerTitle: true,
         elevation: 8,
         foregroundColor: Colors.white,
-        title: Text('Validador da Carteirinha'),
+        title: Text('validador_da_carteirinha'.tr),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -105,7 +105,7 @@ class CarteirinhaValidadorPage extends GetView<CarteirinhaValidadorController> {
                           ),
                           const SizedBox(height: 22),
                           Text(
-                            'Validador da Carteirinha Digital',
+                            'validador_carteirinha_digital'.tr,
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,

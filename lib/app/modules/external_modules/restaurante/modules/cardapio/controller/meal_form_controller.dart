@@ -84,18 +84,18 @@ class MealFormController extends GetxController {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return const Center(
+        return Center(
           child: AlertDialog(
-            insetPadding: EdgeInsets.all(0),
-            contentPadding: EdgeInsets.fromLTRB(15, 15, 5, 15),
+            insetPadding: const EdgeInsets.all(0),
+            contentPadding: const EdgeInsets.fromLTRB(15, 15, 5, 15),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
                   children: [
-                    CircularProgressIndicator(),
-                    SizedBox(width: 20),
-                    Text("Enviando..."),
+                    const CircularProgressIndicator(),
+                    const SizedBox(width: 20),
+                    Text('enviando'.tr),
                   ],
                 ),
               ],
@@ -110,8 +110,8 @@ class MealFormController extends GetxController {
         completer.complete();
         Get.back();
         Get.snackbar(
-          'Erro: Timeout.',
-          'A operação atingiu o tempo limite.',
+          'erro_timeout'.tr,
+          'operacao_atingiu_tempo_limite'.tr,
           snackPosition: SnackPosition.BOTTOM,
           colorText: Colors.white,
         );
@@ -231,36 +231,48 @@ class MealFormController extends GetxController {
       if (chosenDates.length * selectedShifts.length > 1) {
         Get.snackbar(
           campus,
-          'Refeições adicionadas com sucesso.',
+          'refeicoes_adicionadas_sucesso'.tr,
           snackPosition: SnackPosition.BOTTOM,
           colorText: Colors.white,
         );
       } else {
         Get.snackbar(
           campus,
-          'Refeição adicionada com sucesso.',
+          'refeicao_adicionada_sucesso'.tr,
           snackPosition: SnackPosition.BOTTOM,
           colorText: Colors.white,
         );
       }
     } else if (response == 500) {
       Get.snackbar(
-        'Erro: [$campus] [$formattedDate] [$shiftMessage]',
-        'Uma refeição já foi reservada para a data e turno selecionados.',
+        'erro_campus_data_turno'.trParams({
+          'campus': campus,
+          'date': formattedDate,
+          'shift': shiftMessage,
+        }),
+        'refeicao_ja_reservada'.tr,
         snackPosition: SnackPosition.BOTTOM,
         colorText: Colors.white,
       );
     } else if (response == 403) {
       Get.snackbar(
-        'Erro: [$campus] [$formattedDate] [$shiftMessage]',
-        'O horário estipulado para a criação da refeição no turno selecionado foi expirado.',
+        'erro_campus_data_turno'.trParams({
+          'campus': campus,
+          'date': formattedDate,
+          'shift': shiftMessage,
+        }),
+        'horario_criacao_expirado'.tr,
         snackPosition: SnackPosition.BOTTOM,
         colorText: Colors.white,
       );
     } else {
       Get.snackbar(
-        'Erro: [$campus] [$formattedDate] [$shiftMessage]',
-        'Não foi possível criar a refeição.',
+        'erro_campus_data_turno'.trParams({
+          'campus': campus,
+          'date': formattedDate,
+          'shift': shiftMessage,
+        }),
+        'nao_foi_possivel_criar_refeicao'.tr,
         snackPosition: SnackPosition.BOTTOM,
         colorText: Colors.white,
       );
@@ -277,36 +289,48 @@ class MealFormController extends GetxController {
       if (many) {
         Get.snackbar(
           campus,
-          'Refeições alteradas com sucesso.',
+          'refeicoes_alteradas_sucesso'.tr,
           snackPosition: SnackPosition.BOTTOM,
           colorText: Colors.white,
         );
       } else {
         Get.snackbar(
           campus,
-          'Refeição alterada com sucesso.',
+          'refeicao_alterada_sucesso'.tr,
           snackPosition: SnackPosition.BOTTOM,
           colorText: Colors.white,
         );
       }
     } else if (response == 500) {
       Get.snackbar(
-        'Erro: [$campus] [$formattedDate] [$shiftMessage]',
-        'A refeição não pôde ser removida.',
+        'erro_campus_data_turno'.trParams({
+          'campus': campus,
+          'date': formattedDate,
+          'shift': shiftMessage,
+        }),
+        'refeicao_nao_pode_ser_removida'.tr,
         snackPosition: SnackPosition.BOTTOM,
         colorText: Colors.white,
       );
     } else if (response == 403) {
       Get.snackbar(
-        'Erro: [$campus] [$formattedDate] [$shiftMessage]',
-        'O horário estipulado para a edição da refeição no turno selecionado foi expirado.',
+        'erro_campus_data_turno'.trParams({
+          'campus': campus,
+          'date': formattedDate,
+          'shift': shiftMessage,
+        }),
+        'horario_edicao_expirado'.tr,
         snackPosition: SnackPosition.BOTTOM,
         colorText: Colors.white,
       );
     } else {
       Get.snackbar(
-        'Erro: [$campus] [$formattedDate] [$shiftMessage]',
-        'Não foi possível editar a refeição.',
+        'erro_campus_data_turno'.trParams({
+          'campus': campus,
+          'date': formattedDate,
+          'shift': shiftMessage,
+        }),
+        'nao_foi_possivel_editar_refeicao'.tr,
         snackPosition: SnackPosition.BOTTOM,
         colorText: Colors.white,
       );

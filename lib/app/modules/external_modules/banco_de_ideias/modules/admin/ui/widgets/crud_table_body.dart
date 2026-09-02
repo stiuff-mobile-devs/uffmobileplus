@@ -44,18 +44,18 @@ class CrudTableBody extends GetView<BancoDeIdeiasController> {
 
   Widget _error() => AdminStateMessage(
     icon: Icons.error_outline_rounded,
-    title: 'Nao foi possivel carregar os registros',
+    title: 'bdi_nao_foi_possivel_carregar_registros'.tr,
     message: errorMessage!,
-    action: _action(Icons.refresh_rounded, 'Tentar novamente', () {
+    action: _action(Icons.refresh_rounded, 'tentar_novamente'.tr, () {
       onRefresh();
     }),
   );
 
   Widget _empty() => AdminStateMessage(
     icon: Icons.inventory_2_outlined,
-    title: 'Nenhum registro encontrado',
-    message: 'Crie o primeiro item desta tabela.',
-    action: _action(Icons.add_rounded, 'Novo registro', onCreate),
+    title: 'bdi_nenhum_registro_encontrado'.tr,
+    message: 'bdi_crie_primeiro_item'.tr,
+    action: _action(Icons.add_rounded, 'bdi_novo_registro'.tr, onCreate),
   );
 
   Widget _action(IconData icon, String label, VoidCallback onPressed) =>

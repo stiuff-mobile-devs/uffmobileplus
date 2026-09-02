@@ -1,3 +1,5 @@
+import 'package:get/get.dart';
+
 class IdeiaResumo {
   const IdeiaResumo({
     required this.id,
@@ -28,7 +30,7 @@ class IdeiaResumo {
   factory IdeiaResumo.fromJson(Map<String, dynamic> json) {
     return IdeiaResumo(
       id: json['id']?.toString() ?? '',
-      titulo: json['titulo']?.toString() ?? '(sem titulo)',
+      titulo: json['titulo']?.toString() ?? 'bdi_sem_titulo'.tr,
       descricao: json['descricao']?.toString() ?? '',
       estado: nomeDe(json['estado']),
       tipo: nomeDe(json['tipo']),
@@ -86,7 +88,7 @@ class IdeiaOpcao {
   factory IdeiaOpcao.fromJson(Map<String, dynamic> json) {
     return IdeiaOpcao(
       id: json['id']?.toString() ?? '',
-      nome: json['nome']?.toString() ?? '(sem nome)',
+      nome: json['nome']?.toString() ?? 'bdi_sem_nome'.tr,
     );
   }
 }
@@ -239,5 +241,5 @@ String nomeDe(dynamic value, {bool permitirVazio = false}) {
       return nome;
     }
   }
-  return permitirVazio ? '' : '(sem informacao)';
+  return permitirVazio ? '' : 'bdi_sem_informacao'.tr;
 }

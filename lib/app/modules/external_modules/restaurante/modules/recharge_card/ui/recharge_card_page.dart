@@ -17,7 +17,7 @@ class RechargeCardPage extends GetView<RechargeCardController> {
         centerTitle: true,
         elevation: 8,
         foregroundColor: Colors.white,
-        title: const Text("Recarregar Cartão"),
+        title: Text('Recarregar Cartão'.tr),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
         ),
@@ -106,7 +106,8 @@ class RechargeCardPage extends GetView<RechargeCardController> {
                                             ),
                                           ),
                                           Text(
-                                            "$meals ref.",
+                                            'refeicoes_abrev'.trParams(
+                                                {'count': '$meals'}),
                                             style: const TextStyle(
                                               fontSize: 12,
                                               color: Colors.white70,
@@ -177,12 +178,13 @@ class RechargeCardPage extends GetView<RechargeCardController> {
                                 color: Colors.white,
                                 fontSize: 16,
                               ),
-                              hintText: 'Digite ou selecione um valor',
+                              hintText: 'digite_ou_selecione_valor'.tr,
                               hintStyle: const TextStyle(
                                 fontSize: 14,
                                 color: Colors.white54,
                               ),
-                              helperText: 'Valor da recarga a ser efetuada',
+                              helperText:
+                                  'valor_recarga_a_ser_efetuada'.tr,
                               helperStyle: const TextStyle(
                                 fontSize: 14,
                                 color: Colors.white70,
@@ -217,9 +219,9 @@ class RechargeCardPage extends GetView<RechargeCardController> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             backgroundColor: const Color(0xff052750),
-                            label: const Text(
-                              "Ir para o pagamento",
-                              style: TextStyle(
+                            label: Text(
+                              'ir_para_pagamento'.tr,
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 14,
                               ),
@@ -295,7 +297,11 @@ class _MealCountButton extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "$mealCount ${mealCount == 1 ? 'refeição' : 'refeições'}",
+                      mealCount == 1
+                          ? 'refeicao_contagem_singular'
+                              .trParams({'count': '$mealCount'})
+                          : 'refeicao_contagem_plural'
+                              .trParams({'count': '$mealCount'}),
                       style: const TextStyle(
                         fontSize: 13,
                         color: Colors.white70,

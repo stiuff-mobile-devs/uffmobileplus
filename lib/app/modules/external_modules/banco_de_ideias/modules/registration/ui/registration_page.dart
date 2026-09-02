@@ -104,7 +104,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Nao foi possivel concluir o cadastro: $err')),
+        SnackBar(
+          content: Text(
+            'bdi_erro_concluir_cadastro'.trParams({'err': err.toString()}),
+          ),
+        ),
       );
     } finally {
       if (mounted) {
@@ -119,7 +123,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   String? _obrigatorio(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'Campo obrigatorio';
+      return 'campo_obrigatorio'.tr;
     }
 
     return null;
@@ -129,7 +133,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Completar cadastro'),
+        title: Text('bdi_completar_cadastro'.tr),
         centerTitle: true,
         foregroundColor: Colors.white,
         elevation: 8,
@@ -141,7 +145,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         ),
         actions: [
           IconButton(
-            tooltip: 'Sair',
+            tooltip: 'sair'.tr,
             onPressed: _isSaving ? null : _sair,
             icon: const Icon(Icons.logout_rounded),
           ),
@@ -202,7 +206,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
               const SizedBox(height: 24),
               RegistrationTextField(
                 textController: _nomeController,
-                label: 'Nome',
+                label: 'nome'.tr,
                 icon: Icons.person_rounded,
                 validator: _obrigatorio,
               ),
@@ -288,10 +292,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
           initialValue: _cursoId,
           dropdownColor: AppColors.darkBlue(),
           style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
-            labelText: 'Curso',
-            prefixIcon: Icon(Icons.school_rounded),
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: 'curso'.tr,
+            prefixIcon: const Icon(Icons.school_rounded),
+            border: const OutlineInputBorder(),
           ),
           items: _cursos
               .map(
@@ -302,7 +306,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
           onChanged: _isSaving
               ? null
               : (value) => setState(() => _cursoId = value),
-          validator: (value) => value == null ? 'Selecione um curso' : null,
+          validator: (value) =>
+              value == null ? 'bdi_selecione_curso'.tr : null,
         ),
       ],
     );
@@ -316,10 +321,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
           initialValue: _departamentoId,
           dropdownColor: AppColors.darkBlue(),
           style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
-            labelText: 'Departamento',
-            prefixIcon: Icon(Icons.business_rounded),
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: 'departamento'.tr,
+            prefixIcon: const Icon(Icons.business_rounded),
+            border: const OutlineInputBorder(),
           ),
           items: _departamentos
               .map(
@@ -333,7 +338,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
               ? null
               : (value) => setState(() => _departamentoId = value),
           validator: (value) =>
-              value == null ? 'Selecione um departamento' : null,
+              value == null ? 'bdi_selecione_departamento'.tr : null,
         ),
       ],
     );

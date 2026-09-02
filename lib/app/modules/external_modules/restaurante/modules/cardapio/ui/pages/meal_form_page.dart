@@ -26,7 +26,7 @@ class _MealFormPageState extends State<MealFormPage> {
       builder: (RestaurantsController restaurantsController) {
         return Scaffold(
           appBar: customAppBar(
-            'Fórmulário de Refeição',
+            'formulario_refeicao'.tr,
             borderRadius: 0,
             actions: [
               IconButton(

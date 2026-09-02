@@ -134,7 +134,8 @@ class SettingsPage extends GetView<SettingsController> {
               },
             ),
           ],
-        )),
+          );
+        }),
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/models/ideia.dart';
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/provider/ideia_api_service.dart';
@@ -38,11 +39,11 @@ class _IdeaCreateDialogState extends State<IdeaCreateDialog> {
 
   String get _tituloEtapaCadastro {
     return switch (_etapaCadastro) {
-      0 => 'Titulo',
-      1 => 'Descricao',
-      2 => 'Tipo',
-      3 => 'Estado',
-      _ => 'Categorias',
+      0 => 'titulo'.tr,
+      1 => 'bdi_descricao'.tr,
+      2 => 'tipo'.tr,
+      3 => 'estado'.tr,
+      _ => 'bdi_categorias'.tr,
     };
   }
 
@@ -142,7 +143,7 @@ class _IdeaCreateDialogState extends State<IdeaCreateDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(_isEdit ? 'Editar ideia' : _tituloEtapaCadastro),
+      title: Text(_isEdit ? 'bdi_editar_ideia'.tr : _tituloEtapaCadastro),
       content: SizedBox(
         width: 520,
         child: FutureBuilder<IdeiaCadastroOpcoes>(
@@ -261,7 +262,7 @@ class _IdeaCreateDialogState extends State<IdeaCreateDialog> {
     return IdeaTextField(
       textController: _tituloController,
       autofocus: autofocus,
-      labelText: 'Titulo',
+      labelText: 'titulo'.tr,
       textInputAction: TextInputAction.next,
       onFieldSubmitted: onFieldSubmitted,
       validator: _validarTitulo,
@@ -276,7 +277,7 @@ class _IdeaCreateDialogState extends State<IdeaCreateDialog> {
     return IdeaTextField(
       textController: _descricaoController,
       autofocus: autofocus,
-      labelText: 'Descricao',
+      labelText: 'bdi_descricao'.tr,
       minLines: minLines,
       maxLines: maxLines,
       validator: _validarDescricao,
@@ -285,21 +286,21 @@ class _IdeaCreateDialogState extends State<IdeaCreateDialog> {
 
   Widget _buildCampoTipo(List<IdeiaOpcao> tipos) {
     return _buildDropdownOpcoes(
-      labelText: 'Tipo',
+      labelText: 'tipo'.tr,
       value: _tipoId,
       options: tipos,
       onChanged: (value) => setState(() => _tipoId = value),
-      emptyError: 'Selecione o tipo.',
+      emptyError: 'bdi_selecione_tipo'.tr,
     );
   }
 
   Widget _buildCampoEstado(List<IdeiaOpcao> estados) {
     return _buildDropdownOpcoes(
-      labelText: 'Estado',
+      labelText: 'estado'.tr,
       value: _estadoId,
       options: estados,
       onChanged: (value) => setState(() => _estadoId = value),
-      emptyError: 'Selecione o estado.',
+      emptyError: 'bdi_selecione_estado'.tr,
     );
   }
 
@@ -326,7 +327,7 @@ class _IdeaCreateDialogState extends State<IdeaCreateDialog> {
       enabled: !_salvando,
       onChanged: _atualizarCategoria,
       validator: (_) =>
-          _categoriaIds.isEmpty ? 'Selecione pelo menos uma categoria.' : null,
+          _categoriaIds.isEmpty ? 'bdi_selecione_categoria'.tr : null,
     );
   }
 
@@ -347,24 +348,24 @@ class _IdeaCreateDialogState extends State<IdeaCreateDialog> {
 
   List<Widget> _buildAcoesEdicao() {
     return [
-      _buildBotaoDescartar('Cancelar'),
+      _buildBotaoDescartar('cancelar'.tr),
       _buildBotaoPrincipal(
         onPressed: _salvar,
         icon: Icons.save_rounded,
-        label: 'Salvar',
+        label: 'salvar'.tr,
       ),
     ];
   }
 
   List<Widget> _buildAcoesCadastro() {
     return [
-      _buildBotaoDescartar('Descartar', destructive: true),
+      _buildBotaoDescartar('bdi_descartar'.tr, destructive: true),
       _buildBotaoPrincipal(
         onPressed: _ultimaEtapaCadastro ? _salvar : _continuarCadastro,
         icon: _ultimaEtapaCadastro
             ? Icons.save_rounded
             : Icons.arrow_forward_rounded,
-        label: _ultimaEtapaCadastro ? 'Salvar' : 'Continuar',
+        label: _ultimaEtapaCadastro ? 'salvar'.tr : 'continuar'.tr,
       ),
     ];
   }
@@ -393,14 +394,14 @@ class _IdeaCreateDialogState extends State<IdeaCreateDialog> {
 
   String? _validarTitulo(String? value) {
     if ((value ?? '').trim().isEmpty) {
-      return 'Informe o titulo.';
+      return 'bdi_informe_titulo'.tr;
     }
     return null;
   }
 
   String? _validarDescricao(String? value) {
     if ((value ?? '').trim().isEmpty) {
-      return 'Informe a descricao.';
+      return 'bdi_informe_descricao'.tr;
     }
     return null;
   }

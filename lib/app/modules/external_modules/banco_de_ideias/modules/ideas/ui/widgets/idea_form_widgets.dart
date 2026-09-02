@@ -39,7 +39,10 @@ class IdeaStepProgress extends GetView<BancoDeIdeiasController> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'Etapa $currentStep de $totalSteps',
+          'bdi_etapa_de'.trParams({
+            'current': '$currentStep',
+            'total': '$totalSteps',
+          }),
           style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: 8),
@@ -156,12 +159,12 @@ class IdeaCategoriesField extends GetView<BancoDeIdeiasController> {
       builder: (field) {
         return InputDecorator(
           decoration: InputDecoration(
-            labelText: 'Categorias',
+            labelText: 'bdi_categorias'.tr,
             border: const OutlineInputBorder(),
             errorText: field.errorText,
           ),
           child: categorias.isEmpty
-              ? const Text('Nenhuma categoria disponivel.')
+              ? Text('bdi_nenhuma_categoria_disponivel'.tr)
               : Wrap(
                   spacing: 8,
                   runSpacing: 8,

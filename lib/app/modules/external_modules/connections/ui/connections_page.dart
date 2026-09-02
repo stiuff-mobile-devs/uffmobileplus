@@ -92,10 +92,10 @@ class ConnectionsPage extends GetView<ConnectionsController> {
       disconnectedColor: Colors.redAccent,
       connectedIcon: Icons.wifi_rounded,
       disconnectedIcon: Icons.wifi_off_rounded,
-      connectedLabel: 'ATIVO',
-      disconnectedLabel: 'DESCONECTADO',
-      connectedDescription: 'A internet está disponível no momento.',
-      disconnectedDescription: 'A internet está indisponível no momento.',
+      connectedLabel: 'ativo'.tr.toUpperCase(),
+      disconnectedLabel: 'desconectado'.tr,
+      connectedDescription: 'internet_disponivel_msg'.tr,
+      disconnectedDescription: 'internet_indisponivel_msg'.tr,
     );
   }
 
@@ -105,21 +105,21 @@ class ConnectionsPage extends GetView<ConnectionsController> {
       final statusInfo = _getSaciUmmStatusInfo(saciUmmStatus);
 
       return _buildConnectionCard(
-        title: 'STI',
-        description: 'Conexão aos sitemas da STI',
+        title: 'sti'.tr,
+        description: 'conexao_sti_descricao'.tr,
         icon: statusInfo.icon,
         accentColor: statusInfo.color,
         isConnected: saciUmmStatus == 2,
         statusLabel: statusInfo.label,
         onTap: () => _showStatusSheet(
           context: context,
-          title: 'STI',
+          title: 'sti'.tr,
           statusInfo: statusInfo,
-          detailRows: const [
-            (label: 'Carteirinha e STI online', color: Color(0xFF31D07E)),
-            (label: 'Somente STI online', color: Color(0xFFF2C94C)),
-            (label: 'Somente Carteirinha online', color: Color(0xFFFF9F43)),
-            (label: 'Ambos offline', color: Colors.redAccent),
+          detailRows: [
+            (label: 'carteirinha_sti_online'.tr, color: const Color(0xFF31D07E)),
+            (label: 'somente_sti_online'.tr, color: const Color(0xFFF2C94C)),
+            (label: 'somente_carteirinha_online'.tr, color: const Color(0xFFFF9F43)),
+            (label: 'ambos_offline'.tr, color: Colors.redAccent),
           ],
         ),
       );
@@ -130,16 +130,16 @@ class ConnectionsPage extends GetView<ConnectionsController> {
     return _buildSimpleConnectionCard(
       context: context,
       connection: controller.isSctmConnected,
-      title: 'SCTM',
-      description: 'Conexão aos sistemas do R.U',
+      title: 'sctm'.tr,
+      description: 'conexao_sctm_descricao'.tr,
       connectedColor: Colors.green.shade400,
       disconnectedColor: Colors.redAccent,
       connectedIcon: Icons.hub_rounded,
       disconnectedIcon: Icons.hub_rounded,
-      connectedLabel: 'ATIVO',
-      disconnectedLabel: 'DESCONECTADO',
-      connectedDescription: 'O SCTM está disponível no momento.',
-      disconnectedDescription: 'O SCTM está indisponível no momento.',
+      connectedLabel: 'ativo'.tr.toUpperCase(),
+      disconnectedLabel: 'desconectado'.tr,
+      connectedDescription: 'sctm_disponivel_msg'.tr,
+      disconnectedDescription: 'sctm_indisponivel_msg'.tr,
     );
   }
 
@@ -318,29 +318,29 @@ class ConnectionsPage extends GetView<ConnectionsController> {
       case 2:
         return (
           color: const Color(0xFF31D07E),
-          label: 'ATIVO',
-          description: 'SACI e UMM estão online.',
+          label: 'ativo'.tr.toUpperCase(),
+          description: 'saci_umm_online_msg'.tr,
           icon: Icons.verified_rounded,
         );
       case 3:
         return (
           color: const Color(0xFFF2C94C),
-          label: 'STI ONLINE',
-          description: 'Somente a STI está online. A carteirinha está indisponível.',
+          label: 'sti_online'.tr,
+          description: 'somente_sti_online_msg'.tr,
           icon: Icons.warning_amber_rounded,
         );
       case 4:
         return (
           color: const Color(0xFFFF9F43),
-          label: 'Carteirinha ONLINE',
-          description: 'Somente a carteirinha está online. A STI está indisponível.',
+          label: 'carteirinha_online'.tr,
+          description: 'somente_carteirinha_online_msg'.tr,
           icon: Icons.report_problem_rounded,
         );
       default:
         return (
           color: Colors.redAccent,
-          label: 'DESCONECTADO',
-          description: 'Carteirinha e STI estão offline no momento.',
+          label: 'desconectado'.tr,
+          description: 'carteirinha_sti_offline_msg'.tr,
           icon: Icons.cloud_off_rounded,
         );
     }
@@ -404,7 +404,7 @@ class ConnectionsPage extends GetView<ConnectionsController> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Status de $title',
+                              'status_de'.trParams({'title': title}),
                               style: TextStyle(
                                 color: Colors.white.withValues(alpha: 0.72),
                                 fontSize: 12,
@@ -454,9 +454,9 @@ class ConnectionsPage extends GetView<ConnectionsController> {
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    child: const Text(
-                      'Fechar',
-                      style: TextStyle(fontWeight: FontWeight.w800),
+                    child: Text(
+                      'fechar'.tr,
+                      style: const TextStyle(fontWeight: FontWeight.w800),
                     ),
                   ),
                 ),

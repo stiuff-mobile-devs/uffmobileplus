@@ -27,7 +27,7 @@ class RecordFormDialogView extends GetView<BancoDeIdeiasController> {
     actions: [
       TextButton(
         onPressed: isSaving ? null : onCancel,
-        child: const Text('Cancelar'),
+        child: Text('cancelar'.tr),
       ),
       FilledButton.icon(
         onPressed: canSave ? onSave : null,
@@ -37,7 +37,7 @@ class RecordFormDialogView extends GetView<BancoDeIdeiasController> {
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
             : const Icon(Icons.save_rounded),
-        label: const Text('Salvar'),
+        label: Text('salvar'.tr),
       ),
     ],
   );

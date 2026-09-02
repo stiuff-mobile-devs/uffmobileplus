@@ -74,9 +74,8 @@ class SosController extends GetxController {
         isForegroundMode: true,
         autoStart: false,
         autoStartOnBoot: false,
-        initialNotificationTitle: "UM+: SOS ativo",
-        initialNotificationContent:
-            "Rastreamento SOS ativo. Toque aqui para abrir o app.",
+        initialNotificationTitle: 'sos_notificacao_titulo'.tr,
+        initialNotificationContent: 'sos_notificacao_descricao'.tr,
       ),
     );
   }

@@ -41,7 +41,7 @@ class CdcPage extends GetView<CdcController> {
   AppBar _buildAppBar() {
     return AppBar(
       title: Text(
-        'Central de Comunicação',
+        'Central de Comunicação'.tr,
         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
       centerTitle: true,
@@ -69,7 +69,7 @@ class CdcPage extends GetView<CdcController> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Notificações',
+                'notificacoes'.tr,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 18,
@@ -77,7 +77,7 @@ class CdcPage extends GetView<CdcController> {
                 ),
               ),
               Text(
-                'em breve',
+                'em_breve'.tr,
                 style: TextStyle(
                   color: AppColors.lightBlue(),
                   fontSize: 14,
@@ -122,7 +122,7 @@ class CdcPage extends GetView<CdcController> {
                       SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'Estamos preparando esta funcionalidade para disponibilizar avisos oficiais, comunicados importantes da UFF e atualizacoes relevantes para os estudantes. Em breve voce recebera informacoes aqui em tempo real.',
+                          'cdc_notificacoes_em_desenvolvimento'.tr,
                           style: TextStyle(color: Colors.white70, fontSize: 13),
                         ),
                       ),
@@ -148,7 +148,7 @@ class CdcPage extends GetView<CdcController> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Salas de Chat',
+                  'salas_de_chat'.tr,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -162,7 +162,9 @@ class CdcPage extends GetView<CdcController> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    '${controller.chatRooms.length} salas',
+                    'contagem_salas'.trParams({
+                      'count': '${controller.chatRooms.length}',
+                    }),
                     style: TextStyle(
                       color: AppColors.lightBlue(),
                       fontSize: 12,
@@ -183,7 +185,7 @@ class CdcPage extends GetView<CdcController> {
                   border: Border.all(color: Colors.amber.withOpacity(0.4)),
                 ),
                 child: Text(
-                  'Beta: essas salas sao ficticias para testes.',
+                  'beta_salas_ficticias'.tr,
                   style: TextStyle(
                     color: Colors.amberAccent,
                     fontSize: 11,
@@ -212,7 +214,7 @@ class CdcPage extends GetView<CdcController> {
                   border: Border.all(color: Colors.white.withOpacity(0.1)),
                 ),
                 child: Text(
-                  'Nao ha salas de chat disponiveis para o seu curso.',
+                  'nenhuma_sala_disponivel_curso'.tr,
                   style: TextStyle(color: Colors.white70, fontSize: 13),
                   textAlign: TextAlign.center,
                 ),
@@ -302,7 +304,7 @@ class CdcPage extends GetView<CdcController> {
                   ),
                   SizedBox(height: 6),
                   Text(
-                    room.type.isEmpty ? 'Chat' : room.type,
+                    room.type.isEmpty ? 'chat'.tr : room.type,
                     style: TextStyle(color: Colors.white70, fontSize: 10),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -313,7 +315,7 @@ class CdcPage extends GetView<CdcController> {
                       Icon(Icons.open_in_new, color: Colors.white38, size: 14),
                       SizedBox(width: 4),
                       Text(
-                        'Abrir sala',
+                        'abrir_sala'.tr,
                         style: TextStyle(color: Colors.white54, fontSize: 10),
                       ),
                     ],

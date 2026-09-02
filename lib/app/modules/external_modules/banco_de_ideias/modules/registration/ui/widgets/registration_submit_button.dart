@@ -21,7 +21,7 @@ class RegistrationSubmitButton extends GetView<BancoDeIdeiasController> {
             child: CircularProgressIndicator(strokeWidth: 2.4),
           )
         : const Icon(Icons.check_rounded),
-    label: const Text('Concluir cadastro'),
+    label: Text('bdi_concluir_cadastro'.tr),
     style: FilledButton.styleFrom(
       minimumSize: const Size.fromHeight(54),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),

@@ -19,11 +19,11 @@ class BalanceStatementPage extends GetView<BalanceStatementController> {
         centerTitle: true,
         elevation: 8,
         foregroundColor: Colors.white,
-        title: const Text('Saldo e Extrato'),
+        title: Text('Saldo e Extrato'.tr),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: 'Atualizar',
+            tooltip: 'atualizar'.tr,
             onPressed: () {
               controller.getUserBalance();
             },
@@ -54,7 +54,7 @@ class BalanceStatementPage extends GetView<BalanceStatementController> {
                         child: BalanceCard(
                           name: controller.userName.value,
                           idUff: controller.userBalance.idUff ?? controller.userIduff.value,
-                          currentBalance: controller.userBalance.currentBalance ?? "Erro",
+                          currentBalance: controller.userBalance.currentBalance ?? 'erro'.tr,
                         ),
                       ),
                       Row(

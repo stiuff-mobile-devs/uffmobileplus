@@ -10,7 +10,7 @@ class UniteveContatoPage extends GetView<UniteveController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Unitevê"),
+        title: Text('uniteve'.tr),
         centerTitle: true,
         foregroundColor: Colors.white,
         shape: const RoundedRectangleBorder(
@@ -47,7 +47,7 @@ class UniteveContatoPage extends GetView<UniteveController> {
                         ),
                       ),
                 subtitle: Text(
-                  '(21) 2629-9665 (desativado)',
+                  '(21) 2629-9665 (${'desativado'.tr})',
                   style: TextStyle(
                     fontSize: 16.0,
                     color: Colors.white,

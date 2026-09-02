@@ -71,12 +71,14 @@ class AdminDeleteRecordDialog extends GetView<BancoDeIdeiasController> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Excluir registro'),
-      content: Text('Deseja excluir "$recordTitle"?'),
+      title: Text('bdi_excluir_registro_titulo'.tr),
+      content: Text(
+        'bdi_confirmar_exclusao_registro'.trParams({'title': recordTitle}),
+      ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
-          child: const Text('Cancelar'),
+          child: Text('cancelar'.tr),
         ),
         FilledButton(
           onPressed: () => Navigator.of(context).pop(true),
@@ -84,7 +86,7 @@ class AdminDeleteRecordDialog extends GetView<BancoDeIdeiasController> {
             backgroundColor: Theme.of(context).colorScheme.error,
             foregroundColor: Theme.of(context).colorScheme.onError,
           ),
-          child: const Text('Excluir'),
+          child: Text('excluir'.tr),
         ),
       ],
     );

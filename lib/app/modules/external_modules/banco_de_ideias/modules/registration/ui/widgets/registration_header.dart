@@ -10,7 +10,7 @@ class RegistrationHeader extends GetView<BancoDeIdeiasController> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(
-        'Dados do usuario',
+        'bdi_dados_usuario'.tr,
         style: Theme.of(context).textTheme.headlineSmall?.copyWith(
           fontWeight: FontWeight.w800,
           color: Colors.white,
@@ -18,7 +18,7 @@ class RegistrationHeader extends GetView<BancoDeIdeiasController> {
       ),
       const SizedBox(height: 6),
       Text(
-        'Informe seus dados para continuar.',
+        'bdi_informe_dados_continuar'.tr,
         style: Theme.of(
           context,
         ).textTheme.bodyMedium?.copyWith(color: Colors.white70),

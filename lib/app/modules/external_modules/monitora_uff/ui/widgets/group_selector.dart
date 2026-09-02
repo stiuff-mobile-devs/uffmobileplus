@@ -52,13 +52,13 @@ class GroupSelector extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Grupos', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 24)),
+                Text('grupos'.tr, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 24)),
                 IconButton(
                   icon: const Icon(Icons.refresh, color: Colors.white),
                   onPressed: () {
                     googleGroupsController.refreshGroups();
                   },
-                  tooltip: 'Atualizar grupos',
+                  tooltip: 'atualizar_grupos'.tr,
                 ),
               ],
             ),
@@ -78,7 +78,7 @@ class GroupSelector extends StatelessWidget {
                 child: Center(
                   child: Column(
                     children: [
-                      const Text('Nenhum grupo disponível', style: TextStyle(color: Colors.white)),
+                      Text('nenhum_grupo_disponivel'.tr, style: const TextStyle(color: Colors.white)),
                       SizedBox(height: 6),
                       Text('${googleGroupsController.loadError}', style: TextStyle(color: Colors.white60))
                     ],

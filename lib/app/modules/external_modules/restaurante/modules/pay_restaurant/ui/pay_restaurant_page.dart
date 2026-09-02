@@ -15,7 +15,7 @@ class PayRestaurantPage extends GetView<PayRestaurantController> {
         centerTitle: true,
         elevation: 8,
         foregroundColor: Colors.white,
-        title: Text("Pagar Restaurante"),
+        title: Text('Pagar Restaurante'.tr),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
         ),
@@ -25,7 +25,7 @@ class PayRestaurantPage extends GetView<PayRestaurantController> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: 'Atualizar',
+            tooltip: 'atualizar'.tr,
             onPressed: () {
               controller.onInit();
             },
@@ -66,7 +66,7 @@ class PayRestaurantPage extends GetView<PayRestaurantController> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
                             Text(
-                              "Saldo Atual: ",
+                              'saldo_atual'.tr,
                               style: TextStyle(
                                 fontSize: 18.0,
                                 color: Colors.blue[100],
@@ -87,7 +87,7 @@ class PayRestaurantPage extends GetView<PayRestaurantController> {
                         SizedBox(height: 12),
                         if (balance < 0.70)
                           Text(
-                            "Por favor, recarregue para poder usar o bandejão",
+                            'recarregue_para_usar_bandejao'.tr,
                             style: TextStyle(
                               fontSize: 14.0,
                               color: Colors.red[300],
@@ -96,7 +96,8 @@ class PayRestaurantPage extends GetView<PayRestaurantController> {
                           )
                         else
                           Text(
-                            "Refeições disponíveis: ${(balance / 0.70).floor()}",
+                            'refeicoes_disponiveis'.trParams(
+                                {'count': '${(balance / 0.70).floor()}'}),
                             style: TextStyle(
                               fontSize: 16.0,
                               color: Colors.green[300],
@@ -110,8 +111,8 @@ class PayRestaurantPage extends GetView<PayRestaurantController> {
                             child: RichText(
                               textAlign: TextAlign.center,
                               text: TextSpan(
-                                text:
-                                    'O valor não será debitado caso o código não seja utilizado.',
+                                text: 'valor_nao_debitado_se_nao_utilizado'
+                                    .tr,
                                 style: TextStyle(
                                   fontSize: 14.0,
                                   color: Colors.blue[200],
@@ -136,7 +137,7 @@ class PayRestaurantPage extends GetView<PayRestaurantController> {
                             controller.goToPaymentTicket();
                           },
                           child: Text(
-                            "Gerar Código",
+                            'gerar_codigo'.tr,
                             style: TextStyle(
                               fontSize: 20.0,
                               color: Colors.white,
@@ -159,7 +160,7 @@ class PayRestaurantPage extends GetView<PayRestaurantController> {
                                 Container(
                                   margin: EdgeInsets.only(right: 14),
                                   child: Text(
-                                    " Como utilizar o código",
+                                    'como_utilizar_codigo'.tr,
                                     style: TextStyle(color: Colors.white),
                                   ),
                                 ),

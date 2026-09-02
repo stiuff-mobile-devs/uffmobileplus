@@ -99,16 +99,11 @@ class PermissionsController extends GetxController with WidgetsBindingObserver {
               children: [
                 Icon(Icons.security, color: AppColors.darkBlue()),
                 const SizedBox(width: 10),
-                const Text("Atenção"),
+                Text('atencao'.tr),
               ],
             ),
-            content: const Text(
-              "O Monitora UFF deseja coletar dados de localização mesmo quando o aplicativo estiver fechado ou não estiver em uso.\n\n"
-              "Esses dados permitem que os supervisores visualizem sua posição em tempo real.\n\n"
-              "Como ativar:\n"
-              "1. Toque em 'Prosseguir'.\n"
-              "2. Em Permissões > Localização.\n"
-              "3. Selecione 'Permitir o tempo todo'.",
+            content: Text(
+              'monitora_disclosure_localizacao'.tr,
             ),
             actions: [
               TextButton(
@@ -116,7 +111,7 @@ class PermissionsController extends GetxController with WidgetsBindingObserver {
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.darkBlue(),
                 ),
-                child: Text("AGORA NÃO"),
+                child: Text('agora_nao'.tr),
               ),
               TextButton(
                 onPressed: () async {
@@ -125,7 +120,7 @@ class PermissionsController extends GetxController with WidgetsBindingObserver {
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.darkBlue(),
                 ),
-                child: const Text("PROSSEGUIR"),
+                child: Text('prosseguir'.tr),
               ),
             ],
           ),
@@ -137,12 +132,12 @@ class PermissionsController extends GetxController with WidgetsBindingObserver {
   Future<void> notifyGpsDisabled() async {
     await Get.dialog(
       AlertDialog(
-        title: Text("O GPS está desativado"),
-        content: Text("Por favor, ative o GPS para continuar."),
+        title: Text('gps_desligado'.tr),
+        content: Text('ative_gps_continuar'.tr),
         actions: [
           TextButton(
             style: TextButton.styleFrom(foregroundColor: AppColors.darkBlue()),
-            child: Text("ENTENDI"),
+            child: Text('entendi'.tr),
             onPressed: () {
               Get.back(); // Fecha o diálogo
             },

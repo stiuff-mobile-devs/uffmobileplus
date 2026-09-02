@@ -27,12 +27,12 @@ class RecordSelectField extends GetView<BancoDeIdeiasController> {
     return DropdownButtonFormField<String>(
       initialValue: _normalizedValue(),
       decoration: InputDecoration(
-        labelText: field.label,
+        labelText: field.label.tr,
         border: const OutlineInputBorder(),
       ),
       items: [
         if (!field.required)
-          const DropdownMenuItem<String>(value: '', child: Text('Nenhum')),
+          DropdownMenuItem<String>(value: '', child: Text('bdi_nenhum'.tr)),
         for (final option in options)
           DropdownMenuItem<String>(
             value: option.id,
@@ -42,7 +42,9 @@ class RecordSelectField extends GetView<BancoDeIdeiasController> {
       onChanged: enabled ? onChanged : null,
       validator: (value) {
         if (field.required && (value == null || value.isEmpty)) {
-          return 'Informe ${field.label.toLowerCase()}.';
+          return 'bdi_informe_campo'.trParams({
+            'field': field.label.tr.toLowerCase(),
+          });
         }
         return null;
       },

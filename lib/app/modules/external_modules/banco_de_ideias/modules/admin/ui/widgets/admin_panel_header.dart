@@ -12,7 +12,7 @@ class AdminPanelHeader extends GetView<BancoDeIdeiasController> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(
-        'Painel administrativo',
+        'bdi_painel_administrativo'.tr,
         style: Theme.of(context).textTheme.headlineSmall?.copyWith(
           fontWeight: FontWeight.w800,
           color: Colors.white,

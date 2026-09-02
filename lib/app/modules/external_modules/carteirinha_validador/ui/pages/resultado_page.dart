@@ -251,7 +251,7 @@ class CarteirinhaValidadorResultPage extends GetView<CarteirinhaValidadorControl
                               backgroundColor: Colors.blue,
                             ),
                             child: Text(
-                              'Escanear nova carteirinha',
+                              'escanear_nova_carteirinha'.tr,
                               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                             ),
                           ),

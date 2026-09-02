@@ -17,14 +17,14 @@ class DialogError extends GetView<BancoDeIdeiasController> {
         const Icon(Icons.error_outline_rounded, color: Color(0xFFB42318)),
         const SizedBox(height: 8),
         Text(
-          error?.toString() ?? 'Erro ao carregar opcoes.',
+          error?.toString() ?? 'bdi_erro_carregar_opcoes'.tr,
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 8),
         TextButton.icon(
           onPressed: onRetry,
           icon: const Icon(Icons.refresh_rounded),
-          label: const Text('Tentar novamente'),
+          label: Text('tentar_novamente'.tr),
         ),
       ],
     ),

@@ -44,8 +44,8 @@ class _UserHomeContentState extends State<UserHomeContent> {
   late Future<IdeiaCadastroOpcoes> _opcoesFuture;
   IdeiaFiltro _filtro = const IdeiaFiltro();
 
-  bool get _isPerfil => widget.destination.label == 'Perfil';
-  bool get _isMinhasIdeias => widget.destination.label == 'Minhas Ideias';
+  bool get _isPerfil => widget.destination.labelKey == 'bdi_perfil';
+  bool get _isMinhasIdeias => widget.destination.labelKey == 'bdi_minhas_ideias';
 
   @override
   void initState() {
@@ -111,8 +111,8 @@ class _UserHomeContentState extends State<UserHomeContent> {
         SnackBar(
           content: Text(
             ideia.favorita
-                ? 'Ideia removida dos favoritos.'
-                : 'Ideia favoritada com sucesso.',
+                ? 'bdi_ideia_removida_favoritos'.tr
+                : 'bdi_ideia_favoritada_sucesso'.tr,
           ),
         ),
       );
@@ -144,7 +144,7 @@ class _UserHomeContentState extends State<UserHomeContent> {
 
     _recarregar();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Ideia atualizada com sucesso.')),
+      SnackBar(content: Text('bdi_ideia_atualizada_sucesso'.tr)),
     );
     return true;
   }
@@ -153,12 +153,14 @@ class _UserHomeContentState extends State<UserHomeContent> {
     final confirmou = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Excluir ideia'),
-        content: Text('Deseja excluir "${ideia.titulo}"?'),
+        title: Text('bdi_excluir_ideia_titulo'.tr),
+        content: Text(
+          'bdi_confirmar_exclusao_ideia'.trParams({'titulo': ideia.titulo}),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancelar'),
+            child: Text('cancelar'.tr),
           ),
           FilledButton.icon(
             onPressed: () => Navigator.of(context).pop(true),
@@ -167,7 +169,7 @@ class _UserHomeContentState extends State<UserHomeContent> {
               foregroundColor: Theme.of(context).colorScheme.onError,
             ),
             icon: const Icon(Icons.delete_outline_rounded),
-            label: const Text('Excluir'),
+            label: Text('excluir'.tr),
           ),
         ],
       ),
@@ -186,7 +188,7 @@ class _UserHomeContentState extends State<UserHomeContent> {
 
       _recarregar();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ideia excluida com sucesso.')),
+        SnackBar(content: Text('bdi_ideia_excluida_sucesso'.tr)),
       );
       return true;
     } catch (error) {
@@ -232,8 +234,8 @@ class _UserHomeContentState extends State<UserHomeContent> {
       future: _isMinhasIdeias ? _minhasIdeiasFuture : _ideiasFuture,
       canDelete: _isMinhasIdeias,
       emptyMessage: _isMinhasIdeias
-          ? 'Voce ainda nao possui ideias vinculadas.'
-          : 'Nenhuma ideia cadastrada.',
+          ? 'bdi_sem_ideias_vinculadas'.tr
+          : 'bdi_nenhuma_ideia_cadastrada'.tr,
       onRetry: _recarregar,
       onOpenIdea: _abrirDetalheIdeia,
       onDeleteIdea: _confirmarRemocaoIdeia,

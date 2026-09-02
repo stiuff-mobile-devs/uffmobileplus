@@ -110,7 +110,7 @@ class HighlightedUserPanel extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      "Última atualização: ${DateFormat('dd/MM/yyyy HH:mm').format(user.timestamp!)}",
+                      'ultima_atualizacao'.trParams({'datetime': DateFormat('dd/MM/yyyy HH:mm').format(user.timestamp!)}),
                       style: const TextStyle(
                         fontSize: 12,
                         color: Colors.white70,

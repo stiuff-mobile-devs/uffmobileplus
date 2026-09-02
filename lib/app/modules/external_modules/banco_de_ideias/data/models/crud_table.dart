@@ -53,53 +53,56 @@ class CrudTable {
   final List<CrudDisplayField> subtitleFields;
 }
 
-const nomeField = CrudField(name: 'nome', label: 'Nome');
+// Note: `title`/`label` values below are translation KEYS (resolved via
+// `.tr` at the render sites), not display text, so this const list can
+// keep being built at compile time.
+const nomeField = CrudField(name: 'nome', label: 'nome');
 
 const crudTables = <CrudTable>[
   CrudTable(
-    title: 'Categorias',
+    title: 'bdi_tabela_categorias',
     path: '/categorias',
     itemsKey: 'categorias',
     icon: Icons.category_rounded,
     fields: [nomeField],
   ),
   CrudTable(
-    title: 'Departamentos',
+    title: 'bdi_tabela_departamentos',
     path: '/departamentos',
     itemsKey: 'departamentos',
     icon: Icons.business_rounded,
     fields: [nomeField],
   ),
   CrudTable(
-    title: 'Cursos',
+    title: 'bdi_tabela_cursos',
     path: '/cursos',
     itemsKey: 'cursos',
     icon: Icons.school_rounded,
     fields: [nomeField],
   ),
   CrudTable(
-    title: 'Estados',
+    title: 'bdi_tabela_estados',
     path: '/estados',
     itemsKey: 'estados',
     icon: Icons.flag_rounded,
     fields: [nomeField],
   ),
   CrudTable(
-    title: 'Tipos de ideia',
+    title: 'bdi_tabela_tipos_ideia',
     path: '/tipos-ideia',
     itemsKey: 'tipoIdeias',
     icon: Icons.lightbulb_rounded,
     fields: [nomeField],
   ),
   CrudTable(
-    title: 'Tipos de ideia do usuario',
+    title: 'bdi_tabela_tipos_ideia_usuario',
     path: '/tipos-ideia-usuario',
     itemsKey: 'tipoIdeiaUsuarios',
     icon: Icons.person_pin_rounded,
     fields: [nomeField],
   ),
   CrudTable(
-    title: 'Perfis',
+    title: 'bdi_tabela_perfis',
     path: '/perfis',
     itemsKey: 'perfils',
     icon: Icons.admin_panel_settings_rounded,
@@ -107,33 +110,33 @@ const crudTables = <CrudTable>[
       nomeField,
       CrudField(
         name: 'descricao',
-        label: 'Descricao',
+        label: 'bdi_descricao',
         type: CrudFieldType.multiline,
         required: false,
       ),
     ],
-    subtitleFields: [CrudDisplayField('Descricao', 'descricao')],
+    subtitleFields: [CrudDisplayField('bdi_descricao', 'descricao')],
   ),
   CrudTable(
-    title: 'Permissoes',
+    title: 'bdi_tabela_permissoes',
     path: '/permissoes',
     itemsKey: 'permissaos',
     icon: Icons.lock_rounded,
     fields: [
-      CrudField(name: 'recurso', label: 'Recurso'),
-      CrudField(name: 'acao', label: 'Acao'),
+      CrudField(name: 'recurso', label: 'bdi_campo_recurso'),
+      CrudField(name: 'acao', label: 'bdi_campo_acao'),
       CrudField(
         name: 'descricao',
-        label: 'Descricao',
+        label: 'bdi_descricao',
         type: CrudFieldType.multiline,
         required: false,
       ),
     ],
     titlePaths: ['recurso', 'acao'],
-    subtitleFields: [CrudDisplayField('Descricao', 'descricao')],
+    subtitleFields: [CrudDisplayField('bdi_descricao', 'descricao')],
   ),
   CrudTable(
-    title: 'Permissoes por perfil',
+    title: 'bdi_tabela_permissoes_perfil',
     path: '/perfil-permissoes',
     itemsKey: 'perfilPermissaos',
     icon: Icons.rule_rounded,
@@ -141,7 +144,7 @@ const crudTables = <CrudTable>[
     fields: [
       CrudField(
         name: 'perfilId',
-        label: 'Perfil',
+        label: 'bdi_perfil',
         type: CrudFieldType.select,
         recordPath: 'perfil.id',
         optionsPath: '/perfis',
@@ -149,7 +152,7 @@ const crudTables = <CrudTable>[
       ),
       CrudField(
         name: 'permissaoId',
-        label: 'Permissao',
+        label: 'bdi_campo_permissao',
         type: CrudFieldType.select,
         recordPath: 'permissao.id',
         optionsPath: '/permissoes',
@@ -160,20 +163,20 @@ const crudTables = <CrudTable>[
     titlePaths: ['perfil.nome', 'permissao.recurso', 'permissao.acao'],
   ),
   CrudTable(
-    title: 'Ideias',
+    title: 'bdi_tabela_ideias',
     path: '/ideias',
     itemsKey: 'ideias',
     icon: Icons.tips_and_updates_rounded,
     fields: [
-      CrudField(name: 'titulo', label: 'Titulo'),
+      CrudField(name: 'titulo', label: 'titulo'),
       CrudField(
         name: 'descricao',
-        label: 'Descricao',
+        label: 'bdi_descricao',
         type: CrudFieldType.multiline,
       ),
       CrudField(
         name: 'estadoId',
-        label: 'Estado',
+        label: 'estado',
         type: CrudFieldType.select,
         recordPath: 'estado.id',
         optionsPath: '/estados',
@@ -181,7 +184,7 @@ const crudTables = <CrudTable>[
       ),
       CrudField(
         name: 'tipoId',
-        label: 'Tipo de ideia',
+        label: 'bdi_campo_tipo_ideia',
         type: CrudFieldType.select,
         recordPath: 'tipo.id',
         optionsPath: '/tipos-ideia',
@@ -190,13 +193,13 @@ const crudTables = <CrudTable>[
     ],
     titlePaths: ['titulo'],
     subtitleFields: [
-      CrudDisplayField('Estado', 'estado.nome'),
-      CrudDisplayField('Tipo', 'tipo.nome'),
-      CrudDisplayField('Descricao', 'descricao'),
+      CrudDisplayField('estado', 'estado.nome'),
+      CrudDisplayField('tipo', 'tipo.nome'),
+      CrudDisplayField('bdi_descricao', 'descricao'),
     ],
   ),
   CrudTable(
-    title: 'Categorias das ideias',
+    title: 'bdi_tabela_categorias_ideias',
     path: '/ideia-categorias',
     itemsKey: 'ideiaCategorias',
     icon: Icons.account_tree_rounded,
@@ -204,7 +207,7 @@ const crudTables = <CrudTable>[
     fields: [
       CrudField(
         name: 'ideiaId',
-        label: 'Ideia',
+        label: 'bdi_campo_ideia',
         type: CrudFieldType.select,
         recordPath: 'ideia.id',
         optionsPath: '/ideias',
@@ -213,7 +216,7 @@ const crudTables = <CrudTable>[
       ),
       CrudField(
         name: 'categoriaId',
-        label: 'Categoria',
+        label: 'bdi_categoria',
         type: CrudFieldType.select,
         recordPath: 'categoria.id',
         optionsPath: '/categorias',
@@ -223,7 +226,7 @@ const crudTables = <CrudTable>[
     titlePaths: ['ideia.titulo', 'categoria.nome'],
   ),
   CrudTable(
-    title: 'Usuarios das ideias',
+    title: 'bdi_tabela_usuarios_ideias',
     path: '/ideia-usuarios',
     itemsKey: 'ideiaUsuarios',
     icon: Icons.groups_rounded,
@@ -231,7 +234,7 @@ const crudTables = <CrudTable>[
     fields: [
       CrudField(
         name: 'ideiaId',
-        label: 'Ideia',
+        label: 'bdi_campo_ideia',
         type: CrudFieldType.select,
         recordPath: 'ideia.id',
         optionsPath: '/ideias',
@@ -240,7 +243,7 @@ const crudTables = <CrudTable>[
       ),
       CrudField(
         name: 'usuarioId',
-        label: 'Usuario',
+        label: 'usuario',
         type: CrudFieldType.select,
         recordPath: 'usuario.id',
         optionsPath: '/usuarios',
@@ -249,7 +252,7 @@ const crudTables = <CrudTable>[
       ),
       CrudField(
         name: 'tipoIdeiaUsuarioId',
-        label: 'Tipo de usuario na ideia',
+        label: 'bdi_campo_tipo_usuario_ideia',
         type: CrudFieldType.select,
         recordPath: 'tipoIdeiaUsuario.id',
         optionsPath: '/tipos-ideia-usuario',
@@ -258,22 +261,26 @@ const crudTables = <CrudTable>[
     ],
     titlePaths: ['ideia.titulo', 'usuario.nome'],
     subtitleFields: [
-      CrudDisplayField('Email', 'usuario.email'),
-      CrudDisplayField('Tipo', 'tipoIdeiaUsuario.nome'),
+      CrudDisplayField('email', 'usuario.email'),
+      CrudDisplayField('tipo', 'tipoIdeiaUsuario.nome'),
     ],
   ),
   CrudTable(
-    title: 'Usuarios',
+    title: 'bdi_tabela_usuarios',
     path: '/usuarios',
     itemsKey: 'usuarios',
     icon: Icons.person_rounded,
     fields: [
-      CrudField(name: 'uidFirebase', label: 'UID Firebase', required: false),
+      CrudField(
+        name: 'uidFirebase',
+        label: 'bdi_campo_uid_firebase',
+        required: false,
+      ),
       nomeField,
-      CrudField(name: 'email', label: 'Email'),
+      CrudField(name: 'email', label: 'email'),
       CrudField(
         name: 'perfilId',
-        label: 'Perfil',
+        label: 'bdi_perfil',
         type: CrudFieldType.select,
         required: false,
         recordPath: 'perfil.id',
@@ -282,7 +289,7 @@ const crudTables = <CrudTable>[
       ),
       CrudField(
         name: 'departamentoId',
-        label: 'Departamento',
+        label: 'departamento',
         type: CrudFieldType.select,
         required: false,
         recordPath: 'departamento.id',
@@ -291,7 +298,7 @@ const crudTables = <CrudTable>[
       ),
       CrudField(
         name: 'cursoId',
-        label: 'Curso',
+        label: 'curso',
         type: CrudFieldType.select,
         required: false,
         recordPath: 'curso.id',
@@ -301,8 +308,8 @@ const crudTables = <CrudTable>[
     ],
     titlePaths: ['nome'],
     subtitleFields: [
-      CrudDisplayField('Email', 'email'),
-      CrudDisplayField('Perfil', 'perfil.nome'),
+      CrudDisplayField('email', 'email'),
+      CrudDisplayField('bdi_perfil', 'perfil.nome'),
     ],
   ),
 ];

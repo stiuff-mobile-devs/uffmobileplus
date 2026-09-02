@@ -40,8 +40,8 @@ class IdeaCard extends GetView<BancoDeIdeiasController> {
           if (!ideia.podeAdministrar)
             IconButton(
               tooltip: ideia.favorita
-                  ? 'Remover dos favoritos'
-                  : 'Favoritar ideia',
+                  ? 'bdi_remover_favoritos'.tr
+                  : 'bdi_favoritar_ideia'.tr,
               onPressed: onToggleFavorite,
               icon: Icon(
                 ideia.favorita
@@ -51,7 +51,7 @@ class IdeaCard extends GetView<BancoDeIdeiasController> {
             ),
           if (canDelete)
             IconButton(
-              tooltip: 'Excluir ideia',
+              tooltip: 'bdi_excluir_ideia_titulo'.tr,
               onPressed: onDelete,
               icon: const Icon(Icons.delete_outline_rounded),
             )
@@ -73,7 +73,9 @@ class _IdeaCardSubtitle extends GetView<BancoDeIdeiasController> {
       ideia.tipo,
       ideia.estado,
       if ((ideia.tipoVinculo ?? '').isNotEmpty) ideia.tipoVinculo!,
-      '${ideia.quantidadeSeguidores} seguidores',
+      'bdi_quantidade_seguidores'.trParams({
+        'count': '${ideia.quantidadeSeguidores}',
+      }),
     ].where((v) => v.isNotEmpty).join(' - ');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

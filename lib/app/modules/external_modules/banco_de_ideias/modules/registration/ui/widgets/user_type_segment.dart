@@ -16,16 +16,16 @@ class UserTypeSegment extends GetView<BancoDeIdeiasController> {
 
   @override
   Widget build(BuildContext context) => SegmentedButton<bool>(
-    segments: const [
+    segments: [
       ButtonSegment(
         value: true,
-        icon: Icon(Icons.school_rounded),
-        label: Text('Aluno'),
+        icon: const Icon(Icons.school_rounded),
+        label: Text('bdi_aluno'.tr),
       ),
       ButtonSegment(
         value: false,
-        icon: Icon(Icons.co_present_rounded),
-        label: Text('Professor'),
+        icon: const Icon(Icons.co_present_rounded),
+        label: Text('bdi_professor'.tr),
       ),
     ],
     selected: {isAluno},

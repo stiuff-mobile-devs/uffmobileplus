@@ -50,7 +50,7 @@ class AdminTableCard extends GetView<BancoDeIdeiasController> {
               const SizedBox(width: 14),
               Expanded(
                 child: Text(
-                  table.title,
+                  table.title.tr,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,

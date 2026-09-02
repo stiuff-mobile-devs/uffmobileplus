@@ -11,7 +11,7 @@ class UniteveHistoriaPage extends GetView<UniteveController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Unitevê"),
+        title: Text('uniteve'.tr),
         centerTitle: true,
         foregroundColor: Colors.white,
         shape: const RoundedRectangleBorder(

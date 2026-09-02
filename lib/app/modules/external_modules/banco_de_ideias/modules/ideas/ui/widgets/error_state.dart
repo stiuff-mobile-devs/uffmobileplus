@@ -18,7 +18,7 @@ class ErrorState extends GetView<BancoDeIdeiasController> {
           const Icon(Icons.error_outline_rounded, color: Color(0xFFB42318)),
           const SizedBox(height: 10),
           Text(
-            error?.toString() ?? 'Erro ao carregar dados.',
+            error?.toString() ?? 'nao_foi_possivel_carregar_dados'.tr,
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: Color(0xFF486581),
@@ -29,7 +29,7 @@ class ErrorState extends GetView<BancoDeIdeiasController> {
           FilledButton.icon(
             onPressed: onRetry,
             icon: const Icon(Icons.refresh_rounded),
-            label: const Text('Tentar novamente'),
+            label: Text('tentar_novamente'.tr),
           ),
         ],
       ),

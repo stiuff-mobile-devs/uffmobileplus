@@ -42,12 +42,12 @@ class CrudRecordCard extends GetView<BancoDeIdeiasController> {
         spacing: 4,
         children: [
           IconButton(
-            tooltip: 'Editar',
+            tooltip: 'editar'.tr,
             onPressed: onEdit,
             icon: const Icon(Icons.edit_rounded),
           ),
           IconButton(
-            tooltip: 'Excluir',
+            tooltip: 'excluir'.tr,
             onPressed: onDelete,
             icon: const Icon(Icons.delete_outline_rounded),
           ),

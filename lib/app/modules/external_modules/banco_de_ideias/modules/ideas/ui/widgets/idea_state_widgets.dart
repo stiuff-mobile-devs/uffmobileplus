@@ -19,7 +19,7 @@ class DialogError extends GetView<BancoDeIdeiasController> {
           const Icon(Icons.error_outline_rounded, color: Colors.redAccent),
           const SizedBox(height: 8),
           Text(
-            error?.toString() ?? 'Erro ao carregar opcoes.',
+            error?.toString() ?? 'bdi_erro_carregar_opcoes'.tr,
             textAlign: TextAlign.center,
             style: const TextStyle(color: Colors.white70),
           ),
@@ -27,7 +27,7 @@ class DialogError extends GetView<BancoDeIdeiasController> {
           TextButton.icon(
             onPressed: onRetry,
             icon: const Icon(Icons.refresh_rounded),
-            label: const Text('Tentar novamente'),
+            label: Text('tentar_novamente'.tr),
           ),
         ],
       ),
@@ -83,7 +83,7 @@ class ErrorState extends GetView<BancoDeIdeiasController> {
             const Icon(Icons.error_outline_rounded, color: Colors.redAccent),
             const SizedBox(height: 10),
             Text(
-              error?.toString() ?? 'Erro ao carregar dados.',
+              error?.toString() ?? 'nao_foi_possivel_carregar_dados'.tr,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Colors.white70,
@@ -94,7 +94,7 @@ class ErrorState extends GetView<BancoDeIdeiasController> {
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Tentar novamente'),
+              label: Text('tentar_novamente'.tr),
             ),
           ],
         ),

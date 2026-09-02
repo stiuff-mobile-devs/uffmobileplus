@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/models/ideia.dart';
@@ -155,20 +156,20 @@ class _IdeaFilterBarState extends State<IdeaFilterBar> {
       if (widget.filtro.nome.trim().isNotEmpty)
         IdeaActiveFilter(
           type: IdeaActiveFilterType.titulo,
-          label: 'Titulo',
+          label: 'titulo'.tr,
           value: widget.filtro.nome.trim(),
         ),
       if (widget.filtro.tipoId != null && widget.filtro.tipoId!.isNotEmpty)
         IdeaActiveFilter(
           type: IdeaActiveFilterType.tipo,
-          label: 'Tipo',
+          label: 'tipo'.tr,
           value: _nomeDaOpcao(opcoes.tipos, widget.filtro.tipoId!),
         ),
       if (widget.filtro.categoriaId != null &&
           widget.filtro.categoriaId!.isNotEmpty)
         IdeaActiveFilter(
           type: IdeaActiveFilterType.categoria,
-          label: 'Categoria',
+          label: 'bdi_categoria'.tr,
           value: _nomeDaOpcao(opcoes.categorias, widget.filtro.categoriaId!),
         ),
     ];
@@ -180,7 +181,7 @@ class _IdeaFilterBarState extends State<IdeaFilterBar> {
         return opcao.nome;
       }
     }
-    return 'Carregando...';
+    return 'carregando'.tr;
   }
 }
 

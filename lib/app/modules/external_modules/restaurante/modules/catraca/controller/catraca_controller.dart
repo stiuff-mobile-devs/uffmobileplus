@@ -323,7 +323,7 @@ class CatracaController extends GetxController {
         );
         _updateStatusMessage(false);
         _transactionResultMessages(
-          "Transação salva localmente com sucesso!",
+          'transacao_offline_salva_sucesso'.tr,
           true,
           true,
           cpf,
@@ -331,7 +331,7 @@ class CatracaController extends GetxController {
       } catch (e) {
         debugPrint('Erro ao salvar transação offline: $e');
         _transactionResultMessages(
-          "Falha ao salvar a transação. Erro Interno. Tente novamente.",
+          'falha_salvar_transacao_offline'.tr,
           false,
           true,
           cpf,

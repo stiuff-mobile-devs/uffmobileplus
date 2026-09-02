@@ -59,10 +59,10 @@ class LoginCard extends GetView<BancoDeIdeiasController> {
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            'Bem-vindo ao Banco de Ideias',
+          Text(
+            'bdi_bem_vindo'.tr,
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w800,
               color: Colors.white,
@@ -71,7 +71,7 @@ class LoginCard extends GetView<BancoDeIdeiasController> {
           ),
           const SizedBox(height: 12),
           Text(
-            'Entre com sua conta Google para continuar.',
+            'bdi_entrar_google_msg'.tr,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 15,
@@ -88,7 +88,7 @@ class LoginCard extends GetView<BancoDeIdeiasController> {
                     child: CircularProgressIndicator(strokeWidth: 2.5),
                   )
                 : const Icon(Icons.g_mobiledata_rounded, size: 28),
-            label: const Text('Continuar com Google'),
+            label: Text('bdi_continuar_google'.tr),
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.lightBlue(),
               foregroundColor: Colors.white,

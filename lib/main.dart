@@ -14,6 +14,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await rive.RiveNative.init();
 
+  // Carrega os arquivos JSON de tradução (um por idioma suportado)
+  await AppTranslation.load();
+
   await FirebaseService.init();
   await HiveService.init();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);

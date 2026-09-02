@@ -15,7 +15,7 @@ class HarpiaGoogleGroupsController extends GetxController {
   final RxString _loadError = RxString('');
   RxString get loadError => _loadError;
 
-  RxString observedGroup = RxString('Nenhum');
+  RxString observedGroup = RxString('nenhum_grupo_selecionado'.tr);
   RxList<GoogleGroupMember> observedMembers = RxList();
     
   final _highlightedObservedUsers = <GoogleGroupMember>[].obs;
@@ -82,9 +82,9 @@ class HarpiaGoogleGroupsController extends GetxController {
       // na aba de grupos da interface.
       //final List<GoogleGroupModel> finalGroups = [];
       for (final subgroup in subgroups) {
-        final groupEmail = subgroup['email'] ?? 'Email indisponível';
-        final groupName = subgroup['name'] ?? 'Nome indisponível';
-        final groupDescription = subgroup['description'] ?? 'Descrição indisponível';
+        final groupEmail = subgroup['email'] ?? 'email_indisponivel'.tr;
+        final groupName = subgroup['name'] ?? 'nome_indisponivel'.tr;
+        final groupDescription = subgroup['description'] ?? 'descricao_indisponivel'.tr;
         final groupMembers = await _repository.getGroupEntities(token, groupEmail, forceRefresh: forceRefresh);
         final isMember = groupMembers.any(
           (m) => m['email']?.toString().trim().toLowerCase() == userEmail.trim().toLowerCase()
@@ -178,13 +178,13 @@ class HarpiaGoogleGroupsController extends GetxController {
     await _loadGroups(forceRefresh: true);
     
     final currentGroupName = observedGroup.value;
-    if (currentGroupName != 'Nenhum') {
+    if (currentGroupName != 'nenhum_grupo_selecionado'.tr) {
       try {
         final selectedGroup = _observableGoogleGroups.firstWhere((g) => g.name == currentGroupName);
         await updateObservedUsers(selectedGroup, forceRefresh: true);
       } catch (e) {
         // Group not found anymore
-        observedGroup.value = 'Nenhum';
+        observedGroup.value = 'nenhum_grupo_selecionado'.tr;
         observedMembers.clear();
       }
     }
