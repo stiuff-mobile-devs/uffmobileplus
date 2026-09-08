@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:rive/rive.dart' as rive;
@@ -5,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:uffmobileplus/app/data/data_bases/firebase_service.dart';
 import 'package:uffmobileplus/app/data/data_bases/hive_service.dart';
 import 'package:uffmobileplus/app/data/services/deep_link_service.dart';
+import 'package:uffmobileplus/app/data/services/push_notification_service.dart';
 import 'package:uffmobileplus/app/routes/app_pages.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/translations/app_translations.dart';
@@ -16,6 +18,12 @@ Future<void> main() async {
   await FirebaseService.init();
   await HiveService.init();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+  // Registra o handler de notificações em background (deve ser top-level)
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
+  // Inicializa o serviço de Push Notifications
+  await PushNotificationService().init();
 
   // Inicializa Deep Linking (App Links e Universal Links)
   await DeepLinkService().init();
