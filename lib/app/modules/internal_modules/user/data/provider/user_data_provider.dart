@@ -40,8 +40,7 @@ class UserDataProvider {
         shortcutRoutes: newUserData.shortcutRoutes ?? existingData.shortcutRoutes,
         gdiGroupsGoogle: newUserData.gdiGroupsGoogle ?? existingData.gdiGroupsGoogle,
         lastRegisteredTokenCdcUpdate: newUserData.lastRegisteredTokenCdcUpdate ?? existingData.lastRegisteredTokenCdcUpdate,
-        
-
+        lastRegisteredTokenCdcMethod: newUserData.lastRegisteredTokenCdcMethod ?? existingData.lastRegisteredTokenCdcMethod,
       );
     } else {
       dataToSave = newUserData;
@@ -149,22 +148,31 @@ class UserDataProvider {
     }
   }
 
-  Future<String> lastRegisteredTokenCdcUpdate(DateTime lastRegisteredTokenCdcUpdate) async {
+  Future<String> lastRegisteredTokenCdcUpdate(
+    DateTime lastRegisteredTokenCdcUpdate,
+    String method,
+  ) async {
     try {
       var box = await Hive.openBox<UserData>(_collectionPath);
       UserData? user = box.get(_userKey);
 
       if (user == null) {
-        await saveUserData(UserData(lastRegisteredTokenCdcUpdate: lastRegisteredTokenCdcUpdate));
+        await saveUserData(
+          UserData(
+            lastRegisteredTokenCdcUpdate: lastRegisteredTokenCdcUpdate,
+            lastRegisteredTokenCdcMethod: method,
+          ),
+        );
         return "success";
       }
 
-      // altera o campo diretamente e salva
+      // altera os campos diretamente e salva
       user.lastRegisteredTokenCdcUpdate = lastRegisteredTokenCdcUpdate;
+      user.lastRegisteredTokenCdcMethod = method;
       await user.save(); // persiste o objeto atualizado
       return "success";
     } catch (e) {
-      return "Erro ao atualizar grupos GDI Google no Hive: $e";
+      return "Erro ao atualizar token CDC no Hive: $e";
     }
   }
 
