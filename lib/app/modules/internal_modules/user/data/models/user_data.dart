@@ -52,6 +52,9 @@ class UserData extends HiveObject {
   @HiveField(15)
   DateTime? lastRegisteredTokenCdcUpdate;
 
+  @HiveField(16)
+  String? lastRegisteredTokenCdcMethod;
+
   UserData({
     this.name,
     this.nomesocial,
@@ -69,6 +72,7 @@ class UserData extends HiveObject {
     this.shortcutRoutes,
     this.gdiGroupsGoogle,
     this.lastRegisteredTokenCdcUpdate,
+    this.lastRegisteredTokenCdcMethod,
   });
 
   UserData copyWith({
@@ -88,6 +92,7 @@ class UserData extends HiveObject {
     List<String>? shortcutRoutes,
     GdiGroupsGoogle? gdiGroupsGoogle,
     DateTime? lastRegisteredTokenCdcUpdate,
+    String? lastRegisteredTokenCdcMethod,
   }) {
     return UserData(
      name: name ?? this.name,
@@ -104,8 +109,9 @@ class UserData extends HiveObject {
      gdiGroups: gdiGroups ?? this.gdiGroups,
      profileType: profileType ?? this.profileType,
      shortcutRoutes: shortcutRoutes ?? this.shortcutRoutes,
-     gdiGroupsGoogle: gdiGroupsGoogle as GdiGroupsGoogle? ?? this.gdiGroupsGoogle,
+     gdiGroupsGoogle: gdiGroupsGoogle ?? this.gdiGroupsGoogle,
      lastRegisteredTokenCdcUpdate: lastRegisteredTokenCdcUpdate ?? this.lastRegisteredTokenCdcUpdate,
+     lastRegisteredTokenCdcMethod: lastRegisteredTokenCdcMethod ?? this.lastRegisteredTokenCdcMethod,
     );
   }
 
@@ -141,6 +147,7 @@ class UserData extends HiveObject {
       lastRegisteredTokenCdcUpdate: json['lastRegisteredTokenCdcUpdate'] != null
           ? DateTime.parse(json['lastRegisteredTokenCdcUpdate'])
           : null,
+      lastRegisteredTokenCdcMethod: json['lastRegisteredTokenCdcMethod'] as String?,
     );
   }
 
@@ -165,12 +172,13 @@ class UserData extends HiveObject {
       'gdiGroupsGoogle': gdiGroupsGoogle?.toJson(),
       'lastRegisteredTokenCdcUpdate':
           lastRegisteredTokenCdcUpdate?.toIso8601String(),
+      'lastRegisteredTokenCdcMethod': lastRegisteredTokenCdcMethod,
     };
   }
 
   @override
   String toString() {
-    return 'UserData(name: $name, nomesocial: $nomesocial, matricula: $matricula, iduff: $iduff, curso: $curso, dataValidadeMatricula: $dataValidadeMatricula, bond: $bond, textoQrCodeCarteirinha: $textoQrCodeCarteirinha,  bondId: $bondId, gdiGroups: $gdiGroups, gdiGroupsGoogle: $gdiGroupsGoogle, lastRegisteredTokenCdcUpdate: $lastRegisteredTokenCdcUpdate)';
+    return 'UserData(name: $name, nomesocial: $nomesocial, matricula: $matricula, iduff: $iduff, curso: $curso, dataValidadeMatricula: $dataValidadeMatricula, bond: $bond, textoQrCodeCarteirinha: $textoQrCodeCarteirinha,  bondId: $bondId, gdiGroups: $gdiGroups, gdiGroupsGoogle: $gdiGroupsGoogle, lastRegisteredTokenCdcUpdate: $lastRegisteredTokenCdcUpdate, lastRegisteredTokenCdcMethod: $lastRegisteredTokenCdcMethod)';
   }
 }
 

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:uffmobileplus/app/data/connections/cdc_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_iduff_model.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/provider/user_iduff_provider.dart';
 
 class UserIduffRepository {
   final UserIduffProvider _userIduffProvider = UserIduffProvider();
+  final CdcService _cdcService = CdcService();
 
   UserIduffRepository() {
     debugPrint("Creating User Auth Repo");
@@ -60,5 +62,13 @@ Future<String> updateIsLogged(bool isLogged) async {
 
   Future<String?> getPhotoUrl() async {
     return await _userIduffProvider.getPhotoUrl();
+  }
+
+  Future<bool> registerTokenCdc(
+    String iduffAccessToken,
+    String deviceToken,
+    String device,
+  ) async {
+    return await _cdcService.registerToken(iduffAccessToken, deviceToken, device);
   }
 }

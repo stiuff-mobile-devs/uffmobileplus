@@ -44,6 +44,12 @@ class CatracaOnlineRepository {
     return await catracaOnlineProvider.getOperatorTransactionsOffline();
   }
 
+  Future<List<OperatorTransactionOffline>>
+  getOperatorTransactionsSynced() async {
+    return await catracaOnlineProvider.getOperatorTransactionsSynced(
+    );
+  }
+
   Future<String> saveOperatorTransactionToFirebase(
     OperatorTransactionOffline operatorTransactionOffline,
   ) async {
@@ -54,14 +60,6 @@ class CatracaOnlineRepository {
 
   Future<String> deleteOperatorTransactionOffline(String id) async {
     return await catracaOnlineProvider.deleteOperatorTransactionOffline(id);
-  }
-
-  Future<List<OperatorTransactionOffline>> getOperatorTransactionsFromFirebase(
-    String operatorEmail,
-  ) async {
-    return await catracaOnlineProvider.getOperatorTransactionsFromFirebase(
-      operatorEmail,
-    );
   }
 
   Future<void> cleanMore24hTransactionsOffline() async {

@@ -1,12 +1,12 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=/home/pedroamaro/development/flutter"
-export "FLUTTER_APPLICATION_PATH=/home/pedroamaro/StudioProjects/uffmobileplus"
-export "FLUTTER_FRAMEWORK_SWIFT_PACKAGE_PATH=/home/pedroamaro/StudioProjects/uffmobileplus/macos/Flutter/ephemeral/Packages/.packages/FlutterFramework"
+export "FLUTTER_ROOT=/home/joao/develop/flutter"
+export "FLUTTER_APPLICATION_PATH=/home/joao/UFF/STI/uffmobileplus"
+export "FLUTTER_FRAMEWORK_SWIFT_PACKAGE_PATH=/home/joao/UFF/STI/uffmobileplus/macos/Flutter/ephemeral/Packages/.packages/FlutterFramework"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"
-export "FLUTTER_BUILD_NAME=6.10.1"
-export "FLUTTER_BUILD_NUMBER=638"
+export "FLUTTER_BUILD_NAME=6.9.7"
+export "FLUTTER_BUILD_NUMBER=635"
 export "DART_OBFUSCATION=false"
 export "TRACK_WIDGET_CREATION=true"
 export "TREE_SHAKE_ICONS=false"

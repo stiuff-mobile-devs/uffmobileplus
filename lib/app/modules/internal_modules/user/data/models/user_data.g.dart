@@ -33,13 +33,14 @@ class UserDataAdapter extends TypeAdapter<UserData> {
       shortcutRoutes: (fields[13] as List?)?.cast<String>(),
       gdiGroupsGoogle: fields[14] as GdiGroupsGoogle?,
       lastRegisteredTokenCdcUpdate: fields[15] as DateTime?,
+      lastRegisteredTokenCdcMethod: fields[16] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserData obj) {
     writer
-      ..writeByte(16)
+      ..writeByte(17)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
@@ -71,7 +72,9 @@ class UserDataAdapter extends TypeAdapter<UserData> {
       ..writeByte(14)
       ..write(obj.gdiGroupsGoogle)
       ..writeByte(15)
-      ..write(obj.lastRegisteredTokenCdcUpdate);
+      ..write(obj.lastRegisteredTokenCdcUpdate)
+      ..writeByte(16)
+      ..write(obj.lastRegisteredTokenCdcMethod);
   }
 
   @override

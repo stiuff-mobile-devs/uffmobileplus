@@ -118,8 +118,7 @@ class CatracaController extends GetxController {
 
     try {
       operatorTransactionsFromFirebase.value = await repository
-          .getOperatorTransactionsFromFirebase(
-            operatorEmailGoogle ?? operatorEmailUff ?? '',
+          .getOperatorTransactionsSynced(
           );
     } catch (e) {
       debugPrint('Erro ao buscar transações offline do firebase: $e');

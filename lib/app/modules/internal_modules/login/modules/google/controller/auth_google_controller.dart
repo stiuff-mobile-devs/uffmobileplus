@@ -128,27 +128,34 @@ class AuthGoogleController extends GetxController {
     try {
       UserData user = await _userDataRepository.getUserData() ?? UserData();
 
-      if (user.lastRegisteredTokenCdcUpdate != null) {
-        if (DateTime.now()
-                .difference(user.lastRegisteredTokenCdcUpdate as DateTime)
-                .inDays <
-            90) {
-          debugPrint(
-            "Token CDC já atualizado recentemente. Não é necessário atualizar.",
-          );
-          return;
-        }
+      bool isSameMethod = user.lastRegisteredTokenCdcMethod == 'google';
+      bool isRecent = user.lastRegisteredTokenCdcUpdate != null &&
+          DateTime.now()
+                  .difference(user.lastRegisteredTokenCdcUpdate as DateTime)
+                  .inDays <
+              90;
+
+      if (isSameMethod && isRecent) {
+        debugPrint(
+          "Token CDC já atualizado recentemente para login Google. Não é necessário atualizar.",
+        );
+        return;
       }
+
       bool isAndroid = Platform.isAndroid;
       String device = isAndroid ? 'android' : 'ios';
       String? tokenDevice = await getTokenDevice(isAndroid);
       String? token = await _authGoogle.getFirebaseIdToken();
 
       if (token != null && tokenDevice != null) {
-        await _userRepository.registerTokenCdc(token, tokenDevice, device);
+        bool success = await _userRepository.registerTokenCdc(token, tokenDevice, device);
+        if (success) {
+          await _userDataRepository.lastRegisteredTokenCdcUpdate(
+            DateTime.now(),
+            'google',
+          );
+        }
       }
-
-      await _userDataRepository.lastRegisteredTokenCdcUpdate(DateTime.now());
     } catch (e) {
       debugPrint("Erro ao registrar token CDC: $e");
     }

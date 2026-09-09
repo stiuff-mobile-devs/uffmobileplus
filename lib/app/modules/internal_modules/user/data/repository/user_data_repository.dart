@@ -46,9 +46,11 @@ class UserDataRepository {
 
   Future<String> lastRegisteredTokenCdcUpdate(
     DateTime lastRegisteredTokenCdcUpdate,
+    String method,
   ) async {
     return await _userDataProvider.lastRegisteredTokenCdcUpdate(
       lastRegisteredTokenCdcUpdate,
+      method,
     );
   }
 
