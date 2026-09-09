@@ -131,7 +131,7 @@ Widget busuffMapWidget(BusuffController c) {
         color: AppColors.darkBlue(),
         child: Center(
           child: Text(
-            'Arraste para selecionar a rota',
+            'arraste_selecionar_rota'.tr,
             style: const TextStyle(color: Colors.white),
           ),
         ),
@@ -246,7 +246,7 @@ Widget busuffStaticWidget(BusuffController c) {
       color: AppColors.darkBlue(),
       child: Center(
         child: Text(
-          'Arraste para selecionar a rota',
+          'arraste_selecionar_rota'.tr,
           style: TextStyle(color: Colors.white),
         ),
       ),
@@ -255,7 +255,7 @@ Widget busuffStaticWidget(BusuffController c) {
         ? Container(
             color: AppColors.lightBlue(),
             alignment: Alignment.center,
-            child: const Text('Sem imagem de rota disponível'),
+            child: Text('sem_imagem_rota_disponivel'.tr),
           )
         : PhotoView(
             imageProvider: AssetImage(

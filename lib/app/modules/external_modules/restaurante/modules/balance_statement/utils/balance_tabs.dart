@@ -2,6 +2,7 @@
 //import 'package:carteirinha_uff_digital/ui/balance/components/balance_tab_statement.dart';
 //import 'package:carteirinha_uff_digital/utils/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/balance_statement/utils/balance_tab_statement.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/data/model/user_balance.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/utils/constants.dart';
@@ -25,15 +26,15 @@ class BalanceTabs extends StatelessWidget {
           elevation: 2,
           automaticallyImplyLeading: false,
           backgroundColor: const Color(0xff052750),
-          title: const TabBar(
+          title: TabBar(
             labelColor: Colors.white, 
             unselectedLabelColor: Colors.white, 
             labelStyle: TextStyle(fontSize: 14),
             indicatorColor:Color.fromARGB(255, 0, 141, 47), 
             tabs: <Widget>[
-              Tab(text: "Extrato"),
-              Tab(text: "Recargas"),
-              Tab(text: "Pagamentos"),
+              Tab(text: 'extrato'.tr),
+              Tab(text: 'recargas'.tr),
+              Tab(text: 'pagamentos'.tr),
             ],
           ),
         ),

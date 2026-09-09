@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/splash/controller/splash_controller.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/splash/controller/splash_controller.dart';
+import 'package:uffmobileplus/app/ui/widgets/responsive_uff_logo.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 
 class SplashPage extends GetView<SplashController> {
@@ -106,25 +107,11 @@ class SplashPage extends GetView<SplashController> {
               duration: const Duration(milliseconds: 1300),
               alignment: Alignment.center,
               margin: EdgeInsets.only(bottom: controller.animatedMargin),
-              child: SizedBox(
+              child: ResponsiveUffLogo(
                 width: controller.findLogoSize(),
                 height: controller.findLogoSize(),
-                child: Card(
-                  color: Colors.white,
-                  elevation: 8.0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15.0),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Image.asset(
-                      'assets/logos/logo_um+.png',
-                      height: 240.0,
-                      alignment: Alignment.center,
-                      fit: BoxFit.fitWidth,
-                    ),
-                  ),
-                ),
+                showBackgroundCard: false,
+                animate: true,
               ),
             ),
           ],

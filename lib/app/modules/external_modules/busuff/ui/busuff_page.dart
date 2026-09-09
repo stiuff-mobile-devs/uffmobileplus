@@ -18,11 +18,11 @@ class BusuffPage extends GetView<BusuffController> {
             centerTitle: true,
             elevation: 8,
             foregroundColor: Colors.white,
-            title: const Text('Busuff'),
+            title: Text('BusUFF'.tr),
             actions: [
-              const Tooltip(
-                message: "O Busuff ainda está em beta",
-                child: Text("Beta"),
+              Tooltip(
+                message: 'busuff_ainda_beta'.tr,
+                child: Text('beta'.tr),
               ),
               IconButton(
                 onPressed: () {

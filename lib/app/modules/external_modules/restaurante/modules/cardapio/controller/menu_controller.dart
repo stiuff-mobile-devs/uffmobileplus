@@ -71,7 +71,7 @@ class MenuController extends GetxController {
     }).catchError((error) {
       Get.snackbar(
         'Erro',
-        'Não foi possível carregar as refeições.',
+        'nao_foi_possivel_carregar_refeicoes'.tr,
         snackPosition: SnackPosition.BOTTOM,
         colorText: Colors.white,
       );
@@ -139,18 +139,18 @@ class MenuController extends GetxController {
     var result = -1;
     await customAlertDialog(
       context,
-      title: "Aviso!",
+      title: 'aviso'.tr,
       desc: (isMultiple)
-          ? "Você tem certeza que deseja excluir as refeições selecionadas do cardápio? A ação não poderá ser contornada."
-          : "Você tem certeza que deseja excluir esta refeição do cardápio? A ação não poderá ser contornada.",
+          ? 'confirmar_exclusao_refeicoes_multi'.tr
+          : 'confirmar_exclusao_refeicao'.tr,
       onConfirm: () {
         result = 200;
       },
       onCancel: () {
         result = -1;
       },
-      btnCancelText: "Não",
-      btnConfirmText: "Sim",
+      btnCancelText: 'nao'.tr,
+      btnConfirmText: 'sim'.tr,
       dismissOnTouchOutside: false,
       dismissOnBackKeyPress: false,
     ).show();
@@ -167,8 +167,8 @@ class MenuController extends GetxController {
           Get.snackbar(
             Campus.getName(meal.campus!),
             (!multipleRemovals)
-                ? 'Refeição removida com sucesso.'
-                : 'Refeições removidas com sucesso.',
+                ? 'refeicao_removida_sucesso'.tr
+                : 'refeicoes_removidas_sucesso'.tr,
             snackPosition: SnackPosition.BOTTOM,
             colorText: Colors.white,
           );
@@ -176,8 +176,8 @@ class MenuController extends GetxController {
           Get.snackbar(
             'Erro',
             (!multipleRemovals)
-                ? 'Não foi possível remover a refeição.'
-                : 'Não foi possível remover pelo menos uma das refeições.',
+                ? 'nao_foi_possivel_remover_refeicao'.tr
+                : 'nao_foi_possivel_remover_ao_menos_uma'.tr,
             snackPosition: SnackPosition.BOTTOM,
             colorText: Colors.white,
           );
@@ -187,8 +187,8 @@ class MenuController extends GetxController {
       Get.snackbar(
         'Erro',
         (!multipleRemovals)
-            ? 'Não foi possível remover a refeição.'
-            : 'Não foi possível remover pelo menos uma das refeições.',
+            ? 'nao_foi_possivel_remover_refeicao'.tr
+            : 'nao_foi_possivel_remover_ao_menos_uma'.tr,
         snackPosition: SnackPosition.BOTTOM,
         colorText: Colors.white,
       );
@@ -253,13 +253,13 @@ class MenuListController extends GetxController {
 
   String getDayOfWeek(int day) {
     List<String> diasDaSemana = [
-      'Segunda-feira',
-      'Terça-feira',
-      'Quarta-feira',
-      'Quinta-feira',
-      'Sexta-feira',
-      'Sábado',
-      'Domingo',
+      'segunda_feira'.tr,
+      'terca_feira'.tr,
+      'quarta_feira'.tr,
+      'quinta_feira'.tr,
+      'sexta_feira'.tr,
+      'sabado'.tr,
+      'domingo'.tr,
     ];
     return diasDaSemana[day - 1];
   }
@@ -428,7 +428,7 @@ class MenuListController extends GetxController {
           } else {
             Get.snackbar(
               'Erro',
-              'Não foi possível remover a refeição.',
+              'nao_foi_possivel_remover_refeicao'.tr,
               snackPosition: SnackPosition.BOTTOM,
               colorText: Colors.white,
             );

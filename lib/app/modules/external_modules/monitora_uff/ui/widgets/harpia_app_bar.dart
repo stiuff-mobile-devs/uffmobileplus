@@ -19,7 +19,7 @@ class HarpiaAppBar extends StatelessWidget implements PreferredSizeWidget {
         decoration: BoxDecoration(gradient: AppColors.appBarBottomGradient()),
       ),
       title: Obx(() => Text(
-        'Harpia - Grupo observado: ${googleGroupsController.observedGroup}', 
+        'harpia_grupo_observado'.trParams({'group': '${googleGroupsController.observedGroup}'}),
         style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)
       )),
       centerTitle: true,
@@ -29,7 +29,7 @@ class HarpiaAppBar extends StatelessWidget implements PreferredSizeWidget {
         Builder(
           builder: (context) => IconButton(
             icon: const Icon(Icons.menu, color: Colors.white),
-            tooltip: 'Abrir menu',
+            tooltip: 'abrir_menu'.tr,
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),

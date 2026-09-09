@@ -42,9 +42,9 @@ class Calendar extends StatelessWidget {
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
                         onPressed: calendarCtrl.goToToday,
-                        child: const Text(
-                          'Voltar para Hoje',
-                          style: TextStyle(
+                        child: Text(
+                          'voltar_para_hoje'.tr,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
@@ -56,7 +56,7 @@ class Calendar extends StatelessWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text('Dia observado: ', style: TextStyle(color: Colors.white),),
+                    Text('dia_observado'.tr, style: const TextStyle(color: Colors.white),),
                     const SizedBox(width: 8),
                     Text(
                       calendarCtrl.observedDayFormatted,

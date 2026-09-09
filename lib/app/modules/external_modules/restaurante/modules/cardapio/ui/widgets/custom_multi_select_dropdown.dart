@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class CustomMultiSelectDropdown<T> extends StatefulWidget {
   final List<T> options;
   final List<T> selectedValues;
   final ValueChanged<List<T>> onChanged;
   final String Function(T) itemLabel;
-  final String hintText;
-  final String dialogTitle;
+  final String? hintText;
+  final String? dialogTitle;
   final bool isValid;
 
   const CustomMultiSelectDropdown({
@@ -15,8 +16,8 @@ class CustomMultiSelectDropdown<T> extends StatefulWidget {
     required this.selectedValues,
     required this.onChanged,
     required this.itemLabel,
-    this.hintText = 'Selecione os itens',
-    this.dialogTitle = 'Selecione os itens',
+    this.hintText,
+    this.dialogTitle,
     this.isValid = true,
   });
 
@@ -46,7 +47,7 @@ class CustomMultiSelectDropdownState<T>
               const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           errorText: widget.isValid
               ? null
-              : 'Por favor, selecione pelo menos um item', // Mensagem de erro
+              : 'selecione_pelo_menos_um_item'.tr, // Mensagem de erro
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -54,7 +55,7 @@ class CustomMultiSelectDropdownState<T>
             Expanded(
               child: Text(
                 _selectedValues.isEmpty
-                    ? widget.hintText
+                    ? (widget.hintText ?? 'selecione_os_itens'.tr)
                     : _selectedValues.map(widget.itemLabel).join(', '),
                 style: TextStyle(
                     color:
@@ -98,7 +99,7 @@ class MultiSelectDialog<T> extends StatefulWidget {
   final List<T> options;
   final List<T> selectedValues;
   final String Function(T) itemLabel;
-  final String dialogTitle;
+  final String? dialogTitle;
 
   const MultiSelectDialog({
     super.key,
@@ -124,7 +125,7 @@ class MultiSelectDialogState<T> extends State<MultiSelectDialog<T>> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.dialogTitle),
+      title: Text(widget.dialogTitle ?? 'selecione_os_itens'.tr),
       content: SingleChildScrollView(
         child: ListBody(
           children: widget.options.map((item) {
@@ -147,13 +148,13 @@ class MultiSelectDialogState<T> extends State<MultiSelectDialog<T>> {
       ),
       actions: [
         TextButton(
-          child: const Text('Cancelar'),
+          child: Text('cancelar'.tr),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         TextButton(
-          child: const Text('OK'),
+          child: Text('ok'.tr),
           onPressed: () {
             Navigator.pop(context, _tempSelectedValues);
           },

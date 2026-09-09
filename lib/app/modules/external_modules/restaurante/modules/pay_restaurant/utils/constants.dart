@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class Constants {
   // Strings
   static const CREDIT = "CREDITO";
   static const DEBIT = "DEBITO";
-  static const DEFAULT_API_ERROR =
-      "Não foi possível obter os dados. Por favor, tente novamente.";
-  static const AUTHORIZATION_ERROR_MESSAGE =
-      "Ocorreu um erro ao efetuar o login. Por favor, tente novamente.\n\nCódigo do erro: ";
+  static String get DEFAULT_API_ERROR =>
+      'erro_obter_dados_tente_novamente'.tr;
+  static String get AUTHORIZATION_ERROR_MESSAGE =>
+      'erro_login_tente_novamente'.tr;
   static const SENTRY_ERROR_FILTER = [
     "PlatformException(authorize_failed, Failed to authorize: [error: null, description: User cancelled flow], null, null)",
     "PlatformException(authorize_failed, Failed to authorize: The operation couldn’t be completed. (org.openid.appauth.general error -3.), null, null)"

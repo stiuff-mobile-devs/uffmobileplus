@@ -358,7 +358,7 @@ class HomePageController extends GetxController {
       service.page,
       arguments: {
         'url': service.url ?? '',
-        'title': service.subtitle,
+        'title': service.subtitle.tr,
         'interrogation': service.interrogation ?? false,
       },
     );
@@ -455,6 +455,12 @@ class TodayCampusMeal {
 
 class DashboardShortcut {
   final String iconSrc;
+  /// Translation KEY, not display text.
+  ///
+  /// These lists are field initialisers, evaluated once when the controller is
+  /// constructed, so resolving `.tr` here would freeze the label in whatever
+  /// language was active at startup. Call `.tr` at the render site instead, so
+  /// the label follows `Get.updateLocale`.
   final String subtitle;
   final String page;
   final String? url;

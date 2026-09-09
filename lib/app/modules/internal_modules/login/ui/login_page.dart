@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/controller/login_controller.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:uffmobileplus/app/ui/widgets/responsive_uff_logo.dart';
 import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.dart';
 
 class LoginPage extends GetView<LoginController> {
@@ -32,7 +33,7 @@ class LoginPage extends GetView<LoginController> {
                               _BreathingLogoBox(height: 76, width: 228),
                               const SizedBox(height: 16),
                               Text(
-                                'Universidade Federal Fluminense',
+                                'universidade_federal_fluminense'.tr,
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.9),
                                   fontSize: 16,
@@ -73,7 +74,7 @@ class LoginPage extends GetView<LoginController> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'escolha_método_login'.tr,
+                                      'escolha_metodo_login'.tr,
                                       style: TextStyle(
                                         color: Colors.white.withOpacity(0.9),
                                         fontWeight: FontWeight.w800,
@@ -144,7 +145,7 @@ class LoginPage extends GetView<LoginController> {
                                         ? _QuickActionChip(
                                             tooltip: 'qr_code_catraca'.tr,
                                             icon: Icons.qr_code_scanner,
-                                            label: 'Catraca'.tr,
+                                            label: 'catraca'.tr,
                                             onTap: controller
                                                 .goToCatracaOnlinePage,
                                           )
@@ -318,11 +319,9 @@ class _BreathingLogoBoxState extends State<_BreathingLogoBox>
           scale: _scaleAnimation.value,
           child: Opacity(
             opacity: _opacityAnimation.value,
-            child: Image.asset(
-              'assets/logos/mini_logo_um+.png',
-              fit: BoxFit.contain,
-              height: widget.height,
+            child: ResponsiveUffLogo(
               width: widget.width,
+              height: widget.height,
             ),
           ),
         );

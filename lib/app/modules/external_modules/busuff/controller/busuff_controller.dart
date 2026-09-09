@@ -190,7 +190,7 @@ class BusuffController extends GetxController {
   void showToastFeedback(BuildContext context) {
     ScaffoldMessenger.maybeOf(context)?.showSnackBar(
       SnackBar(
-        content: const Text('Ative o serviço de localização'),
+        content: Text('ative_servico_localizacao'.tr),
         backgroundColor: AppColors.darkBlue(),
         duration: const Duration(seconds: 2),
       ),
@@ -220,7 +220,7 @@ class BusuffController extends GetxController {
       title: 'location'.tr,
       desc: 'location_vr'.tr,
       onConfirm: onConfirm,
-      btnCancelText: 'Cancelar',
+      btnCancelText: 'cancelar'.tr,
       onCancel: onCancel,
       dismissOnBackKeyPress: false,
       dismissOnTouchOutside: false,

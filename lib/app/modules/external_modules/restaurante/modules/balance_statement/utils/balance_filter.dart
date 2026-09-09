@@ -1,6 +1,7 @@
 //import 'package:carteirinha_uff_digital/components/ui/close_button.dart';
 //import 'package:carteirinha_uff_digital/ui/balance/components/filter_button.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/balance_statement/utils/close_button.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/balance_statement/utils/filter_button.dart';
 
@@ -39,12 +40,14 @@ class BalanceFilter extends StatelessWidget {
                 Row(
                   children: <Widget>[
                     Text(
-                      "Período:",
+                      'periodo'.tr,
                       style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
                     Expanded(
                       child: Text(
-                        "Últimos ${filters["period"].toStringAsFixed(0)} dias",
+                        'ultimos_dias'.trParams({
+                          'days': filters["period"].toStringAsFixed(0),
+                        }),
                         textAlign: TextAlign.right,
                         style: TextStyle(
                             color: Colors.blueAccent[100],
@@ -70,7 +73,7 @@ class BalanceFilter extends StatelessWidget {
                     children: <Widget>[
                       FilterButton(
                         backgroundColor: Color(0xff052750),
-                        text: "Aplicar Filtros",
+                        text: 'aplicar_filtros'.tr,
                         action: actionApply,
                       ),
                     ],

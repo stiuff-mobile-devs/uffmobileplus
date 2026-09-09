@@ -33,7 +33,7 @@ class CdcController extends GetxController {
       chatRooms.assignAll(rooms);
     } catch (e) {
       chatRooms.clear();
-      Get.snackbar('Erro', 'Nao foi possivel carregar as salas de chat.');
+      Get.snackbar('erro'.tr, 'nao_foi_possivel_carregar_salas_chat'.tr);
     } finally {
       isLoading.value = false;
     }
@@ -42,7 +42,7 @@ class CdcController extends GetxController {
   Future<void> openChatRoom(CdcChatRoomModel room) async {
     final Uri uri = Uri.tryParse(room.link) ?? Uri();
     if (uri.host.isEmpty) {
-      Get.snackbar('Link invalido', 'Esta sala nao possui um link valido.');
+      Get.snackbar('link_invalido'.tr, 'sala_sem_link_valido'.tr);
       return;
     }
 
@@ -51,7 +51,7 @@ class CdcController extends GetxController {
       mode: LaunchMode.externalApplication,
     );
     if (!opened) {
-      Get.snackbar('Erro', 'Nao foi possivel abrir o link da sala.');
+      Get.snackbar('erro'.tr, 'nao_foi_possivel_abrir_link_sala'.tr);
     }
   }
 }

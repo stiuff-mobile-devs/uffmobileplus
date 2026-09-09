@@ -28,17 +28,17 @@ class BancoDeIdeiasController extends GetxController {
 
   static const destinations = [
     UserDestination(
-      label: 'Lista de Ideias',
+      labelKey: 'bdi_lista_de_ideias',
       icon: Icons.lightbulb_outline_rounded,
       selectedIcon: Icons.lightbulb_rounded,
     ),
     UserDestination(
-      label: 'Minhas Ideias',
+      labelKey: 'bdi_minhas_ideias',
       icon: Icons.dashboard_outlined,
       selectedIcon: Icons.dashboard_rounded,
     ),
     UserDestination(
-      label: 'Perfil',
+      labelKey: 'bdi_perfil',
       icon: Icons.person_outline_rounded,
       selectedIcon: Icons.person_rounded,
     ),

@@ -14,7 +14,7 @@ class RechargeCardPay extends GetView<RechargeCardController> {
         centerTitle: true,
         elevation: 8,
         foregroundColor: Colors.white,
-        title: Text("Recarregar Cartão - Pagamento"),
+        title: Text('recarregar_cartao_pagamento'.tr),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
         ),
@@ -65,7 +65,7 @@ class RechargeCardPay extends GetView<RechargeCardController> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "Valor da recarga",
+                                        'valor_da_recarga'.tr,
                                         style: TextStyle(
                                           fontSize: 20,
                                           color: Colors.blue[100],
@@ -88,7 +88,7 @@ class RechargeCardPay extends GetView<RechargeCardController> {
                                 vertical: 8.0,
                               ),
                               child: Text(
-                                "Para concluir o pagamento da recarga, siga os passos a seguir:",
+                                'siga_os_passos_recarga'.tr,
                                 style: TextStyle(
                                   color: Colors.blue[100],
                                   fontSize: 16.0,
@@ -102,7 +102,7 @@ class RechargeCardPay extends GetView<RechargeCardController> {
                                   color: Colors.blue[100],
                                 ),
                                 children: [
-                                  TextSpan(text: "1. Acesse o "),
+                                  TextSpan(text: 'passo_1_acesse_o'.tr),
                                   TextSpan(
                                     text: "PagTesouro",
                                     style: TextStyle(
@@ -115,7 +115,7 @@ class RechargeCardPay extends GetView<RechargeCardController> {
                               ),
                             ),
                             Text(
-                              "2. Siga as instruções do site;",
+                              'passo_2_siga_instrucoes'.tr,
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.blue[100],
@@ -129,8 +129,7 @@ class RechargeCardPay extends GetView<RechargeCardController> {
                                 ),
                                 children: [
                                   TextSpan(
-                                    text:
-                                        "3. Após a confirmação do pagamento no ",
+                                    text: 'passo_3_apos_confirmacao'.tr,
                                   ),
                                   TextSpan(
                                     text: "PagTesouro",
@@ -139,14 +138,14 @@ class RechargeCardPay extends GetView<RechargeCardController> {
                                       color: Colors.blue[100],
                                     ),
                                   ),
-                                  TextSpan(text: ", aguarde o processamento."),
+                                  TextSpan(text: 'aguarde_processamento'.tr),
                                 ],
                               ),
                             ),
                             Padding(
                               padding: const EdgeInsets.only(top: 18.0),
                               child: Text(
-                                "O link do PagTesouro só pode ser utilizado uma vez e tem duração de 1 hora. Caso o pagamento não seja feita nestas condições, será necessário repetir o passo inicial da recarga.",
+                                'link_pagtesouro_validade_msg'.tr,
                                 style: TextStyle(color: Colors.blue[100]),
                               ),
                             ),
@@ -164,7 +163,7 @@ class RechargeCardPay extends GetView<RechargeCardController> {
                           ),
                           backgroundColor: Color(0xff052750),
                           label: Text(
-                            "Ir para o PagTesouro",
+                            'ir_para_pagtesouro'.tr,
                             style: TextStyle(color: Colors.white, fontSize: 16),
                           ),
                           onPressed: () {

@@ -195,12 +195,12 @@ class _MenuWidgetState extends State<MenuWidget> {
                         ),
                       ],
                     ),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Center(
                         child: Text(
-                          'Ver Detalhes >>',
-                          style: TextStyle(
+                          'ver_detalhes'.tr,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontFamily: 'Jockey One',
                             fontSize: 16,
@@ -493,10 +493,10 @@ class _MenuWidgetState extends State<MenuWidget> {
             padding: const EdgeInsets.only(bottom: 140),
             child: SizedBox(
               width: MediaQuery.of(context).size.width / 1.20,
-              child: const Text(
-                "Ainda não há refeições disponíveis para este refeitório.",
+              child: Text(
+                'nenhuma_refeicao_disponivel_refeitorio'.tr,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontFamily: 'Jockey One',
                   fontSize: 20,

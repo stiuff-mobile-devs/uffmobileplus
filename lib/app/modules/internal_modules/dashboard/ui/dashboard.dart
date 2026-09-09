@@ -26,7 +26,7 @@ class Dashboard extends GetView<DashboardController> {
           // Tela Principal
           PersistentBottomNavBarItem(
             icon: const Icon(Icons.home_rounded),
-            title: 'Home Page'.tr,
+            title: 'home_page'.tr,
             activeColorPrimary: const Color(0xFF0B1424),
             inactiveColorPrimary: const Color(0xFFC9D3E4),
             activeColorSecondary: AppColors.lightBlue(),

@@ -70,15 +70,17 @@ class _DetailsPageState extends State<DetailsPage> {
                     if (snapshot.hasError) {
                       debugPrint('Error generating menu visualizer: ${snapshot.error}');
                       return Text(
-                        'Erro ao carregar detalhes: ${snapshot.error}',
+                        'erro_carregar_detalhes'.trParams({
+                          'error': '${snapshot.error}',
+                        }),
                         style: const TextStyle(color: Colors.white),
                         textAlign: TextAlign.center,
                       );
                     }
                     if (!snapshot.hasData || snapshot.data == null) {
-                      return const Text(
-                        'Nenhum dado disponível',
-                        style: TextStyle(color: Colors.white),
+                      return Text(
+                        'nenhum_dado_disponivel'.tr,
+                        style: const TextStyle(color: Colors.white),
                       );
                     }
                     return Container(

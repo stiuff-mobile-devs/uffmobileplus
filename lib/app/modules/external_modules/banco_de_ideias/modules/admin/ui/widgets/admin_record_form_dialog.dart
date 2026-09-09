@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/models/crud_table.dart';
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/provider/crud_api_service.dart';
@@ -150,7 +151,7 @@ class _AdminRecordFormDialogState extends State<AdminRecordFormDialog> {
       actions: [
         TextButton(
           onPressed: _isSaving ? null : () => Navigator.of(context).pop(false),
-          child: const Text('Cancelar'),
+          child: Text('cancelar'.tr),
         ),
         FilledButton.icon(
           onPressed: _isSaving || _isLoadingOptions || _optionsError != null
@@ -162,7 +163,7 @@ class _AdminRecordFormDialogState extends State<AdminRecordFormDialog> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : const Icon(Icons.save_rounded),
-          label: const Text('Salvar'),
+          label: Text('salvar'.tr),
         ),
       ],
     );
@@ -203,12 +204,12 @@ class _AdminRecordFormDialogState extends State<AdminRecordFormDialog> {
       return DropdownButtonFormField<String>(
         initialValue: _normalizedSelectValue(field, options),
         decoration: InputDecoration(
-          labelText: field.label,
+          labelText: field.label.tr,
           border: const OutlineInputBorder(),
         ),
         items: [
           if (!field.required)
-            const DropdownMenuItem<String>(value: '', child: Text('Nenhum')),
+            DropdownMenuItem<String>(value: '', child: Text('bdi_nenhum'.tr)),
           ...options.map(
             (option) => DropdownMenuItem<String>(
               value: option.id,
@@ -225,7 +226,9 @@ class _AdminRecordFormDialogState extends State<AdminRecordFormDialog> {
               },
         validator: (value) {
           if (field.required && (value == null || value.isEmpty)) {
-            return 'Informe ${field.label.toLowerCase()}.';
+            return 'bdi_informe_campo'.trParams({
+              'field': field.label.tr.toLowerCase(),
+            });
           }
           return null;
         },
@@ -236,7 +239,7 @@ class _AdminRecordFormDialogState extends State<AdminRecordFormDialog> {
       controller: _controllers[field.name],
       enabled: !_isSaving,
       decoration: InputDecoration(
-        labelText: field.label,
+        labelText: field.label.tr,
         border: const OutlineInputBorder(),
       ),
       minLines: field.type == CrudFieldType.multiline ? 3 : 1,
@@ -246,7 +249,9 @@ class _AdminRecordFormDialogState extends State<AdminRecordFormDialog> {
           : TextInputAction.next,
       validator: (value) {
         if (field.required && (value == null || value.trim().isEmpty)) {
-          return 'Informe ${field.label.toLowerCase()}.';
+          return 'bdi_informe_campo'.trParams({
+            'field': field.label.tr.toLowerCase(),
+          });
         }
         return null;
       },

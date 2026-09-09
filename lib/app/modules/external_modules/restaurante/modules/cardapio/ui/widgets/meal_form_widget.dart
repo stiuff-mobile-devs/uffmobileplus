@@ -146,9 +146,9 @@ class _MealFormWidgetState extends State<MealFormWidget>
                               borderRadius:
                                   BorderRadius.all(Radius.circular(9.0))),
                           child: CheckboxListTile(
-                            title: const Text(
-                              'Detalhar Campos',
-                              style: TextStyle(color: Colors.white),
+                            title: Text(
+                              'detalhar_campos'.tr,
+                              style: const TextStyle(color: Colors.white),
                             ),
                             tileColor: Colors.white,
                             side: const BorderSide(color: Colors.white),
@@ -170,9 +170,9 @@ class _MealFormWidgetState extends State<MealFormWidget>
                               borderRadius:
                                   const BorderRadius.all(Radius.circular(9.0))),
                           child: CheckboxListTile(
-                            title: const Text(
-                              'Permitir Campos Nulos',
-                              style: TextStyle(color: Colors.white),
+                            title: Text(
+                              'permitir_campos_nulos'.tr,
+                              style: const TextStyle(color: Colors.white),
                             ),
                             activeColor: const Color.fromARGB(255, 76, 23, 126),
                             tileColor: Colors.white,
@@ -189,7 +189,7 @@ class _MealFormWidgetState extends State<MealFormWidget>
                       CustomFormField(
                         primaryController: principal,
                         secondaryController: principalIngr,
-                        titulo: 'Prato Principal',
+                        titulo: 'prato_principal'.tr,
                         artigo: 'o',
                         primaryInitValue: (widget.predefinition != null)
                             ? widget.predefinition!.main
@@ -208,7 +208,7 @@ class _MealFormWidgetState extends State<MealFormWidget>
                       CustomFormField(
                         primaryController: guarnicao,
                         secondaryController: guarnicaoIngr,
-                        titulo: 'Guarnição',
+                        titulo: 'guarnicao'.tr,
                         artigo: 'a',
                         primaryInitValue: (widget.predefinition != null)
                             ? widget.predefinition!.garnish
@@ -227,7 +227,7 @@ class _MealFormWidgetState extends State<MealFormWidget>
                       CustomFormField(
                         primaryController: acompanhamento,
                         secondaryController: acompanhamentoIngr,
-                        titulo: 'Acompanhamento',
+                        titulo: 'acompanhamento'.tr,
                         artigo: 'o',
                         primaryInitValue: (widget.predefinition != null)
                             ? widget.predefinition!.side
@@ -245,7 +245,7 @@ class _MealFormWidgetState extends State<MealFormWidget>
                       ),
                       CustomFormField(
                         primaryController: salada1,
-                        titulo: 'Salada 1',
+                        titulo: 'salada_1'.tr,
                         artigo: 'a',
                         primaryInitValue: (widget.predefinition != null)
                             ? widget.predefinition!.salad1
@@ -259,7 +259,7 @@ class _MealFormWidgetState extends State<MealFormWidget>
                       ),
                       CustomFormField(
                         primaryController: salada2,
-                        titulo: 'Salada 2',
+                        titulo: 'salada_2'.tr,
                         artigo: 'a',
                         primaryInitValue: (widget.predefinition != null)
                             ? widget.predefinition!.salad2
@@ -273,7 +273,7 @@ class _MealFormWidgetState extends State<MealFormWidget>
                       ),
                       CustomFormField(
                         primaryController: sobremesa,
-                        titulo: 'Sobremesa',
+                        titulo: 'sobremesa'.tr,
                         artigo: 'a',
                         primaryInitValue: (widget.predefinition != null)
                             ? widget.predefinition!.dessert
@@ -300,8 +300,8 @@ class _MealFormWidgetState extends State<MealFormWidget>
                                   });
                                 },
                                 itemLabel: (shifts) => shifts,
-                                dialogTitle: 'Selecione os Turnos',
-                                hintText: 'Selecione os Turnos',
+                                dialogTitle: 'selecione_os_turnos'.tr,
+                                hintText: 'selecione_os_turnos'.tr,
                                 isValid: isShiftMultiSelectValid,
                               ),
                             )
@@ -318,15 +318,15 @@ class _MealFormWidgetState extends State<MealFormWidget>
                                   });
                                 },
                                 itemLabel: (campus) => campus,
-                                dialogTitle: 'Selecione os Campus',
-                                hintText: 'Selecione os Campus',
+                                dialogTitle: 'selecione_os_campus'.tr,
+                                hintText: 'selecione_os_campus'.tr,
                                 isValid: isCampusMultiSelectValid,
                               ),
                             )
                           : const SizedBox.shrink(),
                       const Divider(),
                       CheckboxListTile(
-                        title: const Text('Adicionar Observações'),
+                        title: Text('adicionar_observacoes'.tr),
                         value: showObservacoesField,
                         onChanged: (value) {
                           setState(() {
@@ -337,11 +337,11 @@ class _MealFormWidgetState extends State<MealFormWidget>
                       if (showObservacoesField)
                         CustomFormField(
                           primaryController: observ,
-                          titulo: 'Observações',
+                          titulo: 'observacoes'.tr,
                           artigo: 'as',
                           primaryMaxLength: 144,
                           primaryInitValue: (observ.text.isEmpty
-                              ? "*AS PREPARAÇÕES PODEM CONTER TRAÇOS DE GLÚTEN/LACTOSE"
+                              ? 'aviso_gluten_lactose'.tr
                               : observ.text),
                           heightAnimation: heightAnimation,
                           offsetAnimation: offsetAnimation,
@@ -479,16 +479,16 @@ class _MealFormWidgetState extends State<MealFormWidget>
                                             mealFormController
                                                     .chosenDates.length >
                                                 1)
-                                        ? const Text(
-                                            'Enviar Refeições',
-                                            style: TextStyle(
+                                        ? Text(
+                                            'enviar_refeicoes'.tr,
+                                            style: const TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 17,
                                                 fontWeight: FontWeight.w400),
                                           )
-                                        : const Text(
-                                            'Enviar Refeição',
-                                            style: TextStyle(
+                                        : Text(
+                                            'enviar_refeicao'.tr,
+                                            style: const TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 17,
                                                 fontWeight: FontWeight.w400),
@@ -497,15 +497,19 @@ class _MealFormWidgetState extends State<MealFormWidget>
                                                 .mealsPressedOnto.length >
                                             1)
                                         ? Text(
-                                            'Alterações Refeições [${mealFormController.menuController.mealsPressedOnto.length}]',
+                                            'alteracoes_refeicoes_qtd'
+                                                .trParams({
+                                              'count':
+                                                  '${mealFormController.menuController.mealsPressedOnto.length}'
+                                            }),
                                             style: const TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 17,
                                                 fontWeight: FontWeight.w400),
                                           )
-                                        : const Text(
-                                            'Alterar Refeição',
-                                            style: TextStyle(
+                                        : Text(
+                                            'alterar_refeicao'.tr,
+                                            style: const TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 17,
                                                 fontWeight: FontWeight.w400),

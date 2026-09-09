@@ -19,7 +19,7 @@ class PayTicketPage extends GetView<PayRestaurantController> {
         centerTitle: true,
         elevation: 8,
         foregroundColor: Colors.white,
-        title: Text("Ticket de Pagamento"),
+        title: Text('ticket_de_pagamento'.tr),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
         ),
@@ -50,7 +50,7 @@ class PayTicketPage extends GetView<PayRestaurantController> {
                         ),
                         const SizedBox(height: 28),
                         Text(
-                          "Aponte o código para a leitora",
+                          'aponte_codigo_leitora'.tr,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 22.0,
@@ -78,7 +78,7 @@ class PayTicketPage extends GetView<PayRestaurantController> {
                         Obx(
                           () => controller.isExpired.value
                               ? Text(
-                                  'Código expirado',
+                                  'codigo_expirado'.tr,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: 18.0,
@@ -88,7 +88,7 @@ class PayTicketPage extends GetView<PayRestaurantController> {
                               : RichText(
                                   textAlign: TextAlign.center,
                                   text: TextSpan(
-                                    text: 'Expira em ',
+                                    text: 'expira_em'.tr,
                                     style: TextStyle(
                                       fontSize: 18.0,
                                       color: Colors.blue[100],

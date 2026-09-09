@@ -56,7 +56,7 @@ class _IdeaFilterDialogState extends State<IdeaFilterDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Filtrar ideias'),
+      title: Text('bdi_filtrar_ideias'.tr),
       content: SizedBox(
         width: 460,
         child: Column(
@@ -66,15 +66,15 @@ class _IdeaFilterDialogState extends State<IdeaFilterDialog> {
               controller: _tituloController,
               textInputAction: TextInputAction.search,
               onSubmitted: (_) => _aplicar(),
-              decoration: const InputDecoration(
-                labelText: 'Titulo',
-                prefixIcon: Icon(Icons.search_rounded),
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: 'titulo'.tr,
+                prefixIcon: const Icon(Icons.search_rounded),
+                border: const OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 14),
             _OptionField(
-              label: 'Tipo',
+              label: 'tipo'.tr,
               icon: Icons.category_outlined,
               value: _tipoId,
               options: widget.tipos,
@@ -82,7 +82,7 @@ class _IdeaFilterDialogState extends State<IdeaFilterDialog> {
             ),
             const SizedBox(height: 14),
             _OptionField(
-              label: 'Categoria',
+              label: 'bdi_categoria'.tr,
               icon: Icons.sell_outlined,
               value: _categoriaId,
               options: widget.categorias,
@@ -94,17 +94,17 @@ class _IdeaFilterDialogState extends State<IdeaFilterDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancelar'),
+          child: Text('cancelar'.tr),
         ),
         TextButton.icon(
           onPressed: _limpar,
           icon: const Icon(Icons.filter_alt_off_outlined),
-          label: const Text('Limpar'),
+          label: Text('limpar'.tr),
         ),
         FilledButton.icon(
           onPressed: _aplicar,
           icon: const Icon(Icons.filter_list_rounded),
-          label: const Text('Filtrar'),
+          label: Text('filtrar'.tr),
         ),
       ],
     );
@@ -142,12 +142,12 @@ class _OptionField extends GetView<BancoDeIdeiasController> {
         border: const OutlineInputBorder(),
       ),
       items: [
-        const DropdownMenuItem<String>(value: null, child: Text('Todos')),
+        DropdownMenuItem<String>(value: null, child: Text('todos'.tr)),
         if (!hasSelectedOption)
           DropdownMenuItem<String>(
             value: value,
             enabled: false,
-            child: const Text('Carregando selecao...'),
+            child: Text('bdi_carregando_selecao'.tr),
           ),
         for (final option in options)
           DropdownMenuItem<String>(value: option.id, child: Text(option.nome)),

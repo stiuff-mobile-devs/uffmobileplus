@@ -124,7 +124,7 @@ class _TransactionListState extends State<TransactionList> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 FilterChip(
-                  label: const Text('Offline Local'),
+                  label: Text('offline_local'.tr),
                   selected: showOfflineLocal,
                   selectedColor: Colors.orange.shade200,
                   onSelected: (v) => setState(() => showOfflineLocal = v),
@@ -138,7 +138,7 @@ class _TransactionListState extends State<TransactionList> {
                 ),
                 const SizedBox(width: 8),
                 FilterChip(
-                  label: const Text('Online'),
+                  label: Text('online'.tr),
                   selected: showOnline,
                   selectedColor: Colors.green.shade200,
                   onSelected: (v) => setState(() => showOnline = v),
@@ -154,14 +154,17 @@ class _TransactionListState extends State<TransactionList> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
               child: Text(
-                "Nenhuma fonte selecionada. Ative pelo menos uma opção.",
+                'nenhuma_fonte_selecionada'.tr,
                 style: TextStyle(color: Colors.white),
               ),
             ),
 
           // Offline saved (local) - orange
           if (showOfflineLocal) ...[
-            _buildHeader("Últimas Transações (Offline Local)", Colors.orange),
+            _buildHeader(
+              'ultimas_transacoes_offline_local'.tr,
+              Colors.orange,
+            ),
             if (offlineList.isEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(
@@ -169,7 +172,7 @@ class _TransactionListState extends State<TransactionList> {
                   horizontal: 16,
                 ),
                 child: Text(
-                  "Nenhuma transação offline local.",
+                  'nenhuma_transacao_offline_local'.tr,
                   style: TextStyle(color: Colors.orange),
                 ),
               )
@@ -191,7 +194,7 @@ class _TransactionListState extends State<TransactionList> {
           ],
 
           if (showFirebase) ...[
-            _buildHeader("Últimas Transações (Firebase)", Colors.green),
+            _buildHeader('ultimas_transacoes_firebase'.tr, Colors.green),
             if (firebaseList.isEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(
@@ -199,7 +202,7 @@ class _TransactionListState extends State<TransactionList> {
                   horizontal: 16,
                 ),
                 child: Text(
-                  "Nenhuma transação no Firebase.",
+                  'nenhuma_transacao_firebase'.tr,
                   style: TextStyle(color: Colors.green),
                 ),
               )
@@ -226,7 +229,7 @@ class _TransactionListState extends State<TransactionList> {
 
           // Online transactions - green
           if (showOnline) ...[
-            _buildHeader("Últimas Transações (Online)", Colors.green),
+            _buildHeader('ultimas_transacoes_online'.tr, Colors.green),
             if (onlineList.isEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(
@@ -234,7 +237,7 @@ class _TransactionListState extends State<TransactionList> {
                   horizontal: 16,
                 ),
                 child: Text(
-                  "Nenhuma transação online.",
+                  'nenhuma_transacao_online'.tr,
                   style: TextStyle(color: Colors.green),
                 ),
               )

@@ -22,7 +22,7 @@ class BancoDeIdeiasHomePage extends GetView<BancoDeIdeiasController> {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Banco de Ideias'),
+            title: Text('bdi_titulo'.tr),
             centerTitle: true,
             foregroundColor: Colors.white,
             elevation: 8,

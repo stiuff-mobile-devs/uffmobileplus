@@ -3,7 +3,6 @@ allprojects {
         google()
         mavenCentral()
     }
-   allprojects {
     tasks.withType<JavaCompile>().configureEach {
         sourceCompatibility = JavaVersion.VERSION_21.toString()
         targetCompatibility = JavaVersion.VERSION_21.toString()
@@ -13,7 +12,6 @@ allprojects {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
         }
     }
-}
 }
 
 val newBuildDir: Directory = rootProject.layout.buildDirectory.dir("../../build").get()

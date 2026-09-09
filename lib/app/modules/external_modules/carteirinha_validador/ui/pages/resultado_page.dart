@@ -116,7 +116,7 @@ class CarteirinhaValidadorResultPage extends GetView<CarteirinhaValidadorControl
                             controller.validationData.isNotEmpty &&
                                     controller.validationData[0] != null &&
                                     controller.validationData[0].isNotEmpty
-                                ? '${'Documento'.tr}: ${controller.validationData[0]}'
+                                ? '${'documento'.tr}: ${controller.validationData[0]}'
                                 : '',
                             style: const TextStyle(color: Colors.white),
                           ),
@@ -251,7 +251,7 @@ class CarteirinhaValidadorResultPage extends GetView<CarteirinhaValidadorControl
                               backgroundColor: Colors.blue,
                             ),
                             child: Text(
-                              'Escanear nova carteirinha',
+                              'escanear_nova_carteirinha'.tr,
                               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                             ),
                           ),

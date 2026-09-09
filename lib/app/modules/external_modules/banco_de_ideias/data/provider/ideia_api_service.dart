@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/models/ideia.dart';
@@ -56,7 +57,7 @@ class IdeiaApiService {
     final ideia = _extractObject(decoded, 'ideia');
 
     if (ideia == null) {
-      throw StateError('Ideia nao encontrada.');
+      throw StateError('bdi_ideia_nao_encontrada_exc'.tr);
     }
 
     return IdeiaDetalhe.fromJson(ideia);
@@ -137,7 +138,7 @@ class IdeiaApiService {
   }) async {
     final user = _firebaseAuth.currentUser;
     if (user == null) {
-      throw StateError('Usuario nao autenticado.');
+      throw StateError('bdi_usuario_nao_autenticado'.tr);
     }
 
     final token = await user.getIdToken();
@@ -192,7 +193,7 @@ class IdeiaApiService {
     try {
       return jsonDecode(response.body);
     } on FormatException {
-      throw const FormatException('A API retornou uma resposta invalida.');
+      throw FormatException('bdi_resposta_invalida_api'.tr);
     }
   }
 

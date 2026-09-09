@@ -24,7 +24,7 @@ class RecordTextField extends GetView<BancoDeIdeiasController> {
       controller: textController,
       enabled: enabled,
       decoration: InputDecoration(
-        labelText: field.label,
+        labelText: field.label.tr,
         border: const OutlineInputBorder(),
       ),
       minLines: multiline ? 3 : 1,
@@ -34,7 +34,9 @@ class RecordTextField extends GetView<BancoDeIdeiasController> {
           : TextInputAction.next,
       validator: (value) {
         if (field.required && (value == null || value.trim().isEmpty)) {
-          return 'Informe ${field.label.toLowerCase()}.';
+          return 'bdi_informe_campo'.trParams({
+            'field': field.label.tr.toLowerCase(),
+          });
         }
         return null;
       },

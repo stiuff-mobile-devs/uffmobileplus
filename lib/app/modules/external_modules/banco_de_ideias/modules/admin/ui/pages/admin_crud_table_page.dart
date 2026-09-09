@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/modules/admin/utils/admin_crud_helpers.dart';
@@ -67,7 +68,9 @@ class _AdminCrudTablePageState extends State<AdminCrudTablePage> {
     final saved = await showDialog<bool>(
       context: context,
       builder: (context) => AdminRecordFormDialog(
-        title: record == null ? 'Novo registro' : 'Editar registro',
+        title: record == null
+            ? 'bdi_novo_registro'.tr
+            : 'bdi_editar_registro'.tr,
         table: widget.table,
         record: record,
         crudApiService: widget.crudApiService,
@@ -90,7 +93,9 @@ class _AdminCrudTablePageState extends State<AdminCrudTablePage> {
 
     if (saved == true) {
       _showMessage(
-        record == null ? 'Registro criado.' : 'Registro atualizado.',
+        record == null
+            ? 'bdi_registro_criado'.tr
+            : 'bdi_registro_atualizado'.tr,
       );
       await _loadRecords();
     }
@@ -112,7 +117,7 @@ class _AdminCrudTablePageState extends State<AdminCrudTablePage> {
         table: widget.table,
         record: record,
       );
-      _showMessage('Registro excluido.');
+      _showMessage('bdi_registro_excluido'.tr);
       await _loadRecords();
     } catch (error) {
       _showMessage(error.toString());
@@ -146,16 +151,18 @@ class _AdminCrudTablePageState extends State<AdminCrudTablePage> {
     final values = widget.table.subtitleFields
         .map((field) {
           final value = formatCrudValue(readCrudValue(record.raw, field.path));
-          return value.isEmpty ? '' : '${field.label}: $value';
+          return value.isEmpty ? '' : '${field.label.tr}: $value';
         })
         .where((value) => value.isNotEmpty)
         .toList(growable: false);
 
+    final chave = 'bdi_chave'.trParams({'value': _recordKey(record)});
+
     if (values.isEmpty) {
-      return 'Chave: ${_recordKey(record)}';
+      return chave;
     }
 
-    return [...values, 'Chave: ${_recordKey(record)}'].join('\n');
+    return [...values, chave].join('\n');
   }
 
   String _recordKey(CrudRecord record) {
@@ -171,7 +178,7 @@ class _AdminCrudTablePageState extends State<AdminCrudTablePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.table.title),
+        title: Text(widget.table.title.tr),
         centerTitle: true,
         foregroundColor: Colors.white,
         elevation: 8,
@@ -183,7 +190,7 @@ class _AdminCrudTablePageState extends State<AdminCrudTablePage> {
         ),
         actions: [
           IconButton(
-            tooltip: 'Atualizar',
+            tooltip: 'atualizar'.tr,
             onPressed: _isLoading ? null : _loadRecords,
             icon: const Icon(Icons.refresh_rounded),
           ),
@@ -192,7 +199,7 @@ class _AdminCrudTablePageState extends State<AdminCrudTablePage> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _openRecordForm(),
         icon: const Icon(Icons.add_rounded),
-        label: const Text('Novo'),
+        label: Text('novo'.tr),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -221,12 +228,12 @@ class _AdminCrudTablePageState extends State<AdminCrudTablePage> {
     if (_errorMessage != null) {
       return AdminStateMessage(
         icon: Icons.error_outline_rounded,
-        title: 'Nao foi possivel carregar os registros',
+        title: 'bdi_nao_foi_possivel_carregar_registros'.tr,
         message: _errorMessage!,
         action: FilledButton.icon(
           onPressed: _loadRecords,
           icon: const Icon(Icons.refresh_rounded),
-          label: const Text('Tentar novamente'),
+          label: Text('tentar_novamente'.tr),
         ),
       );
     }
@@ -234,12 +241,12 @@ class _AdminCrudTablePageState extends State<AdminCrudTablePage> {
     if (_records.isEmpty) {
       return AdminStateMessage(
         icon: Icons.inventory_2_outlined,
-        title: 'Nenhum registro encontrado',
-        message: 'Crie o primeiro item desta tabela.',
+        title: 'bdi_nenhum_registro_encontrado'.tr,
+        message: 'bdi_crie_primeiro_item'.tr,
         action: FilledButton.icon(
           onPressed: () => _openRecordForm(),
           icon: const Icon(Icons.add_rounded),
-          label: const Text('Novo registro'),
+          label: Text('bdi_novo_registro'.tr),
         ),
       );
     }
@@ -287,13 +294,13 @@ class _AdminCrudTablePageState extends State<AdminCrudTablePage> {
                 spacing: 4,
                 children: [
                   IconButton(
-                    tooltip: 'Editar',
+                    tooltip: 'editar'.tr,
                     onPressed: () => _openRecordForm(record),
                     color: Colors.white70,
                     icon: const Icon(Icons.edit_rounded),
                   ),
                   IconButton(
-                    tooltip: 'Excluir',
+                    tooltip: 'excluir'.tr,
                     onPressed: () => _confirmDelete(record),
                     color: Colors.redAccent,
                     icon: const Icon(Icons.delete_outline_rounded),

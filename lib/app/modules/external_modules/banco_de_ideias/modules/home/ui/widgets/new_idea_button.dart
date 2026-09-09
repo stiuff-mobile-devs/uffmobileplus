@@ -20,7 +20,7 @@ class NewIdeaButton extends GetView<BancoDeIdeiasController> {
     return FloatingActionButton.extended(
       onPressed: () => _openCreateDialog(context),
       icon: const Icon(Icons.add_rounded),
-      label: const Text('Nova ideia'),
+      label: Text('bdi_nova_ideia'.tr),
     );
   }
 
@@ -36,7 +36,7 @@ class NewIdeaButton extends GetView<BancoDeIdeiasController> {
 
     onIdeaCreated();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Ideia cadastrada com sucesso.')),
+      SnackBar(content: Text('bdi_ideia_cadastrada_sucesso'.tr)),
     );
   }
 }

@@ -41,14 +41,14 @@ class CarteirinhaValidadorController extends GetxController {
       if (Get.context != null) {
         final dialog = idUffAlertDialog(
           Get.context!,
-          title: "Resultado",
-          desc: errorMessage ?? "Carteirinha inválida ou dados não encontrados.",
-          btnConfirmText: "OK",
+          title: 'resultado'.tr,
+          desc: errorMessage ?? 'carteirinha_invalida_dados_nao_encontrados'.tr,
+          btnConfirmText: 'ok'.tr,
           // keep default dialogType to match project style
         );
         dialog.show();
       } else {
-        Get.snackbar("Resultado", errorMessage ?? "Carteirinha inválida ou dados não encontrados.");
+        Get.snackbar('resultado'.tr, errorMessage ?? 'carteirinha_invalida_dados_nao_encontrados'.tr);
       }
     }
 

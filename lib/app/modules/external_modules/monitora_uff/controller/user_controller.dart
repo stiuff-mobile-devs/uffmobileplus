@@ -81,6 +81,6 @@ class UserController extends GetxController {
   String getUserName() {
     return user!.nome ??
         _googleName ??
-        "Nome não informado";
+        'nome_nao_informado'.tr;
   }
 }

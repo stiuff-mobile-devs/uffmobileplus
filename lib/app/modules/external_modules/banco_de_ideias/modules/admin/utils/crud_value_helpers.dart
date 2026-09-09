@@ -1,3 +1,5 @@
+import 'package:get/get.dart';
+
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/models/crud_table.dart';
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/provider/crud_api_service.dart';
 
@@ -38,11 +40,11 @@ String crudRecordSubtitle(CrudTable table, CrudRecord record) {
   final values = table.subtitleFields
       .map((field) {
         final value = formatCrudValue(readCrudValue(record.raw, field.path));
-        return value.isEmpty ? '' : '${field.label}: $value';
+        return value.isEmpty ? '' : '${field.label.tr}: $value';
       })
       .where((value) => value.isNotEmpty)
       .toList(growable: false);
-  final key = 'Chave: ${crudRecordKey(table, record)}';
+  final key = 'bdi_chave'.trParams({'value': crudRecordKey(table, record)});
   return values.isEmpty ? key : [...values, key].join('\n');
 }
 

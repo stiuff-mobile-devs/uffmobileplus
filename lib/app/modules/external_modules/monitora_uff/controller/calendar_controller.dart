@@ -18,8 +18,8 @@ class CalendarController extends GetxController {
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
 
-    if (d == today) return 'Hoje';
-    if (d == yesterday) return 'Ontem';
+    if (d == today) return 'hoje'.tr;
+    if (d == yesterday) return 'ontem'.tr;
     return '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
   }
 

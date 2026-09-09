@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class TransactionMessage extends StatelessWidget {
   final bool isQrCodeValid;
@@ -25,7 +26,7 @@ class TransactionMessage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text(
-                transactionUsername != "" ? "Usuário" : "",
+                transactionUsername != "" ? 'usuario'.tr : "",
                 style: TextStyle(fontSize: 20, color: Colors.white),
               ),
               Container(
@@ -50,7 +51,7 @@ class TransactionMessage extends StatelessWidget {
                       margin: EdgeInsets.only(top: 24, left: 30, right: 30),
                       child: isOfflineMode
                           ? Text(
-                              "Transação realizada em modo offline.",
+                              'transacao_realizada_modo_offline'.tr,
                               style: TextStyle(
                                 fontStyle: FontStyle.italic,
                                 fontSize: 18,
@@ -59,7 +60,9 @@ class TransactionMessage extends StatelessWidget {
                               textAlign: TextAlign.center,
                             )
                           : Text(
-                              "Valor Debitado: R\$ $transactionResultMessage",
+                              'valor_debitado_valor'.trParams({
+                                'value': transactionResultMessage,
+                              }),
                               style: TextStyle(
                                 fontStyle: FontStyle.italic,
                                 fontSize: 18,
@@ -71,7 +74,9 @@ class TransactionMessage extends StatelessWidget {
                   : Container(
                       margin: EdgeInsets.only(top: 24, left: 30, right: 30),
                       child: Text(
-                        "Não foi possível debitar o valor: $transactionResultMessage",
+                        'nao_foi_possivel_debitar_valor'.trParams({
+                          'value': transactionResultMessage,
+                        }),
                         style: TextStyle(
                           fontStyle: FontStyle.italic,
                           fontSize: 18,
@@ -94,7 +99,7 @@ class TransactionMessage extends StatelessWidget {
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 22, vertical: 12),
                 child: Text(
-                  "Código Inválido",
+                  'codigo_invalido'.tr,
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,

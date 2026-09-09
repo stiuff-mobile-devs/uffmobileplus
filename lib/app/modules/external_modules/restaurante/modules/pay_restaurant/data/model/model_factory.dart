@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/data/model/base_model.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/data/model/card_transaction.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/data/model/user_balance.dart';
@@ -29,7 +30,7 @@ class ModelFactory {
         return CardTransaction();
         break;
       default:
-        throw Exception("Modelo não registrado!");
+        throw Exception('modelo_nao_registrado'.tr);
     }
   }
 }

@@ -40,7 +40,7 @@ class HighlightedObservedUsersList extends StatelessWidget {
                         const Icon(Icons.visibility, color: Colors.white70, size: 16),
                         const SizedBox(width: 6),
                         Text(
-                          'Trajetórias (${users.length})',
+                          'trajetorias_contagem'.trParams({'count': '${users.length}'}),
                           style: const TextStyle(
                             color: Colors.white70,
                             fontSize: 12,

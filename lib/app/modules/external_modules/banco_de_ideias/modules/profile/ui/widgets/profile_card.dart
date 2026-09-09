@@ -21,13 +21,16 @@ class ProfileCard extends GetView<BancoDeIdeiasController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _ProfileTitle(nome: raw['nome']?.toString() ?? '(sem nome)'),
+            _ProfileTitle(nome: raw['nome']?.toString() ?? 'bdi_sem_nome'.tr),
             const SizedBox(height: 18),
-            ProfileField(label: 'Email', value: raw['email']?.toString() ?? ''),
-            ProfileField(label: 'Perfil', value: _nomeDe(raw['perfil'])),
-            ProfileField(label: 'Curso', value: _nomeDe(raw['curso'])),
             ProfileField(
-              label: 'Departamento',
+              label: 'email'.tr,
+              value: raw['email']?.toString() ?? '',
+            ),
+            ProfileField(label: 'bdi_perfil'.tr, value: _nomeDe(raw['perfil'])),
+            ProfileField(label: 'curso'.tr, value: _nomeDe(raw['curso'])),
+            ProfileField(
+              label: 'departamento'.tr,
               value: _nomeDe(raw['departamento']),
             ),
           ],

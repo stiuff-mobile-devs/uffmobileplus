@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../../../../../../utils/color_pallete.dart';
 
 class CustomFormField extends StatelessWidget {
@@ -77,7 +78,10 @@ class CustomFormField extends StatelessWidget {
                   color: AppColors.darkBlue(),
                 ),
                 decoration: InputDecoration(
-                  hintText: 'Informe $artigo $titulo',
+                  hintText: 'informe_campo'.trParams({
+                    'artigo': artigo,
+                    'titulo': titulo,
+                  }),
                   border: InputBorder.none,
                   focusedBorder: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(
@@ -107,7 +111,10 @@ class CustomFormField extends StatelessWidget {
                     return null;
                   }
                   if (value == null || value.isEmpty) {
-                    return 'Informe $artigo $titulo';
+                    return 'informe_campo'.trParams({
+                      'artigo': artigo,
+                      'titulo': titulo,
+                    });
                   }
                   return null;
                 },
@@ -143,13 +150,19 @@ class CustomFormField extends StatelessWidget {
                                 color: AppColors.darkBlue(),
                               ),
                               decoration: InputDecoration(
-                                hintText:
-                                    'Informe os ingredientes d$artigo $titulo',
+                                hintText: 'informe_ingredientes_campo'
+                                    .trParams({
+                                  'artigo': artigo,
+                                  'titulo': titulo,
+                                }),
                                 border: InputBorder.none,
                                 focusedBorder: InputBorder.none,
                                 contentPadding: const EdgeInsets.symmetric(
                                     vertical: 0.0, horizontal: 0.0),
-                                labelText: 'Ingredientes d$artigo $titulo',
+                                labelText: 'ingredientes_campo'.trParams({
+                                  'artigo': artigo,
+                                  'titulo': titulo,
+                                }),
                                 labelStyle:
                                     TextStyle(color: AppColors.darkBlue()),
                               ),
@@ -158,7 +171,11 @@ class CustomFormField extends StatelessWidget {
                                   return null;
                                 }
                                 if (value == null || value.isEmpty) {
-                                  return 'Informe os ingredientes d$artigo $titulo';
+                                  return 'informe_ingredientes_campo'
+                                      .trParams({
+                                    'artigo': artigo,
+                                    'titulo': titulo,
+                                  });
                                 }
                                 return null;
                               },

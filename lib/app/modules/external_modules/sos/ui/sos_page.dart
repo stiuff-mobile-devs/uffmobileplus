@@ -104,7 +104,7 @@ class SosPage extends GetView<SosController> {
                             size: buttonSize * 0.33,
                           )
                         : Text(
-                            "SOS",
+                            'sos'.tr,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: buttonSize * 0.25,

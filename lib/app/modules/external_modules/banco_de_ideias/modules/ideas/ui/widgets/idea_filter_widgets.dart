@@ -55,10 +55,10 @@ class IdeaFilterSearchRow extends GetView<BancoDeIdeiasController> {
             style: const TextStyle(color: Colors.white),
             textInputAction: TextInputAction.search,
             onSubmitted: (_) => onSearch(),
-            decoration: const InputDecoration(
-              labelText: 'Pesquisar por titulo',
-              prefixIcon: Icon(Icons.search_rounded),
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: 'bdi_pesquisar_titulo'.tr,
+              prefixIcon: const Icon(Icons.search_rounded),
+              border: const OutlineInputBorder(),
               isDense: true,
             ),
           ),
@@ -75,7 +75,7 @@ class IdeaFilterSearchRow extends GetView<BancoDeIdeiasController> {
                 foregroundColor: Colors.white,
               ),
               icon: const Icon(Icons.search_rounded),
-              label: const Text('Buscar'),
+              label: Text('buscar'.tr),
             ),
             OutlinedButton.icon(
               onPressed: canOpenFilters ? onOpenFilters : null,
@@ -84,11 +84,11 @@ class IdeaFilterSearchRow extends GetView<BancoDeIdeiasController> {
                 side: BorderSide(color: Colors.white.withValues(alpha: 0.28)),
               ),
               icon: const Icon(Icons.tune_rounded),
-              label: const Text('Filtros'),
+              label: Text('bdi_filtros'.tr),
             ),
             if (hasFiltro)
               IconButton.filledTonal(
-                tooltip: 'Limpar filtros',
+                tooltip: 'bdi_limpar_filtros'.tr,
                 onPressed: onClear,
                 icon: const Icon(Icons.filter_alt_off_outlined),
               ),
@@ -137,12 +137,19 @@ class IdeaActiveFilterChips extends GetView<BancoDeIdeiasController> {
         for (final filter in filters)
           InputChip(
             avatar: const Icon(Icons.filter_alt_rounded, size: 18),
-            label: Text('${filter.label}: ${filter.value}'),
+            label: Text(
+              'bdi_filtro_label_valor'.trParams({
+                'label': filter.label,
+                'value': filter.value,
+              }),
+            ),
             backgroundColor: Colors.white.withValues(alpha: 0.10),
             labelStyle: const TextStyle(color: Colors.white),
             side: BorderSide(color: Colors.white.withValues(alpha: 0.16)),
             deleteIconColor: Colors.white70,
-            tooltip: 'Remover filtro ${filter.label.toLowerCase()}',
+            tooltip: 'bdi_remover_filtro'.trParams({
+              'label': filter.label.toLowerCase(),
+            }),
             onPressed: () => onRemove(filter),
             onDeleted: () => onRemove(filter),
           ),

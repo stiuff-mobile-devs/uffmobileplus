@@ -46,7 +46,7 @@ class AdminTableSelectionPage extends GetView<BancoDeIdeiasController> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Painel de controle'),
+        title: Text('bdi_painel_controle'.tr),
         centerTitle: true,
         foregroundColor: Colors.white,
         elevation: 8,
@@ -61,10 +61,10 @@ class AdminTableSelectionPage extends GetView<BancoDeIdeiasController> {
             onPressed: () => _openUserArea(context),
             style: TextButton.styleFrom(foregroundColor: Colors.white),
             icon: const Icon(Icons.lightbulb_outline_rounded),
-            label: const Text('Area do usuario'),
+            label: Text('bdi_area_usuario'.tr),
           ),
           IconButton(
-            tooltip: 'Sair',
+            tooltip: 'sair'.tr,
             onPressed: () => _signOut(context),
             icon: const Icon(Icons.logout_rounded),
           ),

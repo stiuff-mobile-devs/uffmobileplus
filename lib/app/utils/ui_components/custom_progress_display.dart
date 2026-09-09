@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rive/rive.dart' as rive;
+import 'package:uffmobileplus/app/ui/widgets/responsive_uff_logo.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 
 class CustomProgressDisplay extends StatefulWidget {
@@ -69,7 +70,11 @@ class _CustomProgressDisplayState extends State<CustomProgressDisplay> {
               future: _fileFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState != ConnectionState.done) {
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(
+                    child: ResponsiveUffLogo(
+                      height: widget.height > 0 ? widget.height : 60,
+                    ),
+                  );
                 }
                 if (snapshot.hasError) {
                   return Center(

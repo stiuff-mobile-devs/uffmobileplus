@@ -78,6 +78,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  integration_test:
+    sdk: flutter
   flutter_launcher_icons: ^0.14.4
 
   flutter_lints: ^6.0.0
@@ -87,12 +89,14 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/translations/
     - assets/papers/logos/
     - assets/papers/icons/
     - assets/images/
     - assets/logos/
     - assets/animations/
     - assets/icons/
+    - assets/icons/flags/
     - assets/carteirinha_digital/
     - assets/carteirinha_digital/images/
     - assets/carteirinha_digital/icons/

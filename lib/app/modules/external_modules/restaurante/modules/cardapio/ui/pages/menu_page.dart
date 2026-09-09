@@ -204,7 +204,7 @@ class _MenuPageState extends State<MenuPage> with TickerProviderStateMixin {
                                               children: [
                                                 Flexible(
                                                   child: Text(
-                                                    '${'horario_do_almoço'.tr}:\n${Campus.getSchedule(Campus.getSigla(location.name))[0].substring(11, 16)}' ' ${'as'.tr} ' '${Campus.getSchedule(Campus.getSigla(location.name))[1].substring(11, 16)}',
+                                                    '${'horario_do_almoco'.tr}:\n${Campus.getSchedule(Campus.getSigla(location.name))[0].substring(11, 16)}' ' ${'as'.tr} ' '${Campus.getSchedule(Campus.getSigla(location.name))[1].substring(11, 16)}',
                                                     style: const TextStyle(
                                                       color: Colors.white,
                                                       fontFamily: "Jost",
@@ -589,7 +589,7 @@ class _MenuPageState extends State<MenuPage> with TickerProviderStateMixin {
             ],
           ),
           // floatingActionButton: FloatingActionButton(
-          //   tooltip: 'Pagar Restaurante',
+          //   tooltip: 'pagar_restaurante',
           //   splashColor: Colors.white,
           //   backgroundColor: controller.restaurantController.evenDarkerBlue,
           //   onPressed: () {
@@ -602,7 +602,7 @@ class _MenuPageState extends State<MenuPage> with TickerProviderStateMixin {
           //     width: 28,
           //     height: 28,
           //     color: Colors.white,
-          //     semanticsLabel: 'Pagar Restaurante',
+          //     semanticsLabel: 'pagar_restaurante',
           //   ),
           // ),
           floatingActionButtonLocation:

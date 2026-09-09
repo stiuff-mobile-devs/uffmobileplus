@@ -2,6 +2,7 @@
 //import 'package:carteirinha_uff_digital/ui/balance/components/timeline_node.dart';
 //import 'package:carteirinha_uff_digital/utils/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/balance_statement/utils/timeline_node.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/data/model/card_transaction.dart';
@@ -18,7 +19,7 @@ class BalanceTabStatement extends StatelessWidget {
     return statement.isEmpty
         ? Center(
             child: Text(
-              "Sem informações para os últimos $period dias",
+              'sem_info_ultimos_dias'.trParams({'period': period}),
               style: TextStyle(
                 color: Colors.grey[300],
               ),
@@ -32,8 +33,8 @@ class BalanceTabStatement extends StatelessWidget {
               itemBuilder: (BuildContext context, int index) {
                 String statementText =
                     statement[index].category!.contains(Constants.DEBIT)
-                        ? "Valor debitado:"
-                        : "Valor creditado:";
+                        ? 'valor_debitado_dois_pontos'.tr
+                        : 'valor_creditado'.tr;
                 return Row(
                   children: <Widget>[
                     TimelineNode(statement[index].category!),

@@ -97,7 +97,7 @@ class _BancoDeIdeiasRestrictedAccess extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Banco de Ideias'),
+        title: Text('bdi_titulo'.tr),
         foregroundColor: Colors.white,
         flexibleSpace: Container(
           decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
@@ -132,26 +132,26 @@ class _BancoDeIdeiasRestrictedAccess extends StatelessWidget {
                       color: AppColors.lightBlue(),
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      'Acesso restrito',
+                    Text(
+                      'bdi_acesso_restrito'.tr,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Você não possui permissão para acessar o Banco de Ideias.',
+                    Text(
+                      'bdi_sem_permissao_msg'.tr,
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white70, height: 1.35),
+                      style: const TextStyle(color: Colors.white70, height: 1.35),
                     ),
                     const SizedBox(height: 20),
                     FilledButton.icon(
                       onPressed: Get.back,
                       icon: const Icon(Icons.arrow_back_rounded),
-                      label: const Text('Voltar'),
+                      label: Text('voltar'.tr),
                     ),
                   ],
                 ),
@@ -179,7 +179,7 @@ class _BancoDeIdeiasError extends GetView<BancoDeIdeiasController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Banco de Ideias'),
+        title: Text('bdi_titulo'.tr),
         foregroundColor: Colors.white,
         flexibleSpace: Container(
           decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
@@ -213,10 +213,10 @@ class _BancoDeIdeiasError extends GetView<BancoDeIdeiasController> {
                       color: AppColors.lightBlue(),
                     ),
                     const SizedBox(height: 14),
-                    const Text(
-                      'Nao foi possivel carregar seu usuario.',
+                    Text(
+                      'bdi_nao_foi_possivel_carregar_usuario'.tr,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
@@ -232,12 +232,12 @@ class _BancoDeIdeiasError extends GetView<BancoDeIdeiasController> {
                     FilledButton.icon(
                       onPressed: onRetry,
                       icon: const Icon(Icons.refresh_rounded),
-                      label: const Text('Tentar novamente'),
+                      label: Text('tentar_novamente'.tr),
                     ),
                     TextButton.icon(
                       onPressed: onSignOut,
                       icon: const Icon(Icons.logout_rounded),
-                      label: const Text('Sair'),
+                      label: Text('sair'.tr),
                     ),
                   ],
                 ),

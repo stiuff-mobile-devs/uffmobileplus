@@ -41,8 +41,8 @@ class ValidarManualmentePage extends GetView<CatracaController> {
                         TextFormField(
                           controller: cpfController,
                           keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            labelText: 'CPF',
+                          decoration: InputDecoration(
+                            labelText: 'cpf'.tr,
                             hintText: '000.000.000-00',
                             border: OutlineInputBorder(),
                             filled: true,
@@ -68,8 +68,8 @@ class ValidarManualmentePage extends GetView<CatracaController> {
                               // Lógica para CPF inválido
                               final messengerContext = Get.context ?? context;
                               final snack = SnackBar(
-                                content: const Text(
-                                  'O CPF informado é inválido. Por favor, verifique e tente novamente.',
+                                content: Text(
+                                  'cpf_invalido_msg'.tr,
                                   style: TextStyle(color: Colors.white),
                                 ),
                                 backgroundColor: Colors.redAccent,
@@ -87,8 +87,8 @@ class ValidarManualmentePage extends GetView<CatracaController> {
                                 ) {
                                   if (Get.overlayContext != null) {
                                     Get.snackbar(
-                                      'O CPF informado é inválido.',
-                                      'Por favor, verifique e tente novamente.',
+                                      'cpf_invalido'.tr,
+                                      'verifique_tente_novamente'.tr,
                                       backgroundColor: Colors.redAccent,
                                       colorText: Colors.white,
                                       snackPosition: SnackPosition.TOP,
@@ -98,7 +98,7 @@ class ValidarManualmentePage extends GetView<CatracaController> {
                               }
                             }
                           },
-                          child: const Text('Validar'),
+                          child: Text('validar'.tr),
                         ),
                       ],
                     ),

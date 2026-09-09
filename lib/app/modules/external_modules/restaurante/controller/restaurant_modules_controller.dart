@@ -28,7 +28,7 @@ class RestaurantModulesController extends GetxController {
   final RxList<RestaurantModules> restaurantModulesList = RxList([
     RestaurantModules(
       iconSrc: 'assets/icons/cardapio.svg',
-      subtitle: 'menu'.tr,
+      subtitle: 'menu',
       page: Routes.BANDEJAPP,
       url: '',
       interrogation: false,
@@ -38,7 +38,7 @@ class RestaurantModulesController extends GetxController {
 
     RestaurantModules(
       iconSrc: 'assets/restaurant/icons/qr-code.svg',
-      subtitle: 'Pagar Restaurante'.tr,
+      subtitle: 'pagar_restaurante',
       page: Routes.PAY_RESTAURANT,
       url: '',
       interrogation: false,
@@ -48,7 +48,7 @@ class RestaurantModulesController extends GetxController {
 
     RestaurantModules(
       iconSrc: 'assets/restaurant/icons/recarga.svg',
-      subtitle: 'Recarregar Cartão'.tr,
+      subtitle: 'recarregar_cartao',
       page: Routes.RECHARGE_CARD,
       url: '',
       interrogation: false,
@@ -58,7 +58,7 @@ class RestaurantModulesController extends GetxController {
 
     RestaurantModules(
       iconSrc: 'assets/restaurant/icons/saldo-extrato.svg',
-      subtitle: 'Saldo e Extrato'.tr,
+      subtitle: 'saldo_e_extrato',
       page: Routes.BALANCE_STATEMENT,
       url: '',
       interrogation: false,
@@ -68,7 +68,7 @@ class RestaurantModulesController extends GetxController {
 
     RestaurantModules(
       iconSrc: 'assets/icons/validator_qr_code.svg',
-      subtitle: 'Catraca'.tr,
+      subtitle: 'catraca',
       page: Routes.CATRACA_ONLINE,
       url: '',
       interrogation: false,
@@ -141,6 +141,12 @@ class RestaurantModulesController extends GetxController {
 class RestaurantModules {
   final List<ProfileTypes> availableFor;
   final String iconSrc;
+  /// Translation KEY, not display text.
+  ///
+  /// These lists are field initialisers, evaluated once when the controller is
+  /// constructed, so resolving `.tr` here would freeze the label in whatever
+  /// language was active at startup. Call `.tr` at the render site instead, so
+  /// the label follows `Get.updateLocale`.
   final String subtitle;
   final String page;
   final String? url;

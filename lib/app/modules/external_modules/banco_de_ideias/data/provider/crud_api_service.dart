@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/models/crud_table.dart';
@@ -105,7 +106,7 @@ class CrudApiService {
   }) async {
     final user = _firebaseAuth.currentUser;
     if (user == null) {
-      throw StateError('Usuario nao autenticado.');
+      throw StateError('bdi_usuario_nao_autenticado'.tr);
     }
 
     final token = await user.getIdToken();
@@ -155,7 +156,7 @@ class CrudApiService {
     try {
       return jsonDecode(body);
     } on FormatException {
-      throw const FormatException('A API retornou uma resposta invalida.');
+      throw FormatException('bdi_resposta_invalida_api'.tr);
     }
   }
 
@@ -183,7 +184,9 @@ class CrudApiService {
         .toList(growable: false);
 
     if (keyValues.isEmpty) {
-      throw StateError('Registro sem chave para ${table.title}.');
+      throw StateError(
+        'bdi_registro_sem_chave'.trParams({'table': table.title.tr}),
+      );
     }
 
     return '${table.path}/${keyValues.join('/')}';
@@ -199,7 +202,7 @@ class CrudApiService {
 
     return CrudRecord(
       id: id,
-      nome: nome.isEmpty ? '(sem nome)' : nome,
+      nome: nome.isEmpty ? 'bdi_sem_nome'.tr : nome,
       raw: item,
     );
   }

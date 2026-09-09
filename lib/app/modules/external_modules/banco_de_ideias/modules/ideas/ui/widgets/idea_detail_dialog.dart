@@ -44,7 +44,7 @@ class _IdeaDetailDialogState extends State<IdeaDetailDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Detalhes da ideia'),
+      title: Text('bdi_detalhes_ideia'.tr),
       content: SizedBox(
         width: 560,
         child: FutureBuilder<IdeiaDetalhe>(
@@ -63,9 +63,9 @@ class _IdeaDetailDialogState extends State<IdeaDetailDialog> {
 
             final detalhe = snapshot.data;
             if (detalhe == null) {
-              return const SizedBox(
+              return SizedBox(
                 height: 120,
-                child: Center(child: Text('Ideia nao encontrada.')),
+                child: Center(child: Text('bdi_ideia_nao_encontrada'.tr)),
               );
             }
 
@@ -97,7 +97,7 @@ class _IdeaDetailDialogState extends State<IdeaDetailDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Fechar'),
+          child: Text('fechar'.tr),
         ),
       ],
     );
@@ -135,16 +135,16 @@ class IdeaDetailContent extends GetView<BancoDeIdeiasController> {
             ),
           ),
           const SizedBox(height: 12),
-          DetailField(label: 'Descricao', value: ideia.descricao),
-          DetailField(label: 'Tipo', value: ideia.tipo),
-          DetailField(label: 'Estado', value: ideia.estado),
+          DetailField(label: 'bdi_descricao'.tr, value: ideia.descricao),
+          DetailField(label: 'tipo'.tr, value: ideia.tipo),
+          DetailField(label: 'estado'.tr, value: ideia.estado),
           DetailField(
-            label: 'Seguidores',
+            label: 'bdi_seguidores'.tr,
             value: ideia.quantidadeSeguidores.toString(),
           ),
           if (detalhe.categorias.isNotEmpty) ...[
             const SizedBox(height: 8),
-            const DetailSectionTitle('Categorias'),
+            DetailSectionTitle('bdi_categorias'.tr),
             const SizedBox(height: 6),
             Wrap(
               spacing: 8,
@@ -157,7 +157,7 @@ class IdeaDetailContent extends GetView<BancoDeIdeiasController> {
           ],
           if (detalhe.participantes.isNotEmpty) ...[
             const SizedBox(height: 16),
-            const DetailSectionTitle('Participantes'),
+            DetailSectionTitle('bdi_participantes'.tr),
             const SizedBox(height: 6),
             for (final participante in detalhe.participantes)
               ParticipantTile(participante: participante),
@@ -172,13 +172,15 @@ class IdeaDetailContent extends GetView<BancoDeIdeiasController> {
                     : Icons.star_outline_rounded,
               ),
               label: Text(
-                ideia.favorita ? 'Remover dos favoritos' : 'Favoritar',
+                ideia.favorita
+                    ? 'bdi_remover_favoritos'.tr
+                    : 'bdi_favoritar_ideia'.tr,
               ),
             ),
           ],
           if (ideia.podeAdministrar) ...[
             const SizedBox(height: 16),
-            const DetailSectionTitle('Administracao'),
+            DetailSectionTitle('bdi_administracao'.tr),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -187,7 +189,7 @@ class IdeaDetailContent extends GetView<BancoDeIdeiasController> {
                 FilledButton.icon(
                   onPressed: onEditIdea,
                   icon: const Icon(Icons.edit_rounded),
-                  label: const Text('Editar'),
+                  label: Text('editar'.tr),
                 ),
                 OutlinedButton.icon(
                   onPressed: onDeleteIdea,
@@ -198,7 +200,7 @@ class IdeaDetailContent extends GetView<BancoDeIdeiasController> {
                     ),
                   ),
                   icon: const Icon(Icons.delete_outline_rounded),
-                  label: const Text('Excluir'),
+                  label: Text('excluir'.tr),
                 ),
               ],
             ),
