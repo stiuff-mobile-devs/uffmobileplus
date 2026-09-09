@@ -33,7 +33,7 @@ class LoginPage extends GetView<LoginController> {
                               _BreathingLogoBox(height: 76, width: 228),
                               const SizedBox(height: 16),
                               Text(
-                                'Universidade Federal Fluminense',
+                                'universidade_federal_fluminense'.tr,
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.9),
                                   fontSize: 16,
@@ -74,7 +74,7 @@ class LoginPage extends GetView<LoginController> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'escolha_método_login'.tr,
+                                      'escolha_metodo_login'.tr,
                                       style: TextStyle(
                                         color: Colors.white.withOpacity(0.9),
                                         fontWeight: FontWeight.w800,
@@ -145,7 +145,7 @@ class LoginPage extends GetView<LoginController> {
                                         ? _QuickActionChip(
                                             tooltip: 'qr_code_catraca'.tr,
                                             icon: Icons.qr_code_scanner,
-                                            label: 'Catraca'.tr,
+                                            label: 'catraca'.tr,
                                             onTap: controller
                                                 .goToCatracaOnlinePage,
                                           )

@@ -49,7 +49,7 @@ class LeitorQrCode extends GetView<LeitorQrCodesController> {
         centerTitle: true,
         elevation: 8,
         foregroundColor: Colors.white,
-        title: const Text("Leitor QR Code"),
+        title: Text('leitor_qr_code'.tr),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
         ),
@@ -69,7 +69,7 @@ class LeitorQrCode extends GetView<LeitorQrCodesController> {
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
-                    'Erro ao iniciar a câmera.\nVerifique as permissões do aplicativo.',
+                    'erro_iniciar_camera'.tr,
                     textAlign: TextAlign.center,
                     style: const TextStyle(color: Colors.red, fontSize: 16),
                   ),
@@ -90,8 +90,8 @@ class LeitorQrCode extends GetView<LeitorQrCodesController> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                const Text(
-                  'Aponte o QR Code para o centro do quadrado',
+                Text(
+                  'aponte_qr_code_centro'.tr,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 22,

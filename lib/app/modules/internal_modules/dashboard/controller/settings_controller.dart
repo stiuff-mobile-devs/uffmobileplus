@@ -83,20 +83,20 @@ class SettingsController extends GetxController {
       AlertDialog(
         backgroundColor: Colors.black87,
         title: Text(
-          'Login IdUFF',
+          'login_iduff_titulo'.tr,
           style: TextStyle(
             color: Colors.blueAccent,
             fontWeight: FontWeight.bold,
           ),
         ),
         content: Text(
-          'Você será redirecionado para fazer login com sua conta IdUFF. Sua matrícula será vinculada a este dispositivo.',
+          'login_iduff_confirmacao_msg'.tr,
           style: TextStyle(color: Colors.white),
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text('Cancelar', style: TextStyle(color: Colors.grey)),
+            child: Text('cancelar'.tr, style: TextStyle(color: Colors.grey)),
           ),
           TextButton(
             onPressed: () {
@@ -118,20 +118,20 @@ class SettingsController extends GetxController {
       AlertDialog(
         backgroundColor: Colors.black87,
         title: Text(
-          'Desconectar IdUFF',
+          'desconectar_iduff_titulo'.tr,
           style: TextStyle(
             color: Colors.blueAccent,
             fontWeight: FontWeight.bold,
           ),
         ),
         content: Text(
-          'Sua conta IdUFF será desconectada deste dispositivo. Você perderá acesso aos serviços que requerem autenticação.',
+          'desconectar_iduff_confirmacao_msg'.tr,
           style: TextStyle(color: Colors.white),
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text('Cancelar', style: TextStyle(color: Colors.grey)),
+            child: Text('cancelar'.tr, style: TextStyle(color: Colors.grey)),
           ),
           TextButton(
             onPressed: () {
@@ -139,7 +139,7 @@ class SettingsController extends GetxController {
               logout();
             },
             child: Text(
-              'Desconectar',
+              'desconectar'.tr,
               style: TextStyle(color: Colors.redAccent),
             ),
           ),
@@ -153,27 +153,27 @@ class SettingsController extends GetxController {
       AlertDialog(
         backgroundColor: Colors.black87,
         title: Text(
-          'Login Google',
+          'login_google_titulo'.tr,
           style: TextStyle(
             color: Colors.redAccent,
             fontWeight: FontWeight.bold,
           ),
         ),
         content: Text(
-          'Você será redirecionado para fazer login com sua conta Google. Sua conta será vinculada a este dispositivo.',
+          'login_google_confirmacao_msg'.tr,
           style: TextStyle(color: Colors.white),
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text('Cancelar', style: TextStyle(color: Colors.grey)),
+            child: Text('cancelar'.tr, style: TextStyle(color: Colors.grey)),
           ),
           TextButton(
             onPressed: () {
               Get.back();
               loginController.loginGoogle();
             },
-            child: Text('Continuar', style: TextStyle(color: Colors.redAccent)),
+            child: Text('continuar'.tr, style: TextStyle(color: Colors.redAccent)),
           ),
         ],
       ),
@@ -185,20 +185,20 @@ class SettingsController extends GetxController {
       AlertDialog(
         backgroundColor: Colors.black87,
         title: Text(
-          'Desconectar Google',
+          'desconectar_google_titulo'.tr,
           style: TextStyle(
             color: Colors.redAccent,
             fontWeight: FontWeight.bold,
           ),
         ),
         content: Text(
-          'Sua conta Google será desconectada deste dispositivo. Você perderá acesso aos serviços vinculados a esta autenticação.',
+          'desconectar_google_confirmacao_msg'.tr,
           style: TextStyle(color: Colors.white),
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text('Cancelar', style: TextStyle(color: Colors.grey)),
+            child: Text('cancelar'.tr, style: TextStyle(color: Colors.grey)),
           ),
           TextButton(
             onPressed: () {
@@ -206,7 +206,7 @@ class SettingsController extends GetxController {
               _authGoogleController.logout();
             },
             child: Text(
-              'Desconectar',
+              'desconectar'.tr,
               style: TextStyle(color: Colors.redAccent),
             ),
           ),

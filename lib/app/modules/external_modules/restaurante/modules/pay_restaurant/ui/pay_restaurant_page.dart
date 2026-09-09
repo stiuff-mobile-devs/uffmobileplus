@@ -15,7 +15,7 @@ class PayRestaurantPage extends GetView<PayRestaurantController> {
         centerTitle: true,
         elevation: 8,
         foregroundColor: Colors.white,
-        title: Text('Pagar Restaurante'.tr),
+        title: Text('pagar_restaurante'.tr),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
         ),

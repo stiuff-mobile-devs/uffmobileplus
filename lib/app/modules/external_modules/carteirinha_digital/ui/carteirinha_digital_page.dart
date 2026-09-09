@@ -121,7 +121,7 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                           ),
                           Text(
                             controller.getUserIdUFF().isNotEmpty
-                                ? '${'Documento'.tr}: ${controller.getUserIdUFF()}'
+                                ? '${'documento'.tr}: ${controller.getUserIdUFF()}'
                                 : '',
                             style: const TextStyle(color: Colors.white),
                           ),

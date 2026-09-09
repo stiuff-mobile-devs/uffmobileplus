@@ -650,7 +650,7 @@ class HomePage extends GetView<HomePageController> {
                             contentPadding: EdgeInsets.zero,
                             leading: _ServiceIcon(iconSrc: service.iconSrc),
                             title: Text(
-                              service.subtitle,
+                              service.subtitle.tr,
                               style: const TextStyle(color: Colors.white),
                             ),
                             trailing: IconButton(
@@ -807,7 +807,7 @@ class _ShortcutCard extends StatelessWidget {
                   _ServiceIcon(iconSrc: item.iconSrc, layoutSpec: layoutSpec),
                   SizedBox(height: layoutSpec.iconLabelSpacing),
                   Text(
-                    item.subtitle,
+                    item.subtitle.tr,
                     textAlign: TextAlign.center,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,

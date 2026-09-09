@@ -116,7 +116,7 @@ class CarteirinhaValidadorResultPage extends GetView<CarteirinhaValidadorControl
                             controller.validationData.isNotEmpty &&
                                     controller.validationData[0] != null &&
                                     controller.validationData[0].isNotEmpty
-                                ? '${'Documento'.tr}: ${controller.validationData[0]}'
+                                ? '${'documento'.tr}: ${controller.validationData[0]}'
                                 : '',
                             style: const TextStyle(color: Colors.white),
                           ),

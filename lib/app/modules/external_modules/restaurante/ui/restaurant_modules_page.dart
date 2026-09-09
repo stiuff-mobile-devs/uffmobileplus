@@ -108,7 +108,7 @@ class RestaurantModulesPage extends StatelessWidget {
             restaurantModule.page,
             interrogation: restaurantModule.interrogation ?? false,
             webViewUrl: restaurantModule.url!,
-            appBarTitle: restaurantModule.subtitle,
+            appBarTitle: restaurantModule.subtitle.tr,
           );
         },
         child: Container(

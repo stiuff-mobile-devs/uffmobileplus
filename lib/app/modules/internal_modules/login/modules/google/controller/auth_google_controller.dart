@@ -59,7 +59,7 @@ class AuthGoogleController extends GetxController {
     } else {
       // Se não for, exibe o pop-up
       Get.defaultDialog(
-        title: "Atenção",
+        title: 'atencao'.tr,
         middleText: "Você não entrou com um e-mail institucional (@id.uff.br). Algumas funcionalidades podem estar indisponíveis.\n\nDeseja continuar mesmo assim?",
         textConfirm: "Continuar",
         textCancel: "Refazer Login",

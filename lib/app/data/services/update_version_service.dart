@@ -4,6 +4,7 @@ import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:get/get.dart';
 
 enum UpdateStatus { upToDate, optionalUpdate, forceUpdate }
 
@@ -108,10 +109,10 @@ class UpdateVersionService {
   void _showAndroidCompleteSnackbar(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text("Atualização baixada com sucesso!"),
+        content: Text('atualizacao_baixada_sucesso'.tr),
         duration: const Duration(days: 1), // Mantém aberto até interagir
         action: SnackBarAction(
-          label: "REINICIAR",
+          label: 'reiniciar'.tr,
           onPressed: () async {
             await InAppUpdate.completeFlexibleUpdate();
           },
@@ -130,15 +131,15 @@ class UpdateVersionService {
           canPop:
               !isForceUpdate, // Bloqueia o botão físico de voltar no Android/iOS
           child: AlertDialog(
-            title: const Text("Nova Versão Disponível"),
+            title: Text('nova_versao_disponivel'.tr),
             content: Text(isForceUpdate
-                ? "Uma atualização obrigatória é necessária para continuar utilizando o aplicativo."
-                : "Uma nova versão está disponível! Gostaria de atualizar agora?"),
+                ? 'atualizacao_obrigatoria_msg'.tr
+                : 'nova_versao_disponivel_msg'.tr),
             actions: [
               if (!isForceUpdate)
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text("Depois"),
+                  child: Text('depois'.tr),
                 ),
               TextButton(
                 onPressed: () async {
@@ -152,7 +153,7 @@ class UpdateVersionService {
                     await launchUrl(url, mode: LaunchMode.externalApplication);
                   }
                 },
-                child: const Text("Atualizar"),
+                child: Text('atualizar'.tr),
               ),
             ],
           ),

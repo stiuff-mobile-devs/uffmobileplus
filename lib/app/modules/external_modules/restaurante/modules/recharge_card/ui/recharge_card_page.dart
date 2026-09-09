@@ -17,7 +17,7 @@ class RechargeCardPage extends GetView<RechargeCardController> {
         centerTitle: true,
         elevation: 8,
         foregroundColor: Colors.white,
-        title: Text('Recarregar Cartão'.tr),
+        title: Text('recarregar_cartao'.tr),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
         ),

@@ -65,14 +65,14 @@ class SettingsPage extends GetView<SettingsController> {
               SettingsItem(
                 icon: Icon(Icons.change_circle, color: Colors.white),
                 main: Text(
-                  'Trocar Matricula',
+                  'trocar_matricula'.tr,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
-                description: 'Alterar a matrícula vinculada ao usuário atual',
+                description: 'trocar_matricula_descricao'.tr,
                 trailing: null,
                 onTap: () {
                   controller.changeMatricula();
@@ -82,14 +82,14 @@ class SettingsPage extends GetView<SettingsController> {
             SettingsItem(
               icon: Icon(Icons.link, color: Colors.white),
               main: Text(
-                'Minhas Vinculações'.tr,
+                'minhas_vinculacoes'.tr,
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
               ),
-              description: 'Ver minhas autenticações ativas'.tr,
+              description: 'ver_autenticacoes_ativas'.tr,
               trailing: null,
               onTap: () async {
                 await controller.reloadBondStates();
@@ -102,14 +102,14 @@ class SettingsPage extends GetView<SettingsController> {
               SettingsItem(
                 icon: Icon(Icons.update_rounded, color: Colors.white),
                 main: Text(
-                  'Atualizar seus dados Google'.tr,
+                  'atualizar_dados_google'.tr,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
-                description: 'Atualizar seus dados Google'.tr,
+                description: 'atualizar_dados_google'.tr,
                 trailing: null,
                 onTap: () {
                   controller.updateGoogleData();
@@ -178,7 +178,7 @@ class SettingsPage extends GetView<SettingsController> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Minhas Vinculações',
+                    'minhas_vinculacoes'.tr,
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,

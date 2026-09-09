@@ -103,7 +103,7 @@ class ExternalModulesPage extends GetView<ExternalModulesController> {
             externalModule.page,
             interrogation: externalModule.interrogation ?? false,
             webViewUrl: externalModule.url ?? '',
-            appBarTitle: externalModule.subtitle,
+            appBarTitle: externalModule.subtitle.tr,
           );
         },
         child: Container(

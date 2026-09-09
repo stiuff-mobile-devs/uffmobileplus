@@ -19,7 +19,7 @@ class BalanceStatementPage extends GetView<BalanceStatementController> {
         centerTitle: true,
         elevation: 8,
         foregroundColor: Colors.white,
-        title: Text('Saldo e Extrato'.tr),
+        title: Text('saldo_e_extrato'.tr),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),

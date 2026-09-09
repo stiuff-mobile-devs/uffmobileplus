@@ -106,7 +106,7 @@ class BibliotecasPage extends StatelessWidget {
             bibliotecaModule.page,
             interrogation: bibliotecaModule.interrogation ?? false,
             webViewUrl: bibliotecaModule.url ?? '',
-            appBarTitle: bibliotecaModule.subtitle,
+            appBarTitle: bibliotecaModule.subtitle.tr,
           );
         },
         child: Container(

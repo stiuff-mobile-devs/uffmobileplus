@@ -152,7 +152,7 @@ class CarteirinhaValidadorPage extends GetView<CarteirinhaValidadorController> {
                                 ),
                                 const SizedBox(height: 12),
                                 Text(
-                                  'Aperte para escanear'.tr,
+                                  'aperte_para_escanear'.tr,
                                   style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,

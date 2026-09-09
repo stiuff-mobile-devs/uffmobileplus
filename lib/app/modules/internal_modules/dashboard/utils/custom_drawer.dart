@@ -129,7 +129,9 @@ class CustomDrawer extends GetView<HomePageController> {
                   if (controller.userMatricula.value.isNotEmpty ||
                       controller.userMatricula.value != '')
                     Text(
-                      'Matrícula: ${controller.userMatricula.value}',
+                      'matricula_label'.trParams({
+                        'matricula': controller.userMatricula.value,
+                      }),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(

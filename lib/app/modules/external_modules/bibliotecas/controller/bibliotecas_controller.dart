@@ -24,7 +24,7 @@ class BibliotecasController extends GetxController {
   final RxList<BibliotecasModules> bibliotecasModulesList = RxList([
     BibliotecasModules(
       iconSrc: 'assets/logos/logo_pergamum_mobile.svg',
-      subtitle: 'pergamum'.tr,
+      subtitle: 'pergamum',
       page: Routes.BIBLIOTECAS_WEB_VIEW,
       url: 'https://catalogobibliotecas.uff.br/login?redirect=/meupergamum',
       interrogation: false,
@@ -33,7 +33,7 @@ class BibliotecasController extends GetxController {
     ),
     BibliotecasModules(
       iconSrc: 'assets/logos/pre-cadastro.svg',
-      subtitle: 'cadastro'.tr,
+      subtitle: 'cadastro',
       page: Routes.BIBLIOTECAS_WEB_VIEW,
       url: "https://bibliotecas.uff.br/cadastro/",
       interrogation: false,
@@ -42,7 +42,7 @@ class BibliotecasController extends GetxController {
     ),
     BibliotecasModules(
       iconSrc: 'assets/logos/catalogo.svg',
-      subtitle: 'catalogo'.tr,
+      subtitle: 'catalogo',
       page: Routes.BIBLIOTECAS_WEB_VIEW,
       url: "https://catalogobibliotecas.uff.br/",
       interrogation: false,
@@ -51,7 +51,7 @@ class BibliotecasController extends GetxController {
     ),
     BibliotecasModules(
       iconSrc: 'assets/logos/ebooks.svg',
-      subtitle: 'ebooks'.tr,
+      subtitle: 'ebooks',
       page: Routes.BIBLIOTECAS_WEB_VIEW,
       url: "https://bibliotecas.uff.br/ebooks",
       interrogation: false,
@@ -60,7 +60,7 @@ class BibliotecasController extends GetxController {
     ),
     BibliotecasModules(
       iconSrc: 'assets/logos/fale_com_bibliotecario_so_logo.svg',
-      subtitle: 'ask'.tr,
+      subtitle: 'ask',
       page: Routes.BIBLIOTECAS_WEB_VIEW,
       url: "http://bibliotecas.uff.br/contato/",
       interrogation: false,
@@ -69,7 +69,7 @@ class BibliotecasController extends GetxController {
     ),
     BibliotecasModules(
       iconSrc: 'assets/logos/ferramentas.svg',
-      subtitle: 'ferramentas'.tr,
+      subtitle: 'ferramentas',
       page: Routes.BIBLIOTECAS_WEB_VIEW,
       url: "https://bibliotecas.uff.br/pesquisa/",
       interrogation: false,
@@ -78,7 +78,7 @@ class BibliotecasController extends GetxController {
     ),
     BibliotecasModules(
       iconSrc: 'assets/logos/saber_uff.svg',
-      subtitle: 'saber'.tr,
+      subtitle: 'saber',
       page: Routes.BIBLIOTECAS_WEB_VIEW,
       url: "https://proxy.uff.br/login/index.html",
       interrogation: false,
@@ -87,7 +87,7 @@ class BibliotecasController extends GetxController {
     ),
     BibliotecasModules(
       iconSrc: 'assets/logos/logo_target_blue.svg',
-      subtitle: 'target'.tr,
+      subtitle: 'target',
       page: Routes.BIBLIOTECAS_WEB_VIEW,
       url: "https://www.gedweb.com.br/uff/",
       interrogation: false,
@@ -136,6 +136,12 @@ class BibliotecasController extends GetxController {
 class BibliotecasModules {
   final List<ProfileTypes> availableFor;
   final String iconSrc;
+  /// Translation KEY, not display text.
+  ///
+  /// These lists are field initialisers, evaluated once when the controller is
+  /// constructed, so resolving `.tr` here would freeze the label in whatever
+  /// language was active at startup. Call `.tr` at the render site instead, so
+  /// the label follows `Get.updateLocale`.
   final String subtitle;
   final String page;
   final String? url;

@@ -41,7 +41,7 @@ class CdcPage extends GetView<CdcController> {
   AppBar _buildAppBar() {
     return AppBar(
       title: Text(
-        'Central de Comunicação'.tr,
+        'central_de_comunicacao'.tr,
         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
       centerTitle: true,
