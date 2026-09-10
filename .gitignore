@@ -231,6 +231,7 @@ mock_data.json
 TODO.md
 NOTES.md
 CREDENTIALS.md
+APRESENTACAO_MODULO_SOS.md
 
 # Application secrets and sensitive configuration
 lib/app/config/secrets.dart
