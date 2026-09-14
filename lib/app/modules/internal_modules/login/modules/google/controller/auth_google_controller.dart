@@ -8,6 +8,7 @@ import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_google_model.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_google_repository.dart';
+import 'package:uffmobileplus/app/data/services/harpia_claims_service.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 
 class AuthGoogleController extends GetxController {
@@ -32,6 +33,9 @@ class AuthGoogleController extends GetxController {
         await _registerTokenCdc();
         await getGdiGroupsGoogle(token ?? '', user.email, false);
         
+        // Sincronizar Custom Claims do Harpia
+        HarpiaClaimsService.syncClaims();
+
         // Chama a função auxiliar passando o e-mail
         _verifyEmailAndNavigate(user.email);
 
@@ -84,6 +88,7 @@ class AuthGoogleController extends GetxController {
       await _registerTokenCdc();
       String? token = await _authGoogle.getFirebaseIdToken();
       await getGdiGroupsGoogle(token ?? '', hasLogged.email, false);
+      HarpiaClaimsService.syncClaims();
       Get.offNamed(Routes.HOME);
     } else {
       Get.offNamed(Routes.LOGIN);

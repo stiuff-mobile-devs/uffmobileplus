@@ -20,6 +20,7 @@ import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/a
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/location_point.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_model.dart';
 import 'package:uffmobileplus/app/data/services/foreground_service.dart';
+import 'package:uffmobileplus/app/data/services/harpia_claims_service.dart';
 
 class TrackingController extends GetxController with WidgetsBindingObserver {
   final FlutterBackgroundService _service = FlutterBackgroundService();
@@ -173,9 +174,13 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
       final futures = <Future<void>>[];
       for (final email in observedEmails) {
         futures.add(() async {
-          final hasPoints = await FirebaseProvider().hasPointsOnDate(email, day);
-          if (hasPoints) {
-            usersWithPointsOnObservedDay.add(email);
+          try {
+            final hasPoints = await FirebaseProvider().hasPointsOnDate(email, day);
+            if (hasPoints) {
+              usersWithPointsOnObservedDay.add(email);
+            }
+          } catch (e) {
+            debugPrint('[TrackingController] Erro ao verificar pontos de $email: $e');
           }
         }());
       }
@@ -468,6 +473,24 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
       return; // Interrompe a execução para não iniciar o serviço sem GPS
     }
 
+    // Garante que os custom claims (harpia_roles) estejam presentes
+    // e contenham MEMBER ou MANAGER antes de escrever no Firestore.
+    final hasClaims = await HarpiaClaimsService.ensureClaims();
+    if (!hasClaims) {
+      debugPrint(
+        '[TrackingController] Claims inválidos — tracking não iniciado.',
+      );
+      Get.snackbar(
+        'Não foi possível iniciar o rastreamento',
+        'Suas permissões de grupo não puderam ser verificadas. '
+        'Tente atualizar seus grupos e tentar novamente.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.shade100,
+        duration: const Duration(seconds: 5),
+      );
+      return;
+    }
+
     await _setPlatformSpecifics();
     await _service.startService();
 
@@ -491,7 +514,20 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
     // Atualiza UI (botão).
     isTrackingEnabled.value = true;
     // Informa Firebase que sua posição pode ser visualizada no mapa.
-    FirebaseProvider().updateIsTracked(userCtrl.user!.email, true);
+    try {
+      await FirebaseProvider().updateIsTracked(userCtrl.user!.email, true);
+    } catch (e) {
+      debugPrint('[TrackingController] Erro ao atualizar isTracked: $e');
+      Get.snackbar(
+        'Erro ao iniciar rastreamento',
+        'Não foi possível atualizar o status de rastreamento. '
+        'Verifique suas permissões de grupo.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.shade100,
+        duration: const Duration(seconds: 5),
+      );
+      await _stopService();
+    }
   }
 
   Future<void> _stopService() async {
@@ -501,7 +537,11 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
     _locationSubscription = null;
     _service.invoke("stopService");
     isTrackingEnabled.value = false;
-    FirebaseProvider().updateIsTracked(userCtrl.user!.email, false);
+    try {
+      await FirebaseProvider().updateIsTracked(userCtrl.user!.email, false);
+    } catch (e) {
+      debugPrint('[TrackingController] Erro ao desativar isTracked: $e');
+    }
   }
 
   @override

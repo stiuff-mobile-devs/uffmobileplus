@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/data/services/harpia_claims_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/google_groups_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/data/provider/firebase_provider.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/google_group_member_model.dart';
@@ -18,8 +19,13 @@ class UserController extends GetxController {
   @override
   Future<void> onInit() async {
     super.onInit();
+    await HarpiaClaimsService.ensureClaims();
     await loadCurrentUser();
-    allFirebaseUsers.bindStream(FirebaseProvider().streamAllUsers());
+    try {
+      allFirebaseUsers.bindStream(FirebaseProvider().streamAllUsers());
+    } catch (e) {
+      debugPrint('[UserController] Erro ao conectar stream de usuários: $e');
+    }
   }
 
   Future<void> loadCurrentUser() async {
@@ -40,26 +46,46 @@ class UserController extends GetxController {
       if (firestoreUser != null) {
         _user.value = firestoreUser;
       } else {
-        // Criar documento no Firestore
-        await FirebaseProvider().setUser(UserModel(
-          email: email,
-          nome: _googleName,
-        ));
-        _user.value = await _initializeUser();
+        // Criar documento no Firestore APENAS se o usuário for observável.
+        // A coleção `usuarios` existe exclusivamente para armazenar
+        // coordenadas de observáveis (MEMBER/MANAGER).
+        final isObservavel = await HarpiaClaimsService.isObservavel();
+        if (isObservavel) {
+          try {
+            await FirebaseProvider().setUser(UserModel(
+              email: email,
+              nome: _googleName,
+            ));
+            _user.value = await _initializeUser();
+          } catch (e) {
+            debugPrint('[UserController] Erro ao criar doc do usuário: $e');
+          }
+        } else {
+          debugPrint(
+            '[UserController] Usuário $email não é observável — doc em `usuarios` não criado.',
+          );
+        }
       }
+    } catch (e) {
+      debugPrint('[UserController] Erro ao carregar usuário atual: $e');
     } finally {
       isLoading.value = false;
     }
   }
 
   Future<UserModel?> _initializeUser() async {
-    final googleUser = await UserGoogleRepository().getUserGoogleModel();
-    final email = googleUser?.email ?? "";
-    debugPrint('Email usado no lookup: $email');
-    if (email.isEmpty) return null;
+    try {
+      final googleUser = await UserGoogleRepository().getUserGoogleModel();
+      final email = googleUser?.email ?? "";
+      debugPrint('Email usado no lookup: $email');
+      if (email.isEmpty) return null;
 
-    final user = await FirebaseProvider().getUserByEmail(email);
-    return user;
+      final user = await FirebaseProvider().getUserByEmail(email);
+      return user;
+    } catch (e) {
+      debugPrint('[UserController] Erro ao buscar usuário no Firestore: $e');
+      return null;
+    }
   }
 
   bool isTrackable() {

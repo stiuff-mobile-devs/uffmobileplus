@@ -33,6 +33,7 @@ dependencies:
   google_sign_in: ^7.2.0
   firebase_auth: ^6.0.2
   cloud_firestore: ^6.3.0
+  cloud_functions: ^6.3.3
   firebase_core: ^4.1.0
   infinite_scroll_tab_view: ^1.0.3
   package_info_plus: ^9.0.0

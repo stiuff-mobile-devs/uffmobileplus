@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/data/repository/google_groups_repository.dart';
+import 'package:uffmobileplus/app/data/services/harpia_claims_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/google_group_member_model.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/google_group_model.dart';
 
@@ -66,6 +67,9 @@ class HarpiaGoogleGroupsController extends GetxController {
         isLoading.value = false;
         return;
       }
+
+      // Garante que os Custom Claims (harpia_roles) estejam presentes no Firebase Harpia
+      await HarpiaClaimsService.ensureClaims();
 
       // 1. Buscar todas as entidades do grupo raiz 'grupos.harpia@id.uff.br'
       final entities = await _repository.getGroupEntities(token, rootGroupEmail, forceRefresh: forceRefresh);
@@ -175,6 +179,10 @@ class HarpiaGoogleGroupsController extends GetxController {
   Future<void> refreshGroups() async {
     isLoading.value = true;
     _observableGoogleGroups.clear();
+
+    // Re-sincronizar claims com os papéis atuais nos grupos
+    await HarpiaClaimsService.syncClaims();
+
     await _loadGroups(forceRefresh: true);
     
     final currentGroupName = observedGroup.value;
