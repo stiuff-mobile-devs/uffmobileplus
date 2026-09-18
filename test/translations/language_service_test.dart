@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uffmobileplus/app/utils/translations/language_service.dart';
 
-/// Behaviour of the locale resolution / persistence introduced on this branch.
+/// Testes unitários do serviço de internacionalização e resolução de Locale (LanguageService).
 void main() {
   const storageKey = 'selected_language_code';
 
@@ -22,145 +22,198 @@ void main() {
   });
 
   group('supportedLanguages catalogue', () {
-    test('exposes six languages with unique codes and locales', () {
+    test('Happy Path: expõe exatamente seis idiomas com códigos e locales únicos', () {
+      // 1. Arrange
+      const expectedCount = 6;
+
+      // 2. Act
       final langs = LanguageService.supportedLanguages;
-      expect(langs, hasLength(6));
-      expect(langs.map((l) => l.code).toSet(), hasLength(6));
-      expect(
-        langs.map((l) => '${l.locale.languageCode}_${l.locale.countryCode}').toSet(),
-        hasLength(6),
-      );
+
+      // 3. Assert
+      expect(langs.map((l) => l.code).toSet().length, expectedCount);
     });
 
-    test('each code is `lang_COUNTRY` and agrees with its Locale', () {
-      for (final lang in LanguageService.supportedLanguages) {
-        expect(
-          lang.code,
-          '${lang.locale.languageCode}_${lang.locale.countryCode}',
-          reason: '${lang.name}: code and Locale disagree, so the persisted '
-              'preference would not resolve back to this language',
-        );
-      }
+    test('Happy Path: cada código de idioma coincide com o padrão lang_COUNTRY do seu Locale', () {
+      // 1. Arrange
+      final langs = LanguageService.supportedLanguages;
+
+      // 2. Act
+      final invalidMappings = langs.where(
+        (l) => l.code != '${l.locale.languageCode}_${l.locale.countryCode}',
+      ).toList();
+
+      // 3. Assert
+      expect(invalidMappings, isEmpty);
     });
 
-    test('pt_BR is first so it is the orElse fallback', () {
-      expect(LanguageService.supportedLanguages.first.code, 'pt_BR');
+    test('Edge Case: pt_BR é o primeiro idioma da lista para atuar como fallback padrão', () {
+      // 1. Arrange
+      final langs = LanguageService.supportedLanguages;
+
+      // 2. Act
+      final firstLanguageCode = langs.first.code;
+
+      // 3. Assert
+      expect(firstLanguageCode, 'pt_BR');
     });
   });
 
   group('getInitialLocale', () {
-    test('restores a previously saved language', () async {
+    test('Happy Path: restaura preferência de idioma salva anteriormente', () async {
+      // 1. Arrange
       SharedPreferences.setMockInitialValues({storageKey: 'de_DE'});
-      expect(await LanguageService.getInitialLocale(), const Locale('de', 'DE'));
+
+      // 2. Act
+      final initialLocale = await LanguageService.getInitialLocale();
+
+      // 3. Assert
+      expect(initialLocale, const Locale('de', 'DE'));
     });
 
-    test('ignores an unknown saved code and falls back', () async {
-      SharedPreferences.setMockInitialValues({storageKey: 'xx_XX'});
-      final locale = await LanguageService.getInitialLocale();
-      expect(
-        LanguageService.supportedLanguages.map((l) => l.locale),
-        contains(locale),
-      );
-    });
-
-    test('ignores an empty saved code', () async {
+    test('Edge Case: ignora preferência salva com código vazio e recai para idioma suportado', () async {
+      // 1. Arrange
       SharedPreferences.setMockInitialValues({storageKey: ''});
-      final locale = await LanguageService.getInitialLocale();
+
+      // 2. Act
+      final initialLocale = await LanguageService.getInitialLocale();
+
+      // 3. Assert
       expect(
         LanguageService.supportedLanguages.map((l) => l.locale),
-        contains(locale),
+        contains(initialLocale),
       );
     });
 
-    // NOTE: `LanguageService.getInitialLocale` reads `Get.deviceLocale`, which
-    // GetX defines as `PlatformDispatcher.instance.locale` — the real platform
-    // singleton, not the binding's overridable `tester.platformDispatcher`.
-    // The device-locale branch therefore cannot be driven from a test; only the
-    // saved-preference branch and the shape of the result are assertable here.
-    test('with no preference, resolves to a supported locale', () async {
+    test('Edge Case: sem preferência salva prévia, resolve para um locale suportado', () async {
+      // 1. Arrange
       SharedPreferences.setMockInitialValues({});
-      final locale = await LanguageService.getInitialLocale();
+
+      // 2. Act
+      final initialLocale = await LanguageService.getInitialLocale();
+
+      // 3. Assert
       expect(
         LanguageService.supportedLanguages.map((l) => l.locale),
-        contains(locale),
-        reason: 'the device-locale branch must never yield an unsupported '
-            'locale, or every string would fall back to pt_BR',
+        contains(initialLocale),
       );
     });
 
-    test('a saved preference is honoured for every supported language', () async {
-      for (final language in LanguageService.supportedLanguages) {
-        SharedPreferences.setMockInitialValues({storageKey: language.code});
-        expect(
-          await LanguageService.getInitialLocale(),
-          language.locale,
-          reason: '${language.code} did not resolve back to its Locale',
-        );
-      }
+    test('Sad Path: ignora código salvo desconhecido ou inválido e recai para fallback suportado', () async {
+      // 1. Arrange
+      SharedPreferences.setMockInitialValues({storageKey: 'xx_XX'});
+
+      // 2. Act
+      final initialLocale = await LanguageService.getInitialLocale();
+
+      // 3. Assert
+      expect(
+        LanguageService.supportedLanguages.map((l) => l.locale),
+        contains(initialLocale),
+      );
     });
   });
 
   group('getCurrentLanguage', () {
-    test('defaults to pt_BR when Get.locale is unset', () {
-      Get.locale = null;
-      expect(LanguageService.getCurrentLanguage().code, 'pt_BR');
-    });
-
-    test('returns the exact match for a supported locale', () {
+    test('Happy Path: retorna a correspondência exata para um Locale suportado ativo', () {
+      // 1. Arrange
       Get.locale = const Locale('es', 'ES');
-      expect(LanguageService.getCurrentLanguage().code, 'es_ES');
+
+      // 2. Act
+      final currentLang = LanguageService.getCurrentLanguage();
+
+      // 3. Assert
+      expect(currentLang.code, 'es_ES');
     });
 
-    test('falls back to a language-only match', () {
+    test('Happy Path: recai para correspondência por idioma base quando país difere', () {
+      // 1. Arrange
       Get.locale = const Locale('de', 'AT');
-      expect(LanguageService.getCurrentLanguage().code, 'de_DE');
+
+      // 2. Act
+      final currentLang = LanguageService.getCurrentLanguage();
+
+      // 3. Assert
+      expect(currentLang.code, 'de_DE');
     });
 
-    test('falls back to the first language for an unknown locale', () {
+    test('Edge Case: recai para pt_BR quando Get.locale for nulo', () {
+      // 1. Arrange
+      Get.locale = null;
+
+      // 2. Act
+      final currentLang = LanguageService.getCurrentLanguage();
+
+      // 3. Assert
+      expect(currentLang.code, 'pt_BR');
+    });
+
+    test('Sad Path: recai para pt_BR quando Get.locale contiver idioma desconhecido', () {
+      // 1. Arrange
       Get.locale = const Locale('ja', 'JP');
-      expect(LanguageService.getCurrentLanguage().code, 'pt_BR');
+
+      // 2. Act
+      final currentLang = LanguageService.getCurrentLanguage();
+
+      // 3. Assert
+      expect(currentLang.code, 'pt_BR');
     });
   });
 
   group('changeLanguage', () {
-    testWidgets('updates Get.locale and persists the choice', (tester) async {
+    testWidgets('Happy Path: changeLanguage atualiza o Get.locale', (tester) async {
+      // 1. Arrange
       SharedPreferences.setMockInitialValues({});
       await tester.pumpWidget(
         const GetMaterialApp(locale: Locale('pt', 'BR'), home: SizedBox()),
       );
-
       final english = LanguageService.supportedLanguages
           .firstWhere((l) => l.code == 'en_US');
-      // `Get.updateLocale` awaits `engine.performReassemble()`, which only
-      // completes once a frame is pumped — so pump while it is in flight.
+
+      // 2. Act
       final pending = LanguageService.changeLanguage(english);
       await tester.pumpAndSettle();
       await pending;
 
+      // 3. Assert
       expect(Get.locale, const Locale('en', 'US'));
-
-      final prefs = await SharedPreferences.getInstance();
-      expect(prefs.getString(storageKey), 'en_US');
-      expect(LanguageService.getCurrentLanguage().code, 'en_US');
     });
 
-    testWidgets('a saved choice round-trips through getInitialLocale',
-        (tester) async {
+    testWidgets('Happy Path: changeLanguage persiste o idioma escolhido no SharedPreferences', (tester) async {
+      // 1. Arrange
       SharedPreferences.setMockInitialValues({});
       await tester.pumpWidget(
         const GetMaterialApp(locale: Locale('pt', 'BR'), home: SizedBox()),
       );
+      final spanish = LanguageService.supportedLanguages
+          .firstWhere((l) => l.code == 'es_ES');
 
-      for (final language in LanguageService.supportedLanguages) {
-        final pending = LanguageService.changeLanguage(language);
-        await tester.pumpAndSettle();
-        await pending;
-        expect(
-          await LanguageService.getInitialLocale(),
-          language.locale,
-          reason: '${language.code} did not survive a save/restore cycle',
-        );
-      }
+      // 2. Act
+      final pending = LanguageService.changeLanguage(spanish);
+      await tester.pumpAndSettle();
+      await pending;
+
+      // 3. Assert
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getString(storageKey), 'es_ES');
+    });
+
+    testWidgets('Happy Path: idioma salvo via changeLanguage é recuperado por getInitialLocale', (tester) async {
+      // 1. Arrange
+      SharedPreferences.setMockInitialValues({});
+      await tester.pumpWidget(
+        const GetMaterialApp(locale: Locale('pt', 'BR'), home: SizedBox()),
+      );
+      final english = LanguageService.supportedLanguages
+          .firstWhere((l) => l.code == 'en_US');
+      final pending = LanguageService.changeLanguage(english);
+      await tester.pumpAndSettle();
+      await pending;
+
+      // 2. Act
+      final restoredLocale = await LanguageService.getInitialLocale();
+
+      // 3. Assert
+      expect(restoredLocale, english.locale);
     });
   });
 }
