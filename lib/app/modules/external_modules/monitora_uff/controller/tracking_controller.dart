@@ -1,10 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart'
-  show
-    Colors,
-    WidgetsBindingObserver;
-import 'package:flutter/services.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -17,6 +13,7 @@ import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controll
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/user_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/data/provider/firebase_provider.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/animated_user_marker.dart';
+import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/google_group_model.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/location_point.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_model.dart';
 import 'package:uffmobileplus/app/data/services/foreground_service.dart';
@@ -80,6 +77,7 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
 
   StreamSubscription? _readySubscription;
   StreamSubscription? _locationSubscription;
+  StreamSubscription<List<UserModel>>? _groupUsersSubscription;
 
   /// Timer para debounce do listener de highlightedObservedUsers.
   Timer? _highlightedUsersDebounce;
@@ -280,16 +278,40 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
     }
   }
 
+  void _subscribeToGroupUsers(String groupEmail) {
+    _groupUsersSubscription?.cancel();
+    _groupUsersSubscription = FirebaseProvider()
+        .streamUsersByGroup(groupEmail)
+        .listen(
+      (users) {
+        firebaseUsers.value = users;
+      },
+      onError: (e) {
+        debugPrint('[TrackingController] Erro no stream do grupo $groupEmail: $e');
+      },
+    );
+  }
+
   @override
   Future<void> onInit() async {
-    // Getx irá automaticamente atualizar 'firebaseUsers' sempre que os
-    // documentos forem atualizados na nuvem
-
     super.onInit();
     mapController = MapController();
 
-    // Vincula o stream do Firebase aos usuários rastreados
-    firebaseUsers.bindStream(FirebaseProvider().getAllUsers());
+    // Vincula o stream do Firebase aos usuários do grupo observado
+    ever(Get.find<HarpiaGoogleGroupsController>().selectedGroup, (selectedGroup) {
+      if (selectedGroup != null) {
+        _subscribeToGroupUsers(selectedGroup.email);
+      } else {
+        _groupUsersSubscription?.cancel();
+        _groupUsersSubscription = null;
+        firebaseUsers.clear();
+      }
+    });
+
+    final initialGroup = Get.find<HarpiaGoogleGroupsController>().selectedGroup.value;
+    if (initialGroup != null) {
+      _subscribeToGroupUsers(initialGroup.email);
+    }
     
     // Escuta mudanças na lista de usuários para atualizar as animações
     ever(firebaseUsers, _onFirebaseUsersUpdated);
@@ -492,20 +514,96 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
     }
 
     await _setPlatformSpecifics();
+    await _readySubscription?.cancel();
+    await _locationSubscription?.cancel();
+
+    // Determinar o grupo ativo para esta jornada
+    final googleGroupsCtrl = Get.find<HarpiaGoogleGroupsController>();
+    final observableGroups = await googleGroupsCtrl.getObservableGroupsForUser();
+
+    String? activeGroupEmail;
+    if (observableGroups.isEmpty) {
+      Get.snackbar(
+        'Nenhum grupo disponível',
+        'Você precisa ser membro ou gestor de pelo menos um grupo operacional para iniciar o rastreamento.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.shade100,
+        duration: const Duration(seconds: 5),
+      );
+      return;
+    } else if (observableGroups.length == 1) {
+      activeGroupEmail = observableGroups.first.email;
+    } else {
+      final currentSelected = googleGroupsCtrl.selectedGroup.value;
+      if (currentSelected != null &&
+          observableGroups.any((g) => g.email == currentSelected.email)) {
+        activeGroupEmail = currentSelected.email;
+      } else {
+        final selected = await Get.bottomSheet<GoogleGroupModel>(
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Iniciar Rastreamento de Jornada',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Selecione o grupo operacional em que você atuará neste turno:',
+                  style: TextStyle(fontSize: 14, color: Colors.black54),
+                ),
+                const SizedBox(height: 16),
+                Flexible(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: observableGroups.length,
+                    itemBuilder: (context, index) {
+                      final g = observableGroups[index];
+                      return ListTile(
+                        leading: const Icon(Icons.group, color: Colors.indigo),
+                        title: Text(g.name, style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.black87)),
+                        subtitle: Text(g.email, style: const TextStyle(color: Colors.black54)),
+                        onTap: () => Get.back(result: g),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          isDismissible: true,
+        );
+
+        if (selected == null) {
+          debugPrint('[TrackingController] Usuário cancelou a seleção do grupo.');
+          return;
+        }
+        activeGroupEmail = selected.email;
+      }
+    }
+
     await _service.startService();
 
     // Este listener ouve o serviço em foreground avisar que está pronto para
     // receber informações do usuário.
-    _service.on('ready').listen((event) async {
+    _readySubscription = _service.on('ready').listen((event) async {
       _service.invoke("setUserInfo", {
         "email": userCtrl.user!.email,
         "name": userCtrl.getUserName(),
+        "grupoAtivo": activeGroupEmail,
       });
     });
 
     // Este listener ouve atualizações da posição por parte do serviço em
     // foreground.
-    _service.on('updateLocationLocally').listen((event) {
+    _locationSubscription = _service.on('updateLocationLocally').listen((event) {
       if (event != null) {
         position = Position.fromMap(event['position']);
       }
@@ -513,9 +611,13 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
 
     // Atualiza UI (botão).
     isTrackingEnabled.value = true;
-    // Informa Firebase que sua posição pode ser visualizada no mapa.
+    // Informa Firebase que sua posição pode ser visualizada no mapa associada ao grupo ativo.
     try {
-      await FirebaseProvider().updateIsTracked(userCtrl.user!.email, true);
+      await FirebaseProvider().updateIsTracked(
+        userCtrl.user!.email,
+        true,
+        grupoAtivo: activeGroupEmail,
+      );
     } catch (e) {
       debugPrint('[TrackingController] Erro ao atualizar isTracked: $e');
       Get.snackbar(
@@ -547,6 +649,7 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
   @override
   void onClose() {
     _compassSubscription?.cancel();
+    _groupUsersSubscription?.cancel();
     _readySubscription?.cancel();
     _locationSubscription?.cancel();
     _markerAnimationTimer?.cancel();

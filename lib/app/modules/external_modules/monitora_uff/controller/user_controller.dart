@@ -13,7 +13,6 @@ class UserController extends GetxController {
 
   String? _googleName;
 
-  final allFirebaseUsers = <UserModel>[].obs;
   final isLoading = true.obs;
 
   @override
@@ -21,11 +20,6 @@ class UserController extends GetxController {
     super.onInit();
     await HarpiaClaimsService.ensureClaims();
     await loadCurrentUser();
-    try {
-      allFirebaseUsers.bindStream(FirebaseProvider().streamAllUsers());
-    } catch (e) {
-      debugPrint('[UserController] Erro ao conectar stream de usuários: $e');
-    }
   }
 
   Future<void> loadCurrentUser() async {

@@ -17,10 +17,27 @@ class HarpiaGoogleGroupsController extends GetxController {
   RxString get loadError => _loadError;
 
   RxString observedGroup = RxString('nenhum_grupo_selecionado'.tr);
+  final Rxn<GoogleGroupModel> selectedGroup = Rxn<GoogleGroupModel>();
   RxList<GoogleGroupMember> observedMembers = RxList();
     
   final _highlightedObservedUsers = <GoogleGroupMember>[].obs;
   RxList<GoogleGroupMember> get highlightedObservedUsers => _highlightedObservedUsers;
+
+  /// Retorna a lista de grupos onde o usuário logado é observável
+  /// (ou seja, possui papel de MEMBER ou MANAGER nos claims).
+  Future<List<GoogleGroupModel>> getObservableGroupsForUser() async {
+    final claims = await HarpiaClaimsService.readClaims();
+    if (claims == null || claims.isEmpty) return [];
+
+    final allowedEmails = claims.entries
+        .where((e) => e.value == 'MEMBER' || e.value == 'MANAGER')
+        .map((e) => e.key.toLowerCase().trim())
+        .toSet();
+
+    return _observableGoogleGroups
+        .where((g) => allowedEmails.contains(g.email.toLowerCase().trim()))
+        .toList();
+  }
 
   /// Email do grupo raiz que contém os subgrupos do Harpia.
   /// Em debug, usa um grupo de teste; em release, o grupo de produção.
@@ -104,8 +121,9 @@ class HarpiaGoogleGroupsController extends GetxController {
         }
       }
 
-      //_observableGoogleGroups.assignAll(finalGroups);
-      //debugPrint("Usuário é membro de ${finalGroups.length} subgrupo(s).");
+      if (_observableGoogleGroups.isNotEmpty && selectedGroup.value == null) {
+        await updateObservedUsers(_observableGoogleGroups.first, forceRefresh: forceRefresh);
+      }
     } catch(e, stack) {
       debugPrint('$e\n$stack');
       _loadError.value = '$e';
@@ -143,6 +161,7 @@ class HarpiaGoogleGroupsController extends GetxController {
   /// Busca os participantes do grupo via API e filtra apenas usuários (type == USER).
   Future<void> updateObservedUsers(GoogleGroupModel selectedGroup, {bool forceRefresh = false}) async {
     observedGroup.value = selectedGroup.name;
+    this.selectedGroup.value = selectedGroup;
 
     try {
       final user = _auth.currentUser;
@@ -193,6 +212,7 @@ class HarpiaGoogleGroupsController extends GetxController {
       } catch (e) {
         // Group not found anymore
         observedGroup.value = 'nenhum_grupo_selecionado'.tr;
+        selectedGroup.value = null;
         observedMembers.clear();
       }
     }
