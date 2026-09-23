@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:uffmobileplus/app/config/secrets.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 
 class UmmService {
   Future<bool> getStatus() async {
@@ -29,5 +31,25 @@ class UmmService {
       debugPrint("Erro desconhecido ao checar status: $e");
       return false;
     }
+  }
+
+   Future<List<GdiGroups>> getGdiGroups(String iduff, String token) async {
+    final path = '${Secrets.gdiGroupsPath}/$iduff${Secrets.gdiGroupsQuery}';
+    var uri = Uri.https(Secrets.gdiGroupsHost, path);
+    try {
+      final response = await http.get(
+        uri,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> jsonResponse = jsonDecode(response.body);
+        return jsonResponse.map((group) => GdiGroups.fromJson(group)).toList();
+      }
+    } catch (e) {
+      debugPrint("Erro ao buscar grupos GDI: $e");
+      return [];
+    }
+    return [];
   }
 }

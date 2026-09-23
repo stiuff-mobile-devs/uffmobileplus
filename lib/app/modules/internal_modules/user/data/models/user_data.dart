@@ -1,5 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
+
 part 'user_data.g.dart';
 
 @HiveType(typeId: 18)
@@ -55,6 +56,12 @@ class UserData extends HiveObject {
   @HiveField(16)
   String? lastRegisteredTokenCdcMethod;
 
+  @HiveField(17)
+  UserGoogleModel? userGoogleModel;
+
+  @HiveField(18)
+  UserIduffModel? userIduffModel;
+
   UserData({
     this.name,
     this.nomesocial,
@@ -73,49 +80,22 @@ class UserData extends HiveObject {
     this.gdiGroupsGoogle,
     this.lastRegisteredTokenCdcUpdate,
     this.lastRegisteredTokenCdcMethod,
+    this.userGoogleModel,
+    this.userIduffModel,
   });
 
-  UserData copyWith({
-    String? name,
-    String? nomesocial,
-    String? matricula,
-    String? iduff,
-    String? curso,
-    String? fotoUrl,  
-  String? dataValidadeMatricula,
-    String? bond,
-    String? textoQrCodeCarteirinha,
-    String? accessToken,
-    String? bondId,
-    List<GdiGroups>? gdiGroups,
-    ProfileTypes? profileType,
-    List<String>? shortcutRoutes,
-    GdiGroupsGoogle? gdiGroupsGoogle,
-    DateTime? lastRegisteredTokenCdcUpdate,
-    String? lastRegisteredTokenCdcMethod,
-  }) {
-    return UserData(
-     name: name ?? this.name,
-     nomesocial: nomesocial ?? this.nomesocial,
-     matricula: matricula ?? this.matricula,
-     iduff: iduff ?? this.iduff,
-     curso: curso ?? this.curso,
-     fotoUrl: fotoUrl ?? this.fotoUrl,
-     dataValidadeMatricula: dataValidadeMatricula ?? this.dataValidadeMatricula,
-     bond: bond ?? this.bond,
-     textoQrCodeCarteirinha: textoQrCodeCarteirinha ?? this.textoQrCodeCarteirinha,
-     accessToken: accessToken ?? this.accessToken,
-     bondId: bondId ?? this.bondId,
-     gdiGroups: gdiGroups ?? this.gdiGroups,
-     profileType: profileType ?? this.profileType,
-     shortcutRoutes: shortcutRoutes ?? this.shortcutRoutes,
-     gdiGroupsGoogle: gdiGroupsGoogle ?? this.gdiGroupsGoogle,
-     lastRegisteredTokenCdcUpdate: lastRegisteredTokenCdcUpdate ?? this.lastRegisteredTokenCdcUpdate,
-     lastRegisteredTokenCdcMethod: lastRegisteredTokenCdcMethod ?? this.lastRegisteredTokenCdcMethod,
-    );
-  }
-
   factory UserData.fromJson(Map<String, dynamic> json) {
+    ProfileTypes? parseProfileType(String? typeStr) {
+      if (typeStr == null) return null;
+      try {
+        return ProfileTypes.values.firstWhere(
+          (e) => e.name == typeStr || e.toString() == 'ProfileTypes.$typeStr',
+        );
+      } catch (_) {
+        return null;
+      }
+    }
+
     return UserData(
       name: json['name'] as String?,
       nomesocial: json['nomesocial'] as String?,
@@ -129,25 +109,24 @@ class UserData extends HiveObject {
       accessToken: json['accessToken'] as String?,
       bondId: json['bondId'] as String?,
       gdiGroups: json['gdiGroups'] != null
-          ? (json['gdiGroups'] as List)
-                .map((group) => GdiGroups.fromJson(group))
-                .toList()
+          ? List<GdiGroups>.from((json['gdiGroups'] as List).map((x) => GdiGroups.fromJson(x)))
           : null,
-      profileType: json['profileType'] != null
-          ? ProfileTypes.values.firstWhere(
-              (e) => e.toString() == 'ProfileTypes.${json['profileType']}',
-            )
-          : null,
+      profileType: parseProfileType(json['profileType'] as String?),
       shortcutRoutes: json['shortcutRoutes'] != null
           ? List<String>.from(json['shortcutRoutes'] as List)
           : null,
       gdiGroupsGoogle: json['gdiGroupsGoogle'] != null
-          ? GdiGroupsGoogle.fromJson(json['gdiGroupsGoogle'])
+          ? GdiGroupsGoogle.fromJson(Map<String, dynamic>.from(json['gdiGroupsGoogle']))
           : null,
-      lastRegisteredTokenCdcUpdate: json['lastRegisteredTokenCdcUpdate'] != null
-          ? DateTime.parse(json['lastRegisteredTokenCdcUpdate'])
-          : null,
+          
+      lastRegisteredTokenCdcUpdate: json['lastRegisteredTokenCdcUpdate'] != null ? _parseCreatedAtDateTime(json['lastRegisteredTokenCdcUpdate']) : null,
       lastRegisteredTokenCdcMethod: json['lastRegisteredTokenCdcMethod'] as String?,
+      userGoogleModel: json['userGoogleModel'] != null 
+          ? UserGoogleModel.fromJson(Map<String, dynamic>.from(json['userGoogleModel'])) 
+          : null,
+      userIduffModel: json['userIduffModel'] != null 
+          ? UserIduffModel.fromJson(Map<String, dynamic>.from(json['userIduffModel'])) 
+          : null,
     );
   }
 
@@ -164,28 +143,33 @@ class UserData extends HiveObject {
       'textoQrCodeCarteirinha': textoQrCodeCarteirinha,
       'accessToken': accessToken,
       'bondId': bondId,
-      'gdiGroups': gdiGroups
-          ?.map((group) => {'gid': group.gid, 'descricao': group.description})
-          .toList(),
-      'profileType': profileType?.toString().split('.').last,
+      'gdiGroups': gdiGroups?.map((group) => group.toJson()).toList(),
+      'profileType': profileType?.name,
       'shortcutRoutes': shortcutRoutes,
       'gdiGroupsGoogle': gdiGroupsGoogle?.toJson(),
-      'lastRegisteredTokenCdcUpdate':
-          lastRegisteredTokenCdcUpdate?.toIso8601String(),
+      'lastRegisteredTokenCdcUpdate': lastRegisteredTokenCdcUpdate,
       'lastRegisteredTokenCdcMethod': lastRegisteredTokenCdcMethod,
+      'userGoogleModel': userGoogleModel?.toJson(),
+      'userIduffModel': userIduffModel?.toJson(),
     };
   }
 
-  @override
-  String toString() {
-    return 'UserData(name: $name, nomesocial: $nomesocial, matricula: $matricula, iduff: $iduff, curso: $curso, dataValidadeMatricula: $dataValidadeMatricula, bond: $bond, textoQrCodeCarteirinha: $textoQrCodeCarteirinha,  bondId: $bondId, gdiGroups: $gdiGroups, gdiGroupsGoogle: $gdiGroupsGoogle, lastRegisteredTokenCdcUpdate: $lastRegisteredTokenCdcUpdate, lastRegisteredTokenCdcMethod: $lastRegisteredTokenCdcMethod)';
+  static DateTime? _parseCreatedAtDateTime(dynamic dataFromFirebase) {
+    if (dataFromFirebase.runtimeType.toString() == 'Timestamp') {
+      return dataFromFirebase.toDate();
+    } else if (dataFromFirebase is String) {
+      return DateTime.tryParse(dataFromFirebase);
+    } else if (dataFromFirebase is DateTime) {
+      return dataFromFirebase;
+    }
+    return null;
   }
 }
 
 @HiveType(typeId: 31)
 class GdiGroups {
   @HiveField(0)
-  String? gid; //Id do grupo
+  String? gid;
   @HiveField(1)
   String? description;
   @HiveField(2)
@@ -195,23 +179,28 @@ class GdiGroups {
   @HiveField(4)
   String? directMembersCount;
 
+  // Construtor posicional (sem as chaves {})
   GdiGroups(this.gid, this.description, this.name, this.email, this.directMembersCount);
 
-  GdiGroups.fromJson(Map<String, dynamic> json) {
-    gid = json['gid'] ?? json['id'];
-    description = json['descricao'];
-    name = json['name'];
-    email = json['email'];
-    directMembersCount = json['directMembersCount'];
-  }
-
-  @override
-  String toString() {
-    return "Group(gid: $gid, descicao: $description)";
+  factory GdiGroups.fromJson(Map<String, dynamic> json) {
+    // Retornando os valores na ordem exata, sem nomear os parâmetros
+    return GdiGroups(
+      json['gid']?.toString() ?? json['id']?.toString(),
+      json['descricao']?.toString(),                   
+      json['name']?.toString(),                          
+      json['email']?.toString(),                        
+      json['directMembersCount']?.toString(),            
+    );
   }
 
   Map<String, dynamic> toJson() {
-    return {'gid': gid, 'descricao': description, 'name': name, 'email': email, 'directMembersCount': directMembersCount};
+    return {
+      'gid': gid,
+      'descricao': description,
+      'name': name,
+      'email': email,
+      'directMembersCount': directMembersCount
+    };
   }
 }
 
@@ -219,29 +208,205 @@ class GdiGroups {
 class GdiGroupsGoogle {
   @HiveField(0)
   DateTime? lastUpdate;
+  
   @HiveField(1)
   List<GdiGroups>? gdiGroups;
 
+  // 1. Construtor posicional sem as chaves {}
   GdiGroupsGoogle(this.lastUpdate, this.gdiGroups);
 
-  GdiGroupsGoogle.fromJson(Map<String, dynamic> json) {
-    lastUpdate = json['lastUpdate'] != null
-        ? DateTime.parse(json['lastUpdate'])
-        : null;
-    gdiGroups = json['gdiGroups'] != null
-        ? (json['gdiGroups'] as List)
-              .map((group) => GdiGroups.fromJson(group))
-              .toList()
-        : null;
+  factory GdiGroupsGoogle.fromJson(Map<String, dynamic> json) {
+    return GdiGroupsGoogle(
+      // 2. Passando os argumentos na ordem exata do construtor, sem nomeá-los
+      json['lastUpdate'] != null ? _parseCreatedAtDateTime(json['lastUpdate']) : null,
+      json['gdiGroups'] != null
+          ? List<GdiGroups>.from((json['gdiGroups'] as List).map((x) => GdiGroups.fromJson(x)))
+          : null,
+    );
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
+    return {
+      'lastUpdate': lastUpdate?.toIso8601String(),
+      'gdiGroups': gdiGroups?.map((group) => group.toJson()).toList(),
+    };
+  }
 
-    data['lastUpdate'] = lastUpdate?.toIso8601String();
+  static DateTime? _parseCreatedAtDateTime(dynamic dataFromFirebase) {
+    if (dataFromFirebase.runtimeType.toString() == 'Timestamp') {
+      return dataFromFirebase.toDate();
+    } else if (dataFromFirebase is String) {
+      return DateTime.tryParse(dataFromFirebase);
+    } else if (dataFromFirebase is DateTime) {
+      return dataFromFirebase;
+    }
+    return null;
+  }
+}
 
-    data['gdiGroups'] = gdiGroups?.map((group) => group.toJson()).toList();
+@HiveType(typeId: 17)
+class UserGoogleModel extends HiveObject {
+  @HiveField(0)
+  String? id;
 
-    return data;
+  @HiveField(1)
+  String? name;
+
+  @HiveField(2)
+  String? email;
+
+  @HiveField(3)
+  String? urlImage;
+
+  @HiveField(4)
+  DateTime? createdAt;
+
+  UserGoogleModel({
+    this.id,
+    this.name,
+    this.email,
+    this.urlImage,
+    this.createdAt,
+  });
+
+  factory UserGoogleModel.fromJson(Map<String, dynamic> json) {
+    return UserGoogleModel(
+      id: json['id']?.toString(),
+      name: json['name']?.toString(),
+      email: json['email']?.toString(),
+      urlImage: json['urlImage']?.toString(),
+      createdAt: json['createdAt'] != null ? _parseCreatedAtDateTime(json['createdAt']) : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'email': email,
+      'urlImage': urlImage,
+      'createdAt': createdAt,
+    };
+  }
+
+  static DateTime? _parseCreatedAtDateTime(dynamic dataFromFirebase) {
+    if (dataFromFirebase.runtimeType.toString() == 'Timestamp') {
+      return dataFromFirebase.toDate();
+    } else if (dataFromFirebase is String) {
+      return DateTime.tryParse(dataFromFirebase);
+    } else if (dataFromFirebase is DateTime) {
+      return dataFromFirebase;
+    }
+    return null;
+  }
+}
+
+@HiveType(typeId: 0)
+class UserIduffModel extends HiveObject {
+  @HiveField(0)
+  String? iduff;
+
+  @HiveField(1)
+  String? fullName;
+
+  @HiveField(2)
+  String? email;
+
+  @HiveField(3)
+  String? photoUrl;
+
+  @HiveField(4)
+  String? registration;
+
+  @HiveField(5)
+  String? vinculacao;
+
+  @HiveField(6)
+  AuthIduffModel? authData;
+
+  UserIduffModel({
+    this.iduff,
+    this.fullName,
+    this.email,
+    this.photoUrl,
+    this.registration,
+    this.vinculacao,
+    this.authData,
+  });
+
+  factory UserIduffModel.fromJson(Map<String, dynamic> json) {
+    return UserIduffModel(
+      iduff: json['iduff']?.toString(),
+      fullName: json['fullName']?.toString(),
+      email: json['email']?.toString(),
+      photoUrl: json['photoUrl']?.toString(),
+      registration: json['registration']?.toString(),
+      vinculacao: json['vinculacao']?.toString(),
+      authData: json['authData'] != null ? AuthIduffModel.fromMap(Map<String, dynamic>.from(json['authData'])) : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'iduff': iduff,
+      'fullName': fullName,
+      'email': email,
+      'photoUrl': photoUrl,
+      'registration': registration,
+      'vinculacao': vinculacao,
+      'authData': authData?.toMap(),
+    };
+  }
+}
+
+@HiveType(typeId: 1)
+class AuthIduffModel extends HiveObject {
+  @HiveField(0)
+  final String? accessToken;
+
+  @HiveField(1)
+  final String? refreshToken;
+
+  @HiveField(2)
+  final int? accessTokenExpiration;
+
+  @HiveField(3)
+  final String? codeVerifier;
+
+  @HiveField(4)
+  final String? authorizationCode;
+
+  @HiveField(5)
+  final bool? isLogged;
+
+  AuthIduffModel({
+    this.accessToken,
+    this.refreshToken,
+    this.accessTokenExpiration = 0,
+    this.codeVerifier,
+    this.authorizationCode,
+    this.isLogged = false,
+  });
+
+  factory AuthIduffModel.fromMap(Map<String, dynamic> map) {
+    return AuthIduffModel(
+      accessToken: map['accessToken']?.toString(),
+      refreshToken: map['refreshToken']?.toString(),
+      accessTokenExpiration: int.tryParse(map['accessTokenExpiration']?.toString() ?? '0') ?? 0,
+      codeVerifier: map['codeVerifier']?.toString(),
+      authorizationCode: map['authorizationCode']?.toString(),
+      isLogged: map['isLogged'] == true || map['isLogged'] == 'true',
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'accessToken': accessToken,
+      'refreshToken': refreshToken,
+      'accessTokenExpiration': accessTokenExpiration,
+      'codeVerifier': codeVerifier,
+      'authorizationCode': authorizationCode,
+      'isLogged': isLogged,
+    };
   }
 }

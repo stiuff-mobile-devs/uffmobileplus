@@ -5,9 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/services/auth_google_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_google_model.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_google_repository.dart';
 import 'package:uffmobileplus/app/data/services/harpia_claims_service.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 
@@ -15,7 +13,6 @@ class AuthGoogleController extends GetxController {
   AuthGoogleController();
 
   late final AuthGoogleService _authGoogle = AuthGoogleService();
-  late final UserGoogleRepository _userRepository = UserGoogleRepository();
   late final UserDataRepository _userDataRepository = UserDataRepository();
 
   @override
@@ -29,15 +26,15 @@ class AuthGoogleController extends GetxController {
 
       if (user != null) {
         String? token = await _authGoogle.getFirebaseIdToken();
-        await _userRepository.saveUserGoogleModel(user);
+        await _userDataRepository.saveUserGoogleModel(user);
         await _registerTokenCdc();
-        await getGdiGroupsGoogle(token ?? '', user.email, false);
+        await getGdiGroupsGoogle(token ?? '', user.email ?? "", false);
         
         // Sincronizar Custom Claims do Harpia
         HarpiaClaimsService.syncClaims();
 
         // Chama a função auxiliar passando o e-mail
-        _verifyEmailAndNavigate(user.email);
+        _verifyEmailAndNavigate(user.email ?? "");
 
       } else {
         Get.snackbar(
@@ -87,7 +84,7 @@ class AuthGoogleController extends GetxController {
     if (hasLogged != null) {
       await _registerTokenCdc();
       String? token = await _authGoogle.getFirebaseIdToken();
-      await getGdiGroupsGoogle(token ?? '', hasLogged.email, false);
+      await getGdiGroupsGoogle(token ?? '', hasLogged.email ?? "", false);
       HarpiaClaimsService.syncClaims();
       Get.offNamed(Routes.HOME);
     } else {
@@ -97,7 +94,7 @@ class AuthGoogleController extends GetxController {
 
   Future<void> logout() async {
     await _authGoogle.logoutGoogle();
-    await _userRepository.deleteUserGoogleModel();
+    await _userDataRepository.deleteUserGoogleModel();
     Get.offAllNamed(Routes.LOGIN);
   }
 
@@ -119,7 +116,7 @@ class AuthGoogleController extends GetxController {
       }
       }
       
-      GdiGroupsGoogle gdiGroups = await _userRepository.getGdiGroupsGoogle(
+      GdiGroupsGoogle gdiGroups = await _userDataRepository.getGdiGroupsGoogle(
         token,
         email,
       );
@@ -153,7 +150,7 @@ class AuthGoogleController extends GetxController {
       String? token = await _authGoogle.getFirebaseIdToken();
 
       if (token != null && tokenDevice != null) {
-        bool success = await _userRepository.registerTokenCdc(token, tokenDevice, device);
+        bool success = await _userDataRepository.registerTokenCdc(token, tokenDevice, device);
         if (success) {
           await _userDataRepository.lastRegisteredTokenCdcUpdate(
             DateTime.now(),

@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:uffmobileplus/app/config/secrets.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/utils/auth_client.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_iduff_model.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_iduff_repository.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
 import 'package:uffmobileplus/app/utils/errors_mensages.dart';
 
 enum KeycloakEnvironment { homologacao, production }
@@ -29,7 +29,7 @@ class OAuth2Info {
 class AuthIduffService {
   final FlutterAppAuth appAuth = FlutterAppAuth();
 
-  UserIduffRepository userIduffRepository = UserIduffRepository();
+  final UserDataRepository _userDataRepository = UserDataRepository();
 
   AuthenticatedClient? client;
 
@@ -76,7 +76,7 @@ class AuthIduffService {
     debugPrint("calling authorize");
 
     try {
-      String? refreshToken = await userIduffRepository.getRefreshToken();
+      String? refreshToken = await _userDataRepository.getRefreshToken();
 
       //Troca o refresh token por um novo access token quando o atual expira, sem precisar fazer login completo novamente.
 
@@ -180,7 +180,7 @@ class AuthIduffService {
   //Renova automaticamente o access token usando o refresh token salvo, mantendo o usuário logado.
   Future<bool> refreshToken() async {
     TokenResponse? tokenResponse;
-    String? refreshToken = await userIduffRepository.getRefreshToken();
+    String? refreshToken = await _userDataRepository.getRefreshToken();
 
     if (refreshToken == null) return false;
 
@@ -232,7 +232,7 @@ class AuthIduffService {
         authData: authInfo,
       );
 
-      await userIduffRepository.saveUserIduffModel(userAuth);
+      await _userDataRepository.saveUserIduffModel(userAuth);
 
       return AuthResult(true, "success");
     } catch (e) {
@@ -256,8 +256,8 @@ class AuthIduffService {
           Secrets.redirectUri,
           grantType: 'refresh_token',
           refreshToken: refreshToken,
-          authorizationCode: await userIduffRepository.getAuthorizationCode(),
-          codeVerifier: await userIduffRepository.getCodeVerifier(),
+          authorizationCode: await _userDataRepository.getAuthorizationCode(),
+          codeVerifier: await _userDataRepository.getCodeVerifier(),
           serviceConfiguration: keycloakInfo[keycloakEnv]!.authServiceConfig,
           scopes: Secrets.authScopes,
         ),
@@ -302,7 +302,7 @@ class AuthIduffService {
   Future<bool> tryLogin() async {
     TokenResponse? tokenResponse;
     try {
-      String? refreshToken = await userIduffRepository.getRefreshToken();
+      String? refreshToken = await _userDataRepository.getRefreshToken();
 
       if (refreshToken == null) return false;
 
@@ -322,7 +322,7 @@ class AuthIduffService {
     // Tenta renovar o token, se possível
     await refreshToken();
     // Busca o access token salvo no UserIduffController
-    return await userIduffRepository.getAccessToken();
+    return await _userDataRepository.getAccessToken();
   }
 }
 

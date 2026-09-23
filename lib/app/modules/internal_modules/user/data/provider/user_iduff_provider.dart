@@ -1,164 +1,96 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_iduff_model.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 
 class UserIduffProvider {
-  final String _collectionPath = "user_auth_data";
-  final String _authKey = "current_auth"; // Chave fixa
+  // Agora acessa a mesma caixa do UserData e GoogleModel
+  final String _collectionPath = "user_data"; 
+  final String _userKey = "current_user"; 
 
   UserIduffProvider() {
-    debugPrint("Started User Iduff provider");
+    debugPrint("✅ Started User Iduff provider");
+  }
+
+  /// Método privado para gerenciar a abertura da caixa principal do usuário
+  Future<Box<UserData>> _getBox() async {
+    if (Hive.isBoxOpen(_collectionPath)) {
+      return Hive.box<UserData>(_collectionPath);
+    }
+    return await Hive.openBox<UserData>(_collectionPath);
   }
 
   Future<void> saveUserIduffModel(UserIduffModel userAuth) async {
     try {
-      var box = await Hive.openBox<UserIduffModel>(_collectionPath);
-      await box.put(_authKey, userAuth);
+      final box = await _getBox();
+      UserData? userData = box.get(_userKey);
+
+      if (userData != null) {
+        userData.userIduffModel = userAuth; 
+        await userData.save(); 
+      } else {
+        // Se o usuário não existir, cria a casca principal já com o IduffModel aninhado
+        await box.put(_userKey, UserData(userIduffModel: userAuth));
+      }
     } catch (e) {
-      debugPrint("Erro ao salvar dados do usuário no Hive: $e");
-      throw Exception("Erro ao salvar dados do usuário no Hive: $e");
+      debugPrint("Erro ao salvar dados do iduff no Hive: $e");
+      throw Exception("Erro ao salvar dados do iduff no Hive: $e");
     }
   }
 
   Future<UserIduffModel?> getUserIduffModel() async {
     try {
-      var box = await Hive.openBox<UserIduffModel>(_collectionPath);
-      return box.get(_authKey);
+      final box = await _getBox();
+      UserData? userData = box.get(_userKey);
+      
+      return userData?.userIduffModel;
     } catch (e) {
-      throw Exception("Erro ao buscar dados do usuário do Hive: $e");
+      throw Exception("Erro ao buscar dados do iduff do Hive: $e");
     }
   }
 
   Future<String> deleteUserIduffModel() async {
     try {
-      var box = await Hive.openBox<UserIduffModel>(_collectionPath);
-      await box.delete(_authKey);
-      return "success";
-    } catch (e) {
-      return "Erro ao deletar dados do usuário do Hive: $e";
-    }
-  }
+      final box = await _getBox();
+      UserData? userData = box.get(_userKey);
 
-  Future<String> clearAllUserIduff() async {
-    try {
-      var box = await Hive.openBox<UserIduffModel>(_collectionPath);
-      await box.clear();
-      return "success";
+      if (userData != null) {
+        userData.userIduffModel = null;
+        await userData.save(); // Salva a alteração para remover apenas este campo
+        return "success";
+      }
+      return "Usuário não encontrado no Hive";
     } catch (e) {
-      return "Erro ao limpar dados do usuário do Hive: $e";
-    }
-  }
-
-  Future<bool> hasUserAuth() async {
-    try {
-      var box = await Hive.openBox<UserIduffModel>(_collectionPath);
-      return box.containsKey(_authKey);
-    } catch (e) {
-      debugPrint("Erro ao verificar existência de dados do usuário: $e");
-      return false;
+      return "Erro ao deletar dados do iduff do Hive: $e";
     }
   }
 
   Future<String?> getRefreshToken() async {
-    try {
-      var box = await Hive.openBox<UserIduffModel>(_collectionPath);
-      UserIduffModel? user = box.get(_authKey);
-      return user?.authData?.refreshToken;
-    } catch (e) {
-      debugPrint("Erro ao buscar refresh token: $e");
-      return null;
-    }
+    final userIduff = await getUserIduffModel();
+    return userIduff?.authData?.refreshToken;
   }
 
   Future<String?> getAuthorizationCode() async {
-    try {
-      var box = await Hive.openBox<UserIduffModel>(_collectionPath);
-      UserIduffModel? user = box.get(_authKey);
-      return user?.authData?.authorizationCode;
-    } catch (e) {
-      debugPrint("Erro ao buscar authorization code: $e");
-      return null;
-    }
+    final userIduff = await getUserIduffModel();
+    return userIduff?.authData?.authorizationCode;
   }
 
   Future<String?> getCodeVerifier() async {
-    try {
-      var box = await Hive.openBox<UserIduffModel>(_collectionPath);
-      UserIduffModel? user = box.get(_authKey);
-      return user?.authData?.codeVerifier;
-    } catch (e) {
-      debugPrint("Erro ao buscar code verifier: $e");
-      return null;
-    }
+    final userIduff = await getUserIduffModel();
+    return userIduff?.authData?.codeVerifier;
   }
 
   Future<String?> getIduff() async {
-    try {
-      var box = await Hive.openBox<UserIduffModel>(_collectionPath);
-      UserIduffModel? user = box.get(_authKey);
-      return user?.iduff;
-    } catch (e) {
-      debugPrint("Erro ao buscar iduff: $e");
-      return null;
-    }
+    final userIduff = await getUserIduffModel();
+    return userIduff?.iduff;
   }
 
   Future<String?> getAccessToken() async {
-    try {
-      var box = await Hive.openBox<UserIduffModel>(_collectionPath);
-      UserIduffModel? user = box.get(_authKey);
-      return user?.authData?.accessToken;
-    } catch (e) {
-      debugPrint("Erro ao buscar access token: $e");
-      return null;
-    }
-  }
-
-  Future<String> updateIsLogged(bool isLogged) async {
-    try {
-      var box = await Hive.openBox<UserIduffModel>(_collectionPath);
-      UserIduffModel? user = box.get(_authKey);
-
-      if (user == null || user.authData == null) {
-        return "Nenhuma informação de autenticação encontrada";
-      }
-
-      // Atualiza o campo isLogged do authData
-      user.authData = AuthIduffModel(
-        accessToken: user.authData!.accessToken,
-        refreshToken: user.authData!.refreshToken,
-        accessTokenExpiration: user.authData!.accessTokenExpiration,
-        codeVerifier: user.authData!.codeVerifier,
-        authorizationCode: user.authData!.authorizationCode,
-        isLogged: isLogged,
-      );
-
-      await box.put(_authKey, user);
-      return "success";
-    } catch (e) {
-      return "Erro ao atualizar status de login no Hive: $e";
-    }
-  }
-
-  Future<bool?> getIsLogged() async {
-    try {
-      var box = await Hive.openBox<UserIduffModel>(_collectionPath);
-      UserIduffModel? user = box.get(_authKey);
-      return user?.authData?.isLogged;
-    } catch (e) {
-      debugPrint("Erro ao buscar status de login: $e");
-      return null;
-    }
+    final userIduff = await getUserIduffModel();
+    return userIduff?.authData?.accessToken;
   }
 
   Future<String?> getPhotoUrl() async {
-    try {
-      var box = await Hive.openBox<UserIduffModel>(_collectionPath);
-      UserIduffModel? user = box.get(_authKey);
-      return user?.photoUrl;
-    } catch (e) {
-      debugPrint("Erro ao buscar photoUrl: $e");
-      return null;
-    }
+    final userIduff = await getUserIduffModel();
+    return userIduff?.photoUrl;
   }
 }

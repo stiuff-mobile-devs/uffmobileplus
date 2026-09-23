@@ -3,14 +3,12 @@ import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/s
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_umm_model.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_iduff_repository.dart';
 import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
 
 class UserDataController extends GetxController {
   UserDataController();
 
   final UserDataRepository _userDataRepository = UserDataRepository();
-  final UserIduffRepository userIduffRepository = UserIduffRepository();
   final AuthIduffService _auth = Get.find<AuthIduffService>();
 
   Future<String> saveUserData(
@@ -21,27 +19,26 @@ class UserDataController extends GetxController {
     try {
       List<dynamic>? saciData = await _userDataRepository.getSaciData(
         await _auth.getAccessToken(),
-        await userIduffRepository.getIduff(),
+        await _userDataRepository.getIduff(),
         _auth,
       );
 
       int? gradIndex = 0;
       int? posIndex = 0;
-      String name = "-";
-      String curso = "-";
-      String bond = "Sem vínculo";
-      String bondId = "-";
-      String matricula = targetMatricula;
+      String? name;
+      String? curso;
+      String? bond;
+      String? bondId;
+      String? matricula = targetMatricula;
 
-      String textoQrCode = await saciData[0] ?? '-';
+      String? textoQrCode = await saciData[0];
       String? dataValidadeMatricula = await saciData[1];
 
-      String iduff =
-          await userIduffRepository.getIduff() ??
-          userUmm.activeBond?.objects?.outerObject?[0].usuario?.iduff ??
-          "-";
+      String? iduff =
+          await _userDataRepository.getIduff() ??
+          userUmm.activeBond?.objects?.outerObject?[0].usuario?.iduff;
 
-      String fotoUrl = await userIduffRepository.getPhotoUrl() ?? "-";
+      String? fotoUrl = await _userDataRepository.getPhotoUrl();
 
       int? bondIndex = _findActiveBond(userUmm, targetMatricula);
 
@@ -51,27 +48,22 @@ class UserDataController extends GetxController {
         if (gradIndex != null) {
           name =
               userUmm.grad?.matriculas?[gradIndex].identificacao?.nomesocial ??
-              userUmm.grad?.matriculas?[gradIndex].identificacao?.nome ??
-              "-";
+              userUmm.grad?.matriculas?[gradIndex].identificacao?.nome;
 
-          curso = userUmm.grad?.matriculas?[gradIndex].nomeCurso ?? "-";
+          curso = userUmm.grad?.matriculas?[gradIndex].nomeCurso;
         }
       } else if (profileType == ProfileTypes.pos) {
         posIndex = _findActivePos(userUmm, targetMatricula);
 
         if (posIndex != null) {
-          name = userUmm.pos?.alunos?[posIndex].nome ?? "-";
-          curso = userUmm.pos?.alunos?[posIndex].cursoNome ?? "-";
+          name = userUmm.pos?.alunos?[posIndex].nome;
+          curso = userUmm.pos?.alunos?[posIndex].cursoNome;
         }
       }
-      String nomeSocial =
-          userUmm.grad?.matriculas?[gradIndex ?? 0].identificacao?.nomesocial ??
-          "-";
+      String? nomeSocial =
+          userUmm.grad?.matriculas?[gradIndex ?? 0].identificacao?.nomesocial;
 
-      if (name == "-") {
-        name =
-            userUmm.activeBond?.objects?.outerObject?[0].usuario?.nome ?? "-";
-      }
+      name ??= userUmm.activeBond?.objects?.outerObject?[0].usuario?.nome;
 
       if (bondIndex != null) {
         bond =
@@ -81,8 +73,7 @@ class UserDataController extends GetxController {
                 ?.outerObject?[1]
                 .innerObjects?[bondIndex]
                 .vinculacao
-                ?.vinculo ??
-            "-";
+                ?.vinculo;
 
         bondId =
             userUmm
@@ -91,13 +82,12 @@ class UserDataController extends GetxController {
                 ?.outerObject?[1]
                 .innerObjects?[bondIndex]
                 .vinculacao
-                ?.id ??
-            "-";
+                ?.id;
       }
 
-      List<GdiGroups>? gdiGroups = await getPersonalGdiGroups(iduff);
+      List<GdiGroups>? gdiGroups = await getPersonalGdiGroups(iduff ?? "-");
       String accessToken = await _auth.getAccessToken() ?? "";
-      final existingUserData = await _userDataRepository.getUserData();
+      UserData? existingUserData = await _userDataRepository.getUserData();
 
       final userData = UserData(
         name: name,
@@ -115,6 +105,10 @@ class UserDataController extends GetxController {
         profileType: profileType,
         shortcutRoutes: existingUserData?.shortcutRoutes,
         gdiGroupsGoogle: existingUserData?.gdiGroupsGoogle,
+        lastRegisteredTokenCdcUpdate: existingUserData?.lastRegisteredTokenCdcUpdate,
+        lastRegisteredTokenCdcMethod: existingUserData?.lastRegisteredTokenCdcMethod,
+        userGoogleModel: existingUserData?.userGoogleModel,
+        userIduffModel: existingUserData?.userIduffModel,
       );
       return await _userDataRepository.saveUserData(userData);
     } catch (e) {
@@ -133,7 +127,7 @@ class UserDataController extends GetxController {
 
   Future<String> updateQrData() async {
     String? token = await _auth.getAccessToken();
-    String? iduffUsuario = await userIduffRepository.getIduff();
+    String? iduffUsuario = await _userDataRepository.getIduff();
 
     var textoQrCode = await _userDataRepository.getSaciData(
       token,

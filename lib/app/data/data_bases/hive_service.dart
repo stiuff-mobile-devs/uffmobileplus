@@ -6,8 +6,6 @@ import 'package:uffmobileplus/app/modules/external_modules/transcript/data/model
 import 'package:uffmobileplus/app/modules/external_modules/study_plan/data/models/discipline_model.dart';
 import 'package:uffmobileplus/app/modules/external_modules/study_plan/data/models/study_plan_model.dart';
 import 'package:uffmobileplus/app/modules/external_modules/study_plan/data/models/weekday_model.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_iduff_model.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_google_model.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
 

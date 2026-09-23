@@ -2,17 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/controller/login_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/controller/auth_google_controller.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_google_model.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_google_repository.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_iduff_repository.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 
 class SettingsController extends GetxController {
   SettingsController();
-  UserIduffRepository userIduffRepository = UserIduffRepository();
-  UserDataRepository userDataRepository = UserDataRepository();
-  UserGoogleRepository userGoogleRepository = UserGoogleRepository();
+  UserDataRepository _userDataRepository = UserDataRepository();
 
   late final LoginController loginController;
   late final AuthGoogleController _authGoogleController;
@@ -28,8 +24,8 @@ class SettingsController extends GetxController {
   }
 
   Future<void> logout() async {
-    await userIduffRepository.deleteUserIduffModel();
-    await userDataRepository.clearAllUserData();
+    await _userDataRepository.deleteUserIduffModel();
+    await _userDataRepository.clearUserData();
      loginController.logoutGoogle();
   }
 
@@ -64,8 +60,8 @@ class SettingsController extends GetxController {
   Future<void> updateGoogleData() async{
     try{
       final token = await _authGoogleController.getFirebaseIdToken();
-      UserGoogleModel? user = await userGoogleRepository.getUserGoogleModel();
-      await _authGoogleController.getGdiGroupsGoogle(token!, user!.email, true);
+      UserGoogleModel? user = await _userDataRepository.getUserGoogleModel();
+      await _authGoogleController.getGdiGroupsGoogle(token!, user?.email ?? "", true);
     }
     catch(e){
       Get.snackbar(

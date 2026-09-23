@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hive/hive.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_google_model.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 
 enum UserRole { user }
 
@@ -9,8 +9,8 @@ class UserGoogleProvider {
   final FirebaseFirestore _firestore = FirebaseFirestore.instanceFor(
     app: Firebase.app('uffmobileplus'),
   );
-  final String _hiveBox = 'user_google_data';
-  final String _hiveKey = 'current_user';
+   final String _userKey = "current_user";
+  final String _collectionPath = "user_data";
 
   Future<UserGoogleModel> createUserDoc(
     String email,
@@ -33,9 +33,8 @@ class UserGoogleProvider {
           urlImage: urlImage,
           createdAt: DateTime.now(),
         );
-        await _createUserDocInFirebase(user);
+        await _firestore.collection('users').doc(user.id).set(user.toJson());
       }
-
       await saveUserGoogleModel(user);
     } catch (e) {
       throw Exception("Erro ao criar usuario no firebase");
@@ -43,21 +42,21 @@ class UserGoogleProvider {
     return user;
   }
 
-  Future<void> _createUserDocInFirebase(UserGoogleModel user) async {
-    await _firestore.collection('users').doc(user.id).set(user.toJson());
-  }
-
   Future<String> saveUserGoogleModel(UserGoogleModel user) async {
     try {
-      late Box<UserGoogleModel> box;
+      var box = Hive.isBoxOpen(_collectionPath)
+          ? Hive.box<UserData>(_collectionPath)
+          : await Hive.openBox<UserData>(_collectionPath);
 
-      if (Hive.isBoxOpen(_hiveBox)) {
-        box = Hive.box<UserGoogleModel>(_hiveBox);
+      UserData? userData = box.get(_userKey);
+
+      if (userData != null) {
+        userData.userGoogleModel = user;
+        await userData.save(); 
       } else {
-        box = await Hive.openBox<UserGoogleModel>(_hiveBox);
+        // Caso o usuário base ainda não exista, cria a instância inicial
+        await box.put(_userKey, UserData(userGoogleModel: user));
       }
-
-      await box.put(_hiveKey, user);
       return "success";
     } catch (e) {
       return "Erro ao salvar usuário Google no Hive: $e";
@@ -66,8 +65,14 @@ class UserGoogleProvider {
 
   Future<UserGoogleModel?> getUserGoogleModel() async {
     try {
-      var box = await Hive.openBox<UserGoogleModel>(_hiveBox);
-      return box.get(_hiveKey);
+      var box = Hive.isBoxOpen(_collectionPath)
+          ? Hive.box<UserData>(_collectionPath)
+          : await Hive.openBox<UserData>(_collectionPath);
+
+      UserData? userData = box.get(_userKey);
+      
+      // Retorna apenas o modelo do Google, caso o UserData exista
+      return userData?.userGoogleModel; 
     } catch (e) {
       throw Exception("Erro ao buscar usuário Google do Hive: $e");
     }
@@ -75,30 +80,21 @@ class UserGoogleProvider {
 
   Future<String> deleteUserGoogleModel() async {
     try {
-      var box = await Hive.openBox<UserGoogleModel>(_hiveBox);
-      await box.delete(_hiveKey);
-      return "success";
+      var box = Hive.isBoxOpen(_collectionPath)
+          ? Hive.box<UserData>(_collectionPath)
+          : await Hive.openBox<UserData>(_collectionPath);
+
+      UserData? userData = box.get(_userKey);
+
+      if (userData != null) {
+        userData.userGoogleModel = null;
+        await userData.save(); // Salva a alteração para remover apenas este campo
+        return "success";
+      }
+
+      return "Usuário não encontrado no Hive";
     } catch (e) {
       return "Erro ao deletar usuário Google do Hive: $e";
-    }
-  }
-
-  Future<String> clearAllUserGoogle() async {
-    try {
-      var box = await Hive.openBox<UserGoogleModel>(_hiveBox);
-      await box.clear();
-      return "success";
-    } catch (e) {
-      return "Erro ao limpar usuários Google do Hive: $e";
-    }
-  }
-
-  Future<bool> hasUserGoogle() async {
-    try {
-      var box = await Hive.openBox<UserGoogleModel>(_hiveBox);
-      return box.containsKey(_hiveKey);
-    } catch (e) {
-      return false;
     }
   }
 }

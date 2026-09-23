@@ -1,9 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:hive/hive.dart';
-import 'package:uffmobileplus/app/config/secrets.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 
 class UserDataProvider {
@@ -11,70 +7,39 @@ class UserDataProvider {
   final String _userKey = "current_user";
 
   UserDataProvider() {
-    debugPrint("Started User Data provider");
+    debugPrint("✅ Started User Data provider");
   }
 
- Future<String> saveUserData(UserData newUserData) async {
-  try {
-    var box = await Hive.openBox<UserData>(_collectionPath);
-    
-    UserData? existingData = box.get(_userKey);
-
-    UserData dataToSave;
-
-    if (existingData != null) {
-      dataToSave = existingData.copyWith(
-        name: newUserData.name ?? existingData.name,
-        nomesocial: newUserData.nomesocial ?? existingData.nomesocial,
-        matricula: newUserData.matricula ?? existingData.matricula,
-        iduff: newUserData.iduff ?? existingData.iduff,
-        curso: newUserData.curso ?? existingData.curso,
-        fotoUrl: newUserData.fotoUrl ?? existingData.fotoUrl,
-        dataValidadeMatricula: newUserData.dataValidadeMatricula ?? existingData.dataValidadeMatricula,
-        bond: newUserData.bond ?? existingData.bond,
-        textoQrCodeCarteirinha: newUserData.textoQrCodeCarteirinha ?? existingData.textoQrCodeCarteirinha,
-        accessToken: newUserData.accessToken ?? existingData.accessToken,
-        bondId: newUserData.bondId ?? existingData.bondId,
-        gdiGroups: newUserData.gdiGroups ?? existingData.gdiGroups,
-        profileType: newUserData.profileType ?? existingData.profileType,
-        shortcutRoutes: newUserData.shortcutRoutes ?? existingData.shortcutRoutes,
-        gdiGroupsGoogle: newUserData.gdiGroupsGoogle ?? existingData.gdiGroupsGoogle,
-        lastRegisteredTokenCdcUpdate: newUserData.lastRegisteredTokenCdcUpdate ?? existingData.lastRegisteredTokenCdcUpdate,
-        lastRegisteredTokenCdcMethod: newUserData.lastRegisteredTokenCdcMethod ?? existingData.lastRegisteredTokenCdcMethod,
-      );
-    } else {
-      dataToSave = newUserData;
+  /// Método privado para gerenciar a abertura do Box e evitar repetição de código
+  Future<Box<UserData>> _getBox() async {
+    if (Hive.isBoxOpen(_collectionPath)) {
+      return Hive.box<UserData>(_collectionPath);
     }
-
-    await box.put(_userKey, dataToSave);
-    return "success";
-  } catch (e) {
-    throw Exception("Erro ao salvar dados do usuário no Hive: $e");
+    return await Hive.openBox<UserData>(_collectionPath);
   }
-}
+
+  Future<String> saveUserData(UserData newUserData) async {
+    try {
+      final box = await _getBox();
+      await box.put(_userKey, newUserData);
+      return "success";
+    } catch (e) {
+      throw Exception("Erro ao salvar dados do usuário no Hive: $e");
+    }
+  }
 
   Future<UserData?> getUserData() async {
     try {
-      var box = await Hive.openBox<UserData>(_collectionPath);
+      final box = await _getBox();
       return box.get(_userKey);
     } catch (e) {
       return null;
     }
   }
 
-  Future<String> deleteUserData() async {
+  Future<String> clearUserData() async {
     try {
-      var box = await Hive.openBox<UserData>(_collectionPath);
-      await box.delete(_userKey);
-      return "success";
-    } catch (e) {
-      return "Erro ao deletar dados do usuário do Hive: $e";
-    }
-  }
-
-  Future<String> clearAllUserData() async {
-    try {
-      var box = await Hive.openBox<UserData>(_collectionPath);
+      final box = await _getBox();
       await box.clear();
       return "success";
     } catch (e) {
@@ -84,7 +49,7 @@ class UserDataProvider {
 
   Future<bool> hasUserData() async {
     try {
-      var box = await Hive.openBox<UserData>(_collectionPath);
+      final box = await _getBox();
       return box.containsKey(_userKey);
     } catch (e) {
       debugPrint("Erro ao verificar existência de dados do usuário: $e");
@@ -94,18 +59,13 @@ class UserDataProvider {
 
   Future<String> updateQrData(String textoQrCodeCarteirinha) async {
     try {
-      var box = await Hive.openBox<UserData>(_collectionPath);
-      UserData? user = box.get(_userKey);
-
-      if (user == null) {
-        await saveUserData(UserData(textoQrCodeCarteirinha: textoQrCodeCarteirinha));
-        return "success";
+      UserData? user = await getUserData();
+      if (user != null) {
+        user.textoQrCodeCarteirinha = textoQrCodeCarteirinha;
+        await user.save(); // Salva a alteração diretamente no HiveObject
+        return textoQrCodeCarteirinha;
       }
-
-      // altera o campo diretamente e salva
-      user.textoQrCodeCarteirinha = textoQrCodeCarteirinha;
-      await user.save(); // persiste o objeto atualizado
-      return textoQrCodeCarteirinha;
+      return "Usuario não encontrado";
     } catch (e) {
       return "Erro ao atualizar status de login no Hive: $e";
     }
@@ -113,17 +73,13 @@ class UserDataProvider {
 
   Future<String> updateShortcutRoutes(List<String> shortcutRoutes) async {
     try {
-      var box = await Hive.openBox<UserData>(_collectionPath);
-      UserData? user = box.get(_userKey);
-
-      if (user == null) {
-        await saveUserData(UserData(shortcutRoutes: List<String>.from(shortcutRoutes)));
+      UserData? user = await getUserData();
+      if (user != null) {
+        user.shortcutRoutes = List<String>.from(shortcutRoutes);
+        await user.save();
         return "success";
       }
-
-      user.shortcutRoutes = List<String>.from(shortcutRoutes);
-      await user.save();
-      return "success";
+      return "Usuario não encontrado";
     } catch (e) {
       return "Erro ao atualizar atalhos no Hive: $e";
     }
@@ -131,17 +87,13 @@ class UserDataProvider {
 
   Future<String> updateGdiGroupsGoogle(GdiGroupsGoogle gdiGroupsGoogle) async {
     try {
-      var box = await Hive.openBox<UserData>(_collectionPath);
-      UserData? user = box.get(_userKey);
-
-      if (user == null) {
-        await saveUserData(  UserData(gdiGroupsGoogle: gdiGroupsGoogle));
-        return "success";
+      UserData? user = await getUserData();
+      if (user != null) {
+        user.gdiGroupsGoogle = gdiGroupsGoogle;
+        await user.save();
+      } else {
+        await saveUserData(UserData(gdiGroupsGoogle: gdiGroupsGoogle));
       }
-
-      // altera o campo diretamente e salva
-      user.gdiGroupsGoogle = gdiGroupsGoogle;
-      await user.save(); // persiste o objeto atualizado
       return "success";
     } catch (e) {
       return "Erro ao atualizar grupos GDI Google no Hive: $e";
@@ -153,46 +105,22 @@ class UserDataProvider {
     String method,
   ) async {
     try {
-      var box = await Hive.openBox<UserData>(_collectionPath);
-      UserData? user = box.get(_userKey);
-
-      if (user == null) {
+      UserData? user = await getUserData();
+      if (user != null) {
+        user.lastRegisteredTokenCdcUpdate = lastRegisteredTokenCdcUpdate;
+        user.lastRegisteredTokenCdcMethod = method;
+        await user.save();
+      } else {
         await saveUserData(
           UserData(
             lastRegisteredTokenCdcUpdate: lastRegisteredTokenCdcUpdate,
             lastRegisteredTokenCdcMethod: method,
           ),
         );
-        return "success";
       }
-
-      // altera os campos diretamente e salva
-      user.lastRegisteredTokenCdcUpdate = lastRegisteredTokenCdcUpdate;
-      user.lastRegisteredTokenCdcMethod = method;
-      await user.save(); // persiste o objeto atualizado
       return "success";
     } catch (e) {
       return "Erro ao atualizar token CDC no Hive: $e";
     }
-  }
-
-  Future<List<GdiGroups>> getGdiGroups(String iduff, String token) async {
-    final path = '${Secrets.gdiGroupsPath}/$iduff${Secrets.gdiGroupsQuery}';
-    var uri = Uri.https(Secrets.gdiGroupsHost, path);
-    try {
-      final response = await http.get(
-        uri,
-        headers: {'Authorization': 'Bearer $token'},
-      );
-
-      if (response.statusCode == 200) {
-        List<dynamic> jsonResponse = jsonDecode(response.body);
-        return jsonResponse.map((group) => GdiGroups.fromJson(group)).toList();
-      }
-    } catch (e) {
-      debugPrint("Erro ao buscar grupos GDI: $e");
-      return [];
-    }
-    return [];
   }
 }

@@ -4,8 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:uffmobileplus/app/config/secrets.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_google_model.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_google_repository.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
 
 class AuthGoogleService {
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
@@ -13,7 +13,7 @@ class AuthGoogleService {
   late final Future<void> _init = _googleSignIn.initialize(
     serverClientId: Secrets.googleServerClientId,
   );
-  final UserGoogleRepository _userRepository = UserGoogleRepository();
+  final UserDataRepository _userDataRepository = UserDataRepository();
 
   final FirebaseApp _uffMobileapp = Firebase.app('uffmobileplus');
   late final fb.FirebaseAuth _uffMobileAuth = fb.FirebaseAuth.instanceFor(
@@ -121,7 +121,7 @@ class AuthGoogleService {
     fb.UserCredential userCredential,
   ) async {
     try {
-      final userDoc = await _userRepository.createUserDoc(
+      final userDoc = await _userDataRepository.createUserDoc(
         userCredential.user!.email ?? '',
         userCredential.user!.displayName ?? '',
         userCredential.user!.uid,

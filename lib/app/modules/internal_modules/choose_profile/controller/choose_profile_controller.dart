@@ -5,7 +5,6 @@ import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_umm_model.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_iduff_repository.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_umm_repository.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
@@ -16,8 +15,7 @@ class ChooseProfileController extends GetxController {
   ChooseProfileController();
 
   final UserUmmRepository userUmmRepository = UserUmmRepository();
-  final UserDataRepository userDataRepository = UserDataRepository();
-  final UserIduffRepository userIduffRepository = UserIduffRepository();
+  final UserDataRepository _userDataRepository = UserDataRepository();
 
   late UserDataController _userDataController;
 
@@ -46,13 +44,13 @@ class ChooseProfileController extends GetxController {
   void onInit() async {
     super.onInit();
     _userDataController = Get.find<UserDataController>();
-    iduff = await userIduffRepository.getIduff();
+    iduff = await _userDataRepository.getIduff();
     await _getUserData();
     await fetchData();
   }
 
   Future<void> _getUserData() async {
-    _user = (await userDataRepository.getUserData()) ?? UserData();
+    _user = (await _userDataRepository.getUserData()) ?? UserData();
     _userDataLoaded.value = true;
     _checkControlPermission();
   }
@@ -249,7 +247,7 @@ class ChooseProfileController extends GetxController {
   }
 
   void _logoutIduff() {
-    userIduffRepository.deleteUserIduffModel();
+    _userDataRepository.deleteUserIduffModel();
     userUmmRepository.deleteUserUmmModel();
     Get.offAllNamed(Routes.LOGIN);
   }

@@ -7,8 +7,6 @@ import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_google_repository.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_iduff_repository.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/gdi_groups.dart';
 
@@ -19,9 +17,7 @@ class LoginController extends GetxController {
   late UmInfosService _umInfosService;
   late AuthIduffService _authIduffService;
 
-  UserGoogleRepository userGoogleRepository = UserGoogleRepository();
-  UserDataRepository userDataRepository = UserDataRepository();
-  UserIduffRepository userIduffRepository = UserIduffRepository();
+  final UserDataRepository _userDataRepository = UserDataRepository();
 
   UserData _user = UserData();
 
@@ -38,7 +34,7 @@ class LoginController extends GetxController {
     _authIduffService = Get.find<AuthIduffService>();
 
     versionCode = _umInfosService.version.value;
-    _user = (await userDataRepository.getUserData()) ?? UserData();
+    _user = (await _userDataRepository.getUserData()) ?? UserData();
 
     _checkAdminPermission(GdiGroupsEnum.controladoresDeAcesso.id);
     _loadBondStates();
@@ -67,8 +63,8 @@ class LoginController extends GetxController {
     }
 
     // Verifica os dados armazenados localmente
-    final storedUser = await userGoogleRepository.getUserGoogleModel();
-    final hasStoredUser = storedUser?.email.isNotEmpty ?? false;
+    final storedUser = await _userDataRepository.getUserGoogleModel();
+    final hasStoredUser = storedUser!.email?.isNotEmpty ?? false;
 
     return hasStoredUser;
   } catch (e) {
@@ -79,7 +75,7 @@ class LoginController extends GetxController {
 
   Future<bool> hasActiveIduffBond() async {
     try {
-      final storedUser = await userIduffRepository.getUserIduffModel();
+      final storedUser = await _userDataRepository.getUserIduffModel();
       final hasStoredUser =
           storedUser != null && (storedUser.iduff?.isNotEmpty ?? false);
       final isLogged = storedUser?.authData?.isLogged ?? false;

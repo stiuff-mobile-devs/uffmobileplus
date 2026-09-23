@@ -5,7 +5,7 @@ import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controll
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/data/provider/firebase_provider.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/google_group_member_model.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_model.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_google_repository.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
 
 class UserController extends GetxController {
   final _user = Rxn<UserModel>();
@@ -25,7 +25,7 @@ class UserController extends GetxController {
   Future<void> loadCurrentUser() async {
     isLoading.value = true;
     try {
-      final googleUser = await UserGoogleRepository().getUserGoogleModel();
+      final googleUser = await UserDataRepository().getUserGoogleModel();
       debugPrint('Hive user: ${googleUser?.email} / ${googleUser?.name}');
       _googleName = googleUser?.name;
       final email = googleUser?.email ?? "";
@@ -69,7 +69,7 @@ class UserController extends GetxController {
 
   Future<UserModel?> _initializeUser() async {
     try {
-      final googleUser = await UserGoogleRepository().getUserGoogleModel();
+      final googleUser = await UserDataRepository().getUserGoogleModel();
       final email = googleUser?.email ?? "";
       debugPrint('Email usado no lookup: $email');
       if (email.isEmpty) return null;

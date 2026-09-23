@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_iduff_repository.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
@@ -15,7 +14,6 @@ import 'package:uffmobileplus/app/routes/app_routes.dart';
 class AuthIduffController extends GetxController {
   late final AuthIduffService _authIduffService;
 
-  UserIduffRepository userIduffRepository = UserIduffRepository();
   final UserDataRepository _userDataRepository = UserDataRepository();
 
   RxBool isLoading = false.obs;
@@ -138,7 +136,7 @@ class AuthIduffController extends GetxController {
                           ),
                         ),
                         onPressed: () {
-                          userIduffRepository.deleteUserIduffModel();
+                          _userDataRepository.deleteUserIduffModel();
                           Get.offAllNamed(Routes.LOGIN);
                         },
                         child: const Text(
@@ -218,7 +216,7 @@ class AuthIduffController extends GetxController {
       String? iduffAccessToken = await _authIduffService.getAccessToken();
 
       if (iduffAccessToken != null && tokenDevice != null) {
-        bool success = await userIduffRepository.registerTokenCdc(
+        bool success = await _userDataRepository.registerTokenCdc(
           iduffAccessToken,
           tokenDevice,
           device,
