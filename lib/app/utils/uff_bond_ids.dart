@@ -26,6 +26,8 @@ enum ProfileTypes {
   employee,
   @HiveField(5)
   outsourced,
+  @HiveField(6)
+  post_doc_researcher_student,
 }
 
 List<ProfileTypes> everyoneLogged = [
@@ -34,6 +36,7 @@ List<ProfileTypes> everyoneLogged = [
   ProfileTypes.teacher,
   ProfileTypes.employee,
   ProfileTypes.outsourced,
+  ProfileTypes.post_doc_researcher_student,
 ];
 List<ProfileTypes> everyone = [
   ProfileTypes.grad,

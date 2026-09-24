@@ -25,6 +25,8 @@ class ProfileTypesAdapter extends TypeAdapter<ProfileTypes> {
         return ProfileTypes.employee;
       case 5:
         return ProfileTypes.outsourced;
+      case 6:
+        return ProfileTypes.post_doc_researcher_student;
       default:
         return ProfileTypes.anonymous;
     }
@@ -50,6 +52,9 @@ class ProfileTypesAdapter extends TypeAdapter<ProfileTypes> {
         break;
       case ProfileTypes.outsourced:
         writer.writeByte(5);
+        break;
+      case ProfileTypes.post_doc_researcher_student:
+        writer.writeByte(6);
         break;
     }
   }

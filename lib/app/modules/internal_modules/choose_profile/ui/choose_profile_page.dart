@@ -69,6 +69,7 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
                       if (controller.employeeQtd > 0) employeeSelection(),
                       if (controller.teacherQtd > 0) teacherAccordion(),
                       if (controller.outsourcedQtd > 0) outsourcedAccordion(),
+                      if(controller.postDocResearcherStudentQtd > 0) postDocResearcherStudentAccordion(),
                     ],
                   ),
                 ],
@@ -372,6 +373,65 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
               onTap: () {
                 controller.saveUserDataBeforeChooseProfile(
                   ProfileTypes.outsourced,
+                  controller.activeBonds()[index].vinculacao!.matricula!, //Todo: Verificar os !
+                );
+              },
+              child: Container(
+                color: Colors.transparent,
+                width: double.infinity,
+                padding: EdgeInsets.all(8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "${controller.activeBonds()[index].vinculacao!.vinculo}",
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.arrow_circle_right_outlined, size: 22),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+      headerBackgroundColor: AppColors.darkBlue(),
+      contentBorderColor: AppColors.darkBlue(),
+    );
+  }
+
+   AccordionSection postDocResearcherStudentAccordion() {
+    return AccordionSection(
+      header: Text(
+        'Pesquisador de Pós-Doutorado'.tr,
+        style: TextStyle(
+          fontWeight: FontWeight.w700,
+          fontSize: 22,
+          color: Colors.white,
+        ),
+      ),
+      leftIcon: const Icon(Icons.account_box, color: Colors.white),
+      content: ListView.separated(
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: controller.postDocResearcherStudentQtd,
+        separatorBuilder: (context, index) =>
+            Divider(thickness: 1.5, color: AppColors.darkBlue()),
+        itemBuilder: (context, index) {
+          return Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                controller.saveUserDataBeforeChooseProfile(
+                  ProfileTypes.post_doc_researcher_student,
                   controller.activeBonds()[index].vinculacao!.matricula!, //Todo: Verificar os !
                 );
               },

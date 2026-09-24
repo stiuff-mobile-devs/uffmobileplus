@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
@@ -37,6 +39,7 @@ class ChooseProfileController extends GetxController {
   int teacherQtd = 0;
   int employeeQtd = 0;
   int outsourcedQtd = 0;
+  int postDocResearcherStudentQtd = 0;
 
   int totalProfileQtd = 0;
 
@@ -120,6 +123,10 @@ class ChooseProfileController extends GetxController {
       //Verifica se o perfil é de terceirizado
       if (bond.vinculacao?.vinculoId == UffBondIds.outsourced) {
         outsourcedQtd++;
+      }
+      if(bond.vinculacao?.vinculoId == UffBondIds.post_doc_researcher_student){
+        postDocResearcherStudentQtd++;
+
       }
     }
 
