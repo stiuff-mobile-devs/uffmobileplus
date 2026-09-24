@@ -159,11 +159,8 @@ class AuthIduffController extends GetxController {
   Future<void> loginSuccessful() async {
     isLoading.value = false;
     await _registerTokenCdc();
-    if (await _userDataRepository.hasUserData()) {
-      Get.offAllNamed(Routes.HOME);
-    } else {
+    
       Get.offAllNamed(Routes.CHOOSE_PROFILE);
-    }
   }
 
   Future<void> _login() async {
