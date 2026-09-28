@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 import 'package:intl/intl.dart';
 
 class Campus {
@@ -30,11 +31,11 @@ class Campus {
   static String getShift(DateTime date) {
     switch (date.hour) {
       case (11):
-        return 'Almoço';
+        return 'almoco'.tr;
       case (12):
-        return 'Almoço';
+        return 'almoco'.tr;
       case (17):
-        return 'Jantar';
+        return 'jantar'.tr;
       default:
         return 'undefined';
     }

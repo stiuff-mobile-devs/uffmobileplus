@@ -48,6 +48,22 @@ class ChooseProfileController extends GetxController {
     super.onInit();
     _userDataController = Get.find<UserDataController>();
     iduff = await _userDataRepository.getIduff();
+
+    bool askSelection = false;
+    if (Get.arguments != null && Get.arguments is Map) {
+      askSelection = Get.arguments['ask_selection'] == true;
+    }
+
+    final savedData = await _userDataRepository.getUserData();
+    final hasMatricula = savedData != null &&
+                         savedData.matricula != null &&
+                         savedData.matricula!.isNotEmpty;
+
+    if (!askSelection && hasMatricula) {
+      Get.offAllNamed(Routes.HOME);
+      return;
+    }
+
     await _getUserData();
     await fetchData();
   }
