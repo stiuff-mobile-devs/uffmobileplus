@@ -30,7 +30,7 @@ class SettingsController extends GetxController {
   }
 
   void changeMatricula() async {
-    Get.offAllNamed(Routes.CHOOSE_PROFILE);
+    Get.offAllNamed(Routes.CHOOSE_PROFILE, arguments: {'ask_selection': true});
   }
 
   Future<void> reloadBondStates() async {
