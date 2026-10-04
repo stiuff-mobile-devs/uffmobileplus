@@ -8,6 +8,7 @@ import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
 
 class AuthGoogleService {
+  static GoogleSignInAccount? currentAccount;
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
 
   late final Future<void> _init = _googleSignIn.initialize(
@@ -45,8 +46,19 @@ class AuthGoogleService {
   Future<UserGoogleModel?> signInGoogle() async {
     try {
       await _init;
-      var account = await _googleSignIn.authenticate();
-      return _signIn(account);
+
+      var account = await _googleSignIn.authenticate(
+          scopeHint: ['https://www.googleapis.com/auth/drive.file']
+      );
+      
+      if (account != null) {
+        currentAccount = account;
+        await account.authorizationClient.authorizeScopes([
+          'https://www.googleapis.com/auth/drive.file',
+        ]);
+      }
+
+      return await _signIn(account);
     } catch (e) {
       debugPrint('Error initializing GoogleSignIn: $e');
       return null;
@@ -137,12 +149,16 @@ class AuthGoogleService {
 
   Future<UserGoogleModel?> trySignInGoogle() async {
     try {
+      await _init;
       final Future<GoogleSignInAccount?>? account = _googleSignIn
           .attemptLightweightAuthentication();
       if (account == null) {
         return null;
       }
       final googleUser = await account;
+      if (googleUser != null) {
+        currentAccount = googleUser;
+      }
       return googleUser != null ? await _signIn(googleUser) : null;
     } catch (e) {
       debugPrint('Error initializing GoogleSignIn: $e');
@@ -169,5 +185,35 @@ class AuthGoogleService {
       return await user.getIdToken(true);
     }
     return null;
+  }
+
+  Future<GoogleSignInAccount?> getDriveAccount() async {
+    await _init; 
+    
+    if (currentAccount != null) {
+      return currentAccount;
+    }
+
+    final accountFuture = _googleSignIn.attemptLightweightAuthentication();
+    if (accountFuture != null) {
+      final account = await accountFuture;
+      if (account != null) {
+        currentAccount = account;
+        return account;
+      }
+    }
+    
+    try {
+      final account = await _googleSignIn.authenticate(
+        scopeHint: ['https://www.googleapis.com/auth/drive.file']
+      );
+      if (account != null) {
+        currentAccount = account;
+      }
+      return account;
+    } catch (e) {
+      debugPrint('AuthGoogleService: Falha na autenticação interativa - $e');
+      return null;
+    }
   }
 }

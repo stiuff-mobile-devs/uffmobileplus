@@ -265,12 +265,14 @@ class HomePageController extends GetxController {
             }
           }
 
-          if (todaysMeal != null) {
-            final d = DateTime.parse(todaysMeal.date.toString());
-            mealShift = Campus.getShift(d);
-            if (mealShift == 'undefined') {
-              mealShift = (d.hour < 15) ? 'almoco'.tr : 'jantar'.tr;
-            }
+          final baseDate = todaysMeal != null 
+              ? DateTime.parse(todaysMeal.date.toString()) 
+              : now;
+          
+          mealShift = Campus.getShift(baseDate);
+
+          if (mealShift == 'undefined') {
+            mealShift = (baseDate.hour < 15) ? 'almoco'.tr : 'jantar'.tr;
           }
         }
       }
@@ -278,7 +280,7 @@ class HomePageController extends GetxController {
 
     return TodayCampusMeal(
       campus: campus,
-      shiftLabel: mealShift ?? (Campus.isActive(sigla) ? Campus.getShift(now) : null),
+      shiftLabel: Campus.isActive(sigla) ? mealShift : null,
       meal: todaysMeal,
     );
   }
