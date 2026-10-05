@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/utils/message_dialogs.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/recharge_card/data/repository/recharge_card_repository.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/services/auth_google_service.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -12,6 +13,7 @@ class RechargeCardController extends GetxController {
 
   late ExternalModulesServices externalModulesServices;
   RechargeCardRepository rechargeCardRepository = RechargeCardRepository();
+   late final AuthGoogleService _authGoogle = AuthGoogleService();
 
   RxBool isLoading = false.obs;
 
@@ -129,6 +131,7 @@ class RechargeCardController extends GetxController {
         priceFieldController.text,
         userIdUFF,
         userAcessToken,
+        await _authGoogle.getFirebaseIdToken() ?? "",
       );
     } catch (e) {
       await MessageDialogs.showErrorDialog(Get.context);

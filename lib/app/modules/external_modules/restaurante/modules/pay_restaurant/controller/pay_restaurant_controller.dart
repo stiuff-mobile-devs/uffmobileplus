@@ -5,12 +5,14 @@ import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/data/services/screen_protector_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/data/repository/pay_restaurant_repository.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/utils/message_dialogs.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/services/auth_google_service.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 
 class PayRestaurantController extends GetxController {
   PayRestaurantController();
 
   PayRestaurantRepository payRestaurantRepository = PayRestaurantRepository();
+   late final AuthGoogleService _authGoogle = AuthGoogleService();
 
   RxBool isLoading = false.obs;
   RxBool isPaymentProcessing = false.obs;
@@ -57,6 +59,7 @@ class PayRestaurantController extends GetxController {
       paymentCode = await payRestaurantRepository.getPaymentCode(
         userIdUFF,
         userAcessToken,
+        await _authGoogle.getFirebaseIdToken() ?? "",
       );
     } catch (e) {
       print(e);

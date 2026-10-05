@@ -9,7 +9,8 @@ class RechargeCardRepository {
     String amount,
     String idUff,
     String acessToken,
+    String tokenGoogle,
   ) async {
-    return await sctmService.getPaymentUrl(amount, idUff, acessToken);
+    return await sctmService.getPaymentUrl(amount, idUff, acessToken, tokenGoogle);
   }
 }

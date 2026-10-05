@@ -16,6 +16,7 @@ class SctmService {
     String iduff,
     String token,
     String areaId,
+    String tokenGoogle,
   ) async {
     try {
       String idUffUser = "";
@@ -55,6 +56,7 @@ class SctmService {
           "area_debito_operador_id": areaId,
           "hash": hash,
           "token": token,
+          "token_google": tokenGoogle,
         },
       );
 
@@ -93,26 +95,32 @@ class SctmService {
         }
       }
     } catch (e) {
-      // Log do erro se necessário
       print('Erro ao validar pagamento: $e');
     }
 
     return {"valid": false, "message": "Erro na comunicação com o servidor"};
   }
 
-  Future<List<AreaModel>> getAreas(String iduff, String token) async {
+  Future<List<AreaModel>> getAreas(
+    String iduff,
+    String token,
+    String tokenGoogle,
+  ) async {
     try {
       var uri = Uri.https(
         Secrets.areasValidationHost,
         Secrets.areasValidationPath,
-        {"iduff_operador": iduff, "token": token},
+        {
+          "iduff_operador": iduff,
+          "token": token,
+          "token_google": tokenGoogle,
+        },
       );
 
       http.Response response = await http.get(uri);
       if (response.statusCode == 200) {
         final responseMap = json.decode(response.body);
 
-        // Verifica se a estrutura esperada existe
         if (responseMap is Map &&
             responseMap.containsKey("content") &&
             responseMap["content"] is Map &&
@@ -125,7 +133,6 @@ class SctmService {
                 try {
                   return AreaModel.fromJson(json);
                 } catch (e) {
-                  // Log ou ignora itens com formato inválido
                   return null;
                 }
               })
@@ -138,13 +145,14 @@ class SctmService {
       throw Exception('Erro ao buscar áreas: $e');
     }
 
-    return []; // Retorna lista vazia em vez de exception
+    return [];
   }
 
   Future<List<OperatorTransactionModel>> getOperatorTransactions(
     String iduff,
     String token,
     String areaId,
+    String tokenGoogle,
   ) async {
     try {
       var uri = Uri.https(
@@ -154,7 +162,8 @@ class SctmService {
           "iduff_operador": iduff,
           "token": token,
           "area_id": areaId.toString(),
-          "minutos": "1440", // Últimas 24 horas = 1440
+          "minutos": "1440",
+          "token_google": tokenGoogle,
         },
       );
 
@@ -163,7 +172,6 @@ class SctmService {
       if (response.statusCode == 200) {
         final responseMap = json.decode(response.body);
 
-        // Verifica se a estrutura esperada existe
         if (responseMap is Map &&
             responseMap.containsKey("content") &&
             responseMap["content"] is Map &&
@@ -179,7 +187,6 @@ class SctmService {
                 try {
                   return OperatorTransactionModel.fromJson(json);
                 } catch (e) {
-                  // Log ou ignora itens com formato inválido
                   return null;
                 }
               })
@@ -189,21 +196,25 @@ class SctmService {
         }
       }
     } catch (e) {
-      // Log do erro se necessário
       print('Erro ao buscar transações: $e');
     }
 
-    return []; // Retorna lista vazia em vez de exception
+    return [];
   }
 
   Future<Map<String, dynamic>> getPaymentCode(
     String idUff,
     String accessToken,
+    String tokenGoogle,
   ) async {
     var uri = Uri.https(
       Secrets.generateQrPaymentHost,
       Secrets.generateQrPaymentPath,
-      {"iduff_usuario": idUff, "token": accessToken},
+      {
+        "iduff_usuario": idUff,
+        "token": accessToken,
+        "token_google": tokenGoogle,
+      },
     );
 
     http.Response response = await http.post(uri);
@@ -227,20 +238,14 @@ class SctmService {
 
   Future<UserBalance> getUserBalance(
     String idUff,
-    String accessToken, {
+    String accessToken,
+    String tokenGoogle, {
     double? period,
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    Map<String, String> parameters;
-    /* String? googleToken = googleSignInService
-        .authenticatedClient
-        ?.headers["Authorization"]
-        ?.split(" ")[1]; */
-
-    parameters = {
+    Map<String, String> parameters = {
       "iduff_usuario": idUff,
-      //if (googleToken != null) "token_google": googleToken,
       "token": accessToken,
     };
 
@@ -253,6 +258,10 @@ class SctmService {
     if (endDate != null) {
       parameters.addAll({"data_fim": ""});
     }
+    
+    // Adicionado no final para garantir que seja o último parâmetro na URI
+    parameters.addAll({"token_google": tokenGoogle});
+
     var uri = Uri.https(
       Secrets.getUserBalanceHost,
       Secrets.getUserBalancePath,
@@ -279,6 +288,7 @@ class SctmService {
     String value,
     String idUff,
     String accessToken,
+    String tokenGoogle,
   ) async {
     int centsValue = int.parse(value.replaceAll(',', ''));
 
@@ -286,6 +296,7 @@ class SctmService {
       "iduff_usuario": idUff,
       "token": accessToken,
       "valor": centsValue.toString(),
+      "token_google": tokenGoogle,
     };
 
     var uri = Uri.https(
@@ -310,12 +321,20 @@ class SctmService {
     }
   }
 
-  Future<bool> refreshPayments(String idUff, String accessToken) async {
+  Future<bool> refreshPayments(
+    String idUff,
+    String accessToken,
+    String tokenGoogle,
+  ) async {
     try {
       var uri = Uri.https(
         Secrets.refreshPaymentsHost,
         Secrets.refreshPaymentsPath,
-        {"iduff_usuario": idUff, "token": accessToken},
+        {
+          "iduff_usuario": idUff,
+          "token": accessToken,
+          "token_google": tokenGoogle,
+        },
       );
 
       http.Response response = await http.post(uri);
@@ -331,9 +350,12 @@ class SctmService {
     return false;
   }
 
-  Future<bool> getStatus() async {
+  Future<bool> getStatus( ) async {
     try {
-      var uri = Uri.https(Secrets.getStatusSCTMHost, Secrets.getStatusSCTMPath);
+      var uri = Uri.https(
+        Secrets.getStatusSCTMHost,
+        Secrets.getStatusSCTMPath,
+      );
 
       http.Response response = await http
           .get(uri)
@@ -342,15 +364,12 @@ class SctmService {
 
       return response.statusCode == 200;
     } on TimeoutException catch (_) {
-      // Erro específico de demora na resposta
       debugPrint("Erro: O sistema UMM demorou demais para responder.");
       return false;
     } on SocketException catch (_) {
-      // Erro específico de rede (sem internet ou DNS falhou)
       debugPrint("Erro: Sem conexão de rede para alcançar o UMM.");
       return false;
     } catch (e) {
-      // Qualquer outro erro inesperado
       debugPrint("Erro desconhecido ao checar status: $e");
       return false;
     }

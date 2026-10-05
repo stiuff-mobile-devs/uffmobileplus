@@ -7,6 +7,7 @@ import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/c
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/operator_transaction.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/operator_transaction_offline.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/repository/catraca_repository.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/services/auth_google_service.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'dart:async';
 
@@ -16,6 +17,8 @@ class CatracaController extends GetxController {
   late ExternalModulesServices externalModulesServices;
 
   CatracaOnlineRepository repository = CatracaOnlineRepository();
+
+   late final AuthGoogleService _authGoogle = AuthGoogleService();
 
   RxBool isAreaBusy = false.obs;
   RxBool isTransactionBusy = false.obs;
@@ -90,7 +93,7 @@ class CatracaController extends GetxController {
     token = await externalModulesServices.getAccessToken();
     try {
       areas.value = await repository
-          .getAreas(operatorIdUff ?? '', token)
+          .getAreas(operatorIdUff ?? '', token, await _authGoogle.getFirebaseIdToken() ?? "",)
           .timeout(const Duration(seconds: 5));
           
       _updateStatusMessage(true);
@@ -129,6 +132,7 @@ class CatracaController extends GetxController {
         operatorIdUff ?? '',
         token ?? '',
         selectedArea.value.id.toString(),
+        await _authGoogle.getFirebaseIdToken() ?? "",
       );
     } catch (e) {
       debugPrint('Erro ao buscar transações online: $e');
@@ -194,6 +198,7 @@ class CatracaController extends GetxController {
             operatorIdUff!,
             token!,
             selectedArea.value.id.toString(),
+            await _authGoogle.getFirebaseIdToken() ?? "",
           );
 
           _transactionResultMessages(

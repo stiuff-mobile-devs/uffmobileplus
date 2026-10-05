@@ -3,10 +3,13 @@ import 'package:get/get.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/balance_statement/data/repository/balance_statement_repository.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/data/model/user_balance.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/services/auth_google_service.dart';
 
 class BalanceStatementController extends GetxController {
   BalanceStatementController();
 
+   late final AuthGoogleService _authGoogle = AuthGoogleService();
+   
   BalanceStatementRepository repository = BalanceStatementRepository();
   late ExternalModulesServices externalModulesServices;
 
@@ -37,11 +40,12 @@ class BalanceStatementController extends GetxController {
     isBusy.value = true;
     String userAcessToken =
         await externalModulesServices.getAccessToken() ?? "";
-    await repository.fetchUserBalance(userIduff.value, userAcessToken);
+    await repository.fetchUserBalance(userIduff.value, userAcessToken, await _authGoogle.getFirebaseIdToken() ?? "");
     try {
       userBalance = await repository.getUserBalance(
         userIduff.value,
         userAcessToken,
+        await _authGoogle.getFirebaseIdToken() ?? "",
         period: filters["period"],
       );
     } catch (e) {

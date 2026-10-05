@@ -10,16 +10,17 @@ class CatracaOnlineRepository {
   CatracaOnlineProvider catracaOnlineProvider = CatracaOnlineProvider();
   SctmService sctmService = SctmService();
 
-  Future<List<AreaModel>> getAreas(iduff, token) async {
-    return await sctmService.getAreas(iduff, token);
+  Future<List<AreaModel>> getAreas( iduff,  token, String tokenGoogle) async {
+    return await sctmService.getAreas(iduff, token, tokenGoogle);
   }
 
   Future<List<OperatorTransactionModel>> getOperatorTransactions(
     String iduff,
     String token,
     String areaId,
+    String tokenGoogle
   ) async {
-    return await sctmService.getOperatorTransactions(iduff, token, areaId);
+    return await sctmService.getOperatorTransactions(iduff, token, areaId, tokenGoogle);
   }
 
   Future<Map<String, dynamic>> validatePayment(
@@ -27,8 +28,9 @@ class CatracaOnlineRepository {
     String iduff,
     String token,
     String areaId,
+    String tokenGoogle,
   ) async {
-    return await sctmService.validatePayment(paymentCode, iduff, token, areaId);
+    return await sctmService.validatePayment(paymentCode, iduff, token, areaId, tokenGoogle);
   }
 
   Future<void> saveOperatorTransactionsOffline(

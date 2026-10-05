@@ -6,19 +6,21 @@ class BalanceStatementRepository {
 
   SctmService sctmService = SctmService();
 
-  Future<bool> fetchUserBalance(String iduff, String acessToken) async {
-    final response = await sctmService.refreshPayments(iduff, acessToken);
+  Future<bool> fetchUserBalance(String iduff, String acessToken, String tokenGoogle) async {
+    final response = await sctmService.refreshPayments(iduff, acessToken, tokenGoogle,);
     return response;
   }
 
   Future<UserBalance> getUserBalance(
     String iduff,
-    String acessToken, {
+    String acessToken,
+    String tokenGoogle,{
     required double period,
   }) async {
     final response = await sctmService.getUserBalance(
       iduff,
       acessToken,
+      tokenGoogle,
       period: period,
     );
     return response;

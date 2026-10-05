@@ -10,8 +10,9 @@ class PayRestaurantRepository {
   Future<Map<String, dynamic>> getPaymentCode(
     String idUff,
     String accessToken,
+    String googleToken
   ) {
-    return sctmService.getPaymentCode(idUff, accessToken);
+    return sctmService.getPaymentCode(idUff, accessToken, googleToken);
   }
 
   Future<UserBalance> getUserBalance(
@@ -20,13 +21,16 @@ class PayRestaurantRepository {
     double? period,
     DateTime? startDate,
     DateTime? endDate,
+    String? googleToken,
   }) {
     return sctmService.getUserBalance(
       idUff,
       accessToken,
+      googleToken ?? "",
       period: period,
       startDate: startDate,
       endDate: endDate,
+      
     );
   }
 }
