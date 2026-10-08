@@ -29,10 +29,6 @@ android {
     kotlin {
         jvmToolchain(21)
     }
-    
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_21.toString()
-    }
 
     // Configuração das chaves de assinatura
     signingConfigs {

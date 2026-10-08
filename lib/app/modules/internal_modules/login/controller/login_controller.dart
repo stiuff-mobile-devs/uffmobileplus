@@ -120,9 +120,18 @@ class LoginController extends GetxController {
   Future<void> loginGoogle() async {
     isLoading.value = true;
     try {
-      await _loginGoogleController.loginGoogle();
+      if(hasActiveGoogleBondObs.value){
+        bool loginStatus = await _loginGoogleController.tryLogin();
+        if(!loginStatus){
+          await _loginGoogleController.loginGoogle();
+        }
+      }
+      else{
+        await _loginGoogleController.loginGoogle();
+
+      }
     } catch (e) {
-      debugPrint("Erro no login google");
+      await _loginGoogleController.loginGoogle();
     } finally {
       isLoading.value = false;
     }

@@ -71,15 +71,18 @@ class LoginPage extends GetView<LoginController> {
                                   ],
                                 ),
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Text(
-                                      'escolha_metodo_login'.tr,
-                                      style: TextStyle(
-                                        color: Colors.white.withOpacity(0.9),
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 18,
-                                        letterSpacing: 0.9,
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        'escolha_metodo_login'.tr,
+                                        style: TextStyle(
+                                          color: Colors.white.withOpacity(0.9),
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 18,
+                                          letterSpacing: 0.9,
+                                        ),
                                       ),
                                     ),
                                     const SizedBox(height: 16),
@@ -87,41 +90,42 @@ class LoginPage extends GetView<LoginController> {
                                       children: [
                                         Obx(
                                           () => _LoginOptionButton(
-                                            text: 'IdUFF',
-                                            color:
-                                                controller
-                                                    .hasActiveIduffBondObs
-                                                    .value
-                                                ? Colors.blueAccent
-                                                : Colors.grey,
-                                            image:
-                                                'assets/images/uff_background2.png',
+                                            text: controller.hasActiveIduffBondObs.value 
+                                                ? 'IdUFF (Conectado)' 
+                                                : 'IdUFF',
+                                            color: Colors.blueAccent,
+                                            isActive: controller.hasActiveIduffBondObs.value,
+                                            image: 'assets/images/uff_background2.png',
                                             onTap: controller.loginIDUFF,
                                           ),
                                         ),
                                         const SizedBox(height: 12),
                                         Obx(
                                           () => _LoginOptionButton(
-                                            text: 'Google',
-                                            color:
-                                                controller
-                                                    .hasActiveGoogleBondObs
-                                                    .value
-                                                ? Colors.redAccent
-                                                : Colors.grey,
-                                            image:
-                                                'assets/icons/google-icon.svg',
+                                            text: controller.hasActiveGoogleBondObs.value 
+                                                ? 'Google (Conectado)' 
+                                                : 'Google',
+                                            color: Colors.redAccent,
+                                            isActive: controller.hasActiveGoogleBondObs.value,
+                                            image: 'assets/icons/google-icon.svg',
                                             onTap: controller.loginGoogle,
                                           ),
                                         ),
-                                        const SizedBox(height: 12),
-                                        _LoginOptionButton(
-                                          text: 'sem_login'.tr,
-                                          color: Colors.green,
-                                          image:
-                                              'assets/icons/no-login-icon.svg',
-                                          svgColor: Colors.white,
-                                          onTap: controller.loginAnonimous,
+                                        const SizedBox(height: 8),
+                                        // Botão "Sem Login" discreto, cinza e embaixo
+                                        TextButton(
+                                          onPressed: controller.loginAnonimous,
+                                          style: TextButton.styleFrom(
+                                            foregroundColor: Colors.grey,
+                                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                          ),
+                                          child: Text(
+                                            'sem_login'.tr,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -336,6 +340,7 @@ class _LoginOptionButton extends StatelessWidget {
   final String image;
   final VoidCallback onTap;
   final Color? svgColor;
+  final bool isActive; // Novo parâmetro para indicar atividade
 
   const _LoginOptionButton({
     required this.text,
@@ -343,11 +348,11 @@ class _LoginOptionButton extends StatelessWidget {
     required this.image,
     required this.onTap,
     this.svgColor,
+    this.isActive = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final bool isActive = color != Colors.grey;
     Widget imageWidget;
     if (image.toLowerCase().endsWith('.svg')) {
       imageWidget = SvgPicture.asset(
@@ -372,7 +377,8 @@ class _LoginOptionButton extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
         onTap: onTap,
-        child: Container(
+        child: AnimatedContainer( // AnimatedContainer para suavizar a transição de cor
+          duration: const Duration(milliseconds: 300),
           height: 68,
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -380,11 +386,14 @@ class _LoginOptionButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: isActive
-                  ? color.withOpacity(0.6)
+                  ? color.withOpacity(0.8)
                   : Colors.white.withOpacity(0.16),
-              width: 1,
+              width: isActive ? 1.5 : 1.0, // Borda levemente mais grossa quando ativo
             ),
-            color: Colors.white.withOpacity(0.04),
+            // Aplica um fundo colorido se ativo, senão mantém sutil
+            color: isActive 
+                ? color.withOpacity(0.15) 
+                : Colors.white.withOpacity(0.04),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -395,7 +404,9 @@ class _LoginOptionButton extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withOpacity(0.06),
+                  color: isActive 
+                      ? color.withOpacity(0.2) 
+                      : Colors.white.withOpacity(0.06),
                 ),
                 child: ClipOval(child: imageWidget),
               ),
@@ -405,17 +416,27 @@ class _LoginOptionButton extends StatelessWidget {
                   text,
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.white.withOpacity(0.92),
-                    fontWeight: FontWeight.w600,
+                    color: isActive 
+                        ? Colors.white // Cor de destaque no texto se ativo
+                        : Colors.white.withOpacity(0.92),
+                    fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
                     letterSpacing: 0.2,
                   ),
                 ),
               ),
-              Icon(
-                Icons.chevron_right,
-                color: Colors.white.withOpacity(0.55),
-                size: 20,
-              ),
+              // Troca a seta por um check_circle quando ativo
+              if (isActive)
+                Icon(
+                  Icons.check_circle,
+                  color: color,
+                  size: 24,
+                )
+              else
+                Icon(
+                  Icons.chevron_right,
+                  color: Colors.white.withOpacity(0.55),
+                  size: 20,
+                ),
             ],
           ),
         ),

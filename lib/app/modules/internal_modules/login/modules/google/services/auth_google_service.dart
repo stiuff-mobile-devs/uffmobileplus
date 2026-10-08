@@ -150,19 +150,21 @@ class AuthGoogleService {
   Future<UserGoogleModel?> trySignInGoogle() async {
     try {
       await _init;
-      final Future<GoogleSignInAccount?>? account = _googleSignIn
-          .attemptLightweightAuthentication();
-      if (account == null) {
-        return null;
-      }
-      final googleUser = await account;
-      if (googleUser != null) {
-        currentAccount = googleUser;
-      }
-      return googleUser != null ? await _signIn(googleUser) : null;
+
+     
+      final googleUser = await _googleSignIn.attemptLightweightAuthentication(); 
+
+      if (googleUser == null) {
+        debugPrint("Nenhum usuário encontrado durante login silencioso.");
+        throw Exception("Nenhum usuário logado anteriormente");
+      } 
+        
+      debugPrint("Usuário encontrado durante login silencioso: ${googleUser.email}");
+      return await _signIn(googleUser);
+      
     } catch (e) {
       debugPrint('Error initializing GoogleSignIn: $e');
-      return null;
+      throw Exception("Erro ao tentar fazer login silenciosamente: $e");
     }
   }
 

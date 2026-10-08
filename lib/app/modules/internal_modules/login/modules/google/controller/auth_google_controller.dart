@@ -81,16 +81,17 @@ class AuthGoogleController extends GetxController {
     }
   }
 
-  tryLogin() async {
+  Future<bool> tryLogin() async {
     UserGoogleModel? hasLogged = await _authGoogle.trySignInGoogle();
     if (hasLogged != null) {
       await _registerTokenCdc();
       String? token = await _authGoogle.getFirebaseIdToken();
       await getGdiGroupsGoogle(token ?? '', hasLogged.email ?? "", false);
       HarpiaClaimsService.syncClaims();
-      Get.offNamed(Routes.HOME);
+      Get.offAllNamed(Routes.HOME);
+      return true;
     } else {
-      Get.offNamed(Routes.LOGIN);
+      return false;
     }
   }
 
