@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:screen_brightness/screen_brightness.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/data/services/screen_protector_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/data/repository/pay_restaurant_repository.dart';
@@ -31,6 +33,7 @@ class PayRestaurantController extends GetxController {
 
   @override
   onInit() {
+
     externalModulesServices = Get.find<ExternalModulesServices>();
     externalModulesServices.initialize();
 
@@ -50,6 +53,7 @@ class PayRestaurantController extends GetxController {
   }
 
   Future<void> goToPaymentTicket() async {
+    _setMaxBrightness();
     isPaymentProcessing.value = true;
     isLoading.value = true;
     String userAcessToken =
@@ -120,9 +124,19 @@ class PayRestaurantController extends GetxController {
       isLoading.value = false;
     }
   }
+  
+  Future<void> _setMaxBrightness() async {
+    try {
+      await ScreenBrightness().setApplicationScreenBrightness(1.0);
+    } catch (e) {
+      // Alguns dispositivos ou plataformas podem recusar a alteração
+      debugPrint('Erro ao aumentar brilho da tela: $e');
+    }
+  }
 
   @override
   void onClose() {
+    ScreenBrightness().resetApplicationScreenBrightness();
     screenProtector.disableScreenProtection();
     super.onClose();
   }

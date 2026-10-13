@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:screen_brightness/screen_brightness.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/data/services/screen_protector_service.dart';
 
@@ -28,6 +29,7 @@ class CarteirinhaDigitalController extends GetxController {
   void onInit() {
     super.onInit();
     screenProtector.enableScreenProtection();
+    _setMaxBrightness();
     _initAsync();
   }
 
@@ -96,8 +98,18 @@ class CarteirinhaDigitalController extends GetxController {
     }
   }
 
+  Future<void> _setMaxBrightness() async {
+    try {
+      await ScreenBrightness().setApplicationScreenBrightness(1.0);
+    } catch (e) {
+      // Alguns dispositivos ou plataformas podem recusar a alteração
+      debugPrint('Erro ao aumentar brilho da tela: $e');
+    }
+  }
+
   @override
   void onClose() {
+    ScreenBrightness().resetApplicationScreenBrightness();
     screenProtector.disableScreenProtection();
     super.onClose();
   }
