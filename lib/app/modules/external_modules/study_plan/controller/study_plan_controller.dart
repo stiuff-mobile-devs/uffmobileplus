@@ -47,8 +47,7 @@ class StudyPlanController extends GetxController {
 
   Future<void> refreshStudyPlan() async {
     isLoading = true;
-    await _fetchStudyPlan(true);
-    isLoading = false;
     update();
+    await _fetchStudyPlan(true);
   }
 }
