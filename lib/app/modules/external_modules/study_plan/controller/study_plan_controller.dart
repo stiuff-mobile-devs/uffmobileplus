@@ -14,7 +14,7 @@ class StudyPlanController extends GetxController {
     _fetchStudyPlan(false);
   }
 
-  void _fetchStudyPlan(bool isRefresh) async {
+  Future<void> _fetchStudyPlan(bool isRefresh) async {
     try {
       studyPlan = await _repository.getStudyPlan(isRefresh);
       if (studyPlan != null) {
@@ -34,7 +34,8 @@ class StudyPlanController extends GetxController {
       }
     } catch (_) {
       studyPlan = null;
-    } finally {
+    } 
+    finally{
       isLoading = false;
       update();
     }
@@ -44,9 +45,10 @@ class StudyPlanController extends GetxController {
     return studyPlan;
   }
 
-  void refreshStudyPlan() {
+  Future<void> refreshStudyPlan() async {
     isLoading = true;
+    await _fetchStudyPlan(true);
+    isLoading = false;
     update();
-    _fetchStudyPlan(true);
   }
 }

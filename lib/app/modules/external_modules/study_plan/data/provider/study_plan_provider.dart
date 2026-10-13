@@ -45,9 +45,9 @@ class StudyPlanProvider {
       final response = await http.get(
         url,
         headers: {'Authorization': 'Bearer $accessToken'},
-      ).timeout(const Duration(seconds: 10));
+      ).timeout(const Duration(seconds: 20));
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         Map<String, dynamic> jsonResponse = jsonDecode(response.body);
         return StudyPlanModel.fromJson(jsonResponse);
       } else {
