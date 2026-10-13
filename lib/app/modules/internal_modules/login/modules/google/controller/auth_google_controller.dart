@@ -24,6 +24,21 @@ class AuthGoogleController extends GetxController {
 
   Future<void> loginGoogle() async {
     try {
+      await Get.defaultDialog(
+        title: 'atencao'.tr,
+        middleText: "Ao realizar o login com a Conta Google, determinados módulos ficarão indisponíveis, incluindo a carteirinha digital de identificação e as funcionalidades de pagamento do restaurante universitário.\n\nDeseja continuar mesmo assim?",
+        textConfirm: "Continuar",
+        textCancel: "Refazer Login",
+        confirmTextColor: Colors.white,
+        barrierDismissible: false,
+        onConfirm: () {
+          Get.back(); // Fecha o dialog
+        },
+        onCancel: () async {
+          Get.back(); // Fecha o dialog
+        },
+      );
+
       UserGoogleModel? user = await _authGoogle.signInGoogle();
 
       if (user != null) {
@@ -56,9 +71,10 @@ class AuthGoogleController extends GetxController {
   }
 
   void _verifyEmailAndNavigate(String email) {
+     
     if (email.endsWith('@id.uff.br')) {
       // Se for acadêmico, vai direto para a Home
-      Get.offNamed(Routes.HOME);
+      Get.offAllNamed(Routes.HOME);
     } else {
       // Se não for, exibe o pop-up
       Get.defaultDialog(
@@ -70,7 +86,7 @@ class AuthGoogleController extends GetxController {
         barrierDismissible: false,
         onConfirm: () {
           Get.back(); // Fecha o dialog
-          Get.offNamed(Routes.HOME); // Vai para a Home
+          Get.offAllNamed(Routes.HOME); // Vai para a Home
         },
         onCancel: () async {
           // Desloga o usuário para ele poder escolher outra conta do Google
@@ -82,6 +98,20 @@ class AuthGoogleController extends GetxController {
   }
 
   Future<bool> tryLogin() async {
+     await Get.defaultDialog(
+        title: 'atencao'.tr,
+        middleText: "Ao realizar o login com a Conta Google, determinados módulos ficarão indisponíveis, incluindo a carteirinha digital de identificação e as funcionalidades de pagamento do restaurante universitário.\n\nDeseja continuar mesmo assim?",
+        textConfirm: "Continuar",
+        textCancel: "Refazer Login",
+        confirmTextColor: Colors.white,
+        barrierDismissible: false,
+        onConfirm: () {
+          Get.back(); // Fecha o dialog
+        },
+        onCancel: () async {
+          Get.back(); // Fecha o dialog
+        },
+      );
     UserGoogleModel? hasLogged = await _authGoogle.trySignInGoogle();
     if (hasLogged != null) {
       await _registerTokenCdc();
