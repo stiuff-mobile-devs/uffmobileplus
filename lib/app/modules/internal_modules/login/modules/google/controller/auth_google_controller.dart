@@ -26,17 +26,14 @@ class AuthGoogleController extends GetxController {
     try {
       await Get.defaultDialog(
         title: 'atencao'.tr,
-        middleText: "Ao realizar o login com a Conta Google, determinados módulos ficarão indisponíveis, incluindo a carteirinha digital de identificação e as funcionalidades de pagamento do restaurante universitário.\n\nDeseja continuar mesmo assim?",
+        middleText: "Ao realizar o login apenas com Conta Google, determinados módulos poderão ficar indisponíveis, incluindo a carteirinha digital de identificação e as funcionalidades de pagamento do restaurante universitário.\n\nDeseja continuar mesmo assim?",
         textConfirm: "Continuar",
-        textCancel: "Refazer Login",
         confirmTextColor: Colors.white,
         barrierDismissible: false,
         onConfirm: () {
           Get.back(); // Fecha o dialog
         },
-        onCancel: () async {
-          Get.back(); // Fecha o dialog
-        },
+        
       );
 
       UserGoogleModel? user = await _authGoogle.signInGoogle();
