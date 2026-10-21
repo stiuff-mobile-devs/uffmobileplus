@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_umm_model.dart';
@@ -21,6 +22,7 @@ class ChooseProfileController extends GetxController {
 
   UserData _user = UserData();
   UserUmmModel userUmm = UserUmmModel();
+   late AuthIduffService _auth;
 
   String matricula = '';
   String? iduff;
@@ -46,6 +48,7 @@ class ChooseProfileController extends GetxController {
     super.onInit();
     _userDataController = Get.find<UserDataController>();
     iduff = await _userDataRepository.getIduff();
+    _auth = Get.find<AuthIduffService>();
 
     bool askSelection = false;
     if (Get.arguments != null && Get.arguments is Map) {
@@ -91,8 +94,10 @@ class ChooseProfileController extends GetxController {
   Future<void> fetchData() async {
     isBusy.value = true;
 
+
+
     try {
-      userUmm = await userUmmRepository.getUserData(iduff);
+      userUmm = await userUmmRepository.getUserData(iduff, await _auth.getAccessToken() ?? "");
     } catch (e) {
       isBusy.value = false;
       _showErrorSnackbar(

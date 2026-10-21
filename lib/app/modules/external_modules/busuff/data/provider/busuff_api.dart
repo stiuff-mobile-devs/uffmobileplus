@@ -18,8 +18,6 @@ class BusuffApiClient {
   BusuffApiClient();
 
   Future<List<BusuffModel>?> getLastPosition() async {
-    //https://app.homologacao.uff.br/autointelligence/vehicles.json
-    // Uri url = Uri.https('app.uff.br', '/umm/api/busuff/get_gps', {'password': 'LittlePotato', 'id': 'd2bcb6d41f4404e3'});
     List<BusuffModel> busuffs = [];
     Uri url = Uri.https('app.uff.br', '/autointelligence/vehicles');
     try {

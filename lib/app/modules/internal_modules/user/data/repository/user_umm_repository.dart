@@ -4,8 +4,8 @@ import 'package:uffmobileplus/app/modules/internal_modules/user/data/provider/us
 class UserUmmRepository {
   final UserUMMProvider _userDataApi = UserUMMProvider();
 
-  Future<UserUmmModel> getUserData(String? idUFF) async {
-    return await _userDataApi.getUserData(idUFF);
+  Future<UserUmmModel> getUserData(String? idUFF, String token) async {
+    return await _userDataApi.getUserData(idUFF, token);
   }
 
   Future<String> saveUserUmmModel(UserUmmModel userUmm) async {

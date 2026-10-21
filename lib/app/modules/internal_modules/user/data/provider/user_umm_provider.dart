@@ -11,16 +11,17 @@ class UserUMMProvider {
   final String _ummCollectionPath = "user_umm_data";
   final String _ummKey = "current_umm";
 
-  Future<UserUmmModel> getUserData(String? idUFF) async {
-    Uri url = Uri(
-      host: Secrets.productionBaseUrl,
-      path: Secrets.getUserDataUrl,
-      scheme: Secrets.deepLinkScheme,
-      queryParameters: {"iduff": idUFF, "password": Secrets.passwordForApi},
+  Future<UserUmmModel> getUserData(String? idUFF, String token) async {
+    Uri url = Uri.https(
+      Secrets.productionBaseUrl,
+      Secrets.getUserDataUrl,
     );
 
     try {
-      final apiResponse = await http.get(url);
+      final apiResponse = await http.get(url, headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },);
 
       final statusCode = apiResponse.statusCode;
       final body = apiResponse.body;
