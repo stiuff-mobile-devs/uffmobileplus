@@ -30,7 +30,7 @@ class ChooseProfileController extends GetxController {
   final RxBool _userDataLoaded = false.obs;
   RxBool hasControlPermission = false.obs;
 
-  RxBool isBusy = true.obs;
+  RxBool isBusy = false.obs;
 
   bool hasGradButNoGradInfo = false;
 

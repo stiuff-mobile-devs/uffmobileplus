@@ -29,11 +29,6 @@ class SettingsController extends GetxController {
      loginController.logoutGoogle();
   }
 
-  Future<void> logoutIduff() async {
-    await _userDataRepository.deleteUserIduffModel();
-    Get.offAllNamed(Routes.LOGIN);
-  }
-
   void changeMatricula() async {
     Get.offAllNamed(Routes.CHOOSE_PROFILE, arguments: {'ask_selection': true});
   }
@@ -137,7 +132,7 @@ class SettingsController extends GetxController {
           TextButton(
             onPressed: () {
               Get.back();
-              logoutIduff();
+              logout();
             },
             child: Text(
               'desconectar'.tr,
