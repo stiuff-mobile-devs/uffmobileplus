@@ -60,7 +60,7 @@ class LoginCard extends GetView<BancoDeIdeiasController> {
           ),
           const SizedBox(height: 20),
           Text(
-            'bdi_bem_vindo'.tr,
+            'bdi_login_google_necessario'.tr,
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 24,
@@ -71,7 +71,7 @@ class LoginCard extends GetView<BancoDeIdeiasController> {
           ),
           const SizedBox(height: 12),
           Text(
-            'bdi_entrar_google_msg'.tr,
+            'bdi_login_google_falhou'.tr,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 15,
@@ -97,6 +97,13 @@ class LoginCard extends GetView<BancoDeIdeiasController> {
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
+          ),
+          const SizedBox(height: 8),
+          TextButton.icon(
+            onPressed: Get.back,
+            icon: const Icon(Icons.arrow_back_rounded),
+            label: Text('voltar'.tr),
+            style: TextButton.styleFrom(foregroundColor: Colors.white),
           ),
         ],
       ),

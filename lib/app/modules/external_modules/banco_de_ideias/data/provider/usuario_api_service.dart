@@ -22,20 +22,26 @@ class UsuarioCadastroData {
   const UsuarioCadastroData({
     required this.nome,
     required this.isAluno,
+    this.tipoUsuario,
     this.cursoId,
+    this.cursoNome,
     this.departamentoId,
   });
 
   final String nome;
   final bool isAluno;
+  final String? tipoUsuario;
   final String? cursoId;
+  final String? cursoNome;
   final String? departamentoId;
 
   Map<String, dynamic> toJson() {
     return {
       'nome': nome,
       'isAluno': isAluno,
+      'tipoUsuario': tipoUsuario ?? (isAluno ? 'Aluno' : 'Professor'),
       'cursoId': cursoId,
+      if (cursoNome != null) 'cursoNome': cursoNome,
       'departamentoId': departamentoId,
     };
   }
@@ -95,6 +101,28 @@ class UsuarioApiService {
       contentType: 'application/json',
     );
 
+    _throwIfError(response);
+  }
+
+  Future<CrudRecord> prepararCurso(String nome) async {
+    final response = await _send(
+      method: 'POST',
+      path: '/usuarios/me/curso',
+      body: jsonEncode({'cursoNome': nome}),
+      contentType: 'application/json',
+    );
+    _throwIfError(response);
+    final decoded = _decodeBody(response.body) as Map;
+    return _toRecords([decoded['curso']]).single;
+  }
+
+  Future<void> preencherVinculo(String tipo) async {
+    final response = await _send(
+      method: 'PATCH',
+      path: '/usuarios/me/vinculo',
+      body: jsonEncode({'tipoUsuario': tipo}),
+      contentType: 'application/json',
+    );
     _throwIfError(response);
   }
 
