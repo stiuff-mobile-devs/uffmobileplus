@@ -175,20 +175,28 @@ class IdeiaDetalhe {
 }
 
 class IdeiaFiltro {
-  const IdeiaFiltro({this.nome = '', this.tipoId, this.categoriaId});
+  const IdeiaFiltro({
+    this.buscaGeral = '',
+    this.titulo = '',
+    this.tipoId,
+    this.categoriaId,
+  });
 
-  final String nome;
+  final String buscaGeral;
+  final String titulo;
   final String? tipoId;
   final String? categoriaId;
 
   bool get isEmpty =>
-      nome.trim().isEmpty &&
+      buscaGeral.trim().isEmpty &&
+      titulo.trim().isEmpty &&
       (tipoId == null || tipoId!.isEmpty) &&
       (categoriaId == null || categoriaId!.isEmpty);
 
   Map<String, String> toQueryParameters() {
     return {
-      if (nome.trim().isNotEmpty) 'nome': nome.trim(),
+      if (buscaGeral.trim().isNotEmpty) 'busca_geral': buscaGeral.trim(),
+      if (titulo.trim().isNotEmpty) 'titulo': titulo.trim(),
       if (tipoId != null && tipoId!.isNotEmpty) 'tipoId': tipoId!,
       if (categoriaId != null && categoriaId!.isNotEmpty)
         'categoriaId': categoriaId!,

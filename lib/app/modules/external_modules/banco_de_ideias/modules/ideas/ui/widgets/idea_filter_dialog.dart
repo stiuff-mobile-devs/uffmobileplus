@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/controller/banco_de_ideias_controller.dart';
 
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/models/ideia.dart';
@@ -28,7 +29,7 @@ class _IdeaFilterDialogState extends State<IdeaFilterDialog> {
   @override
   void initState() {
     super.initState();
-    _tituloController = TextEditingController(text: widget.filtro.nome);
+    _tituloController = TextEditingController(text: widget.filtro.titulo);
     _tipoId = widget.filtro.tipoId;
     _categoriaId = widget.filtro.categoriaId;
   }
@@ -42,7 +43,8 @@ class _IdeaFilterDialogState extends State<IdeaFilterDialog> {
   void _aplicar() {
     Navigator.of(context).pop(
       IdeiaFiltro(
-        nome: _tituloController.text,
+        buscaGeral: widget.filtro.buscaGeral,
+        titulo: _tituloController.text,
         tipoId: _tipoId,
         categoriaId: _categoriaId,
       ),
@@ -55,58 +57,102 @@ class _IdeaFilterDialogState extends State<IdeaFilterDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('bdi_filtrar_ideias'.tr),
-      content: SizedBox(
-        width: 460,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _tituloController,
-              textInputAction: TextInputAction.search,
-              onSubmitted: (_) => _aplicar(),
-              decoration: InputDecoration(
-                labelText: 'titulo'.tr,
-                prefixIcon: const Icon(Icons.search_rounded),
-                border: const OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 14),
-            _OptionField(
-              label: 'tipo'.tr,
-              icon: Icons.category_outlined,
-              value: _tipoId,
-              options: widget.tipos,
-              onChanged: (value) => setState(() => _tipoId = value),
-            ),
-            const SizedBox(height: 14),
-            _OptionField(
-              label: 'bdi_categoria'.tr,
-              icon: Icons.sell_outlined,
-              value: _categoriaId,
-              options: widget.categorias,
-              onChanged: (value) => setState(() => _categoriaId = value),
-            ),
-          ],
+    final base = Theme.of(context);
+    return Theme(
+      data: base.copyWith(
+        colorScheme: ColorScheme.dark(
+          primary: AppColors.lightBlue(),
+          onPrimary: AppColors.darkBlue(),
+          surface: AppColors.darkBlue(),
+          onSurface: Colors.white,
+        ),
+        textTheme: base.textTheme.apply(
+          bodyColor: Colors.white,
+          displayColor: Colors.white,
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.white.withValues(alpha: 0.08),
+          labelStyle: const TextStyle(color: Colors.white70),
+          prefixIconColor: Colors.white70,
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.16)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: AppColors.lightBlue()),
+          ),
+        ),
+        textSelectionTheme: TextSelectionThemeData(
+          cursorColor: AppColors.lightBlue(),
+          selectionColor: AppColors.mediumBlue(alpha: 128),
+          selectionHandleColor: AppColors.lightBlue(),
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text('cancelar'.tr),
+      child: AlertDialog(
+        backgroundColor: AppColors.darkBlue(),
+        surfaceTintColor: Colors.transparent,
+        titleTextStyle: base.textTheme.headlineSmall?.copyWith(
+          color: Colors.white,
         ),
-        TextButton.icon(
-          onPressed: _limpar,
-          icon: const Icon(Icons.filter_alt_off_outlined),
-          label: Text('limpar'.tr),
+        title: Text('bdi_filtrar_ideias'.tr),
+        content: SizedBox(
+          width: 460,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _tituloController,
+                style: const TextStyle(color: Colors.white),
+                textInputAction: TextInputAction.search,
+                onSubmitted: (_) => _aplicar(),
+                decoration: InputDecoration(
+                  labelText: 'titulo'.tr,
+                  prefixIcon: const Icon(Icons.search_rounded),
+                  border: const OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 14),
+              _OptionField(
+                label: 'tipo'.tr,
+                icon: Icons.category_outlined,
+                value: _tipoId,
+                options: widget.tipos,
+                onChanged: (value) => setState(() => _tipoId = value),
+              ),
+              const SizedBox(height: 14),
+              _OptionField(
+                label: 'bdi_categoria'.tr,
+                icon: Icons.sell_outlined,
+                value: _categoriaId,
+                options: widget.categorias,
+                onChanged: (value) => setState(() => _categoriaId = value),
+              ),
+            ],
+          ),
         ),
-        FilledButton.icon(
-          onPressed: _aplicar,
-          icon: const Icon(Icons.filter_list_rounded),
-          label: Text('filtrar'.tr),
-        ),
-      ],
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('cancelar'.tr),
+          ),
+          TextButton.icon(
+            onPressed: _limpar,
+            icon: const Icon(Icons.filter_alt_off_outlined),
+            label: Text('limpar'.tr),
+          ),
+          FilledButton.icon(
+            onPressed: _aplicar,
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.mediumBlue(),
+              foregroundColor: Colors.white,
+            ),
+            icon: const Icon(Icons.filter_list_rounded),
+            label: Text('filtrar'.tr),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -135,6 +181,9 @@ class _OptionField extends GetView<BancoDeIdeiasController> {
 
     return DropdownButtonFormField<String>(
       initialValue: value?.isEmpty == true ? null : value,
+      dropdownColor: AppColors.darkBlue(),
+      style: const TextStyle(color: Colors.white),
+      iconEnabledColor: Colors.white70,
       isExpanded: true,
       decoration: InputDecoration(
         labelText: label,

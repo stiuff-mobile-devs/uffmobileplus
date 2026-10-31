@@ -56,7 +56,7 @@ class IdeaFilterSearchRow extends GetView<BancoDeIdeiasController> {
             textInputAction: TextInputAction.search,
             onSubmitted: (_) => onSearch(),
             decoration: InputDecoration(
-              labelText: 'bdi_pesquisar_titulo'.tr,
+              labelText: 'buscar'.tr,
               prefixIcon: const Icon(Icons.search_rounded),
               border: const OutlineInputBorder(),
               isDense: true,
@@ -90,6 +90,10 @@ class IdeaFilterSearchRow extends GetView<BancoDeIdeiasController> {
               IconButton.filledTonal(
                 tooltip: 'bdi_limpar_filtros'.tr,
                 onPressed: onClear,
+                style: IconButton.styleFrom(
+                  backgroundColor: AppColors.alternativeMediumBlue(),
+                  foregroundColor: Colors.white,
+                ),
                 icon: const Icon(Icons.filter_alt_off_outlined),
               ),
           ],
@@ -136,17 +140,33 @@ class IdeaActiveFilterChips extends GetView<BancoDeIdeiasController> {
       children: [
         for (final filter in filters)
           InputChip(
-            avatar: const Icon(Icons.filter_alt_rounded, size: 18),
+            avatar: Icon(
+              Icons.filter_alt_rounded,
+              size: 18,
+              color: AppColors.lightBlue(),
+            ),
             label: Text(
               'bdi_filtro_label_valor'.trParams({
                 'label': filter.label,
                 'value': filter.value,
               }),
             ),
-            backgroundColor: Colors.white.withValues(alpha: 0.10),
+            color: WidgetStateProperty.resolveWith((states) {
+              if (states.contains(WidgetState.pressed) ||
+                  states.contains(WidgetState.hovered) ||
+                  states.contains(WidgetState.focused)) {
+                return AppColors.mediumBlue();
+              }
+              return AppColors.alternativeMediumBlue();
+            }),
+            surfaceTintColor: Colors.transparent,
             labelStyle: const TextStyle(color: Colors.white),
-            side: BorderSide(color: Colors.white.withValues(alpha: 0.16)),
-            deleteIconColor: Colors.white70,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            side: BorderSide(color: AppColors.lightBlue(alpha: 80)),
+            deleteIcon: const Icon(Icons.close_rounded, size: 18),
+            deleteIconColor: Colors.white,
             tooltip: 'bdi_remover_filtro'.trParams({
               'label': filter.label.toLowerCase(),
             }),

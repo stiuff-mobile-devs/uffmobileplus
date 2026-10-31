@@ -10,4 +10,4 @@ class IdeaActiveFilter {
   final String value;
 }
 
-enum IdeaActiveFilterType { titulo, tipo, categoria }
+enum IdeaActiveFilterType { buscaGeral, titulo, tipo, categoria }

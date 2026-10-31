@@ -26,26 +26,28 @@ class IdeaFilterBar extends StatefulWidget {
 }
 
 class _IdeaFilterBarState extends State<IdeaFilterBar> {
-  late final TextEditingController _tituloController;
+  late final TextEditingController _buscaGeralController;
 
   @override
   void initState() {
     super.initState();
-    _tituloController = TextEditingController(text: widget.filtro.nome);
+    _buscaGeralController = TextEditingController(
+      text: widget.filtro.buscaGeral,
+    );
   }
 
   @override
   void didUpdateWidget(covariant IdeaFilterBar oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.filtro.nome != widget.filtro.nome &&
-        _tituloController.text != widget.filtro.nome) {
-      _tituloController.text = widget.filtro.nome;
+    if (oldWidget.filtro.buscaGeral != widget.filtro.buscaGeral &&
+        _buscaGeralController.text != widget.filtro.buscaGeral) {
+      _buscaGeralController.text = widget.filtro.buscaGeral;
     }
   }
 
   @override
   void dispose() {
-    _tituloController.dispose();
+    _buscaGeralController.dispose();
     super.dispose();
   }
 
@@ -56,7 +58,7 @@ class _IdeaFilterBarState extends State<IdeaFilterBar> {
     final novoFiltro = await showDialog<IdeiaFiltro>(
       context: context,
       builder: (context) => IdeaFilterDialog(
-        filtro: widget.filtro.copyWith(nome: _tituloController.text),
+        filtro: widget.filtro.copyWith(buscaGeral: _buscaGeralController.text),
         tipos: opcoes.tipos,
         categorias: opcoes.categorias,
       ),
@@ -67,24 +69,27 @@ class _IdeaFilterBarState extends State<IdeaFilterBar> {
     }
   }
 
-  void _buscarPorTitulo() {
-    widget.onChanged(widget.filtro.copyWith(nome: _tituloController.text));
+  void _buscarIdeia() {
+    widget.onChanged(
+      widget.filtro.copyWith(buscaGeral: _buscaGeralController.text),
+    );
   }
 
   void _limparFiltros() {
-    _tituloController.clear();
+    _buscaGeralController.clear();
     widget.onChanged(const IdeiaFiltro());
   }
 
   void _removerFiltro(IdeaActiveFilter filter) {
     final novoFiltro = switch (filter.type) {
-      IdeaActiveFilterType.titulo => widget.filtro.copyWith(nome: ''),
+      IdeaActiveFilterType.buscaGeral => widget.filtro.copyWith(buscaGeral: ''),
+      IdeaActiveFilterType.titulo => widget.filtro.copyWith(titulo: ''),
       IdeaActiveFilterType.tipo => widget.filtro.copyWith(tipoId: ''),
       IdeaActiveFilterType.categoria => widget.filtro.copyWith(categoriaId: ''),
     };
 
-    if (filter.type == IdeaActiveFilterType.titulo) {
-      _tituloController.clear();
+    if (filter.type == IdeaActiveFilterType.buscaGeral) {
+      _buscaGeralController.clear();
     }
 
     widget.onChanged(novoFiltro);
@@ -126,10 +131,10 @@ class _IdeaFilterBarState extends State<IdeaFilterBar> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   IdeaFilterSearchRow(
-                    textController: _tituloController,
+                    textController: _buscaGeralController,
                     canOpenFilters: snapshot.hasData,
                     hasFiltro: hasFiltro,
-                    onSearch: _buscarPorTitulo,
+                    onSearch: _buscarIdeia,
                     onOpenFilters: snapshot.hasData
                         ? () => _abrirFiltros(context, opcoes)
                         : null,
@@ -153,11 +158,17 @@ class _IdeaFilterBarState extends State<IdeaFilterBar> {
 
   List<IdeaActiveFilter> _filtrosAtivos(IdeiaCadastroOpcoes opcoes) {
     return [
-      if (widget.filtro.nome.trim().isNotEmpty)
+      if (widget.filtro.buscaGeral.trim().isNotEmpty)
+        IdeaActiveFilter(
+          type: IdeaActiveFilterType.buscaGeral,
+          label: 'Busca',
+          value: widget.filtro.buscaGeral.trim(),
+        ),
+      if (widget.filtro.titulo.trim().isNotEmpty)
         IdeaActiveFilter(
           type: IdeaActiveFilterType.titulo,
           label: 'titulo'.tr,
-          value: widget.filtro.nome.trim(),
+          value: widget.filtro.titulo.trim(),
         ),
       if (widget.filtro.tipoId != null && widget.filtro.tipoId!.isNotEmpty)
         IdeaActiveFilter(
@@ -186,9 +197,15 @@ class _IdeaFilterBarState extends State<IdeaFilterBar> {
 }
 
 extension on IdeiaFiltro {
-  IdeiaFiltro copyWith({String? nome, String? tipoId, String? categoriaId}) {
+  IdeiaFiltro copyWith({
+    String? buscaGeral,
+    String? titulo,
+    String? tipoId,
+    String? categoriaId,
+  }) {
     return IdeiaFiltro(
-      nome: nome ?? this.nome,
+      buscaGeral: buscaGeral ?? this.buscaGeral,
+      titulo: titulo ?? this.titulo,
       tipoId: tipoId ?? this.tipoId,
       categoriaId: categoriaId ?? this.categoriaId,
     );
