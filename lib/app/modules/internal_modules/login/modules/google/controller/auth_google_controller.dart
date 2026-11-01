@@ -1,8 +1,9 @@
+import 'dart:async';
 import 'dart:io';
-
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/data/services/google_drive_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/services/auth_google_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
@@ -71,6 +72,7 @@ class AuthGoogleController extends GetxController {
      
     if (email.endsWith('@id.uff.br')) {
       // Se for acadêmico, vai direto para a Home
+      unawaited(_ensureDriveFolder(interactive: true));
       Get.offAllNamed(Routes.HOME);
     } else {
       // Se não for, exibe o pop-up
@@ -83,6 +85,7 @@ class AuthGoogleController extends GetxController {
         barrierDismissible: false,
         onConfirm: () {
           Get.back(); // Fecha o dialog
+          unawaited(_ensureDriveFolder(interactive: true));
           Get.offAllNamed(Routes.HOME); // Vai para a Home
         },
         onCancel: () async {
@@ -115,10 +118,20 @@ class AuthGoogleController extends GetxController {
       String? token = await _authGoogle.getFirebaseIdToken();
       await getGdiGroupsGoogle(token ?? '', hasLogged.email ?? "", false);
       HarpiaClaimsService.syncClaims();
+      unawaited(_ensureDriveFolder(interactive: false));
       Get.offAllNamed(Routes.HOME);
       return true;
     } else {
       return false;
+    }
+  }
+
+  // Garante a pasta do app no Google Drive. Não bloqueia a navegação
+  Future<void> _ensureDriveFolder({required bool interactive}) async {
+    try {
+      await GoogleDriveService().ensureFolderExists(interactive: interactive);
+    } catch (e) {
+      debugPrint('Erro ao garantir pasta no Drive: $e');
     }
   }
 

@@ -20,10 +20,10 @@ class GoogleAuthClient extends http.BaseClient {
 class GoogleDriveService {
   final folderName = 'UFF+';
 
-  Future<drive.DriveApi?> _getDriveApi() async {
+  Future<drive.DriveApi?> _getDriveApi({bool interactive = true}) async {
     try {
       final authController = Get.find<AuthGoogleController>();
-      final account = await authController.authGoogle.getDriveAccount();
+      final account = await authController.authGoogle.getDriveAccount(interactive: interactive);
 
       if (account == null) {
         debugPrint('GoogleDriveService: Nenhuma conta encontrada ou login cancelado.');
@@ -32,7 +32,7 @@ class GoogleDriveService {
 
       final authHeaders = await account.authorizationClient.authorizationHeaders(
         [drive.DriveApi.driveFileScope],
-        promptIfNecessary: true,
+        promptIfNecessary: interactive,
       );
 
       if (authHeaders == null) {
@@ -49,9 +49,42 @@ class GoogleDriveService {
     }
   }
 
-  Future<String?> createFolder() async {
+  Future<String?> checkFolderExists({bool interactive = true}) async {
     try {
-      final driveApi = await _getDriveApi();
+      final driveApi = await _getDriveApi(interactive: interactive);
+      if (driveApi == null) return null;
+
+      final result = await driveApi.files.list(
+        q: "mimeType = 'application/vnd.google-apps.folder' "
+            "and name = '$folderName' and trashed = false",
+        spaces: 'drive',
+        $fields: 'files(id, name)',
+        pageSize: 1,
+      );
+
+      final files = result.files;
+      if (files == null || files.isEmpty) {
+        debugPrint('GoogleDriveService: Pasta "$folderName" não encontrada.');
+        return null;
+      }
+
+      debugPrint('GoogleDriveService: Pasta encontrada. ID: ${files.first.id}');
+      return files.first.id;
+    } catch (e) {
+      debugPrint('GoogleDriveService: Erro ao verificar se a pasta existe - $e');
+      return null;
+    }
+  }
+
+  Future<String?> ensureFolderExists({bool interactive = true}) async {
+    final existingId = await checkFolderExists(interactive: interactive);
+    if (existingId != null) return existingId;
+    return createFolder(interactive: interactive);
+  }
+
+  Future<String?> createFolder({bool interactive = true}) async {
+    try {
+      final driveApi = await _getDriveApi(interactive: interactive);
       if (driveApi == null) return null;
 
       final folder = drive.File()

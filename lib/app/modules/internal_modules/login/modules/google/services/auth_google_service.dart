@@ -189,7 +189,7 @@ class AuthGoogleService {
     return null;
   }
 
-  Future<GoogleSignInAccount?> getDriveAccount() async {
+  Future<GoogleSignInAccount?> getDriveAccount({bool interactive = true}) async {
     await _init; 
     
     if (currentAccount != null) {
@@ -204,7 +204,9 @@ class AuthGoogleService {
         return account;
       }
     }
-    
+
+    if (!interactive) return null;
+
     try {
       final account = await _googleSignIn.authenticate(
         scopeHint: ['https://www.googleapis.com/auth/drive.file']
