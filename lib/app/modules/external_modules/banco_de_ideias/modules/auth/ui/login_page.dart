@@ -29,7 +29,7 @@ class LoginPage extends GetView<BancoDeIdeiasController> {
         ),
         child: SafeArea(
           child: Center(
-            child: Padding(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 460),

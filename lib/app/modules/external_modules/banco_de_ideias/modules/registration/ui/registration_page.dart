@@ -25,18 +25,20 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final _formKey = GlobalKey<FormState>();
   final _nomeController = TextEditingController();
 
-  bool _isAluno = true;
+  String _tipoUsuario = 'Terceirizado';
+  bool get _isAluno => _tipoUsuario == 'Aluno';
   bool _isLoading = true;
   bool _isSaving = false;
   String? _cursoId;
-  String? _departamentoId;
   String? _errorMessage;
   List<CrudRecord> _cursos = const [];
-  List<CrudRecord> _departamentos = const [];
 
   @override
   void initState() {
     super.initState();
+    final draft = _moduleController.registrationDraft;
+    _nomeController.text = draft?.nome ?? '';
+    _tipoUsuario = draft?.tipoUsuario ?? 'Terceirizado';
     _carregarOpcoes();
   }
 
@@ -48,8 +50,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   Future<void> _carregarOpcoes() async {
     try {
-      final opcoes = await _moduleController.usuarioApiService
-          .carregarOpcoesCadastro();
+      final opcoes =
+          _moduleController.registrationOptions ??
+          await _moduleController.usuarioApiService.carregarOpcoesCadastro();
 
       if (!mounted) {
         return;
@@ -57,11 +60,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
       setState(() {
         _cursos = opcoes.cursos;
-        _departamentos = opcoes.departamentos;
-        _cursoId = _cursos.isEmpty ? null : _cursos.first.id;
-        _departamentoId = _departamentos.isEmpty
-            ? null
-            : _departamentos.first.id;
+        _cursoId = _moduleController.registrationDraft?.cursoId;
         _isLoading = false;
       });
     } catch (err) {
@@ -88,8 +87,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
         UsuarioCadastroData(
           nome: _nomeController.text.trim(),
           isAluno: _isAluno,
+          tipoUsuario: _tipoUsuario,
           cursoId: _isAluno ? _cursoId : null,
-          departamentoId: _isAluno ? null : _departamentoId,
         ),
       );
 
@@ -212,14 +211,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
               ),
               const SizedBox(height: 20),
               UserTypeSegment(
-                isAluno: _isAluno,
+                tipoUsuario: _tipoUsuario,
                 enabled: !_isSaving,
-                onChanged: (value) => setState(() => _isAluno = value),
+                onChanged: (value) => setState(() => _tipoUsuario = value),
               ),
               const SizedBox(height: 20),
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 180),
-                child: _isAluno ? _buildAlunoFields() : _buildProfessorFields(),
+                child: _isAluno ? _buildAlunoFields() : const SizedBox.shrink(),
               ),
               const SizedBox(height: 24),
               RegistrationSubmitButton(
@@ -306,39 +305,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
           onChanged: _isSaving
               ? null
               : (value) => setState(() => _cursoId = value),
-          validator: (value) =>
-              value == null ? 'bdi_selecione_curso'.tr : null,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildProfessorFields() {
-    return Column(
-      key: const ValueKey('professor-fields'),
-      children: [
-        DropdownButtonFormField<String>(
-          initialValue: _departamentoId,
-          dropdownColor: AppColors.darkBlue(),
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: 'departamento'.tr,
-            prefixIcon: const Icon(Icons.business_rounded),
-            border: const OutlineInputBorder(),
-          ),
-          items: _departamentos
-              .map(
-                (departamento) => DropdownMenuItem(
-                  value: departamento.id,
-                  child: Text(departamento.nome),
-                ),
-              )
-              .toList(growable: false),
-          onChanged: _isSaving
-              ? null
-              : (value) => setState(() => _departamentoId = value),
-          validator: (value) =>
-              value == null ? 'bdi_selecione_departamento'.tr : null,
+          validator: (value) => value == null ? 'bdi_selecione_curso'.tr : null,
         ),
       ],
     );

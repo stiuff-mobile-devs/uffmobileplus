@@ -5,30 +5,39 @@ import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/contr
 class UserTypeSegment extends GetView<BancoDeIdeiasController> {
   const UserTypeSegment({
     super.key,
-    required this.isAluno,
+    required this.tipoUsuario,
     required this.enabled,
     required this.onChanged,
   });
 
-  final bool isAluno;
+  final String tipoUsuario;
   final bool enabled;
-  final ValueChanged<bool> onChanged;
+  final ValueChanged<String> onChanged;
 
   @override
-  Widget build(BuildContext context) => SegmentedButton<bool>(
-    segments: [
-      ButtonSegment(
-        value: true,
-        icon: const Icon(Icons.school_rounded),
-        label: Text('bdi_aluno'.tr),
-      ),
-      ButtonSegment(
-        value: false,
-        icon: const Icon(Icons.co_present_rounded),
-        label: Text('bdi_professor'.tr),
-      ),
-    ],
-    selected: {isAluno},
-    onSelectionChanged: enabled ? (values) => onChanged(values.first) : null,
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) => SegmentedButton<String>(
+      direction: constraints.maxWidth < 480 ? Axis.vertical : Axis.horizontal,
+      expandedInsets: EdgeInsets.zero,
+      segments: [
+        ButtonSegment(
+          value: 'Aluno',
+          icon: const Icon(Icons.school_rounded),
+          label: Text('bdi_aluno'.tr),
+        ),
+        ButtonSegment(
+          value: 'Professor',
+          icon: const Icon(Icons.co_present_rounded),
+          label: Text('bdi_professor'.tr),
+        ),
+        ButtonSegment(
+          value: 'Terceirizado',
+          icon: const Icon(Icons.badge_outlined),
+          label: Text('bdi_terceirizado'.tr),
+        ),
+      ],
+      selected: {tipoUsuario},
+      onSelectionChanged: enabled ? (values) => onChanged(values.first) : null,
+    ),
   );
 }
