@@ -31,8 +31,12 @@ class UserDataController extends GetxController {
       String? bondId;
       String? matricula = targetMatricula;
 
-      String? textoQrCode = await saciData[0];
-      String? dataValidadeMatricula = await saciData[1];
+      // O SACI devolve lista vazia quando não há dados da carteirinha
+      // (ex.: pós-doutorado). Não pode derrubar o login por isso.
+      String? textoQrCode =
+          saciData.isNotEmpty ? saciData[0]?.toString() : null;
+      String? dataValidadeMatricula =
+          saciData.length > 1 ? saciData[1]?.toString() : null;
 
       String? iduff =
           await _userDataRepository.getIduff() ??
@@ -60,8 +64,12 @@ class UserDataController extends GetxController {
           curso = userUmm.pos?.alunos?[posIndex].cursoNome;
         }
       }
+      final gradList = userUmm.grad?.matriculas;
+      final nomeSocialIndex = gradIndex ?? 0;
       String? nomeSocial =
-          userUmm.grad?.matriculas?[gradIndex ?? 0].identificacao?.nomesocial;
+          (gradList != null && nomeSocialIndex < gradList.length)
+              ? gradList[nomeSocialIndex].identificacao?.nomesocial
+              : null;
 
       name ??= userUmm.activeBond?.objects?.outerObject?[0].usuario?.nome;
 

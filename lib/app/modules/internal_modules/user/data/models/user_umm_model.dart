@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class UserUmmModel {
   Grad? grad;
   Pos? pos;
@@ -346,16 +348,15 @@ class OuterObject {
     usuario = json['usuario'] != null ? Usuario.fromJson(json['usuario']) : null;
     if (json['object'] != null) {
       innerObjects = <InnerObject>[];
-      try {
-        if (json['object'] is List) {
-          json['object'].forEach((v) {
-            innerObjects!.add(InnerObject.fromJson(v));
-          });
-        } else {
-          innerObjects!.add(InnerObject.fromJson(json['object']));
+      final raw = json['object'];
+      final items = raw is List ? raw : [raw];
+      // Lê cada vínculo separadamente: um vínculo inválido não descarta os outros
+      for (final v in items) {
+        try {
+          innerObjects!.add(InnerObject.fromJson(Map<String, dynamic>.from(v)));
+        } catch (e) {
+          debugPrint('UserUmmModel: vínculo ignorado por erro de leitura: $e\n$v');
         }
-      } catch (e) {
-        // ignore parsing errors
       }
     }
   }
@@ -384,13 +385,13 @@ class Usuario {
   Usuario({this.id, this.nome, this.cpf, this.ddd, this.tel, this.rg, this.iduff});
 
   Usuario.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    nome = json['nome'];
-    cpf = json['cpf'];
-    ddd = json['ddd'];
-    tel = json['tel'];
-    rg = json['rg'];
-    iduff = json['iduff'];
+    id = json['id']?.toString();
+    nome = json['nome']?.toString();
+    cpf = json['cpf']?.toString();
+    ddd = json['ddd']?.toString();
+    tel = json['tel']?.toString();
+    rg = json['rg']?.toString();
+    iduff = json['iduff']?.toString();
   }
 
   Map<String, dynamic> toJson() {
@@ -436,11 +437,12 @@ class Vinculacao {
   Vinculacao({this.id, this.matricula, this.localidadeId, this.vinculoId, this.vinculo});
 
   Vinculacao.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    matricula = json['matricula'];
-    localidadeId = json['localidade_id'];
-    vinculoId = json['vinculo_id'];
-    vinculo = json['vinculo'];
+    // ?.toString(): a API pode mandar número ou texto
+    id = json['id']?.toString();
+    matricula = json['matricula']?.toString();
+    localidadeId = json['localidade_id']?.toString();
+    vinculoId = json['vinculo_id']?.toString();
+    vinculo = json['vinculo']?.toString();
   }
 
   Map<String, dynamic> toJson() {

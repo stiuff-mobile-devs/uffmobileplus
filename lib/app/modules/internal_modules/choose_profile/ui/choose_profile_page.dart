@@ -253,7 +253,7 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "${controller.activeBonds()[index].vinculacao!.vinculo}",
+                            controller.postDocBonds()[index].vinculacao?.vinculo ?? '',
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Text(
@@ -315,7 +315,7 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "${controller.activeBonds()[index].vinculacao!.vinculo}",
+                            controller.postDocBonds()[index].vinculacao?.vinculo ?? '',
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Text(
@@ -377,7 +377,7 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "${controller.activeBonds()[index].vinculacao!.vinculo}",
+                            controller.postDocBonds()[index].vinculacao?.vinculo ?? '',
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ],
@@ -420,7 +420,7 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
               onTap: () {
                 controller.saveUserDataBeforeChooseProfile(
                   ProfileTypes.post_doc_researcher_student,
-                  controller.activeBonds()[index].vinculacao!.matricula!, //Todo: Verificar os !
+                  controller.postDocBonds()[index].vinculacao?.matricula ?? '',
                 );
               },
               child: Container(
@@ -436,7 +436,7 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "${controller.activeBonds()[index].vinculacao!.vinculo}",
+                            controller.postDocBonds()[index].vinculacao?.vinculo ?? '',
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ],

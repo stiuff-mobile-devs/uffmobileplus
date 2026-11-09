@@ -94,28 +94,33 @@ class ChooseProfileController extends GetxController {
   Future<void> fetchData() async {
     isBusy.value = true;
 
-
+    // Zera os contadores: sem isso, "Atualizar" duplicava as listas
+    teacherQtd = 0;
+    employeeQtd = 0;
+    outsourcedQtd = 0;
+    postDocResearcherStudentQtd = 0;
+    hasGradButNoGradInfo = false;
+    matricula = '';
 
     try {
       userUmm = await userUmmRepository.getUserData(iduff, await _auth.getAccessToken() ?? "");
     } catch (e) {
-      isBusy.value = false;
-      _showErrorSnackbar(
+      debugPrint("Error fetching user data: $e");
+      await _failAndLogout(
         'erro_carregar_dados_usuario'.tr,
         'erro_carregar_dados_usuario_msg'.tr,
       );
-      _logoutIduff();
-      debugPrint("Error fetching user data: $e");
+      return;
     }
 
-    List<InnerObject> bonds =
-        userUmm.activeBond?.objects?.outerObject?[1].innerObjects ?? [];
+    List<InnerObject> bonds = activeBonds();
     if (bonds.isEmpty) {
-      _showErrorSnackbar(
+      debugPrint("Nenhum vínculo ativo encontrado na UMM");
+      await _failAndLogout(
         'nenhum_perfil_encontrado'.tr,
         'nenhum_perfil_encontrado_msg'.tr,
       );
-      _logoutIduff();
+      return;
     }
 
     //Verifica se o usuario tem algum perfil de graduação
@@ -143,21 +148,25 @@ class ChooseProfileController extends GetxController {
       if (bond.vinculacao?.vinculoId == UffBondIds.outsourced) {
         outsourcedQtd++;
       }
-      if(bond.vinculacao?.vinculoId == UffBondIds.post_doc_researcher_student){
+      //Verifica se o perfil é de pesquisador de pós-doutorado
+      if (bond.vinculacao?.vinculoId == UffBondIds.post_doc_researcher_student) {
         postDocResearcherStudentQtd++;
-
       }
     }
 
     debugPrint(
-      "gradqtd: $gradQtd / posqtd: $posQtd / teacherQtd: $teacherQtd / employeeQtd: $employeeQtd / outsourcedQtd: $outsourcedQtd",
+      "gradqtd: $gradQtd / posqtd: $posQtd / teacherQtd: $teacherQtd / employeeQtd: $employeeQtd / outsourcedQtd: $outsourcedQtd / postDocQtd: $postDocResearcherStudentQtd",
     );
 
     final gradSelectableQtd = gradQtd > 0
         ? gradQtd
         : (hasGradButNoGradInfo ? 1 : 0);
-    totalProfileQtd =
-        gradSelectableQtd + posQtd + teacherQtd + employeeQtd + outsourcedQtd;
+    totalProfileQtd = gradSelectableQtd +
+        posQtd +
+        teacherQtd +
+        employeeQtd +
+        outsourcedQtd +
+        postDocResearcherStudentQtd;
 
     if (totalProfileQtd == 1) {
       await _autoSelectSingleProfile();
@@ -186,6 +195,14 @@ class ChooseProfileController extends GetxController {
       await saveUserDataBeforeChooseProfile(
         ProfileTypes.pos,
         userUmm.pos?.alunos?.first.matricula?.toString() ?? "",
+      );
+      return;
+    }
+
+    if (postDocResearcherStudentQtd == 1) {
+      await saveUserDataBeforeChooseProfile(
+        ProfileTypes.post_doc_researcher_student,
+        postDocBonds().first.vinculacao?.matricula ?? "",
       );
       return;
     }
@@ -226,7 +243,21 @@ class ChooseProfileController extends GetxController {
   }
 
   List<InnerObject> activeBonds() {
-    return userUmm.activeBond?.objects?.outerObject?[1].innerObjects ?? [];
+    final outer = userUmm.activeBond?.objects?.outerObject;
+    if (outer == null || outer.length < 2) return [];
+    return outer[1].innerObjects ?? [];
+  }
+
+  /// Só os vínculos de pesquisador de pós-doutorado (a lista da tela usa
+  /// este índice, não o de todos os vínculos).
+  List<InnerObject> postDocBonds() {
+    return activeBonds()
+        .where(
+          (bond) =>
+              bond.vinculacao?.vinculoId ==
+              UffBondIds.post_doc_researcher_student,
+        )
+        .toList();
   }
 
   Future<void> saveUserDataBeforeChooseProfile(
@@ -239,19 +270,28 @@ class ChooseProfileController extends GetxController {
       await _userDataController.saveUserData(userUmm, matricula, profileType);
       Get.offAllNamed(Routes.HOME);
     } catch (e) {
+      debugPrint("Erro ao salvar dados do perfil ($profileType): $e");
       isBusy.value = false;
-      _showErrorSnackbar(
+      await _failAndLogout(
         'erro_salvar_dados_usuario'.tr,
         'erro_salvar_dados_usuario_msg'.tr,
       );
-      _logoutIduff();
     } finally {
       isBusy.value = false;
     }
   }
 
-  void _showErrorSnackbar(String title, String message) {
-    AppPopups.error(message, title: title);
+  /// Mostra o erro e espera o OK antes de voltar ao login (um snackbar
+  /// sumia na troca de tela e o usuário não via o motivo).
+  Future<void> _failAndLogout(String title, String message) async {
+    isBusy.value = false;
+    await AppPopups.alert(
+      title: title,
+      message: message,
+      type: PopupType.error,
+      dismissible: false,
+    );
+    _logoutIduff();
   }
 
   void goToCarteirinhaPage() {
