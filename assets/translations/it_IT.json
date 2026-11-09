@@ -578,5 +578,6 @@
   "aviso_email_nao_institucional_msg": "Hai effettuato l'accesso con un'email che non è @id.uff.br. Alcune funzionalità potrebbero non essere disponibili.",
   "erro_login_google_msg": "Impossibile accedere con l'Account Google. Riprova.",
   "erro_atualizar_dados_google_msg": "Impossibile aggiornare i tuoi dati ora. Riprova più tardi.",
-  "suporte_iduff_copiar_email": "Serve aiuto? Tocca per copiare l'email dell'assistenza:"
+  "suporte_iduff_copiar_email": "Serve aiuto? Tocca per copiare l'email dell'assistenza:",
+  "manual_guias_em_construcao": "Stiamo lavorando al manuale delle guide. Sarà presto disponibile qui."
 }

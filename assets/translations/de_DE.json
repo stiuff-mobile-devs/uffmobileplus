@@ -578,5 +578,6 @@
   "aviso_email_nao_institucional_msg": "Du hast dich mit einer E-Mail angemeldet, die nicht @id.uff.br ist. Einige Funktionen sind möglicherweise nicht verfügbar.",
   "erro_login_google_msg": "Anmeldung mit dem Google-Konto nicht möglich. Bitte versuche es erneut.",
   "erro_atualizar_dados_google_msg": "Deine Daten konnten gerade nicht aktualisiert werden. Bitte versuche es später erneut.",
-  "suporte_iduff_copiar_email": "Brauchst du Hilfe? Tippe, um die Support-E-Mail zu kopieren:"
+  "suporte_iduff_copiar_email": "Brauchst du Hilfe? Tippe, um die Support-E-Mail zu kopieren:",
+  "manual_guias_em_construcao": "Wir arbeiten am Handbuch mit den Anleitungen. Es ist bald hier verfügbar."
 }

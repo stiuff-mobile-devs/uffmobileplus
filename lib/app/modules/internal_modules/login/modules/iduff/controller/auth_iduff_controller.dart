@@ -68,10 +68,11 @@ class AuthIduffController extends GetxController {
   }
 
   Future<void> loginSuccessful() async {
-    isLoading.value = false;
+    // Mantém o carregamento até a navegação: zerar antes deixava a tela
+    // vazia (branca) enquanto o token do CDC era registrado.
+    isLoading.value = true;
     await _registerTokenCdc();
-    
-      Get.offAllNamed(Routes.CHOOSE_PROFILE);
+    Get.offAllNamed(Routes.CHOOSE_PROFILE);
   }
 
   Future<void> _login() async {

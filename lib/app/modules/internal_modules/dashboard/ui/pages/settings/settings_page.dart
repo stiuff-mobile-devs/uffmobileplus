@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/utils/help_guides.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_bars.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/settings_controller.dart';
 import 'package:uffmobileplus/app/ui/widgets/language_selector_bottom_sheet.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
@@ -13,6 +15,11 @@ class SettingsPage extends GetView<SettingsController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.darkBlue(),
+      appBar: AppBars.build(
+        title: 'configuracoes'.tr,
+        actions: [AppBars.helpAction(HelpGuides.configuracoes)],
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: AppColors.darkBlueToBlackGradient(),
@@ -22,8 +29,6 @@ class SettingsPage extends GetView<SettingsController> {
 
           return CustomScrollView(
             slivers: [
-              _sliverAppBar('configuracoes'.tr),
-
               SettingsItem(
                 icon: Icon(Icons.language, color: Colors.white),
                 main: Row(
@@ -140,29 +145,6 @@ class SettingsPage extends GetView<SettingsController> {
       ),
     );
   }
-  // TODO: app bar identica à utilizada na página Sobre, extrair para um componente reutilizável
-  Widget _sliverAppBar(String title) {
-    return SliverAppBar(
-      foregroundColor: Colors.white,
-      title: Text(title),
-      centerTitle: true,
-      elevation: 8,
-
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
-      ),
-
-      flexibleSpace: Container(
-        decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
-      ),
-
-      actions: <Widget>[
-        IconButton(onPressed: () {}, icon: const Icon(Icons.question_mark)),
-      ],
-    );
-  }
-
-
   void _showBondsDialog(SettingsController controller) {
     AppPopups.sheet<void>(
       title: 'minhas_vinculacoes'.tr,

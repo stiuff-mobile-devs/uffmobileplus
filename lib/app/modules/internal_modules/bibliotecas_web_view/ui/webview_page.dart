@@ -1,45 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_bars.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/web_view/controller/webview_controller.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class WebViewPage extends StatelessWidget {
-  const WebViewPage({Key? key}) : super(key: key);
+  const WebViewPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return GetBuilder<WebViewPageController>(
       builder: (controller) {
-        return WillPopScope(
-          onWillPop: ( ) => onExit(controller),
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, _) async {
+            if (didPop) return;
+            if (await onExit(controller)) Get.back();
+          },
           child: Scaffold(
-            appBar: AppBar(
-              backgroundColor: AppColors.darkBlue(),
-              foregroundColor: Colors.white,
-              automaticallyImplyLeading: false,
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(onPressed: () async {
-                    if (await controller.wvc.canGoBack()) {
-                      controller.wvc.goBack();
-                    } else {
-                      Get.back();
-                    }
-                  }, icon: const Icon(Icons.arrow_back)),
-                  Expanded(child: Center(child: Text(controller.title))),
-                  IconButton(onPressed: () {Get.back();}, icon: const Icon(Icons.close)),                  
-                  controller.interrogation? IconButton(onPressed: (){controller.goDocPage();}, icon: const Icon(Icons.question_mark, color: Colors.white,)) : const SizedBox(width: 0,),
-                ],
+            backgroundColor: AppColors.darkBlue(),
+            appBar: AppBars.build(
+              title: controller.title,
+              leading: IconButton(
+                tooltip: 'voltar'.tr,
+                icon: const Icon(Icons.arrow_back_rounded),
+                onPressed: () async {
+                  if (await onExit(controller)) Get.back();
+                },
               ),
+              actions: [
+                if (controller.interrogation)
+                  IconButton(
+                    tooltip: 'ajuda'.tr,
+                    icon: const Icon(Icons.help_outline_rounded),
+                    onPressed: controller.goDocPage,
+                  ),
+                IconButton(
+                  tooltip: 'fechar'.tr,
+                  icon: const Icon(Icons.close_rounded),
+                  onPressed: () => Get.back(),
+                ),
+              ],
             ),
-            body: WebViewWidget(controller: controller.wvc,),
+            body: WebViewWidget(controller: controller.wvc),
           ),
         );
-      });
+      },
+    );
   }
 
+  /// Volta no histórico da WebView. Retorna true quando não há mais histórico
+  /// (a tela pode ser fechada).
   Future<bool> onExit(WebViewPageController controller) async {
     if (await controller.wvc.canGoBack()) {
       controller.wvc.goBack();

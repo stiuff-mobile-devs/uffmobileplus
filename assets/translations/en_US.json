@@ -578,5 +578,6 @@
   "aviso_email_nao_institucional_msg": "You signed in with an email that is not @id.uff.br. Some features may be unavailable.",
   "erro_login_google_msg": "Could not sign in with the Google Account. Please try again.",
   "erro_atualizar_dados_google_msg": "Could not update your data right now. Please try again later.",
-  "suporte_iduff_copiar_email": "Need help? Tap to copy the support email:"
+  "suporte_iduff_copiar_email": "Need help? Tap to copy the support email:",
+  "manual_guias_em_construcao": "We are working on the guide manual. It will be available here soon."
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/utils/help_guides.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_bars.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/external_modules_controller.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/utils/custom_drawer.dart';
@@ -9,29 +11,15 @@ import 'package:uffmobileplus/app/modules/internal_modules/dashboard/utils/custo
 class ExternalModulesPage extends GetView<ExternalModulesController> {
   const ExternalModulesPage({super.key});
 
-  AppBar _appBar() {
-    return AppBar(
-      foregroundColor: Colors.white,
-      title: Text('servicos'.tr),
-      centerTitle: true,
-      elevation: 8,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
-      ),
-      flexibleSpace: Container(
-        decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
-      ),
-      actions: <Widget>[
-        IconButton(onPressed: () {}, icon: const Icon(Icons.question_mark)),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.darkBlue(),
       drawer: CustomDrawer(),
-      appBar: _appBar(),
+      appBar: AppBars.build(
+        title: 'servicos'.tr,
+        actions: [AppBars.helpAction(HelpGuides.servicos)],
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: AppColors.darkBlueToBlackGradient(),

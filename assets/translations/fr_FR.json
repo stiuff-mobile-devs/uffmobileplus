@@ -578,5 +578,6 @@
   "aviso_email_nao_institucional_msg": "Vous vous êtes connecté avec une adresse qui n'est pas @id.uff.br. Certaines fonctionnalités peuvent être indisponibles.",
   "erro_login_google_msg": "Impossible de se connecter avec le compte Google. Veuillez réessayer.",
   "erro_atualizar_dados_google_msg": "Impossible de mettre à jour vos données pour le moment. Réessayez plus tard.",
-  "suporte_iduff_copiar_email": "Besoin d'aide ? Touchez pour copier l'e-mail du support :"
+  "suporte_iduff_copiar_email": "Besoin d'aide ? Touchez pour copier l'e-mail du support :",
+  "manual_guias_em_construcao": "Nous travaillons sur le manuel des guides. Il sera bientôt disponible ici."
 }

@@ -1,6 +1,7 @@
 import 'package:accordion/accordion.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_bars.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/choose_profile/controller/choose_profile_controller.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
@@ -13,45 +14,32 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
   Widget build(BuildContext context) {
     return Obx(
       () => Scaffold(
+        backgroundColor: AppColors.darkBlue(),
         appBar: controller.isBusy.value
             ? null
-            : AppBar(
-                centerTitle: true,
-                elevation: 8,
-                foregroundColor: Colors.white,
-                title: Text('escolha_perfil'.tr),
+            : AppBars.build(
+                title: 'escolha_perfil'.tr,
                 actions: [
                   IconButton(
                     onPressed: controller.goToCarteirinhaPage,
-                    icon: const Icon(Icons.qr_code_2),
+                    icon: const Icon(Icons.qr_code_2_rounded),
                     tooltip: 'carteirinha_digital'.tr,
                   ),
                   Obx(
                     () => controller.hasControlPermission.value
                         ? IconButton(
                             onPressed: controller.goToCatracaOnlinePage,
-                            icon: const Icon(Icons.qr_code_scanner),
+                            icon: const Icon(Icons.qr_code_scanner_rounded),
                             tooltip: 'catraca'.tr,
                           )
                         : const SizedBox.shrink(),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.refresh),
+                    icon: const Icon(Icons.refresh_rounded),
                     tooltip: 'atualizar'.tr,
-                    onPressed: () {
-                      controller.fetchData();
-                    },
+                    onPressed: controller.fetchData,
                   ),
                 ],
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(
-                    bottom: Radius.circular(10),
-                  ),
-                ),
-                flexibleSpace: Container(
-                  decoration:
-                      BoxDecoration(gradient: AppColors.appBarTopGradient()),
-                ),
               ),
         body: Stack(
           children: [
@@ -78,7 +66,7 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
             if (controller.isBusy.value)
               Positioned.fill(
                 child: Container(
-                  color: Colors.black.withOpacity(0.35),
+                  color: Colors.black.withValues(alpha: 0.35),
                   child: const Center(
                     child: CustomProgressDisplay(),
                   ),

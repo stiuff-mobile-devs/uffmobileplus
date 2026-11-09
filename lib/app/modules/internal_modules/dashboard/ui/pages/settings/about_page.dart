@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/utils/help_guides.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_bars.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/about_controller.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 
@@ -29,6 +31,11 @@ class AboutPage extends StatelessWidget {
       }
     });
     return Scaffold(
+      backgroundColor: AppColors.darkBlue(),
+      appBar: AppBars.build(
+        title: 'titulo'.tr,
+        actions: [AppBars.helpAction(HelpGuides.sobre)],
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: AppColors.darkBlueToBlackGradient(),
@@ -38,7 +45,6 @@ class AboutPage extends StatelessWidget {
           builder: (controller) {
             return CustomScrollView(
               slivers: [
-                _sliverAppBar('titulo'.tr),
                 _aboutItemCard(
                   Icons.home,
                   'nome_versao'.tr,
@@ -59,28 +65,6 @@ class AboutPage extends StatelessWidget {
           },
         ),
       ),
-    );
-  }
-
-  // TODO: app bar identica à utilizada na página Configurações, extrair para um componente reutilizável
-  Widget _sliverAppBar(String title) {
-    return SliverAppBar(
-      foregroundColor: Colors.white,
-      title: Text(title),
-      centerTitle: true,
-      elevation: 8,
-
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
-      ),
-
-      flexibleSpace: Container(
-        decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
-      ),
-
-      actions: <Widget>[
-        IconButton(onPressed: () {}, icon: const Icon(Icons.question_mark)),
-      ],
     );
   }
 

@@ -55,6 +55,14 @@ Custom GetX-native i18n (`lib/app/utils/translations/`), **not** Flutter's `.arb
 
 To add a new translated string, add the key to **all 6** JSON files, not just one. `test/translations/translation_integrity_test.dart` checks that every locale has the same keys as `pt_BR`, no empty values, no duplicate keys, and that every `.tr` key used in `lib/` exists in `pt_BR.json`. Before checking for a new key, grep `pt_BR.json` — many texts already have a key.
 
+### AppBars (`AppBars`)
+Ponto único: `lib/app/utils/ui_components/app_bars.dart`. **Obrigatório nos `internal_modules`** (exceto a tela especial `lock_develop_mode`); os `external_modules` ainda usam `customAppBar`/blocos próprios — migre-os quando for mexer neles.
+- Nunca use `AppBar(...)`/`SliverAppBar(...)` direto nas telas: `appBar: AppBars.build(title: ..., actions: [...])`.
+- Visual único: degradê vertical `AppColors.mediumBlue()` → `AppColors.darkBlue()`, raio inferior 16, título centralizado, texto/ícones brancos, status bar clara.
+- A seta de voltar e o ícone do menu (quando há drawer) são automáticos; passe `leading` só para comportamentos especiais (ex.: WebView volta no histórico). Filtros/abas vão em `bottom`.
+- Dê ao `Scaffold` `backgroundColor: AppColors.darkBlue()`, senão os cantos arredondados da AppBar mostram o fundo branco padrão.
+- Botão de ajuda: `AppBars.helpAction(HelpGuides.<tela>)`. As URLs dos guias online ficam em `lib/app/utils/help_guides.dart`; enquanto for `null`, o botão avisa que o manual está em construção.
+
 ### Pop-ups e snackbars (`AppPopups`)
 Ponto único: `lib/app/utils/ui_components/app_popups.dart`. **Obrigatório nos `internal_modules`**; os `external_modules` ainda usam o padrão antigo (`Get.snackbar`, `customAlertDialog`/AwesomeDialog etc.) — migre-os para `AppPopups` quando for mexer neles.
 - Nunca use `showDialog`, `Get.dialog`, `Get.defaultDialog`, `Get.snackbar`, `Get.bottomSheet`, `showModalBottomSheet`, `ScaffoldMessenger` ou `customAlertDialog` direto nas telas/controllers.

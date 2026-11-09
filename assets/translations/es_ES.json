@@ -578,5 +578,6 @@
   "aviso_email_nao_institucional_msg": "Iniciaste sesión con un correo que no es @id.uff.br. Algunas funciones pueden no estar disponibles.",
   "erro_login_google_msg": "No fue posible iniciar sesión con la Cuenta de Google. Inténtalo de nuevo.",
   "erro_atualizar_dados_google_msg": "No fue posible actualizar tus datos ahora. Inténtalo más tarde.",
-  "suporte_iduff_copiar_email": "¿Necesitas ayuda? Toca para copiar el correo de soporte:"
+  "suporte_iduff_copiar_email": "¿Necesitas ayuda? Toca para copiar el correo de soporte:",
+  "manual_guias_em_construcao": "Estamos trabajando en el manual de guías. Pronto estará disponible aquí."
 }

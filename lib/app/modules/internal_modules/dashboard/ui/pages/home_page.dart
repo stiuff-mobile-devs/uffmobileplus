@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_bars.dart';
 import 'package:uffmobileplus/app/data/services/responsive_layout_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/cardapio/ui/pages/menu_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/study_plan/data/models/discipline_model.dart';
@@ -83,25 +84,17 @@ class HomePage extends GetView<HomePageController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: CustomDrawer(), //_buildDrawer(context),
-      appBar: AppBar(
-        centerTitle: true,
-        elevation: 8,
-        foregroundColor: Colors.white,
-        title: const Text('UFF+'),
+      backgroundColor: AppColors.darkBlue(),
+      drawer: CustomDrawer(),
+      appBar: AppBars.build(
+        title: 'UFF+',
         actions: [
           IconButton(
-            icon: const Icon(Icons.help_outline),
+            icon: const Icon(Icons.help_outline_rounded),
             tooltip: 'ajuda'.tr,
             onPressed: () => Get.toNamed(Routes.CENTRAL_DE_ATENDIMENTO),
           ),
         ],
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
-        ),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
-        ),
       ),
       body: Obx(() {
         final layoutService = controller.layoutService;
