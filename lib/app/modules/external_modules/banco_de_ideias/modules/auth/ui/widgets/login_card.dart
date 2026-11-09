@@ -71,7 +71,7 @@ class LoginCard extends GetView<BancoDeIdeiasController> {
           ),
           const SizedBox(height: 12),
           Text(
-            'bdi_login_google_falhou'.tr,
+            'bdi_login_google_necessario_msg'.tr,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 15,
