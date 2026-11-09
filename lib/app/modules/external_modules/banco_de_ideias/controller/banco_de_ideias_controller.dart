@@ -81,6 +81,8 @@ class BancoDeIdeiasController extends GetxController {
     var refreshGroups = user.gdiGroupsGoogle?.lastUpdate == null;
 
     if (forceGoogleLogin || !await authService.hasValidGoogleSession(email)) {
+      if (!forceGoogleLogin) return ModuleAccess.googleLoginRequired;
+
       // Groups left by a previous account must never authorize the new login.
       final cleared = await userDataRepository.updateGdiGroupsGoogle(
         GdiGroupsGoogle(null, []),
