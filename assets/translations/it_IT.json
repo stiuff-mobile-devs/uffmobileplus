@@ -569,5 +569,14 @@
   "nova_versao_disponivel": "Nuova Versione Disponibile",
   "atualizacao_obrigatoria_msg": "È necessario un aggiornamento obbligatorio per continuare a usare l'app.",
   "nova_versao_disponivel_msg": "È disponibile una nuova versione! Vuoi aggiornare ora?",
-  "depois": "Più tardi"
+  "depois": "Più tardi",
+  "confirmar": "Conferma",
+  "refazer_login": "Accedi di nuovo",
+  "aviso_login_google_msg": "Se accedi solo con l'Account Google, questi servizi non saranno disponibili:",
+  "aviso_login_google_pagamentos_ru": "Pagamenti della mensa universitaria",
+  "aviso_email_nao_institucional_titulo": "Email non istituzionale",
+  "aviso_email_nao_institucional_msg": "Hai effettuato l'accesso con un'email che non è @id.uff.br. Alcune funzionalità potrebbero non essere disponibili.",
+  "erro_login_google_msg": "Impossibile accedere con l'Account Google. Riprova.",
+  "erro_atualizar_dados_google_msg": "Impossibile aggiornare i tuoi dati ora. Riprova più tardi.",
+  "suporte_iduff_copiar_email": "Serve aiuto? Tocca per copiare l'email dell'assistenza:"
 }

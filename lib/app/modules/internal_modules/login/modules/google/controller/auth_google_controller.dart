@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
 import 'package:uffmobileplus/app/data/services/google_drive_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/services/auth_google_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
@@ -25,18 +26,6 @@ class AuthGoogleController extends GetxController {
 
   Future<void> loginGoogle() async {
     try {
-      await Get.defaultDialog(
-        title: 'atencao'.tr,
-        middleText: "Ao realizar o login apenas com Conta Google, determinados módulos poderão ficar indisponíveis, incluindo a carteirinha digital de identificação e as funcionalidades de pagamento do restaurante universitário.\n\nDeseja continuar mesmo assim?",
-        textConfirm: "Continuar",
-        confirmTextColor: Colors.white,
-        barrierDismissible: false,
-        onConfirm: () {
-          Get.back(); // Fecha o dialog
-        },
-        
-      );
-
       UserGoogleModel? user = await _authGoogle.signInGoogle();
 
       if (user != null) {
@@ -49,69 +38,52 @@ class AuthGoogleController extends GetxController {
         HarpiaClaimsService.syncClaims();
 
         // Chama a função auxiliar passando o e-mail
-        _verifyEmailAndNavigate(user.email ?? "");
+        await _verifyEmailAndNavigate(user.email ?? "");
 
       } else {
-        Get.snackbar(
-          "Erro de Login",
-          "Falha ao autenticar o usuário.",
-          snackPosition: SnackPosition.BOTTOM,
+        AppPopups.error(
+          'falha_autenticar_usuario'.tr,
+          title: 'erro_login_titulo'.tr,
         );
       }
     } catch (e) {
-      Get.snackbar(
-        "Erro de Login externo",
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
+      debugPrint('Erro no login Google: $e');
+      AppPopups.error(
+        'erro_login_google_msg'.tr,
+        title: 'erro_login_externo_titulo'.tr,
       );
       rethrow;
     }
   }
 
-  void _verifyEmailAndNavigate(String email) {
-     
+  Future<void> _verifyEmailAndNavigate(String email) async {
     if (email.endsWith('@id.uff.br')) {
       // Se for acadêmico, vai direto para a Home
       unawaited(_ensureDriveFolder(interactive: true));
       Get.offAllNamed(Routes.HOME);
+      return;
+    }
+
+    final proceed = await AppPopups.confirm(
+      title: 'aviso_email_nao_institucional_titulo'.tr,
+      message: 'aviso_email_nao_institucional_msg'.tr,
+      icon: Icons.alternate_email_rounded,
+      type: PopupType.warning,
+      confirmText: 'continuar'.tr,
+      cancelText: 'refazer_login'.tr,
+      dismissible: false,
+    );
+
+    if (proceed) {
+      unawaited(_ensureDriveFolder(interactive: true));
+      Get.offAllNamed(Routes.HOME);
     } else {
-      // Se não for, exibe o pop-up
-      Get.defaultDialog(
-        title: 'atencao'.tr,
-        middleText: "Você não entrou com um e-mail institucional (@id.uff.br). Algumas funcionalidades podem estar indisponíveis.\n\nDeseja continuar mesmo assim?",
-        textConfirm: "Continuar",
-        textCancel: "Refazer Login",
-        confirmTextColor: Colors.white,
-        barrierDismissible: false,
-        onConfirm: () {
-          Get.back(); // Fecha o dialog
-          unawaited(_ensureDriveFolder(interactive: true));
-          Get.offAllNamed(Routes.HOME); // Vai para a Home
-        },
-        onCancel: () async {
-          // Desloga o usuário para ele poder escolher outra conta do Google
-          logout();
-          debugPrint("Usuário cancelou. Inserir lógica de logout aqui.");
-        },
-      );
+      // Desloga para o usuário poder escolher outra conta do Google
+      await logout();
     }
   }
 
   Future<bool> tryLogin() async {
-     await Get.defaultDialog(
-        title: 'atencao'.tr,
-        middleText: "Ao realizar o login apenas com Conta Google, determinados módulos poderão ficar indisponíveis, incluindo a carteirinha digital de identificação e as funcionalidades de pagamento do restaurante universitário.\n\nDeseja continuar mesmo assim?",
-        textConfirm: "Continuar",
-        textCancel: "Refazer Login",
-        confirmTextColor: Colors.white,
-        barrierDismissible: false,
-        onConfirm: () {
-          Get.back(); // Fecha o dialog
-        },
-        onCancel: () async {
-          Get.back(); // Fecha o dialog
-        },
-      );
     UserGoogleModel? hasLogged = await _authGoogle.trySignInGoogle();
     if (hasLogged != null) {
       await _registerTokenCdc();

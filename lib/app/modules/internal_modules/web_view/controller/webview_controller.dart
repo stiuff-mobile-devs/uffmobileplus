@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
 //import 'package:uffmobileplus/app/data/providers/firebase/firebase_analytics_service.dart';
 //import 'package:uffmobileplus/app/data/repositories/user_repository.dart';
-import 'package:uffmobileplus/app/utils/ui_components/custom_alert_dialog.dart';
 import 'package:uffmobileplus/app/utils/ui_components/uri_launcher_helper.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -14,7 +14,7 @@ class WebViewPageController extends GetxController {
       'url': '',
       'title': 'services'.tr,
     });*/
-    customAlertDialog(Get.context!, title: 'page_under_development'.tr).show();
+    AppPopups.info('page_under_development'.tr);
   }
 
   // final _obj = ''.obs;

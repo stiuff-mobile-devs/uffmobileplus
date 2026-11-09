@@ -569,5 +569,14 @@
   "nova_versao_disponivel": "New Version Available",
   "atualizacao_obrigatoria_msg": "A mandatory update is required to keep using the app.",
   "nova_versao_disponivel_msg": "A new version is available! Would you like to update now?",
-  "depois": "Later"
+  "depois": "Later",
+  "confirmar": "Confirm",
+  "refazer_login": "Sign in again",
+  "aviso_login_google_msg": "If you sign in with a Google Account only, these services will be unavailable:",
+  "aviso_login_google_pagamentos_ru": "University restaurant payments",
+  "aviso_email_nao_institucional_titulo": "Non-institutional email",
+  "aviso_email_nao_institucional_msg": "You signed in with an email that is not @id.uff.br. Some features may be unavailable.",
+  "erro_login_google_msg": "Could not sign in with the Google Account. Please try again.",
+  "erro_atualizar_dados_google_msg": "Could not update your data right now. Please try again later.",
+  "suporte_iduff_copiar_email": "Need help? Tap to copy the support email:"
 }

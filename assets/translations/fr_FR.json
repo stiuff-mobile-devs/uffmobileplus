@@ -569,5 +569,14 @@
   "nova_versao_disponivel": "Nouvelle Version Disponible",
   "atualizacao_obrigatoria_msg": "Une mise à jour obligatoire est requise pour continuer à utiliser l'application.",
   "nova_versao_disponivel_msg": "Une nouvelle version est disponible ! Souhaitez-vous mettre à jour maintenant ?",
-  "depois": "Plus tard"
+  "depois": "Plus tard",
+  "confirmar": "Confirmer",
+  "refazer_login": "Se reconnecter",
+  "aviso_login_google_msg": "Si vous vous connectez uniquement avec un compte Google, ces services seront indisponibles :",
+  "aviso_login_google_pagamentos_ru": "Paiements du restaurant universitaire",
+  "aviso_email_nao_institucional_titulo": "E-mail non institutionnel",
+  "aviso_email_nao_institucional_msg": "Vous vous êtes connecté avec une adresse qui n'est pas @id.uff.br. Certaines fonctionnalités peuvent être indisponibles.",
+  "erro_login_google_msg": "Impossible de se connecter avec le compte Google. Veuillez réessayer.",
+  "erro_atualizar_dados_google_msg": "Impossible de mettre à jour vos données pour le moment. Réessayez plus tard.",
+  "suporte_iduff_copiar_email": "Besoin d'aide ? Touchez pour copier l'e-mail du support :"
 }

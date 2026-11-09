@@ -5,6 +5,7 @@ import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/
 import 'package:uffmobileplus/app/ui/widgets/language_selector_bottom_sheet.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/utils/translations/language_service.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
 
 class SettingsPage extends GetView<SettingsController> {
   const SettingsPage({super.key});
@@ -93,7 +94,7 @@ class SettingsPage extends GetView<SettingsController> {
               trailing: null,
               onTap: () async {
                 await controller.reloadBondStates();
-                _showBondsDialog(context, controller);
+                _showBondsDialog(controller);
               },
             ),
 
@@ -162,75 +163,40 @@ class SettingsPage extends GetView<SettingsController> {
   }
 
 
-  void _showBondsDialog(BuildContext context, SettingsController controller) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: Colors.black.withOpacity(0.9),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'minhas_vinculacoes'.tr,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  SizedBox(height: 24),
-                  GetBuilder<SettingsController>(
-                    builder: (ctrl) {
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _BondStatusCard(
-                            name: 'IdUFF',
-                            hasActiveIduffBond:
-                                controller.loginController.hasActiveIduffBondObs,
-                            color: Colors.blueAccent,
-                            onTap: () => controller.handleIduffBondTap(),
-                          ),
-                          SizedBox(height: 16),
-                          _BondStatusCard(
-                            name: 'Google',
-                            hasActiveIduffBond:
-                                controller.loginController.hasActiveGoogleBondObs,
-                            color: Colors.redAccent,
-                            onTap: () => controller.handleGoogleBondTap(),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                  SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 12,
-                      ),
-                    ),
-                    child: Text(
-                      'Fechar',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
+  void _showBondsDialog(SettingsController controller) {
+    AppPopups.sheet<void>(
+      title: 'minhas_vinculacoes'.tr,
+      icon: Icons.link_rounded,
+      child: GetBuilder<SettingsController>(
+        builder: (ctrl) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _BondStatusCard(
+                name: 'IdUFF',
+                hasActiveIduffBond:
+                    controller.loginController.hasActiveIduffBondObs,
+                color: Colors.blueAccent,
+                onTap: () => controller.handleIduffBondTap(),
               ),
-            ),
-          ),
-        );
-      },
+              const SizedBox(height: 16),
+              _BondStatusCard(
+                name: 'Google',
+                hasActiveIduffBond:
+                    controller.loginController.hasActiveGoogleBondObs,
+                color: Colors.redAccent,
+                onTap: () => controller.handleGoogleBondTap(),
+              ),
+            ],
+          );
+        },
+      ),
+      actions: (ctx) => [
+        AppSheetButton.secondary(
+          label: 'fechar'.tr,
+          onPressed: () => Navigator.of(ctx).pop(),
+        ),
+      ],
     );
   }
 }
@@ -300,7 +266,7 @@ class _BondStatusCard extends StatelessWidget {
               width: 2,
             ),
             borderRadius: BorderRadius.circular(12),
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withValues(alpha: 0.3),
           ),
           padding: EdgeInsets.all(16),
           child: Row(

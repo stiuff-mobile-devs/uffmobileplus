@@ -5,6 +5,7 @@ import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
 
 class SettingsController extends GetxController {
   SettingsController();
@@ -62,159 +63,59 @@ class SettingsController extends GetxController {
       _showGoogleLoginConfirmation();
     }
   }
-  Future<void> updateGoogleData() async{
-    try{
+  Future<void> updateGoogleData() async {
+    try {
       final token = await _authGoogleController.getFirebaseIdToken();
       UserGoogleModel? user = await _userDataRepository.getUserGoogleModel();
       await _authGoogleController.getGdiGroupsGoogle(token!, user?.email ?? "", true);
-    }
-    catch(e){
-      Get.snackbar(
-        "Erro ao atualizar dados do Google",
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
+    } catch (e) {
+      debugPrint('Erro ao atualizar dados do Google: $e');
+      AppPopups.error(
+        'erro_atualizar_dados_google_msg'.tr,
+        title: 'erro_atualizar_dados_google'.tr,
       );
     }
-    
-
-
   }
-  void _showIduffLoginConfirmation() {
-    Get.dialog(
-      AlertDialog(
-        backgroundColor: Colors.black87,
-        title: Text(
-          'login_iduff_titulo'.tr,
-          style: TextStyle(
-            color: Colors.blueAccent,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Text(
-          'login_iduff_confirmacao_msg'.tr,
-          style: TextStyle(color: Colors.white),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: Text('cancelar'.tr, style: TextStyle(color: Colors.grey)),
-          ),
-          TextButton(
-            onPressed: () {
-              Get.back();
-              loginController.loginIDUFF();
-            },
-            child: Text(
-              'Continuar',
-              style: TextStyle(color: Colors.blueAccent),
-            ),
-          ),
-        ],
-      ),
+
+  Future<void> _showIduffLoginConfirmation() async {
+    final ok = await AppPopups.confirm(
+      title: 'login_iduff_titulo'.tr,
+      message: 'login_iduff_confirmacao_msg'.tr,
+      icon: Icons.login_rounded,
+      confirmText: 'continuar'.tr,
     );
+    if (ok) loginController.loginIDUFF();
   }
 
-  void _showIduffLogoutConfirmation() {
-    Get.dialog(
-      AlertDialog(
-        backgroundColor: Colors.black87,
-        title: Text(
-          'desconectar_iduff_titulo'.tr,
-          style: TextStyle(
-            color: Colors.blueAccent,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Text(
-          'desconectar_iduff_confirmacao_msg'.tr,
-          style: TextStyle(color: Colors.white),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: Text('cancelar'.tr, style: TextStyle(color: Colors.grey)),
-          ),
-          TextButton(
-            onPressed: () {
-              Get.back();
-              logoutIduff();
-            },
-            child: Text(
-              'desconectar'.tr,
-              style: TextStyle(color: Colors.redAccent),
-            ),
-          ),
-        ],
-      ),
+  Future<void> _showIduffLogoutConfirmation() async {
+    final ok = await AppPopups.confirm(
+      title: 'desconectar_iduff_titulo'.tr,
+      message: 'desconectar_iduff_confirmacao_msg'.tr,
+      icon: Icons.link_off_rounded,
+      confirmText: 'desconectar'.tr,
+      destructive: true,
     );
+    if (ok) await logoutIduff();
   }
 
-  void _showGoogleLoginConfirmation() {
-    Get.dialog(
-      AlertDialog(
-        backgroundColor: Colors.black87,
-        title: Text(
-          'login_google_titulo'.tr,
-          style: TextStyle(
-            color: Colors.redAccent,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Text(
-          'login_google_confirmacao_msg'.tr,
-          style: TextStyle(color: Colors.white),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: Text('cancelar'.tr, style: TextStyle(color: Colors.grey)),
-          ),
-          TextButton(
-            onPressed: () {
-              Get.back();
-              loginController.loginGoogle();
-            },
-            child: Text('continuar'.tr, style: TextStyle(color: Colors.redAccent)),
-          ),
-        ],
-      ),
+  Future<void> _showGoogleLoginConfirmation() async {
+    final ok = await AppPopups.confirm(
+      title: 'login_google_titulo'.tr,
+      message: 'login_google_confirmacao_msg'.tr,
+      icon: Icons.login_rounded,
+      confirmText: 'continuar'.tr,
     );
+    if (ok) loginController.loginGoogle();
   }
 
-  void _showGoogleLogoutConfirmation() {
-    Get.dialog(
-      AlertDialog(
-        backgroundColor: Colors.black87,
-        title: Text(
-          'desconectar_google_titulo'.tr,
-          style: TextStyle(
-            color: Colors.redAccent,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Text(
-          'desconectar_google_confirmacao_msg'.tr,
-          style: TextStyle(color: Colors.white),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: Text('cancelar'.tr, style: TextStyle(color: Colors.grey)),
-          ),
-          TextButton(
-            onPressed: () {
-              Get.back();
-              _authGoogleController.logout();
-            },
-            child: Text(
-              'desconectar'.tr,
-              style: TextStyle(color: Colors.redAccent),
-            ),
-          ),
-        ],
-      ),
+  Future<void> _showGoogleLogoutConfirmation() async {
+    final ok = await AppPopups.confirm(
+      title: 'desconectar_google_titulo'.tr,
+      message: 'desconectar_google_confirmacao_msg'.tr,
+      icon: Icons.link_off_rounded,
+      confirmText: 'desconectar'.tr,
+      destructive: true,
     );
+    if (ok) _authGoogleController.logout();
   }
-
-
 }

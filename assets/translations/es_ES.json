@@ -569,5 +569,14 @@
   "nova_versao_disponivel": "Nueva Versión Disponible",
   "atualizacao_obrigatoria_msg": "Se requiere una actualización obligatoria para seguir usando la aplicación.",
   "nova_versao_disponivel_msg": "¡Hay una nueva versión disponible! ¿Desea actualizar ahora?",
-  "depois": "Más tarde"
+  "depois": "Más tarde",
+  "confirmar": "Confirmar",
+  "refazer_login": "Iniciar sesión de nuevo",
+  "aviso_login_google_msg": "Si inicias sesión solo con la Cuenta de Google, estos servicios no estarán disponibles:",
+  "aviso_login_google_pagamentos_ru": "Pagos del comedor universitario",
+  "aviso_email_nao_institucional_titulo": "Correo no institucional",
+  "aviso_email_nao_institucional_msg": "Iniciaste sesión con un correo que no es @id.uff.br. Algunas funciones pueden no estar disponibles.",
+  "erro_login_google_msg": "No fue posible iniciar sesión con la Cuenta de Google. Inténtalo de nuevo.",
+  "erro_atualizar_dados_google_msg": "No fue posible actualizar tus datos ahora. Inténtalo más tarde.",
+  "suporte_iduff_copiar_email": "¿Necesitas ayuda? Toca para copiar el correo de soporte:"
 }

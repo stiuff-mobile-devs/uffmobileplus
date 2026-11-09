@@ -569,5 +569,14 @@
   "nova_versao_disponivel": "Neue Version verfügbar",
   "atualizacao_obrigatoria_msg": "Ein verpflichtendes Update ist erforderlich, um die App weiter zu nutzen.",
   "nova_versao_disponivel_msg": "Eine neue Version ist verfügbar! Möchten Sie jetzt aktualisieren?",
-  "depois": "Später"
+  "depois": "Später",
+  "confirmar": "Bestätigen",
+  "refazer_login": "Erneut anmelden",
+  "aviso_login_google_msg": "Wenn du dich nur mit einem Google-Konto anmeldest, sind diese Dienste nicht verfügbar:",
+  "aviso_login_google_pagamentos_ru": "Zahlungen in der Mensa",
+  "aviso_email_nao_institucional_titulo": "Keine institutionelle E-Mail",
+  "aviso_email_nao_institucional_msg": "Du hast dich mit einer E-Mail angemeldet, die nicht @id.uff.br ist. Einige Funktionen sind möglicherweise nicht verfügbar.",
+  "erro_login_google_msg": "Anmeldung mit dem Google-Konto nicht möglich. Bitte versuche es erneut.",
+  "erro_atualizar_dados_google_msg": "Deine Daten konnten gerade nicht aktualisiert werden. Bitte versuche es später erneut.",
+  "suporte_iduff_copiar_email": "Brauchst du Hilfe? Tippe, um die Support-E-Mail zu kopieren:"
 }

@@ -8,6 +8,7 @@ import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/utils/custom_drawer.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
 import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.dart';
 
 class HomePage extends GetView<HomePageController> {
@@ -585,92 +586,56 @@ class HomePage extends GetView<HomePageController> {
   }
 
   Future<void> _showAddShortcutSheet(BuildContext context) async {
-    await showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: AppColors.darkBlue(),
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
-      ),
-      builder: (context) {
-        return Obx(() {
-          final remainingServices = controller.availableToAdd.toList(
-            growable: false,
-          );
-          final layoutService = controller.layoutService;
-          final safeBottom = MediaQuery.of(context).padding.bottom;
-          final bottomPadding = layoutService.bottomPadding(
-            safeBottom: safeBottom,
-          );
+    await AppPopups.sheet<void>(
+      title: 'adicionar_atalho'.tr,
+      message: 'servicos_nao_salvos_desc'.tr,
+      icon: Icons.add_rounded,
+      child: Obx(() {
+        final remainingServices = controller.availableToAdd.toList(
+          growable: false,
+        );
 
-          return SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(16, 14, 16, bottomPadding),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'adicionar_atalho'.tr,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.96),
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'servicos_nao_salvos_desc'.tr,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.68),
-                      fontSize: 13,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  if (remainingServices.isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 20),
-                      child: Text(
-                        'todos_servicos_salvos'.tr,
-                        style: TextStyle(color: Colors.white.withOpacity(0.8)),
-                      ),
-                    )
-                  else
-                    Flexible(
-                      child: ListView.separated(
-                        shrinkWrap: true,
-                        itemCount: remainingServices.length,
-                        separatorBuilder: (_, __) => Divider(
-                          color: Colors.white.withOpacity(0.12),
-                          height: 1,
-                        ),
-                        itemBuilder: (context, index) {
-                          final service = remainingServices[index];
-                          return ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            leading: _ServiceIcon(iconSrc: service.iconSrc),
-                            title: Text(
-                              service.subtitle.tr,
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                            trailing: IconButton(
-                              icon: const Icon(
-                                Icons.add_circle_outline,
-                                color: Colors.white,
-                              ),
-                              onPressed: () => controller.addShortcut(service),
-                            ),
-                            onTap: () => controller.addShortcut(service),
-                          );
-                        },
-                      ),
-                    ),
-                ],
-              ),
+        if (remainingServices.isEmpty) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Text(
+              'todos_servicos_salvos'.tr,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
             ),
           );
-        });
-      },
+        }
+
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (int i = 0; i < remainingServices.length; i++) ...[
+              if (i > 0)
+                Divider(
+                  color: Colors.white.withValues(alpha: 0.12),
+                  height: 1,
+                ),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: _ServiceIcon(iconSrc: remainingServices[i].iconSrc),
+                title: Text(
+                  remainingServices[i].subtitle.tr,
+                  style: const TextStyle(color: Colors.white),
+                ),
+                trailing: IconButton(
+                  icon: const Icon(
+                    Icons.add_circle_outline,
+                    color: Colors.white,
+                  ),
+                  onPressed: () =>
+                      controller.addShortcut(remainingServices[i]),
+                ),
+                onTap: () => controller.addShortcut(remainingServices[i]),
+              ),
+            ],
+          ],
+        );
+      }),
     );
   }
 }

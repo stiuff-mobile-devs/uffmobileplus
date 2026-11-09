@@ -10,6 +10,7 @@ import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/gdi_groups.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
 
 class LoginController extends GetxController {
   bool showQrCode = false;
@@ -147,6 +148,11 @@ class LoginController extends GetxController {
   }
 
   Future<void> loginGoogle() async {
+    // Aviso só faz sentido quando o Google será o único vínculo
+    if (!hasActiveIduffBondObs.value && !await _confirmGoogleOnlyLogin()) {
+      return;
+    }
+
     isLoading.value = true;
     try {
       if(hasActiveGoogleBondObs.value){
@@ -164,6 +170,38 @@ class LoginController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  Future<bool> _confirmGoogleOnlyLogin() {
+    return AppPopups.confirm(
+      title: 'atencao'.tr,
+      message: 'aviso_login_google_msg'.tr,
+      icon: Icons.warning_amber_rounded,
+      type: PopupType.warning,
+      confirmText: 'continuar'.tr,
+      dismissible: false,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          for (final item in [
+            'carteirinha_digital'.tr,
+            'aviso_login_google_pagamentos_ru'.tr,
+          ])
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                children: [
+                  const Icon(Icons.block_rounded, size: 18, color: Colors.white70),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(item, style: const TextStyle(color: Colors.white)),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
   }
 
   void goToCarteirinhaPage() {

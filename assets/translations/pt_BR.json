@@ -569,5 +569,14 @@
   "nova_versao_disponivel": "Nova Versão Disponível",
   "atualizacao_obrigatoria_msg": "Uma atualização obrigatória é necessária para continuar utilizando o aplicativo.",
   "nova_versao_disponivel_msg": "Uma nova versão está disponível! Gostaria de atualizar agora?",
-  "depois": "Depois"
+  "depois": "Depois",
+  "confirmar": "Confirmar",
+  "refazer_login": "Refazer login",
+  "aviso_login_google_msg": "Ao entrar apenas com a Conta Google, estes serviços ficarão indisponíveis:",
+  "aviso_login_google_pagamentos_ru": "Pagamentos do restaurante universitário",
+  "aviso_email_nao_institucional_titulo": "E-mail não institucional",
+  "aviso_email_nao_institucional_msg": "Você entrou com um e-mail que não é @id.uff.br. Algumas funcionalidades podem ficar indisponíveis.",
+  "erro_login_google_msg": "Não foi possível entrar com a Conta Google. Tente novamente.",
+  "erro_atualizar_dados_google_msg": "Não foi possível atualizar seus dados agora. Tente novamente mais tarde.",
+  "suporte_iduff_copiar_email": "Precisa de ajuda? Toque para copiar o e-mail do suporte:"
 }

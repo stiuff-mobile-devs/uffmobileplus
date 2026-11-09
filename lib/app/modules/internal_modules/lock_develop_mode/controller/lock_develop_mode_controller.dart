@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
 import 'package:open_settings_plus/open_settings_plus.dart';
 import 'package:safe_device/safe_device.dart';
 import 'package:uffmobileplus/app/config/secrets.dart';
@@ -55,19 +56,16 @@ class LockDevelopModeController extends GetxController {
             await settings.general();
             break;
           default:
-            Get.snackbar(
-              'erro'.tr,
+            AppPopups.error(
               'plataforma_nao_suportada'.tr,
-              backgroundColor: Get.theme.colorScheme.error,
-              colorText: Get.theme.colorScheme.onError,
+              title: 'erro'.tr,
             );
         }
       } catch (e) {
-        Get.snackbar(
-          'erro'.tr,
+        debugPrint('Erro ao abrir as configurações: $e');
+        AppPopups.error(
           'nao_foi_possivel_abrir_as_configuracoes'.tr,
-          backgroundColor: Get.theme.colorScheme.error,
-          colorText: Get.theme.colorScheme.onError,
+          title: 'erro'.tr,
         );
       }
     }

@@ -46,13 +46,26 @@ When adding to an existing module, match that module's existing pattern rather t
 GetX bindings (`Get.lazyPut` in each `<module>_binding.dart`, resolved via `Get.find()`) are the **sole** DI mechanism, used consistently across all modules. `get_it` is listed in `pubspec.yaml` but is unused anywhere in `lib/` — don't introduce `GetIt` for new code, stick to GetX bindings for consistency.
 
 ### Internationalization
-Added on this branch (`lib/app/utils/translations/`). Custom GetX-native i18n, **not** Flutter's `.arb`/`gen-l10n` tooling:
-- `app_translations.dart` — `AppTranslation extends Translations`, maps locale codes to per-language dictionaries
-- One file per locale: `pt_BR/`, `en_US/`, `es_ES/`, `fr_FR/`, `it_IT/`, `de_DE/`, each holding a `Map<String, String>` of translation keys
+Custom GetX-native i18n (`lib/app/utils/translations/`), **not** Flutter's `.arb`/`gen-l10n` tooling:
+- Translations are flat key→value JSON files, one per locale: `assets/translations/{pt_BR,en_US,es_ES,fr_FR,it_IT,de_DE}.json`
+- `app_translations.dart` — `AppTranslation extends Translations`; `AppTranslation.load()` reads every JSON into memory and must be awaited before `runApp`
 - `language_service.dart` — `LanguageService`/`AppLanguage`: persists the chosen locale via `shared_preferences`, resolves the initial locale, and calls `Get.updateLocale()` on change
 - Wired in `lib/main.dart` via `GetMaterialApp(translations: AppTranslation(), locale: <initial>, fallbackLocale: pt_BR)`
+- Usage: `'chave'.tr` / `'chave'.trParams({...})` (placeholders as `@nome`)
 
-To add a new translated string, add the key to every per-locale map file, not just one.
+To add a new translated string, add the key to **all 6** JSON files, not just one. `test/translations/translation_integrity_test.dart` checks that every locale has the same keys as `pt_BR`, no empty values, no duplicate keys, and that every `.tr` key used in `lib/` exists in `pt_BR.json`. Before checking for a new key, grep `pt_BR.json` — many texts already have a key.
+
+### Pop-ups e snackbars (`AppPopups`)
+Ponto único: `lib/app/utils/ui_components/app_popups.dart`. **Obrigatório nos `internal_modules`**; os `external_modules` ainda usam o padrão antigo (`Get.snackbar`, `customAlertDialog`/AwesomeDialog etc.) — migre-os para `AppPopups` quando for mexer neles.
+- Nunca use `showDialog`, `Get.dialog`, `Get.defaultDialog`, `Get.snackbar`, `Get.bottomSheet`, `showModalBottomSheet`, `ScaffoldMessenger` ou `customAlertDialog` direto nas telas/controllers.
+- Mensagem rápida: `AppPopups.success/error/warning/info(texto, title: opcional)` (snackbar flutuante via `ScaffoldMessenger`, não quebra o `Get.back()`).
+- Confirmação: `await AppPopups.confirm(...)` → `bool` (bottom sheet; `destructive: true` para desconectar/excluir; `type:` para mudar a cor do ícone).
+- Texto: `AppPopups.input(...)`; lista de opções: `AppPopups.choose<T>(...)`; conteúdo livre: `AppPopups.sheet(...)` ou `AppPopups.custom(widget)` com `AppSheet`/`AppSheetButton.primary/secondary` por dentro.
+- Aviso centralizado: `AppPopups.alert(...)`; carregamento bloqueante: `AppPopups.showLoading()`/`hideLoading()`.
+- Dentro das folhas, feche com `Navigator.of(ctx).pop(valor)` usando o `ctx` da folha, nunca `Get.back()`.
+- Visual: sempre o azul-escuro da marca (`AppPopups.theme`), independente do `ThemeData` global (o app não define um).
+- Mensagens ao usuário são amigáveis e traduzidas; o detalhe técnico (`$e`) vai só para `debugPrint`, nunca para o pop-up.
+- Use `withValues(alpha: x)` (não `withOpacity`) e `PopScope` (não `WillPopScope`) em código novo.
 
 ### App bootstrap (`lib/main.dart`)
 Order matters: `WidgetsFlutterBinding.ensureInitialized()` → `RiveNative.init()` → `FirebaseService.init()` → `HiveService.init()` → lock portrait orientation → `DeepLinkService().init()` → `LanguageService.getInitialLocale()` → `runApp(GetMaterialApp(initialRoute: Routes.SPLASH, getPages: AppPages.pages, ...))`.
@@ -63,3 +76,11 @@ Order matters: `WidgetsFlutterBinding.ensureInitialized()` → `RiveNative.init(
 
 ### Naming convention
 Folders and files use `snake_case` throughout (per README.md).
+
+### Convenção de commits
+Mensagem em português, curta, minúscula, no formato `tipo: descrição` (seguindo o histórico do repositório):
+- `feat:` funcionalidade nova ou melhoria visível — ex.: `feat: padroniza pop-ups e snackbars dos módulos internos com AppPopups`
+- `fix:` correção de bug — ex.: `fix: login google somente ao continuar no banco de ideias`
+- `beta: x.y.z` para marcar versões beta — ex.: `beta: 7.0.2`
+
+Um commit por mudança coesa; não inclua arquivos gerados em `linux/flutter/ephemeral/` ou `macos/Flutter/ephemeral/`.
