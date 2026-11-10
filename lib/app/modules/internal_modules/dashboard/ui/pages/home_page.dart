@@ -99,8 +99,11 @@ class HomePage extends GetView<HomePageController> {
       body: Obx(() {
         final layoutService = controller.layoutService;
         final safeBottom = MediaQuery.of(context).padding.bottom;
+        // A dashboard usa extendBody: o padding inferior já inclui a barra
+        // Home/Serviços e a área do sistema.
         final bottomPadding = layoutService.bottomPadding(
           safeBottom: safeBottom,
+          navBarHeight: 0,
         );
         final isLoading = controller.isLoading.value;
         final isRemoving = controller.isRemovingShortcuts.value;

@@ -583,5 +583,9 @@
   "conectando_google": "Connexion à votre compte Google...",
   "login_sucesso_titulo": "Connecté avec succès",
   "login_google_sucesso_msg": "Compte Google @email associé.",
-  "login_iduff_sucesso_msg": "Compte IdUFF @email associé."
+  "login_iduff_sucesso_msg": "Compte IdUFF @email associé.",
+  "todos_os_servicos": "Tous les services",
+  "ver_todos_servicos_desc": "Voir la liste complète des services",
+  "voltar_pagina_inicial": "Retour à la page d'accueil",
+  "voltar_pagina_inicial_desc": "Vos raccourcis, cours et menu du jour"
 }

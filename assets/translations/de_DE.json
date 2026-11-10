@@ -583,5 +583,9 @@
   "conectando_google": "Verbindung mit deinem Google-Konto wird hergestellt...",
   "login_sucesso_titulo": "Erfolgreich verbunden",
   "login_google_sucesso_msg": "Google-Konto @email verknüpft.",
-  "login_iduff_sucesso_msg": "IdUFF-Konto @email verknüpft."
+  "login_iduff_sucesso_msg": "IdUFF-Konto @email verknüpft.",
+  "todos_os_servicos": "Alle Dienste",
+  "ver_todos_servicos_desc": "Vollständige Liste der Dienste anzeigen",
+  "voltar_pagina_inicial": "Zurück zur Startseite",
+  "voltar_pagina_inicial_desc": "Deine Verknüpfungen, Kurse und das heutige Menü"
 }

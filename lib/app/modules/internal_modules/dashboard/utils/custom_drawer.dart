@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/dashboard_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/home_page_controller.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/ui/widgets/language_selector_bottom_sheet.dart';
@@ -25,6 +26,7 @@ class CustomDrawer extends GetView<HomePageController> {
                 child: ListView(
                   padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
                   children: [
+                    const _SwitchTabDrawerTile(),
                     _LanguageDrawerTile(
                       onTap: () {
                         LanguageSelectorBottomSheet.show(context);
@@ -166,6 +168,38 @@ class CustomDrawer extends GetView<HomePageController> {
         ),
       ),
     );
+  }
+}
+
+/// Alterna entre as abas da dashboard: na Home leva a todos os serviços e em
+/// Serviços volta para a Home.
+class _SwitchTabDrawerTile extends StatelessWidget {
+  const _SwitchTabDrawerTile();
+
+  @override
+  Widget build(BuildContext context) {
+    if (!Get.isRegistered<DashboardController>()) {
+      return const SizedBox.shrink();
+    }
+    final dashboard = Get.find<DashboardController>();
+
+    return Obx(() {
+      final onHome =
+          dashboard.currentIndex.value == DashboardController.homeTab;
+      return _DrawerTile(
+        icon: onHome ? Icons.apps_rounded : Icons.home_rounded,
+        title: onHome ? 'todos_os_servicos'.tr : 'voltar_pagina_inicial'.tr,
+        subtitle: onHome
+            ? 'ver_todos_servicos_desc'.tr
+            : 'voltar_pagina_inicial_desc'.tr,
+        onTap: () {
+          Navigator.of(context).pop();
+          dashboard.goToTab(
+            onHome ? DashboardController.servicesTab : DashboardController.homeTab,
+          );
+        },
+      );
+    });
   }
 }
 

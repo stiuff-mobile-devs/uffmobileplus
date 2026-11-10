@@ -583,5 +583,9 @@
   "conectando_google": "Connecting your Google account...",
   "login_sucesso_titulo": "Successfully connected",
   "login_google_sucesso_msg": "Google account @email linked.",
-  "login_iduff_sucesso_msg": "IdUFF account @email linked."
+  "login_iduff_sucesso_msg": "IdUFF account @email linked.",
+  "todos_os_servicos": "All services",
+  "ver_todos_servicos_desc": "See the full list of services",
+  "voltar_pagina_inicial": "Back to home page",
+  "voltar_pagina_inicial_desc": "Your shortcuts, classes and today's menu"
 }

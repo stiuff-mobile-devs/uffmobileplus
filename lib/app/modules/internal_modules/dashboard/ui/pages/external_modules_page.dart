@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/data/services/responsive_layout_service.dart';
 import 'package:uffmobileplus/app/utils/help_guides.dart';
 import 'package:uffmobileplus/app/utils/ui_components/app_bars.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/external_modules_controller.dart';
@@ -42,7 +43,17 @@ class ExternalModulesPage extends GetView<ExternalModulesController> {
               return CustomScrollView(
                 slivers: [
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(16, 18, 16, 96),
+                    // O padding inferior já inclui a barra Home/Serviços e a
+                    // área do sistema (extendBody na dashboard).
+                    padding: EdgeInsets.fromLTRB(
+                      16,
+                      18,
+                      16,
+                      Get.find<ResponsiveLayoutService>().bottomPadding(
+                        safeBottom: MediaQuery.paddingOf(context).bottom,
+                        navBarHeight: 0,
+                      ),
+                    ),
                     sliver: SliverGrid(
                       delegate: SliverChildBuilderDelegate((context, index) {
                         final externalModule = modules[index];

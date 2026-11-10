@@ -1,56 +1,62 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/dashboard_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/ui/pages/external_modules_page.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/ui/pages/home_page.dart';
-import 'package:uffmobileplus/app/utils/color_pallete.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/dashboard/ui/widgets/dashboard_nav_bar.dart';
 
 class Dashboard extends GetView<DashboardController> {
   const Dashboard({super.key});
 
+  static const Color _background = Color(0xFF060D19);
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: PersistentTabView(
-        context,
-        controller: controller.tabController,
-        screens: const [HomePage(), ExternalModulesPage()],
-        backgroundColor: const Color(0xFF0A1C34),
-        decoration: NavBarDecoration(
-          borderRadius: BorderRadius.circular(18),
-          colorBehindNavBar: const Color(0xFF060D19),
+    // Barra do sistema (botões/gestos) com o mesmo fundo escuro da dashboard.
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light.copyWith(
+        systemNavigationBarColor: _background,
+        systemNavigationBarIconBrightness: Brightness.light,
+        systemNavigationBarDividerColor: Colors.transparent,
+      ),
+      child: Scaffold(
+        backgroundColor: _background,
+        // O conteúdo passa por trás da pílula; o Scaffold soma a altura da
+        // barra ao padding inferior que as páginas usam no fim das listas.
+        extendBody: true,
+        body: PageView(
+          controller: controller.pageController,
+          onPageChanged: controller.onPageChanged,
+          children: const [
+            _KeepAlivePage(child: HomePage()),
+            _KeepAlivePage(child: ExternalModulesPage()),
+          ],
         ),
-        margin: const EdgeInsets.fromLTRB(14, 0, 14, 14),
-        items: [
-          // Tela Principal
-          PersistentBottomNavBarItem(
-            icon: const Icon(Icons.home_rounded),
-            title: 'home_page'.tr,
-            activeColorPrimary: const Color(0xFF0B1424),
-            inactiveColorPrimary: const Color(0xFFC9D3E4),
-            activeColorSecondary: AppColors.lightBlue(),
-            textStyle: const TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 13,
-            ),
-          ),
-
-          // Tela de Serviços
-          PersistentBottomNavBarItem(
-            icon: const Icon(Icons.apps_rounded),
-            title: 'servicos'.tr,
-            activeColorPrimary: const Color(0xFF0B1424),
-            inactiveColorPrimary: const Color(0xFFC9D3E4),
-            activeColorSecondary: AppColors.lightBlue(),
-            textStyle: const TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 13,
-            ),
-          ),
-        ],
-        navBarStyle: NavBarStyle.style7,
+        bottomNavigationBar: const DashboardNavBar(),
       ),
     );
+  }
+}
+
+/// Mantém a aba viva fora da tela para preservar a rolagem ao trocar de aba.
+class _KeepAlivePage extends StatefulWidget {
+  const _KeepAlivePage({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_KeepAlivePage> createState() => _KeepAlivePageState();
+}
+
+class _KeepAlivePageState extends State<_KeepAlivePage>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return widget.child;
   }
 }
