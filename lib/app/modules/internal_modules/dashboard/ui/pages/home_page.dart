@@ -2,84 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/utils/ui_components/app_bars.dart';
-import 'package:uffmobileplus/app/data/services/responsive_layout_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/cardapio/ui/pages/menu_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/study_plan/data/models/discipline_model.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/home_page_controller.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/dashboard/ui/widgets/home_section_card.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/utils/custom_drawer.dart';
 import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
 import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.dart';
 
+enum _SectionAction { moveUp, moveDown, hide }
+
 class HomePage extends GetView<HomePageController> {
   const HomePage({super.key});
 
-  static const ResponsiveGridConfig _shortcutGridConfig = ResponsiveGridConfig(
-    breakpoints: [
-      ResponsiveGridBreakpoint(
-        maxWidth: 360,
-        spec: ResponsiveGridSpec(
-          crossAxisCount: 2,
-          childAspectRatio: 0.86,
-          crossAxisSpacing: 8,
-          mainAxisSpacing: 8,
-          cardPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 9),
-          iconBoxSize: 30,
-          iconPadding: 5,
-          iconBorderRadius: 10,
-          labelFontSize: 10,
-          labelHeight: 1.05,
-          iconLabelSpacing: 6,
-        ),
-      ),
-      ResponsiveGridBreakpoint(
-        maxWidth: 600,
-        spec: ResponsiveGridSpec(
-          crossAxisCount: 3,
-          childAspectRatio: 0.92,
-          crossAxisSpacing: 8,
-          mainAxisSpacing: 8,
-          cardPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-          iconBoxSize: 32,
-          iconPadding: 6,
-          iconBorderRadius: 10,
-          labelFontSize: 10.5,
-          labelHeight: 1.05,
-          iconLabelSpacing: 8,
-        ),
-      ),
-      ResponsiveGridBreakpoint(
-        maxWidth: 900,
-        spec: ResponsiveGridSpec(
-          crossAxisCount: 4,
-          childAspectRatio: 0.98,
-          crossAxisSpacing: 8,
-          mainAxisSpacing: 8,
-          cardPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-          iconBoxSize: 32,
-          iconPadding: 6,
-          iconBorderRadius: 10,
-          labelFontSize: 10.5,
-          labelHeight: 1.05,
-          iconLabelSpacing: 8,
-        ),
-      ),
-    ],
-    defaultSpec: ResponsiveGridSpec(
-      crossAxisCount: 5,
-      childAspectRatio: 0.98,
-      crossAxisSpacing: 8,
-      mainAxisSpacing: 8,
-      cardPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-      iconBoxSize: 32,
-      iconPadding: 6,
-      iconBorderRadius: 10,
-      labelFontSize: 10.5,
-      labelHeight: 1.05,
-      iconLabelSpacing: 8,
-    ),
-  );
+  /// Espaço padrão entre as seções e nas bordas da tela.
+  static const double _gap = 16;
 
   @override
   Widget build(BuildContext context) {
@@ -97,19 +36,15 @@ class HomePage extends GetView<HomePageController> {
         ],
       ),
       body: Obx(() {
-        final layoutService = controller.layoutService;
-        final safeBottom = MediaQuery.of(context).padding.bottom;
         // A dashboard usa extendBody: o padding inferior já inclui a barra
         // Home/Serviços e a área do sistema.
-        final bottomPadding = layoutService.bottomPadding(
-          safeBottom: safeBottom,
+        final bottomPadding = controller.layoutService.bottomPadding(
+          safeBottom: MediaQuery.paddingOf(context).bottom,
           navBarHeight: 0,
         );
         final isLoading = controller.isLoading.value;
-        final isRemoving = controller.isRemovingShortcuts.value;
-        final savedShortcuts = controller.savedShortcuts.toList(
-          growable: false,
-        );
+        final sections = controller.visibleSections;
+        final hiddenCount = controller.hiddenSections.length;
 
         return Container(
           width: double.infinity,
@@ -121,159 +56,44 @@ class HomePage extends GetView<HomePageController> {
               ? const SizedBox.expand(child: CustomProgressDisplay())
               : SafeArea(
                   bottom: false,
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final layoutSpec = layoutService.gridSpecForWidth(
-                        width: constraints.maxWidth,
-                        config: _shortcutGridConfig,
-                      );
-
-                      return CustomScrollView(
-                        physics: const BouncingScrollPhysics(),
-                        slivers: [
-                          SliverPadding(
-                            padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-                            sliver: SliverToBoxAdapter(
-                              child: _buildStudyPlanSection(),
+                  child: ListView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: EdgeInsets.fromLTRB(
+                      _gap,
+                      _gap,
+                      _gap,
+                      bottomPadding,
+                    ),
+                    children: [
+                      for (int i = 0; i < sections.length; i++) ...[
+                        if (i > 0) const SizedBox(height: _gap),
+                        _buildSection(
+                          context,
+                          sections[i],
+                          isFirst: i == 0,
+                          isLast: i == sections.length - 1,
+                        ),
+                      ],
+                      if (hiddenCount > 0) ...[
+                        const SizedBox(height: 8),
+                        Center(
+                          child: TextButton.icon(
+                            onPressed: _showHiddenSections,
+                            icon: Icon(
+                              Icons.visibility_outlined,
+                              size: 18,
+                              color: AppColors.lightBlue(),
+                            ),
+                            label: Text(
+                              'mostrar_secoes_ocultas'.trParams({
+                                'n': '$hiddenCount',
+                              }),
+                              style: TextStyle(color: AppColors.lightBlue()),
                             ),
                           ),
-                          SliverPadding(
-                            padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-                            sliver: SliverToBoxAdapter(
-                              child: _buildRestauranteSection(),
-                            ),
-                          ),
-                          SliverPadding(
-                            padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
-                            sliver: SliverToBoxAdapter(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          'atalhos_rapidos'.tr,
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
-                                      ),
-                                      IconButton(
-                                        onPressed: () =>
-                                            _showAddShortcutSheet(context),
-                                        tooltip: 'adicionar_atalho'.tr,
-                                        icon: Container(
-                                          padding: const EdgeInsets.all(4),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white.withOpacity(
-                                              0.12,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                          ),
-                                          child: const Icon(
-                                            Icons.add,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      IconButton(
-                                        onPressed:
-                                            controller.toggleRemoveShortcutMode,
-                                        tooltip: 'remover_atalho'.tr,
-                                        icon: Container(
-                                          padding: const EdgeInsets.all(4),
-                                          decoration: BoxDecoration(
-                                            color: isRemoving
-                                                ? Colors.red.withOpacity(0.25)
-                                                : Colors.white.withOpacity(
-                                                    0.12,
-                                                  ),
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                          ),
-                                          child: const Icon(
-                                            Icons.remove,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'atalhos_rapidos_descricao'.tr,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 13,
-                                      height: 1.4,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 14),
-                                ],
-                              ),
-                            ),
-                          ),
-                          SliverPadding(
-                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                            sliver: SliverGrid(
-                              delegate: SliverChildBuilderDelegate((
-                                context,
-                                index,
-                              ) {
-                                final item = savedShortcuts[index];
-                                return _ShortcutCard(
-                                  key: ValueKey(item.page),
-                                  item: item,
-                                  layoutSpec: layoutSpec,
-                                  isRemoveMode: isRemoving,
-                                  onTap: () {
-                                    if (isRemoving) {
-                                      controller.removeShortcut(item);
-                                      return;
-                                    }
-
-                                    controller.openShortcut(item);
-                                  },
-                                );
-                              }, childCount: savedShortcuts.length),
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: layoutSpec.crossAxisCount,
-                                    crossAxisSpacing:
-                                        layoutSpec.crossAxisSpacing,
-                                    mainAxisSpacing: layoutSpec.mainAxisSpacing,
-                                    childAspectRatio:
-                                        layoutSpec.childAspectRatio,
-                                  ),
-                            ),
-                          ),
-                          SliverPadding(
-                            padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-                            sliver: SliverToBoxAdapter(
-                              child: _buildHistoricoSection(),
-                            ),
-                          ),
-                          SliverPadding(
-                            padding: EdgeInsets.fromLTRB(
-                              16,
-                              24,
-                              16,
-                              bottomPadding,
-                            ),
-                            sliver: SliverToBoxAdapter(
-                              child: _buildNoticiasSection(),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
+                        ),
+                      ],
+                    ],
                   ),
                 ),
         );
@@ -281,171 +101,86 @@ class HomePage extends GetView<HomePageController> {
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-        color: Colors.white,
-        fontSize: 20,
-        fontWeight: FontWeight.w700,
-      ),
+  // ---------------- SEÇÕES ----------------
+
+  Widget _buildSection(
+    BuildContext context,
+    HomeSection section, {
+    required bool isFirst,
+    required bool isLast,
+  }) {
+    void openMenu() => _showSectionMenu(
+      section,
+      canMoveUp: !isFirst,
+      canMoveDown: !isLast,
     );
+
+    switch (section) {
+      case HomeSection.studyPlan:
+        return _buildStudyPlanSection(openMenu);
+      case HomeSection.restaurant:
+        return _buildRestauranteSection(openMenu);
+      case HomeSection.shortcuts:
+        return _buildShortcutsSection(context, openMenu);
+      case HomeSection.transcript:
+        return _buildHistoricoSection(openMenu);
+      case HomeSection.news:
+        return _buildNoticiasSection(openMenu);
+    }
   }
 
-  BoxDecoration _cardDecoration() {
-    return BoxDecoration(
-      borderRadius: BorderRadius.circular(16),
-      gradient: LinearGradient(
-        colors: [
-          Colors.white.withOpacity(0.12),
-          Colors.white.withOpacity(0.06),
-        ],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      ),
-      border: Border.all(color: Colors.white.withOpacity(0.08)),
-    );
+  static String _sectionTitle(HomeSection section) {
+    switch (section) {
+      case HomeSection.studyPlan:
+        return 'plano_estudos'.tr;
+      case HomeSection.restaurant:
+        return 'restaurante'.tr;
+      case HomeSection.shortcuts:
+        return 'atalhos_rapidos'.tr;
+      case HomeSection.transcript:
+        return 'historico'.tr;
+      case HomeSection.news:
+        return 'noticias'.tr;
+    }
   }
 
-  Widget _buildRestauranteSection() {
+  static IconData _sectionIcon(HomeSection section) {
+    switch (section) {
+      case HomeSection.studyPlan:
+        return Icons.calendar_today_rounded;
+      case HomeSection.restaurant:
+        return Icons.restaurant_rounded;
+      case HomeSection.shortcuts:
+        return Icons.bolt_rounded;
+      case HomeSection.transcript:
+        return Icons.insights_rounded;
+      case HomeSection.news:
+        return Icons.newspaper_rounded;
+    }
+  }
+
+  Widget _buildStudyPlanSection(VoidCallback onMenu) {
     return Obx(() {
-      final mealsList = controller.campusMeals;
-      final meals = mealsList != null ? mealsList.toList(growable: false) : [];
-      final isLoading = controller.isLoadingCampusMeals.value ?? false;
-      final hasDefault = controller.hasDefaultRestaurant.value;
+      final classes = controller.todayClasses.toList(growable: false);
+      final isLoading = controller.isLoadingTodayClasses.value;
 
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSectionTitle('restaurante'.tr),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  hasDefault
-                      ? 'cardapio_de_hoje'.tr
-                      : 'defina_restaurante_padrao_desc'.tr,
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.92),
-                    fontSize: 13,
-                    height: 1.4,
-                  ),
-                ),
+      return HomeSectionCard(
+        icon: _sectionIcon(HomeSection.studyPlan),
+        title: _sectionTitle(HomeSection.studyPlan),
+        onMenu: onMenu,
+        onTap: () => Get.toNamed(Routes.STUDY_PLAN),
+        child: isLoading
+            ? HomeSectionCard.loading
+            : classes.isEmpty
+            ? Text('nenhuma_aula_hoje'.tr, style: HomeSectionCard.secondaryText)
+            : Column(
+                children: classes.map(_buildDisciplineRow).toList(),
               ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          if (!hasDefault && !isLoading)
-            Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(16),
-                onTap: () => Get.toNamed(Routes.BANDEJAPP),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-                  decoration: _cardDecoration(),
-                  child: Column(
-                    children: [
-                      const Icon(Icons.restaurant, color: Colors.white, size: 32),
-                      const SizedBox(height: 12),
-                      Text(
-                        'defina_restaurante_padrao'.tr,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'clique_escolher_refeitorio'.tr,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            )
-          else if (isLoading)
-            const SizedBox(
-              height: 150,
-              child: Center(child: CustomProgressDisplay(height: 50)),
-            )
-          else if (meals.isNotEmpty)
-            SizedBox(
-              height: 150,
-              child: _CampusMealCard(data: meals.first),
-            )
-          else
-            SizedBox(
-              height: 150,
-              child: Center(
-                child: Text(
-                  'cardapio_indisponivel'.tr,
-                  style: const TextStyle(color: Colors.white70),
-                ),
-              ),
-            ),
-        ],
-      );
-    });
-  }
-
-  Widget _buildStudyPlanSection() {
-    return Obx(() {
-      // Proteção contra nulos na lista e no boolean
-      final classesList = controller.todayClasses;
-      final classes = classesList != null
-          ? classesList.toList(growable: false)
-          : [];
-      final isLoading = controller.isLoadingTodayClasses.value ?? false;
-
-      return Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: () => Get.toNamed(Routes.STUDY_PLAN),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: _cardDecoration(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildSectionTitle('plano_estudos'.tr),
-                const SizedBox(height: 12),
-                if (isLoading)
-                  // Substituído SizedBox.expand por tamanho fixo dentro da Column
-                  const SizedBox(
-                    height: 100,
-                    child: Center(child: CustomProgressDisplay(height: 50)),
-                  )
-                else if (classes.isEmpty)
-                  Text(
-                    'nenhuma_aula_hoje'.tr,
-                    style: TextStyle(color: Colors.white.withOpacity(0.7)),
-                  )
-                else
-                  Column(
-                    children: classes
-                        .map((discipline) => _buildDisciplineRow(discipline))
-                        .toList(),
-                  ),
-              ],
-            ),
-          ),
-        ),
       );
     });
   }
 
   Widget _buildDisciplineRow(Discipline discipline) {
-    // Esse já estava seguro, os nulos já estavam sendo tratados com ??
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -453,7 +188,7 @@ class HomePage extends GetView<HomePageController> {
           Expanded(
             child: Text(
               discipline.title ?? '-',
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: Colors.white,
@@ -465,21 +200,99 @@ class HomePage extends GetView<HomePageController> {
           const SizedBox(width: 8),
           Text(
             '${discipline.startTime ?? ''} - ${discipline.endTime ?? ''}',
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.68),
-              fontSize: 12,
-            ),
+            style: HomeSectionCard.secondaryText,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildHistoricoSection() {
+  Widget _buildRestauranteSection(VoidCallback onMenu) {
+    return Obx(() {
+      final meals = controller.campusMeals.toList(growable: false);
+      final isLoading = controller.isLoadingCampusMeals.value;
+      final hasDefault = controller.hasDefaultRestaurant.value;
+      final meal = meals.isNotEmpty ? meals.first : null;
+
+      VoidCallback? onTap;
+      Widget body;
+      if (isLoading) {
+        body = HomeSectionCard.loading;
+      } else if (!hasDefault) {
+        onTap = () => Get.toNamed(Routes.BANDEJAPP);
+        body = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'defina_restaurante_padrao'.tr,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'clique_escolher_refeitorio'.tr,
+              style: HomeSectionCard.secondaryText,
+            ),
+          ],
+        );
+      } else if (meal != null) {
+        onTap = () => Get.to(
+          () => MenuPage(location: meal.campus),
+          transition: Transition.rightToLeft,
+        );
+        body = _CampusMealContent(data: meal);
+      } else {
+        body = Text(
+          'cardapio_indisponivel'.tr,
+          style: HomeSectionCard.secondaryText,
+        );
+      }
+
+      return HomeSectionCard(
+        icon: _sectionIcon(HomeSection.restaurant),
+        title: _sectionTitle(HomeSection.restaurant),
+        onMenu: onMenu,
+        onTap: onTap,
+        child: body,
+      );
+    });
+  }
+
+  Widget _buildShortcutsSection(BuildContext context, VoidCallback onMenu) {
+    return Obx(() {
+      final shortcuts = controller.savedShortcuts.toList(growable: false);
+
+      return HomeSectionCard(
+        icon: _sectionIcon(HomeSection.shortcuts),
+        title: _sectionTitle(HomeSection.shortcuts),
+        onMenu: onMenu,
+        headerAction: TextButton(
+          onPressed: _showShortcutEditor,
+          child: Text(
+            'editar'.tr,
+            style: TextStyle(
+              color: AppColors.lightBlue(),
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+        child: shortcuts.isEmpty
+            ? Text('atalhos_vazio'.tr, style: HomeSectionCard.secondaryText)
+            : _ShortcutGrid(
+                shortcuts: shortcuts,
+                onOpen: controller.openShortcut,
+              ),
+      );
+    });
+  }
+
+  Widget _buildHistoricoSection(VoidCallback onMenu) {
     return Obx(() {
       final stats = controller.transcriptStats.value;
-      // Proteção contra boolean nulo
-      final isLoading = controller.isLoadingTranscript.value ?? false;
+      final isLoading = controller.isLoadingTranscript.value;
 
       final chCursada = stats?.chCursada ?? 0;
       final chTotal = stats?.chTotal ?? 0;
@@ -487,32 +300,18 @@ class HomePage extends GetView<HomePageController> {
           ? (chCursada / chTotal).clamp(0.0, 1.0)
           : 0.0;
 
-      return Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: () => Get.toNamed(Routes.HISTORICO),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: _cardDecoration(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildSectionTitle('historico'.tr),
-                const SizedBox(height: 12),
-                if (isLoading)
-                  // Substituído SizedBox.expand por altura fixa para não explodir a Column
-                  const SizedBox(
-                    height: 80,
-                    child: Center(child: CustomProgressDisplay(height: 50)),
-                  )
-                else if (stats == null)
-                  Text(
-                    'dados_indisponiveis'.tr,
-                    style: TextStyle(color: Colors.white.withOpacity(0.7)),
-                  )
-                else ...[
+      return HomeSectionCard(
+        icon: _sectionIcon(HomeSection.transcript),
+        title: _sectionTitle(HomeSection.transcript),
+        onMenu: onMenu,
+        onTap: () => Get.toNamed(Routes.HISTORICO),
+        child: isLoading
+            ? HomeSectionCard.loading
+            : stats == null
+            ? Text('dados_indisponiveis'.tr, style: HomeSectionCard.secondaryText)
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
                     'horas_cursadas_status'.trParams({
                       'cursada': '$chCursada',
@@ -530,105 +329,200 @@ class HomePage extends GetView<HomePageController> {
                     child: LinearProgressIndicator(
                       value: progress,
                       minHeight: 8,
-                      backgroundColor: Colors.white.withOpacity(0.12),
+                      backgroundColor: Colors.white.withValues(alpha: 0.12),
                       valueColor: const AlwaysStoppedAnimation(Colors.white),
                     ),
                   ),
                 ],
-              ],
-            ),
-          ),
-        ),
+              ),
       );
     });
   }
 
-  Widget _buildNoticiasSection() {
-    // Essa seção é completamente estática, não há risco de erros nela!
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionTitle('noticias'.tr),
-        const SizedBox(height: 12),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(16),
-          decoration: _cardDecoration(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'noticias_em_breve'.tr,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'noticias_preparando_desc'.tr,
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.75),
-                  fontSize: 12.5,
-                  height: 1.4,
-                ),
-              ),
-            ],
+  Widget _buildNoticiasSection(VoidCallback onMenu) {
+    return HomeSectionCard(
+      icon: _sectionIcon(HomeSection.news),
+      title: _sectionTitle(HomeSection.news),
+      onMenu: onMenu,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'noticias_em_breve'.tr,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
-      ],
+          const SizedBox(height: 4),
+          Text(
+            'noticias_preparando_desc'.tr,
+            style: HomeSectionCard.secondaryText.copyWith(height: 1.4),
+          ),
+        ],
+      ),
     );
   }
 
-  Future<void> _showAddShortcutSheet(BuildContext context) async {
-    await AppPopups.sheet<void>(
-      title: 'adicionar_atalho'.tr,
-      message: 'servicos_nao_salvos_desc'.tr,
-      icon: Icons.add_rounded,
-      child: Obx(() {
-        final remainingServices = controller.availableToAdd.toList(
-          growable: false,
-        );
+  // ---------------- MENUS ----------------
 
-        if (remainingServices.isEmpty) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            child: Text(
-              'todos_servicos_salvos'.tr,
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
-            ),
-          );
-        }
+  Future<void> _showSectionMenu(
+    HomeSection section, {
+    required bool canMoveUp,
+    required bool canMoveDown,
+  }) async {
+    final action = await AppPopups.choose<_SectionAction>(
+      title: _sectionTitle(section),
+      icon: _sectionIcon(section),
+      options: [
+        if (canMoveUp)
+          PopupOption(
+            value: _SectionAction.moveUp,
+            label: 'mover_para_cima'.tr,
+            icon: Icons.arrow_upward_rounded,
+          ),
+        if (canMoveDown)
+          PopupOption(
+            value: _SectionAction.moveDown,
+            label: 'mover_para_baixo'.tr,
+            icon: Icons.arrow_downward_rounded,
+          ),
+        PopupOption(
+          value: _SectionAction.hide,
+          label: 'ocultar_secao'.tr,
+          icon: Icons.visibility_off_outlined,
+        ),
+      ],
+    );
+
+    switch (action) {
+      case _SectionAction.moveUp:
+        controller.moveSection(section, -1);
+      case _SectionAction.moveDown:
+        controller.moveSection(section, 1);
+      case _SectionAction.hide:
+        controller.hideSection(section);
+        AppPopups.info('secao_ocultada_msg'.tr);
+      case null:
+        break;
+    }
+  }
+
+  /// Escolhe uma seção oculta para mostrar de novo, ou restaura o padrão.
+  Future<void> _showHiddenSections() async {
+    final hidden = controller.sectionOrder
+        .where(controller.hiddenSections.contains)
+        .toList();
+
+    // `choose` devolve null ao fechar a folha, então "Restaurar padrão" usa
+    // um valor próprio (-1) e as seções usam o índice no enum.
+    const restoreDefault = -1;
+    final choice = await AppPopups.choose<int>(
+      title: 'mostrar_secoes_ocultas'.trParams({'n': '${hidden.length}'}),
+      icon: Icons.visibility_outlined,
+      options: [
+        for (final section in hidden)
+          PopupOption(
+            value: section.index,
+            label: _sectionTitle(section),
+            icon: _sectionIcon(section),
+          ),
+        PopupOption(
+          value: restoreDefault,
+          label: 'restaurar_padrao'.tr,
+          icon: Icons.restart_alt_rounded,
+        ),
+      ],
+    );
+
+    if (choice == null) return;
+    if (choice == restoreDefault) {
+      controller.resetSections();
+    } else {
+      controller.showSection(HomeSection.values[choice]);
+    }
+  }
+
+  /// Editor de atalhos: ordenar/remover os salvos e adicionar novos.
+  Future<void> _showShortcutEditor() async {
+    await AppPopups.sheet<void>(
+      title: 'editar_atalhos'.tr,
+      icon: Icons.bolt_rounded,
+      maxHeightFactor: 0.85,
+      child: Obx(() {
+        final saved = controller.savedShortcuts.toList(growable: false);
+        final available = controller.availableToAdd.toList(growable: false);
 
         return Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            for (int i = 0; i < remainingServices.length; i++) ...[
-              if (i > 0)
-                Divider(
-                  color: Colors.white.withValues(alpha: 0.12),
-                  height: 1,
+            _EditorHeader('seus_atalhos'.tr),
+            if (saved.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Text(
+                  'atalhos_vazio'.tr,
+                  style: HomeSectionCard.secondaryText,
                 ),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: _ServiceIcon(iconSrc: remainingServices[i].iconSrc),
-                title: Text(
-                  remainingServices[i].subtitle.tr,
-                  style: const TextStyle(color: Colors.white),
-                ),
-                trailing: IconButton(
-                  icon: const Icon(
-                    Icons.add_circle_outline,
-                    color: Colors.white,
-                  ),
-                  onPressed: () =>
-                      controller.addShortcut(remainingServices[i]),
-                ),
-                onTap: () => controller.addShortcut(remainingServices[i]),
+              )
+            else
+              ReorderableListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                buildDefaultDragHandles: false,
+                itemCount: saved.length,
+                onReorderItem: controller.reorderShortcut,
+                proxyDecorator: (child, _, _) =>
+                    Material(color: Colors.transparent, child: child),
+                itemBuilder: (context, index) {
+                  final item = saved[index];
+                  return _EditorRow(
+                    key: ValueKey(item.page),
+                    item: item,
+                    leading: ReorderableDragStartListener(
+                      index: index,
+                      child: Icon(
+                        Icons.drag_indicator_rounded,
+                        color: Colors.white.withValues(alpha: 0.6),
+                      ),
+                    ),
+                    action: IconButton(
+                      tooltip: 'remover'.tr,
+                      onPressed: () => controller.removeShortcut(item),
+                      icon: const Icon(
+                        Icons.remove_circle_rounded,
+                        color: Color(0xFFF87171),
+                      ),
+                    ),
+                  );
+                },
               ),
-            ],
+            const SizedBox(height: 16),
+            _EditorHeader('adicionar'.tr),
+            if (available.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Text(
+                  'todos_servicos_salvos'.tr,
+                  style: HomeSectionCard.secondaryText,
+                ),
+              )
+            else
+              for (final item in available)
+                _EditorRow(
+                  key: ValueKey('add-${item.page}'),
+                  item: item,
+                  action: IconButton(
+                    tooltip: 'adicionar'.tr,
+                    onPressed: () => controller.addShortcut(item),
+                    icon: Icon(
+                      Icons.add_circle_rounded,
+                      color: AppColors.lightBlue(),
+                    ),
+                  ),
+                ),
           ],
         );
       }),
@@ -636,206 +530,205 @@ class HomePage extends GetView<HomePageController> {
   }
 }
 
-class _CampusMealCard extends StatelessWidget {
-  const _CampusMealCard({required this.data});
+// ---------------- WIDGETS ----------------
+
+/// Conteúdo do restaurante padrão: campus · turno e os itens do cardápio.
+class _CampusMealContent extends StatelessWidget {
+  const _CampusMealContent({required this.data});
 
   final TodayCampusMeal data;
 
   @override
   Widget build(BuildContext context) {
     final meal = data.meal;
-    final hasDish = meal?.main?.isNotEmpty ?? false;
-    
-    String subtitle = 'refeicoes_indisponiveis_refeitorio'.tr;
-    if (hasDish) {
-      final items = [meal!.main, meal.garnish, meal.side]
-          .where((item) => item != null && item.trim().isNotEmpty)
-          .map((item) => '• ${item!.trim()}')
-          .toList();
-      if (items.isNotEmpty) {
-        subtitle = items.join('\n');
-      }
-    }
-    
+    final items = [meal?.main, meal?.garnish, meal?.side]
+        .whereType<String>()
+        .map((item) => item.trim())
+        .where((item) => item.isNotEmpty)
+        .toList();
     final isOpen = data.shiftLabel != null;
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: () => Get.to(
-          () => MenuPage(location: data.campus),
-          transition: Transition.rightToLeft,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '${data.campus.name} · ${isOpen ? data.shiftLabel! : 'fechado'.tr}',
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            gradient: LinearGradient(
-              colors: [
-                Colors.white.withOpacity(0.12),
-                Colors.white.withOpacity(0.06),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+        const SizedBox(height: 6),
+        if (items.isEmpty)
+          Text(
+            'refeicoes_indisponiveis_refeitorio'.tr,
+            style: HomeSectionCard.secondaryText,
+          )
+        else
+          for (final item in items)
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Text(
+                '• $item',
+                style: HomeSectionCard.secondaryText.copyWith(height: 1.3),
+              ),
             ),
-            border: Border.all(color: Colors.white.withOpacity(0.08)),
+      ],
+    );
+  }
+}
+
+/// Grade de atalhos: colunas pela largura e altura pela fonte do sistema, para
+/// o rótulo nunca cortar em telas estreitas ou com fonte grande.
+class _ShortcutGrid extends StatelessWidget {
+  const _ShortcutGrid({required this.shortcuts, required this.onOpen});
+
+  final List<DashboardShortcut> shortcuts;
+  final ValueChanged<DashboardShortcut> onOpen;
+
+  static const double _iconSize = 44;
+  static const double _labelSize = 11;
+  static const double _labelLineHeight = 1.2;
+
+  @override
+  Widget build(BuildContext context) {
+    final labelLine = MediaQuery.textScalerOf(context).scale(_labelSize) *
+        _labelLineHeight;
+    final itemHeight = _iconSize + 6 + labelLine * 2 + 12;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns = (constraints.maxWidth / 80).floor().clamp(3, 6);
+
+        return GridView.builder(
+          shrinkWrap: true,
+          padding: EdgeInsets.zero,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: shortcuts.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: columns,
+            mainAxisExtent: itemHeight,
+            crossAxisSpacing: 4,
+            mainAxisSpacing: 4,
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                data.campus.name,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
+          itemBuilder: (context, index) {
+            final item = shortcuts[index];
+            return InkWell(
+              key: ValueKey(item.page),
+              borderRadius: BorderRadius.circular(12),
+              onTap: () => onOpen(item),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Column(
+                  children: [
+                    _ServiceIcon(iconSrc: item.iconSrc, size: _iconSize),
+                    const SizedBox(height: 6),
+                    Text(
+                      item.subtitle.tr,
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.92),
+                        fontSize: _labelSize,
+                        fontWeight: FontWeight.w600,
+                        height: _labelLineHeight,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 4),
-              Text(
-                isOpen ? data.shiftLabel! : 'fechado'.tr,
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.68),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Expanded(
-                child: Text(
-                  subtitle,
-                  maxLines: 4,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.92),
-                    fontSize: 15,
-                    height: 1.3,
-                  ),
-                ),
-              ),
-            ],
-          ),
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class _EditorHeader extends StatelessWidget {
+  const _EditorHeader(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        text.toUpperCase(),
+        style: TextStyle(
+          color: Colors.white.withValues(alpha: 0.55),
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.8,
         ),
       ),
     );
   }
 }
 
-class _ShortcutCard extends StatelessWidget {
-  const _ShortcutCard({
+class _EditorRow extends StatelessWidget {
+  const _EditorRow({
     super.key,
     required this.item,
-    required this.onTap,
-    required this.isRemoveMode,
-    required this.layoutSpec,
+    required this.action,
+    this.leading,
   });
 
   final DashboardShortcut item;
-  final VoidCallback onTap;
-  final bool isRemoveMode;
-  final ResponsiveGridSpec layoutSpec;
+  final Widget action;
+  final Widget? leading;
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: Stack(
-          fit: StackFit.expand,
-          clipBehavior: Clip.none,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.white.withOpacity(0.12),
-                    Colors.white.withOpacity(0.06),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                border: Border.all(color: Colors.white.withOpacity(0.08)),
-              ),
-              padding: layoutSpec.cardPadding,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _ServiceIcon(iconSrc: item.iconSrc, layoutSpec: layoutSpec),
-                  SizedBox(height: layoutSpec.iconLabelSpacing),
-                  Text(
-                    item.subtitle.tr,
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.92),
-                      fontSize: layoutSpec.labelFontSize,
-                      fontWeight: FontWeight.w600,
-                      height: layoutSpec.labelHeight,
-                    ),
-                  ),
-                ],
-              ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          if (leading != null) ...[leading!, const SizedBox(width: 8)],
+          _ServiceIcon(iconSrc: item.iconSrc, size: 36),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              item.subtitle.tr,
+              style: const TextStyle(color: Colors.white, fontSize: 14),
             ),
-            if (isRemoveMode)
-              Positioned(
-                top: 4,
-                right: 4,
-                child: Container(
-                  width: 18,
-                  height: 18,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.red,
-                  ),
-                  child: const Icon(
-                    Icons.remove,
-                    size: 12,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-          ],
-        ),
+          ),
+          action,
+        ],
       ),
     );
   }
 }
 
 class _ServiceIcon extends StatelessWidget {
-  const _ServiceIcon({required this.iconSrc, this.layoutSpec});
+  const _ServiceIcon({required this.iconSrc, this.size = 32});
 
   final String iconSrc;
-  final ResponsiveGridSpec? layoutSpec;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
-    final iconSize = layoutSpec?.iconBoxSize ?? 32;
-    final iconPadding = layoutSpec?.iconPadding ?? 6;
-    final iconRadius = layoutSpec?.iconBorderRadius ?? 10;
-
     return Container(
-      height: iconSize,
-      width: iconSize,
+      height: size,
+      width: size,
       decoration: BoxDecoration(
-        color: AppColors.lightBlue().withOpacity(0.14),
-        borderRadius: BorderRadius.circular(iconRadius),
+        color: AppColors.lightBlue().withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(size * 0.3),
       ),
-      child: Padding(
-        padding: EdgeInsets.all(iconPadding),
-        child: iconSrc.endsWith('.svg')
-            ? SvgPicture.asset(
-                iconSrc,
-                color: Colors.white,
-                fit: BoxFit.contain,
-              )
-            : Image.asset(iconSrc, color: Colors.white, fit: BoxFit.contain),
-      ),
+      padding: EdgeInsets.all(size * 0.2),
+      child: iconSrc.endsWith('.svg')
+          ? SvgPicture.asset(
+              iconSrc,
+              colorFilter: const ColorFilter.mode(
+                Colors.white,
+                BlendMode.srcIn,
+              ),
+              fit: BoxFit.contain,
+            )
+          : Image.asset(iconSrc, color: Colors.white, fit: BoxFit.contain),
     );
   }
 }

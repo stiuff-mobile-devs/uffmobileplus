@@ -43,8 +43,6 @@ class HomePageController extends GetxController {
   final savedShortcuts = <DashboardShortcut>[].obs;
   final availableToAdd = <DashboardShortcut>[].obs;
 
-  final isRemovingShortcuts = false.obs;
-
   final RxBool isLoadingTodayClasses = true.obs;
   final RxList<Discipline> todayClasses = <Discipline>[].obs;
 
@@ -62,6 +60,7 @@ class HomePageController extends GetxController {
   Future<void> onInit() async {
     super.onInit();
     isLoading.value = true;
+    await _loadSectionPrefs();
 
     _externalModulesController = Get.find<ExternalModulesController>();
     _restaurantModulesController = Get.find<RestaurantModulesController>();
@@ -373,14 +372,112 @@ class HomePageController extends GetxController {
     shortcutRoutes.remove(service.page);
     _rebuildShortcutCaches();
     _persistShortcuts();
+  }
 
-    if (shortcutRoutes.isEmpty) {
-      isRemovingShortcuts.value = false;
+  /// Move o atalho de [oldIndex] para [newIndex] (posição final, já
+  /// ajustada; é o que o `onReorderItem` do ReorderableListView entrega).
+  void reorderShortcut(int oldIndex, int newIndex) {
+    if (oldIndex < 0 || oldIndex >= shortcutRoutes.length) return;
+    final route = shortcutRoutes.removeAt(oldIndex);
+    shortcutRoutes.insert(newIndex.clamp(0, shortcutRoutes.length), route);
+    _rebuildShortcutCaches();
+    _persistShortcuts();
+  }
+
+  // ---------------- SEÇÕES DA HOME ----------------
+  // Ordem e visibilidade ficam no aparelho (SharedPreferences), como o
+  // restaurante padrão: continuam valendo depois de sair da conta.
+
+  static const String _sectionsOrderKey = 'home_sections_order';
+  static const String _sectionsHiddenKey = 'home_sections_hidden';
+
+  static const List<HomeSection> defaultSectionOrder = [
+    HomeSection.studyPlan,
+    HomeSection.restaurant,
+    HomeSection.shortcuts,
+    HomeSection.transcript,
+    HomeSection.news,
+  ];
+
+  final sectionOrder = <HomeSection>[...defaultSectionOrder].obs;
+  final hiddenSections = <HomeSection>{}.obs;
+
+  List<HomeSection> get visibleSections =>
+      sectionOrder.where((s) => !hiddenSections.contains(s)).toList();
+
+  Future<void> _loadSectionPrefs() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final byName = {for (final s in HomeSection.values) s.name: s};
+
+      // Ignora nomes desconhecidos e acrescenta no fim seções novas que
+      // ainda não estavam salvas (atualizações futuras do app).
+      final saved = (prefs.getStringList(_sectionsOrderKey) ?? const [])
+          .map((n) => byName[n])
+          .whereType<HomeSection>()
+          .toList();
+      final order = [
+        ...saved,
+        ...defaultSectionOrder.where((s) => !saved.contains(s)),
+      ];
+      sectionOrder.assignAll(order);
+
+      hiddenSections.assignAll(
+        (prefs.getStringList(_sectionsHiddenKey) ?? const [])
+            .map((n) => byName[n])
+            .whereType<HomeSection>(),
+      );
+    } catch (e) {
+      debugPrint('Erro ao carregar seções da Home: $e');
     }
   }
 
-  void toggleRemoveShortcutMode() {
-    isRemovingShortcuts.toggle();
+  Future<void> _persistSectionPrefs() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList(
+        _sectionsOrderKey,
+        sectionOrder.map((s) => s.name).toList(),
+      );
+      await prefs.setStringList(
+        _sectionsHiddenKey,
+        hiddenSections.map((s) => s.name).toList(),
+      );
+    } catch (e) {
+      debugPrint('Erro ao salvar seções da Home: $e');
+    }
+  }
+
+  /// Move a seção [delta] posições entre as seções visíveis (-1 sobe, 1 desce).
+  void moveSection(HomeSection section, int delta) {
+    final visible = visibleSections;
+    final from = visible.indexOf(section);
+    final to = from + delta;
+    if (from < 0 || to < 0 || to >= visible.length) return;
+
+    // Troca de lugar com a vizinha visível, mantendo as ocultas onde estão.
+    final neighbor = visible[to];
+    final i = sectionOrder.indexOf(section);
+    final j = sectionOrder.indexOf(neighbor);
+    sectionOrder[i] = neighbor;
+    sectionOrder[j] = section;
+    _persistSectionPrefs();
+  }
+
+  void hideSection(HomeSection section) {
+    hiddenSections.add(section);
+    _persistSectionPrefs();
+  }
+
+  void showSection(HomeSection section) {
+    hiddenSections.remove(section);
+    _persistSectionPrefs();
+  }
+
+  void resetSections() {
+    sectionOrder.assignAll(defaultSectionOrder);
+    hiddenSections.clear();
+    _persistSectionPrefs();
   }
 
   void openShortcut(DashboardShortcut service) {
@@ -470,6 +567,10 @@ class HomePageController extends GetxController {
     super.onClose();
   }
 }
+
+/// Seções da Home que o usuário pode reordenar e ocultar. O `name` é salvo
+/// nas preferências, então não renomeie os valores.
+enum HomeSection { studyPlan, restaurant, shortcuts, transcript, news }
 
 class TodayCampusMeal {
   final Campus campus;
