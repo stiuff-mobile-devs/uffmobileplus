@@ -587,5 +587,11 @@
   "todos_os_servicos": "Tutti i servizi",
   "ver_todos_servicos_desc": "Vedi l'elenco completo dei servizi",
   "voltar_pagina_inicial": "Torna alla pagina iniziale",
-  "voltar_pagina_inicial_desc": "Le tue scorciatoie, lezioni e menù del giorno"
+  "voltar_pagina_inicial_desc": "Le tue scorciatoie, lezioni e menù del giorno",
+  "conta": "Account",
+  "preferencias": "Preferenze",
+  "inativo": "Inattivo",
+  "atualizar_dados_google_desc": "Recupera di nuovo i tuoi gruppi e permessi",
+  "sair_confirmacao_titulo": "Uscire dall'account?",
+  "sair_confirmacao_msg": "Verrai disconnesso da IdUFF e Google su questo dispositivo. I dati salvati, come il profilo e le scorciatoie della schermata iniziale, verranno eliminati e dovrai accedere di nuovo. La lingua scelta verrà mantenuta."
 }

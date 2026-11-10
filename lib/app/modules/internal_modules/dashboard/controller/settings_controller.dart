@@ -32,6 +32,18 @@ class SettingsController extends GetxController {
      loginController.logoutGoogle();
   }
 
+  /// Explica o que acontece ao sair antes de executar o [logout].
+  Future<void> confirmLogout() async {
+    final ok = await AppPopups.confirm(
+      title: 'sair_confirmacao_titulo'.tr,
+      message: 'sair_confirmacao_msg'.tr,
+      icon: Icons.logout_rounded,
+      confirmText: 'sair'.tr,
+      destructive: true,
+    );
+    if (ok) await logout();
+  }
+
   Future<void> logoutIduff() async {
     // Apaga também matrícula/nome/curso/perfil: assim o próximo login IdUFF
     // consulta a UMM de novo em vez de reaproveitar os dados da conta anterior.
