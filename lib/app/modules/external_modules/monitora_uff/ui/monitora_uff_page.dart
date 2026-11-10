@@ -16,6 +16,7 @@ import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/ui/widge
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/ui/widgets/highlighted_users_list.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/data/services/foreground_service.dart' as foreground_service;
+import 'package:uffmobileplus/app/ui/widgets/responsive_uff_logo.dart';
 
 class MonitoraUFFPage extends StatelessWidget {
   const MonitoraUFFPage({super.key});
@@ -54,7 +55,7 @@ class MonitoraUFFPage extends StatelessWidget {
   Widget _body(BuildContext context) {
     return Obx(() {
       if (userCtrl.isLoading.value) {
-        return const Center(child: CircularProgressIndicator());
+        return const Center(child: ResponsiveUffLogo(height: 50));
       }
 
       if (userCtrl.isTrackable() & !kIsWeb & !permissionsCtrl.arePermissionsGranted()) {

@@ -7,6 +7,7 @@ import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/modul
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/modules/registration/ui/registration_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/modules/auth/ui/login_page.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
+import 'package:uffmobileplus/app/ui/widgets/responsive_uff_logo.dart';
 
 class BancoDeIdeiasPage extends GetView<BancoDeIdeiasController> {
   const BancoDeIdeiasPage({super.key});
@@ -99,7 +100,7 @@ class _BancoDeIdeiasLoading extends GetView<BancoDeIdeiasController> {
           gradient: AppColors.darkBlueToBlackGradient(),
         ),
         child: Center(
-          child: CircularProgressIndicator(color: AppColors.lightBlue()),
+          child: const ResponsiveUffLogo(height: 50),
         ),
       ),
     );

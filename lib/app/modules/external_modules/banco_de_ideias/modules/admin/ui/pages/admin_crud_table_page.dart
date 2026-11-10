@@ -6,6 +6,7 @@ import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/modul
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/modules/admin/ui/widgets/admin_record_form_dialog.dart';
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/models/crud_table.dart';
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/provider/crud_api_service.dart';
+import 'package:uffmobileplus/app/ui/widgets/responsive_uff_logo.dart';
 
 class AdminCrudTablePage extends StatefulWidget {
   AdminCrudTablePage({
@@ -222,7 +223,7 @@ class _AdminCrudTablePageState extends State<AdminCrudTablePage> {
 
   Widget _buildBody(ColorScheme colorScheme) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: ResponsiveUffLogo(height: 50));
     }
 
     if (_errorMessage != null) {

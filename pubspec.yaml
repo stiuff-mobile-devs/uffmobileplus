@@ -39,7 +39,6 @@ dependencies:
   qr_flutter: ^4.1.0
   intl: ^0.20.2
   mobile_scanner: ^7.2.0
-  rive: ^0.14.6
   http: ^1.5.0
   radio_player: ^2.2.1
   marquee: ^2.3.0
@@ -95,7 +94,6 @@ flutter:
     - assets/papers/icons/
     - assets/images/
     - assets/logos/
-    - assets/animations/
     - assets/icons/
     - assets/icons/flags/
     - assets/carteirinha_digital/

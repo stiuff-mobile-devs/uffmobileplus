@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/transcript/controller/transcript_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/transcript/data/models/transcript_discipline.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
+import 'package:uffmobileplus/app/ui/widgets/responsive_uff_logo.dart';
 
 class TranscriptPage extends StatelessWidget {
   const TranscriptPage({super.key});
@@ -71,13 +72,7 @@ class CustomCircularProgressIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: SizedBox(
-        width: 48,
-        height: 48,
-        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3.5),
-      ),
-    );
+    return const Center(child: ResponsiveUffLogo(height: 50));
   }
 }
 

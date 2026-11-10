@@ -2,7 +2,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:rive/rive.dart' as rive;
 import 'package:uffmobileplus/app/data/data_bases/firebase_service.dart';
 import 'package:uffmobileplus/app/data/data_bases/hive_service.dart';
 import 'package:uffmobileplus/app/data/services/deep_link_service.dart';
@@ -14,7 +13,6 @@ import 'package:uffmobileplus/app/utils/translations/language_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await rive.RiveNative.init();
 
   // Carrega os arquivos JSON de tradução (um por idioma suportado)
   await AppTranslation.load();

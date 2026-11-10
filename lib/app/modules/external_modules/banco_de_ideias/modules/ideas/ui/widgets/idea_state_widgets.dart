@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/controller/banco_de_ideias_controller.dart';
-import 'package:uffmobileplus/app/utils/color_pallete.dart';
+import 'package:uffmobileplus/app/ui/widgets/responsive_uff_logo.dart';
 
 class DialogError extends GetView<BancoDeIdeiasController> {
   const DialogError({super.key, required this.error, required this.onRetry});
@@ -41,7 +41,7 @@ class LoadingState extends GetView<BancoDeIdeiasController> {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: CircularProgressIndicator(color: AppColors.lightBlue()),
+      child: const ResponsiveUffLogo(height: 50),
     );
   }
 }

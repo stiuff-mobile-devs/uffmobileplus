@@ -76,7 +76,7 @@ Ponto único: `lib/app/utils/ui_components/app_popups.dart`. **Obrigatório nos 
 - Use `withValues(alpha: x)` (não `withOpacity`) e `PopScope` (não `WillPopScope`) em código novo.
 
 ### App bootstrap (`lib/main.dart`)
-Order matters: `WidgetsFlutterBinding.ensureInitialized()` → `RiveNative.init()` → `FirebaseService.init()` → `HiveService.init()` → lock portrait orientation → `DeepLinkService().init()` → `LanguageService.getInitialLocale()` → `runApp(GetMaterialApp(initialRoute: Routes.SPLASH, getPages: AppPages.pages, ...))`.
+Order matters: `WidgetsFlutterBinding.ensureInitialized()` → `AppTranslation.load()` → `FirebaseService.init()` → `HiveService.init()` → lock portrait orientation → `DeepLinkService().init()` → `LanguageService.getInitialLocale()` → `runApp(GetMaterialApp(initialRoute: Routes.SPLASH, getPages: AppPages.pages, ...))`.
 
 ### Platform/environment notes
 - Single Firebase project, single build flavor on both Android (`br.uff.uffmobileplus`) and iOS — no dev/prod flavor split.

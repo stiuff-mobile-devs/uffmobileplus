@@ -6,6 +6,7 @@ import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/provider/crud_api_service.dart';
 import 'admin_state_message.dart';
 import 'crud_record_list.dart';
+import 'package:uffmobileplus/app/ui/widgets/responsive_uff_logo.dart';
 
 class CrudTableBody extends GetView<BancoDeIdeiasController> {
   const CrudTableBody({
@@ -30,7 +31,7 @@ class CrudTableBody extends GetView<BancoDeIdeiasController> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) return const Center(child: CircularProgressIndicator());
+    if (isLoading) return const Center(child: ResponsiveUffLogo(height: 50));
     if (errorMessage != null) return _error();
     if (records.isEmpty) return _empty();
     return CrudRecordList(

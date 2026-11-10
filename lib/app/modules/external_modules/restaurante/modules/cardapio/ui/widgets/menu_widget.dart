@@ -8,6 +8,7 @@ import '../../data/models/meal_model.dart';
 import '../../data/repository/restaurant_repository.dart';
 import '../pages/details_page.dart';
 import 'custom_polygon.dart';
+import 'package:uffmobileplus/app/ui/widgets/responsive_uff_logo.dart';
 
 class MenuWidget extends StatefulWidget {
   final String campus;
@@ -477,13 +478,7 @@ class _MenuWidgetState extends State<MenuWidget> {
       return const Center(
         child: Padding(
           padding: EdgeInsets.only(bottom: 140),
-          child: SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(
-              color: Colors.amber,
-            ),
-          ),
+          child: ResponsiveUffLogo(height: 32),
         ),
       );
     } else if (restaurantsController.isFetchLoading == 0) {

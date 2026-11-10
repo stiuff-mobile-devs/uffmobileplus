@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/controller/google_groups_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/google_group_model.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
+import 'package:uffmobileplus/app/ui/widgets/responsive_uff_logo.dart';
 
 class GroupSelector extends StatelessWidget {
   const GroupSelector({super.key});
@@ -68,7 +69,7 @@ class GroupSelector extends StatelessWidget {
             if (googleGroupsController.isLoading.value) {
               return const Padding(
                 padding: EdgeInsets.all(16),
-                child: Center(child: CircularProgressIndicator(color: Colors.white)),
+                child: Center(child: ResponsiveUffLogo(height: 32)),
               );
             }
 

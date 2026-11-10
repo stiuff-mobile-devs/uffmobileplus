@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/modules/external_modules/sos/controller/sos_controller.dart';
+import 'package:uffmobileplus/app/ui/widgets/responsive_uff_logo.dart';
 
 class SosPage extends GetView<SosController> {
   const SosPage({super.key});
@@ -47,14 +48,7 @@ class SosPage extends GetView<SosController> {
               if (controller.isLoading.value) {
                 return Column(
                   children: [
-                    SizedBox(
-                      height: 60,
-                      width: 60,
-                      child: CircularProgressIndicator(
-                        color: AppColors.lightBlue(),
-                        strokeWidth: 5,
-                      ),
-                    ),
+                    const ResponsiveUffLogo(height: 60),
                     const SizedBox(height: 20),
                     Text(
                       "sos_enviando".tr,

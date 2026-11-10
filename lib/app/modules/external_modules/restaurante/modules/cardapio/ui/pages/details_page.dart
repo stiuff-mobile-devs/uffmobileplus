@@ -6,6 +6,7 @@ import '../../../../../../../utils/color_pallete.dart';
 import '../../controller/details_controller.dart';
 import '../../data/models/campus_model.dart';
 import '../../data/models/meal_model.dart';
+import 'package:uffmobileplus/app/ui/widgets/responsive_uff_logo.dart';
 
 class DetailsPage extends StatefulWidget {
   final MealModel meal;
@@ -63,9 +64,7 @@ class _DetailsPageState extends State<DetailsPage> {
                   builder:
                       (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator(
-                        color: Colors.amber,
-                      );
+                      return const ResponsiveUffLogo(height: 50);
                     }
                     if (snapshot.hasError) {
                       debugPrint('Error generating menu visualizer: ${snapshot.error}');

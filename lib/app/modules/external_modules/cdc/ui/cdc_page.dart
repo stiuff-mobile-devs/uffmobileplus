@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/cdc/controller/cdc_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/cdc/data/models/cdc_chat_room_model.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
+import 'package:uffmobileplus/app/ui/widgets/responsive_uff_logo.dart';
 
 class CdcPage extends GetView<CdcController> {
   const CdcPage({super.key});
@@ -199,9 +200,7 @@ class CdcPage extends GetView<CdcController> {
               Center(
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 24),
-                  child: CircularProgressIndicator(
-                    color: AppColors.lightBlue(),
-                  ),
+                  child: ResponsiveUffLogo(height: 40),
                 ),
               )
             else if (controller.chatRooms.isEmpty)
