@@ -579,5 +579,9 @@
   "erro_login_google_msg": "No fue posible iniciar sesión con la Cuenta de Google. Inténtalo de nuevo.",
   "erro_atualizar_dados_google_msg": "No fue posible actualizar tus datos ahora. Inténtalo más tarde.",
   "suporte_iduff_copiar_email": "¿Necesitas ayuda? Toca para copiar el correo de soporte:",
-  "manual_guias_em_construcao": "Estamos trabajando en el manual de guías. Pronto estará disponible aquí."
+  "manual_guias_em_construcao": "Estamos trabajando en el manual de guías. Pronto estará disponible aquí.",
+  "conectando_google": "Conectando tu cuenta de Google...",
+  "login_sucesso_titulo": "Conectado con éxito",
+  "login_google_sucesso_msg": "Cuenta de Google @email vinculada.",
+  "login_iduff_sucesso_msg": "Cuenta IdUFF @email vinculada."
 }

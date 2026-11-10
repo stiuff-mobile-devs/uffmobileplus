@@ -15,7 +15,11 @@ class RestaurantModulesController extends GetxController {
   @override
   Future<void> onInit() async {
     super.onInit();
+    await reload();
+  }
 
+  /// Relê o usuário salvo e refiltra os módulos (ex.: após um novo login).
+  Future<void> reload() async {
     _usermodel = (await _userDataRepository.getUserData()) ?? UserData();
 
     await filterButtonList(
@@ -25,7 +29,10 @@ class RestaurantModulesController extends GetxController {
     );
   }
 
-  final RxList<RestaurantModules> restaurantModulesList = RxList([
+  /// Catálogo completo. A lista exibida é sempre filtrada a partir dele
+  /// (filtrar a própria lista removia serviços para sempre e um novo login
+  /// não conseguia trazê-los de volta).
+  final List<RestaurantModules> _allModules = [
     RestaurantModules(
       iconSrc: 'assets/icons/cardapio.svg',
       subtitle: 'menu',
@@ -83,7 +90,11 @@ class RestaurantModulesController extends GetxController {
         ),
       ],
     ),
-  ]);
+  ];
+
+  // Começa com o catálogo completo, como antes, para os atalhos salvos não
+  // serem descartados enquanto o filtro do perfil ainda não rodou.
+  late final RxList<RestaurantModules> restaurantModulesList = RxList<RestaurantModules>.of(_allModules);
 
   void navigateTo(
     String route, {
@@ -106,35 +117,46 @@ class RestaurantModulesController extends GetxController {
     List<GdiGroups> currentGdiGroups,
     List<GdiGroups> currentGdiGroupsGoogle,
   ) async {
-    restaurantModulesList.removeWhere((button) {
-      bool hasProfile = button.availableFor.contains(currentProfile);
-      if (!hasProfile) return true;
+    restaurantModulesList.assignAll(_allModules.where((button) => !_isHidden(
+      button,
+      currentProfile,
+      currentGdiGroups,
+      currentGdiGroupsGoogle,
+    )));
+  }
 
-      if (button.gdiGroups == null) return false;
+  bool _isHidden(
+    RestaurantModules button,
+    ProfileTypes currentProfile,
+    List<GdiGroups> currentGdiGroups,
+    List<GdiGroups> currentGdiGroupsGoogle,
+  ) {
+    bool hasProfile = button.availableFor.contains(currentProfile);
+    if (!hasProfile) return true;
 
-      if (button.gdiGroups!.any(
-        (btnGroup) => btnGroup.gid == GdiGroupsEnum.controladoresDeAcesso.id,
+    if (button.gdiGroups == null) return false;
+
+    if (button.gdiGroups!.any(
+      (btnGroup) => btnGroup.gid == GdiGroupsEnum.controladoresDeAcesso.id,
+    )) {
+      if (currentGdiGroupsGoogle.any(
+        (userGroup) =>
+            userGroup.email == 'controladores-de-acesso-ru.proaes@id.uff.br',
       )) {
-        if (currentGdiGroupsGoogle.any(
-          (userGroup) =>
-              userGroup.email == 'controladores-de-acesso-ru.proaes@id.uff.br',
-        )) {
-          return false;
-        }
+        return false;
       }
-      bool hasGroupMatch = button.gdiGroups!.any(
-        (btnGroup) =>
-            currentGdiGroups.any(
-              (userGroup) => userGroup.gid == btnGroup.gid,
-            ) ||
-            currentGdiGroupsGoogle.any(
-              (userGroup) => userGroup.gid == btnGroup.gid,
-            ),
-      );
+    }
+    bool hasGroupMatch = button.gdiGroups!.any(
+      (btnGroup) =>
+          currentGdiGroups.any(
+            (userGroup) => userGroup.gid == btnGroup.gid,
+          ) ||
+          currentGdiGroupsGoogle.any(
+            (userGroup) => userGroup.gid == btnGroup.gid,
+          ),
+    );
 
-      return !hasGroupMatch;
-    });
-    restaurantModulesList.refresh();
+    return !hasGroupMatch;
   }
 }
 

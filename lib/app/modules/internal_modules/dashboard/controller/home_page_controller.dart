@@ -15,6 +15,7 @@ import 'package:uffmobileplus/app/modules/external_modules/study_plan/data/repos
 import 'package:uffmobileplus/app/modules/external_modules/transcript/data/models/transcript_model.dart';
 import 'package:uffmobileplus/app/modules/external_modules/transcript/data/repository/transcript_repository.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/external_modules_controller.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/login/controller/login_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
 import 'package:uffmobileplus/app/ui/widgets/app_recommendation_dialog.dart';
 
@@ -88,6 +89,30 @@ class HomePageController extends GetxController {
     });
 
     _showAppRecommendationDialog();
+  }
+
+  /// Recarrega tudo que depende do usuário logado. Chamado depois de um login
+  /// feito com a Home já aberta: o controller não é recriado nesse caso, então
+  /// sem isto a dashboard só mostrava os dados novos ao reabrir o app.
+  Future<void> reloadSession() async {
+    await _externalModulesServices.initialize();
+    await _loadProfileData();
+
+    isLoadingTodayClasses.value = true;
+    isLoadingTranscript.value = true;
+    await Future.wait([_loadTodayClasses(), _loadTranscriptStats()]);
+
+    // Os workers de _bindServicesCatalog ressincronizam os atalhos quando
+    // estas listas mudam.
+    await Future.wait([
+      _externalModulesController.reload(),
+      _restaurantModulesController.reload(),
+    ]);
+    await _loadSavedShortcuts();
+
+    if (Get.isRegistered<LoginController>()) {
+      await Get.find<LoginController>().reloadUserData();
+    }
   }
 
   Future<void> _loadProfileData() async {

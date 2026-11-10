@@ -24,30 +24,57 @@ class AuthGoogleController extends GetxController {
 
   AuthGoogleService get authGoogle => _authGoogle;
 
-  Future<void> loginGoogle() async {
+  /// Login interativo. Retorna o usuário quando o login foi concluído, ou
+  /// `null` se falhou, foi cancelado ou o e-mail não institucional foi recusado.
+  ///
+  /// Com [navigate] falso (login pelas Configurações), não troca de tela: quem
+  /// chamou decide para onde ir e recarrega a dashboard.
+  Future<UserGoogleModel?> loginGoogle({bool navigate = true}) async {
     try {
       UserGoogleModel? user = await _authGoogle.signInGoogle();
 
       if (user != null) {
+        final previousEmail =
+            (await _userDataRepository.getUserGoogleModel())?.email?.toLowerCase();
         String? token = await _authGoogle.getFirebaseIdToken();
         await _userDataRepository.saveUserGoogleModel(user);
+        // Grupos de outra conta não servem: limpa para a regra dos 90 dias
+        // buscar de novo (ex.: sessão expirou e entrou com outra conta).
+        if (previousEmail != null &&
+            previousEmail.isNotEmpty &&
+            previousEmail != user.email?.toLowerCase()) {
+          await _userDataRepository.clearGdiGroupsGoogle();
+        }
         await _registerTokenCdc();
         await getGdiGroupsGoogle(token ?? '', user.email ?? "", false);
-        
+
         // Sincronizar Custom Claims do Harpia
         HarpiaClaimsService.syncClaims();
 
-        // Chama a função auxiliar passando o e-mail
-        await _verifyEmailAndNavigate(user.email ?? "");
+        if (!await _confirmInstitutionalEmail(user.email ?? "")) {
+          // Desloga para o usuário poder escolher outra conta do Google
+          if (navigate) {
+            await logout();
+          } else {
+            await _clearGoogleSession();
+          }
+          return null;
+        }
 
+        unawaited(_ensureDriveFolder(interactive: true));
+        if (navigate) Get.offAllNamed(Routes.HOME);
+        return user;
       } else {
+        AppPopups.hideLoading();
         AppPopups.error(
           'falha_autenticar_usuario'.tr,
           title: 'erro_login_titulo'.tr,
         );
+        return null;
       }
     } catch (e) {
       debugPrint('Erro no login Google: $e');
+      AppPopups.hideLoading();
       AppPopups.error(
         'erro_login_google_msg'.tr,
         title: 'erro_login_externo_titulo'.tr,
@@ -56,15 +83,14 @@ class AuthGoogleController extends GetxController {
     }
   }
 
-  Future<void> _verifyEmailAndNavigate(String email) async {
-    if (email.endsWith('@id.uff.br')) {
-      // Se for acadêmico, vai direto para a Home
-      unawaited(_ensureDriveFolder(interactive: true));
-      Get.offAllNamed(Routes.HOME);
-      return;
-    }
+  /// E-mail @id.uff.br passa direto; outro e-mail pede confirmação.
+  Future<bool> _confirmInstitutionalEmail(String email) async {
+    if (email.endsWith('@id.uff.br')) return true;
 
-    final proceed = await AppPopups.confirm(
+    // O aviso precisa ficar acessível, então fecha um carregamento aberto
+    // (não faz nada se não houver).
+    AppPopups.hideLoading();
+    return AppPopups.confirm(
       title: 'aviso_email_nao_institucional_titulo'.tr,
       message: 'aviso_email_nao_institucional_msg'.tr,
       icon: Icons.alternate_email_rounded,
@@ -73,17 +99,9 @@ class AuthGoogleController extends GetxController {
       cancelText: 'refazer_login'.tr,
       dismissible: false,
     );
-
-    if (proceed) {
-      unawaited(_ensureDriveFolder(interactive: true));
-      Get.offAllNamed(Routes.HOME);
-    } else {
-      // Desloga para o usuário poder escolher outra conta do Google
-      await logout();
-    }
   }
 
-  Future<bool> tryLogin() async {
+  Future<bool> tryLogin({bool navigate = true}) async {
     UserGoogleModel? hasLogged = await _authGoogle.trySignInGoogle();
     if (hasLogged != null) {
       await _registerTokenCdc();
@@ -91,7 +109,7 @@ class AuthGoogleController extends GetxController {
       await getGdiGroupsGoogle(token ?? '', hasLogged.email ?? "", false);
       HarpiaClaimsService.syncClaims();
       unawaited(_ensureDriveFolder(interactive: false));
-      Get.offAllNamed(Routes.HOME);
+      if (navigate) Get.offAllNamed(Routes.HOME);
       return true;
     } else {
       return false;
@@ -108,9 +126,15 @@ class AuthGoogleController extends GetxController {
   }
 
   Future<void> logout() async {
+    await _clearGoogleSession();
+    Get.offAllNamed(Routes.LOGIN);
+  }
+
+  /// Sai da conta Google e apaga o que é dela (usuário e grupos GDI), sem navegar.
+  Future<void> _clearGoogleSession() async {
     await _authGoogle.logoutGoogle();
     await _userDataRepository.deleteUserGoogleModel();
-    Get.offAllNamed(Routes.LOGIN);
+    await _userDataRepository.clearGdiGroupsGoogle();
   }
 
   Future<void> getGdiGroupsGoogle(String token, String email, bool forceUpdate) async {

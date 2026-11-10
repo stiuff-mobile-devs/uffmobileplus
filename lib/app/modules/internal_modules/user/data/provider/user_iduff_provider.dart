@@ -64,6 +64,40 @@ class UserIduffProvider {
     }
   }
 
+  /// Desconecta o IdUFF apagando também os dados de perfil que vieram dele
+  /// (UMM/SACI). Sem isso, a escolha de perfil encontrava a matrícula antiga e pulava
+  /// direto para a Home com os dados da conta anterior. Mantém atalhos, a conta
+  /// Google e os dados do token do CDC.
+  Future<String> clearIduffProfileData() async {
+    try {
+      final box = await _getBox();
+      UserData? userData = box.get(_userKey);
+
+      if (userData != null) {
+        userData
+          ..name = null
+          ..nomesocial = null
+          ..matricula = null
+          ..iduff = null
+          ..curso = null
+          ..fotoUrl = null
+          ..dataValidadeMatricula = null
+          ..textoQrCodeCarteirinha = null
+          ..bond = null
+          ..bondId = null
+          ..gdiGroups = null
+          ..accessToken = null
+          ..profileType = null
+          ..userIduffModel = null;
+        await userData.save();
+        return "success";
+      }
+      return "Usuário não encontrado no Hive";
+    } catch (e) {
+      return "Erro ao limpar dados do iduff do Hive: $e";
+    }
+  }
+
   Future<String?> getRefreshToken() async {
     final userIduff = await getUserIduffModel();
     return userIduff?.authData?.refreshToken;

@@ -579,5 +579,9 @@
   "erro_login_google_msg": "Anmeldung mit dem Google-Konto nicht möglich. Bitte versuche es erneut.",
   "erro_atualizar_dados_google_msg": "Deine Daten konnten gerade nicht aktualisiert werden. Bitte versuche es später erneut.",
   "suporte_iduff_copiar_email": "Brauchst du Hilfe? Tippe, um die Support-E-Mail zu kopieren:",
-  "manual_guias_em_construcao": "Wir arbeiten am Handbuch mit den Anleitungen. Es ist bald hier verfügbar."
+  "manual_guias_em_construcao": "Wir arbeiten am Handbuch mit den Anleitungen. Es ist bald hier verfügbar.",
+  "conectando_google": "Verbindung mit deinem Google-Konto wird hergestellt...",
+  "login_sucesso_titulo": "Erfolgreich verbunden",
+  "login_google_sucesso_msg": "Google-Konto @email verknüpft.",
+  "login_iduff_sucesso_msg": "IdUFF-Konto @email verknüpft."
 }

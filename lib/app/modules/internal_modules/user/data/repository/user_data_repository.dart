@@ -84,6 +84,14 @@ class UserDataRepository {
     return await _userIduffProvider.deleteUserIduffModel();
   }
 
+  Future<String> clearIduffProfileData() async {
+    return await _userIduffProvider.clearIduffProfileData();
+  }
+
+  Future<String> clearGdiGroupsGoogle() async {
+    return await _userDataProvider.clearGdiGroupsGoogle();
+  }
+
   Future<String?> getRefreshToken() async {
     return await _userIduffProvider.getRefreshToken();
   }

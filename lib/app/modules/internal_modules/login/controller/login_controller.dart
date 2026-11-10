@@ -131,6 +131,14 @@ class LoginController extends GetxController {
     await _loadBondStates();
   }
 
+  /// Relê o usuário salvo (ex.: após um novo login) para atualizar a
+  /// permissão de administrador e o estado das vinculações.
+  Future<void> reloadUserData() async {
+    _user = (await _userDataRepository.getUserData()) ?? UserData();
+    _checkAdminPermission(GdiGroupsEnum.controladoresDeAcesso.id);
+    await _loadBondStates();
+  }
+
   void _checkAdminPermission(final gdi) {
     final groups = _user.gdiGroups;
     if (groups == null || groups.isEmpty) {
@@ -147,29 +155,45 @@ class LoginController extends GetxController {
     ); //Esse argumento é para iniciar a função de login automaticamente apenas quando o usuario aperta em login com iduff
   }
 
-  Future<void> loginGoogle() async {
-    // Aviso só faz sentido quando o Google será o único vínculo
-    if (!hasActiveIduffBondObs.value && !await _confirmGoogleOnlyLogin()) {
-      return;
+  /// Faz o login Google e retorna o usuário logado, ou `null` se não concluiu.
+  ///
+  /// [navigate] falso: não troca de tela (login pelas Configurações).
+  /// [skipGoogleOnlyConfirm]: quem chamou já fez [confirmGoogleOnlyLoginIfNeeded].
+  Future<UserGoogleModel?> loginGoogle({
+    bool navigate = true,
+    bool skipGoogleOnlyConfirm = false,
+  }) async {
+    if (!skipGoogleOnlyConfirm && !await confirmGoogleOnlyLoginIfNeeded()) {
+      return null;
     }
 
     isLoading.value = true;
     try {
-      if(hasActiveGoogleBondObs.value){
-        bool loginStatus = await _loginGoogleController.tryLogin();
-        if(!loginStatus){
-          await _loginGoogleController.loginGoogle();
+      if (hasActiveGoogleBondObs.value) {
+        try {
+          if (await _loginGoogleController.tryLogin(navigate: navigate)) {
+            return await _userDataRepository.getUserGoogleModel();
+          }
+        } catch (e) {
+          // Login silencioso falhou: cai no login interativo abaixo.
+          debugPrint('Erro no login Google silencioso: $e');
         }
       }
-      else{
-        await _loginGoogleController.loginGoogle();
-
-      }
+      return await _loginGoogleController.loginGoogle(navigate: navigate);
     } catch (e) {
-      await _loginGoogleController.loginGoogle();
+      // O erro já foi mostrado ao usuário; tentar de novo aqui abria o
+      // seletor de contas uma segunda vez.
+      debugPrint('Erro no login Google: $e');
+      return null;
     } finally {
       isLoading.value = false;
     }
+  }
+
+  /// Aviso só faz sentido quando o Google será o único vínculo.
+  Future<bool> confirmGoogleOnlyLoginIfNeeded() async {
+    if (hasActiveIduffBondObs.value) return true;
+    return _confirmGoogleOnlyLogin();
   }
 
   Future<bool> _confirmGoogleOnlyLogin() {

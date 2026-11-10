@@ -579,5 +579,9 @@
   "erro_login_google_msg": "Impossibile accedere con l'Account Google. Riprova.",
   "erro_atualizar_dados_google_msg": "Impossibile aggiornare i tuoi dati ora. Riprova più tardi.",
   "suporte_iduff_copiar_email": "Serve aiuto? Tocca per copiare l'email dell'assistenza:",
-  "manual_guias_em_construcao": "Stiamo lavorando al manuale delle guide. Sarà presto disponibile qui."
+  "manual_guias_em_construcao": "Stiamo lavorando al manuale delle guide. Sarà presto disponibile qui.",
+  "conectando_google": "Connessione al tuo account Google...",
+  "login_sucesso_titulo": "Connesso con successo",
+  "login_google_sucesso_msg": "Account Google @email collegato.",
+  "login_iduff_sucesso_msg": "Account IdUFF @email collegato."
 }

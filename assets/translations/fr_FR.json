@@ -579,5 +579,9 @@
   "erro_login_google_msg": "Impossible de se connecter avec le compte Google. Veuillez réessayer.",
   "erro_atualizar_dados_google_msg": "Impossible de mettre à jour vos données pour le moment. Réessayez plus tard.",
   "suporte_iduff_copiar_email": "Besoin d'aide ? Touchez pour copier l'e-mail du support :",
-  "manual_guias_em_construcao": "Nous travaillons sur le manuel des guides. Il sera bientôt disponible ici."
+  "manual_guias_em_construcao": "Nous travaillons sur le manuel des guides. Il sera bientôt disponible ici.",
+  "conectando_google": "Connexion à votre compte Google...",
+  "login_sucesso_titulo": "Connecté avec succès",
+  "login_google_sucesso_msg": "Compte Google @email associé.",
+  "login_iduff_sucesso_msg": "Compte IdUFF @email associé."
 }

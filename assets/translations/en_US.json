@@ -579,5 +579,9 @@
   "erro_login_google_msg": "Could not sign in with the Google Account. Please try again.",
   "erro_atualizar_dados_google_msg": "Could not update your data right now. Please try again later.",
   "suporte_iduff_copiar_email": "Need help? Tap to copy the support email:",
-  "manual_guias_em_construcao": "We are working on the guide manual. It will be available here soon."
+  "manual_guias_em_construcao": "We are working on the guide manual. It will be available here soon.",
+  "conectando_google": "Connecting your Google account...",
+  "login_sucesso_titulo": "Successfully connected",
+  "login_google_sucesso_msg": "Google account @email linked.",
+  "login_iduff_sucesso_msg": "IdUFF account @email linked."
 }

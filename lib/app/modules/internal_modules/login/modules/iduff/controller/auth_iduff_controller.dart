@@ -73,6 +73,17 @@ class AuthIduffController extends GetxController {
     isLoading.value = true;
     await _registerTokenCdc();
     Get.offAllNamed(Routes.CHOOSE_PROFILE);
+
+    // Só no login feito pelo usuário (no automático do splash, não).
+    if (isLogin) {
+      final email = (await _userDataRepository.getUserIduffModel())?.email ?? '';
+      AppPopups.success(
+        email.isEmpty
+            ? 'login_sucesso_titulo'.tr
+            : 'login_iduff_sucesso_msg'.trParams({'email': email}),
+        title: email.isEmpty ? null : 'login_sucesso_titulo'.tr,
+      );
+    }
   }
 
   Future<void> _login() async {

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/home_page_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/controller/login_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/controller/auth_google_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_umm_repository.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
 
@@ -31,7 +33,10 @@ class SettingsController extends GetxController {
   }
 
   Future<void> logoutIduff() async {
-    await _userDataRepository.deleteUserIduffModel();
+    // Apaga também matrícula/nome/curso/perfil: assim o próximo login IdUFF
+    // consulta a UMM de novo em vez de reaproveitar os dados da conta anterior.
+    await _userDataRepository.clearIduffProfileData();
+    await UserUmmRepository().deleteUserUmmModel();
     Get.offAllNamed(Routes.LOGIN);
   }
 
@@ -105,7 +110,39 @@ class SettingsController extends GetxController {
       icon: Icons.login_rounded,
       confirmText: 'continuar'.tr,
     );
-    if (ok) loginController.loginGoogle();
+    if (!ok || !await loginController.confirmGoogleOnlyLoginIfNeeded()) return;
+
+    UserGoogleModel? user;
+    AppPopups.showLoading('conectando_google'.tr);
+    try {
+      user = await loginController.loginGoogle(
+        navigate: false,
+        skipGoogleOnlyConfirm: true,
+      );
+    } finally {
+      AppPopups.hideLoading();
+    }
+
+    if (user == null) {
+      await reloadBondStates();
+      return;
+    }
+
+    // Volta para a Home que já está aberta (fecha a folha e as Configurações)
+    // e recarrega os dados dela com a conta nova.
+    if (Get.isRegistered<HomePageController>()) {
+      Get.until((route) => route.settings.name == Routes.HOME);
+      await Get.find<HomePageController>().reloadSession();
+    } else {
+      Get.offAllNamed(Routes.HOME);
+    }
+    final email = user.email ?? '';
+    AppPopups.success(
+      email.isEmpty
+          ? 'login_sucesso_titulo'.tr
+          : 'login_google_sucesso_msg'.trParams({'email': email}),
+      title: email.isEmpty ? null : 'login_sucesso_titulo'.tr,
+    );
   }
 
   Future<void> _showGoogleLogoutConfirmation() async {

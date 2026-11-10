@@ -15,6 +15,11 @@ class ExternalModulesController extends GetxController {
    @override
   Future<void> onInit() async {
     super.onInit();
+    await reload();
+  }
+
+  /// Relê o usuário salvo e refiltra os serviços (ex.: após um novo login).
+  Future<void> reload() async {
     _usermodel = (await userDataRepository.getUserData()) ?? UserData();
 
     await filterButtonList(
@@ -24,7 +29,10 @@ class ExternalModulesController extends GetxController {
     );
   }
 
-  final RxList<ExternalModules> externalModulesList = RxList([
+  /// Catálogo completo. A lista exibida é sempre filtrada a partir dele
+  /// (filtrar a própria lista removia serviços para sempre e um novo login
+  /// não conseguia trazê-los de volta).
+  final List<ExternalModules> _allModules = [
     ExternalModules(
       iconSrc: 'assets/carteirinha_digital/icons/carteirinha.svg',
       subtitle: 'carteirinha_digital',
@@ -212,7 +220,11 @@ class ExternalModulesController extends GetxController {
       availableFor: everyoneLogged,
       gdiGroups: null,
     ),
-  ]);
+  ];
+
+  // Começa com o catálogo completo, como antes, para os atalhos salvos não
+  // serem descartados enquanto o filtro do perfil ainda não rodou.
+  late final RxList<ExternalModules> externalModulesList = RxList<ExternalModules>.of(_allModules);
 
  
 
@@ -238,27 +250,38 @@ class ExternalModulesController extends GetxController {
     List<GdiGroups> currentGdiGroups,
     List<GdiGroups> currentGdiGroupsGoogle
   ) async {
-    externalModulesList.removeWhere((button) {
-      final hasProfile = button.availableFor.contains(currentProfile);
-      if (!hasProfile) return true;
+    externalModulesList.assignAll(_allModules.where((button) => !_isHidden(
+      button,
+      currentProfile,
+      currentGdiGroups,
+      currentGdiGroupsGoogle,
+    )));
+  }
 
-      if (button.gdiGroups == null) return false;
+  bool _isHidden(
+    ExternalModules button,
+    ProfileTypes currentProfile,
+    List<GdiGroups> currentGdiGroups,
+    List<GdiGroups> currentGdiGroupsGoogle,
+  ) {
+    final hasProfile = button.availableFor.contains(currentProfile);
+    if (!hasProfile) return true;
 
-       if (currentGdiGroupsGoogle.any(
-          (userGroup) =>
-              userGroup.email == 'grupos.harpia@id.uff.br' || userGroup.email == 'bombeiros.harpia@id.uff.br' || userGroup.email == 'campo-monitorauff.harpia@id.uff.br'
-        )) {
-          return false;
-        }
-        
-      final hasGroupMatch = button.gdiGroups!.any(
-        (btnGroup) =>
-            currentGdiGroups.any((userGroup) => userGroup.gid == btnGroup.gid),
-      );
+    if (button.gdiGroups == null) return false;
 
-      return !hasGroupMatch;
-    });
-    externalModulesList.refresh();
+     if (currentGdiGroupsGoogle.any(
+        (userGroup) =>
+            userGroup.email == 'grupos.harpia@id.uff.br' || userGroup.email == 'bombeiros.harpia@id.uff.br' || userGroup.email == 'campo-monitorauff.harpia@id.uff.br'
+      )) {
+        return false;
+      }
+      
+    final hasGroupMatch = button.gdiGroups!.any(
+      (btnGroup) =>
+          currentGdiGroups.any((userGroup) => userGroup.gid == btnGroup.gid),
+    );
+
+    return !hasGroupMatch;
   }
 }
 

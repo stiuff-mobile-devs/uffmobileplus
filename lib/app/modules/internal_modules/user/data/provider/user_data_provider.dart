@@ -100,6 +100,20 @@ class UserDataProvider {
     }
   }
 
+  /// Remove os grupos GDI do Google (eles pertencem à conta que saiu).
+  Future<String> clearGdiGroupsGoogle() async {
+    try {
+      UserData? user = await getUserData();
+      if (user != null) {
+        user.gdiGroupsGoogle = null;
+        await user.save();
+      }
+      return "success";
+    } catch (e) {
+      return "Erro ao limpar grupos GDI Google no Hive: $e";
+    }
+  }
+
   Future<String> lastRegisteredTokenCdcUpdate(
     DateTime lastRegisteredTokenCdcUpdate,
     String method,

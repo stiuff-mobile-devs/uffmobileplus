@@ -579,5 +579,9 @@
   "erro_login_google_msg": "Não foi possível entrar com a Conta Google. Tente novamente.",
   "erro_atualizar_dados_google_msg": "Não foi possível atualizar seus dados agora. Tente novamente mais tarde.",
   "suporte_iduff_copiar_email": "Precisa de ajuda? Toque para copiar o e-mail do suporte:",
-  "manual_guias_em_construcao": "Estamos trabalhando no manual de guias. Em breve ele estará disponível aqui."
+  "manual_guias_em_construcao": "Estamos trabalhando no manual de guias. Em breve ele estará disponível aqui.",
+  "conectando_google": "Conectando sua conta Google...",
+  "login_sucesso_titulo": "Conectado com sucesso",
+  "login_google_sucesso_msg": "Conta Google @email vinculada.",
+  "login_iduff_sucesso_msg": "Conta IdUFF @email vinculada."
 }
