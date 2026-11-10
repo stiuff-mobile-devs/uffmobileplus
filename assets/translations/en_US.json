@@ -200,9 +200,6 @@
   "nenhuma_aula_hoje": "No classes today.",
   "dados_indisponiveis": "Data unavailable at the moment.",
   "horas_cursadas_status": "@cursada h completed out of @total h total",
-  "noticias": "News",
-  "noticias_em_breve": "Coming soon: UFF news",
-  "noticias_preparando_desc": "We are preparing this section to bring you the latest university news.",
   "todos_servicos_salvos": "All services are already in your grid.",
   "refeicoes_indisponiveis_refeitorio": "No meals available yet for this cafeteria.",
   "erro_atualizar_dados_google": "Error updating Google data",
@@ -599,5 +596,10 @@
   "seus_atalhos": "Your shortcuts",
   "adicionar": "Add",
   "atalhos_vazio": "No shortcuts yet. Tap Edit to add some.",
-  "remover": "Remove"
+  "remover": "Remove",
+  "ao_vivo": "Live",
+  "tocar": "Play",
+  "pausar": "Pause",
+  "ver_tudo": "See all",
+  "noticias_indisponiveis": "Couldn't load the news right now."
 }

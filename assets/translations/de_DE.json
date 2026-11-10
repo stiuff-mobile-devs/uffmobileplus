@@ -200,9 +200,6 @@
   "nenhuma_aula_hoje": "Heute kein Unterricht.",
   "dados_indisponiveis": "Daten derzeit nicht verfügbar.",
   "horas_cursadas_status": "@cursada Std. absolviert von @total Std. gesamt",
-  "noticias": "Nachrichten",
-  "noticias_em_breve": "Demnächst: UFF-Nachrichten",
-  "noticias_preparando_desc": "Wir bereiten diesen Bereich vor, um Ihnen die neuesten Nachrichten der Universität zu bringen.",
   "todos_servicos_salvos": "Alle Dienste befinden sich bereits in Ihrem Raster.",
   "refeicoes_indisponiveis_refeitorio": "Für diese Mensa sind noch keine Mahlzeiten verfügbar.",
   "erro_atualizar_dados_google": "Fehler beim Aktualisieren der Google-Daten",
@@ -599,5 +596,10 @@
   "seus_atalhos": "Deine Verknüpfungen",
   "adicionar": "Hinzufügen",
   "atalhos_vazio": "Noch keine Verknüpfungen. Tippe auf Bearbeiten, um welche hinzuzufügen.",
-  "remover": "Entfernen"
+  "remover": "Entfernen",
+  "ao_vivo": "Live",
+  "tocar": "Abspielen",
+  "pausar": "Pausieren",
+  "ver_tudo": "Alle anzeigen",
+  "noticias_indisponiveis": "Die Nachrichten konnten gerade nicht geladen werden."
 }

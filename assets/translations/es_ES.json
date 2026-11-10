@@ -200,9 +200,6 @@
   "nenhuma_aula_hoje": "No hay clases hoy.",
   "dados_indisponiveis": "Datos no disponibles en este momento.",
   "horas_cursadas_status": "@cursada h cursadas de @total h totales",
-  "noticias": "Noticias",
-  "noticias_em_breve": "Próximamente: noticias de la UFF",
-  "noticias_preparando_desc": "Estamos preparando esta sección para traerle las últimas noticias de la universidad.",
   "todos_servicos_salvos": "Todos los servicios ya están en su cuadrícula.",
   "refeicoes_indisponiveis_refeitorio": "Aún no hay comidas disponibles para este comedor.",
   "erro_atualizar_dados_google": "Error al actualizar los datos de Google",
@@ -599,5 +596,10 @@
   "seus_atalhos": "Tus accesos directos",
   "adicionar": "Añadir",
   "atalhos_vazio": "Aún no hay accesos directos. Toca Editar para añadir.",
-  "remover": "Quitar"
+  "remover": "Quitar",
+  "ao_vivo": "En vivo",
+  "tocar": "Reproducir",
+  "pausar": "Pausar",
+  "ver_tudo": "Ver todo",
+  "noticias_indisponiveis": "No fue posible cargar las noticias ahora."
 }

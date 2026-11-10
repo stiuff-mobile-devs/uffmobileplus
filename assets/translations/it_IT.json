@@ -200,9 +200,6 @@
   "nenhuma_aula_hoje": "Nessuna lezione oggi.",
   "dados_indisponiveis": "Dati non disponibili al momento.",
   "horas_cursadas_status": "@cursada h completate su @total h totali",
-  "noticias": "Notizie",
-  "noticias_em_breve": "Prossimamente: notizie UFF",
-  "noticias_preparando_desc": "Stiamo preparando questa sezione per portarti le ultime notizie dell'università.",
   "todos_servicos_salvos": "Tutti i servizi sono già nella tua griglia.",
   "refeicoes_indisponiveis_refeitorio": "Nessun pasto ancora disponibile per questa mensa.",
   "erro_atualizar_dados_google": "Errore nell'aggiornamento dei dati Google",
@@ -599,5 +596,10 @@
   "seus_atalhos": "Le tue scorciatoie",
   "adicionar": "Aggiungi",
   "atalhos_vazio": "Nessuna scorciatoia. Tocca Modifica per aggiungerne.",
-  "remover": "Rimuovi"
+  "remover": "Rimuovi",
+  "ao_vivo": "In diretta",
+  "tocar": "Riproduci",
+  "pausar": "Pausa",
+  "ver_tudo": "Vedi tutto",
+  "noticias_indisponiveis": "Impossibile caricare le notizie al momento."
 }

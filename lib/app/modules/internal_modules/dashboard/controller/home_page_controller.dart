@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:googleapis/youtube/v3.dart' as youtube;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uffmobileplus/app/data/services/app_availability_service.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
@@ -14,10 +17,12 @@ import 'package:uffmobileplus/app/modules/external_modules/study_plan/data/model
 import 'package:uffmobileplus/app/modules/external_modules/study_plan/data/repository/study_plan_repository.dart';
 import 'package:uffmobileplus/app/modules/external_modules/transcript/data/models/transcript_model.dart';
 import 'package:uffmobileplus/app/modules/external_modules/transcript/data/repository/transcript_repository.dart';
+import 'package:uffmobileplus/app/modules/external_modules/uniteve/data/services/youtube_services.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/external_modules_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/controller/login_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
 import 'package:uffmobileplus/app/ui/widgets/app_recommendation_dialog.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePageController extends GetxController {
   final UserDataRepository _userDataRepository = UserDataRepository();
@@ -52,6 +57,9 @@ class HomePageController extends GetxController {
   final RxBool isLoadingCampusMeals = true.obs;
   final RxList<TodayCampusMeal> campusMeals = <TodayCampusMeal>[].obs;
 
+  final RxBool isLoadingNews = true.obs;
+  final RxList<HomeNewsItem> news = <HomeNewsItem>[].obs;
+
   late Worker _servicesWorker;
 
   ResponsiveLayoutService get layoutService => _layoutService;
@@ -61,6 +69,9 @@ class HomePageController extends GetxController {
     super.onInit();
     isLoading.value = true;
     await _loadSectionPrefs();
+    // Notícias vêm da rede (YouTube da UniTV): carregam em paralelo, sem
+    // segurar a abertura da Home. A seção tem o próprio carregamento.
+    unawaited(_loadNews());
 
     _externalModulesController = Get.find<ExternalModulesController>();
     _restaurantModulesController = Get.find<RestaurantModulesController>();
@@ -181,6 +192,61 @@ class HomePageController extends GetxController {
     } catch (_) {
     } finally {
       isLoadingTranscript.value = false;
+    }
+  }
+
+  static const int _newsLimit = 6;
+
+  /// Vídeos mais recentes das playlists do canal da UniTV (mesma fonte do
+  /// módulo Unitevê), sem repetidos e sem privados.
+  Future<void> _loadNews() async {
+    isLoadingNews.value = true;
+    try {
+      final playlistIds = await YoutubeService.instance
+          .getChannelSectionPlaylists()
+          .timeout(const Duration(seconds: 10));
+
+      final perPlaylist = await Future.wait(
+        playlistIds.map((id) async {
+          try {
+            final items = await YoutubeService.instance
+                .getPlaylistItems(playlistId: id)
+                .timeout(const Duration(seconds: 10));
+            return (items ?? const []).map((i) => HomeNewsItem.from(i, id));
+          } catch (e) {
+            debugPrint('Erro ao carregar playlist $id da UniTV: $e');
+            return const <HomeNewsItem?>[];
+          }
+        }),
+      );
+
+      final seen = <String>{};
+      final all = perPlaylist
+          .expand((items) => items)
+          .whereType<HomeNewsItem>()
+          .where((item) => seen.add(item.videoId))
+          .toList()
+        ..sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
+
+      news.assignAll(all.take(_newsLimit));
+    } catch (e) {
+      debugPrint('Erro ao carregar notícias da UniTV: $e');
+      news.clear();
+    } finally {
+      isLoadingNews.value = false;
+    }
+  }
+
+  /// Abre o vídeo no app do YouTube, como o módulo Unitevê.
+  Future<void> openNews(HomeNewsItem item) async {
+    final uri = Uri.https('www.youtube.com', '/watch', {
+      'v': item.videoId,
+      'list': item.playlistId,
+    });
+    try {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      debugPrint('Erro ao abrir vídeo da UniTV: $e');
     }
   }
 
@@ -391,12 +457,18 @@ class HomePageController extends GetxController {
   static const String _sectionsOrderKey = 'home_sections_order';
   static const String _sectionsHiddenKey = 'home_sections_hidden';
 
+  /// Versão do layout salvo. Ao subir, [_migrateSectionOrder] ajusta uma vez
+  /// a ordem de quem já tinha personalizado a Home.
+  static const String _sectionsVersionKey = 'home_sections_version';
+  static const int _sectionsVersion = 2;
+
   static const List<HomeSection> defaultSectionOrder = [
     HomeSection.studyPlan,
     HomeSection.restaurant,
     HomeSection.shortcuts,
-    HomeSection.transcript,
     HomeSection.news,
+    HomeSection.radio,
+    HomeSection.transcript,
   ];
 
   final sectionOrder = <HomeSection>[...defaultSectionOrder].obs;
@@ -410,17 +482,33 @@ class HomePageController extends GetxController {
       final prefs = await SharedPreferences.getInstance();
       final byName = {for (final s in HomeSection.values) s.name: s};
 
-      // Ignora nomes desconhecidos e acrescenta no fim seções novas que
-      // ainda não estavam salvas (atualizações futuras do app).
-      final saved = (prefs.getStringList(_sectionsOrderKey) ?? const [])
+      // Ignora nomes desconhecidos. Seções novas que ainda não estavam
+      // salvas (atualizações do app) entram antes da próxima seção que vem
+      // depois delas na ordem padrão, e não no fim da tela.
+      final order = (prefs.getStringList(_sectionsOrderKey) ?? const [])
           .map((n) => byName[n])
           .whereType<HomeSection>()
+          .toSet()
           .toList();
-      final order = [
-        ...saved,
-        ...defaultSectionOrder.where((s) => !saved.contains(s)),
-      ];
-      sectionOrder.assignAll(order);
+      if (order.isNotEmpty) {
+        for (int i = 0; i < defaultSectionOrder.length; i++) {
+          final section = defaultSectionOrder[i];
+          if (order.contains(section)) continue;
+          final later = defaultSectionOrder.skip(i + 1).where(order.contains);
+          if (later.isEmpty) {
+            order.add(section);
+          } else {
+            order.insert(order.indexOf(later.first), section);
+          }
+        }
+        final migrated = _migrateSectionOrder(
+          order,
+          prefs.getInt(_sectionsVersionKey) ?? 1,
+        );
+        sectionOrder.assignAll(order);
+        if (migrated) await _persistSectionPrefs();
+      }
+      await prefs.setInt(_sectionsVersionKey, _sectionsVersion);
 
       hiddenSections.assignAll(
         (prefs.getStringList(_sectionsHiddenKey) ?? const [])
@@ -430,6 +518,23 @@ class HomePageController extends GetxController {
     } catch (e) {
       debugPrint('Erro ao carregar seções da Home: $e');
     }
+  }
+
+  /// Ajustes únicos de ordem entre versões. Retorna se mudou algo.
+  ///
+  /// v2: o Unitevê (notícias) fica logo acima da Rádio.
+  bool _migrateSectionOrder(List<HomeSection> order, int savedVersion) {
+    var changed = false;
+    if (savedVersion < 2) {
+      final radio = order.indexOf(HomeSection.radio);
+      final news = order.indexOf(HomeSection.news);
+      if (radio >= 0 && news >= 0 && news != radio - 1) {
+        order.remove(HomeSection.news);
+        order.insert(order.indexOf(HomeSection.radio), HomeSection.news);
+        changed = true;
+      }
+    }
+    return changed;
   }
 
   Future<void> _persistSectionPrefs() async {
@@ -570,7 +675,46 @@ class HomePageController extends GetxController {
 
 /// Seções da Home que o usuário pode reordenar e ocultar. O `name` é salvo
 /// nas preferências, então não renomeie os valores.
-enum HomeSection { studyPlan, restaurant, shortcuts, transcript, news }
+enum HomeSection { studyPlan, restaurant, shortcuts, radio, transcript, news }
+
+/// Notícia da Home: um vídeo do canal da UniTV.
+class HomeNewsItem {
+  final String title;
+  final String thumbnailUrl;
+  final String videoId;
+  final String playlistId;
+  final DateTime publishedAt;
+
+  const HomeNewsItem({
+    required this.title,
+    required this.thumbnailUrl,
+    required this.videoId,
+    required this.playlistId,
+    required this.publishedAt,
+  });
+
+  /// Converte um item de playlist; `null` se for privado ou sem capa/vídeo.
+  static HomeNewsItem? from(youtube.PlaylistItem item, String playlistId) {
+    final snippet = item.snippet;
+    if (snippet == null || item.status?.privacyStatus == 'private') return null;
+
+    final thumbs = snippet.thumbnails;
+    final thumb =
+        thumbs?.standard ?? thumbs?.high ?? thumbs?.medium ?? thumbs?.default_;
+    final videoId = snippet.resourceId?.videoId;
+    final url = thumb?.url;
+    if (videoId == null || url == null) return null;
+
+    return HomeNewsItem(
+      title: snippet.title ?? '',
+      thumbnailUrl: url,
+      videoId: videoId,
+      playlistId: playlistId,
+      publishedAt:
+          snippet.publishedAt ?? DateTime.fromMillisecondsSinceEpoch(0),
+    );
+  }
+}
 
 class TodayCampusMeal {
   final Campus campus;

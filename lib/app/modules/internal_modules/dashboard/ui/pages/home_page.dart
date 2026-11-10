@@ -1,7 +1,10 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/utils/ui_components/app_bars.dart';
+import 'package:radio_player/radio_player.dart';
+import 'package:uffmobileplus/app/modules/external_modules/radio/controller/radio_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/cardapio/ui/pages/menu_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/study_plan/data/models/discipline_model.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/home_page_controller.dart';
@@ -122,6 +125,8 @@ class HomePage extends GetView<HomePageController> {
         return _buildRestauranteSection(openMenu);
       case HomeSection.shortcuts:
         return _buildShortcutsSection(context, openMenu);
+      case HomeSection.radio:
+        return _buildRadioSection(openMenu);
       case HomeSection.transcript:
         return _buildHistoricoSection(openMenu);
       case HomeSection.news:
@@ -137,10 +142,12 @@ class HomePage extends GetView<HomePageController> {
         return 'restaurante'.tr;
       case HomeSection.shortcuts:
         return 'atalhos_rapidos'.tr;
+      case HomeSection.radio:
+        return 'radio_name'.tr;
       case HomeSection.transcript:
         return 'historico'.tr;
       case HomeSection.news:
-        return 'noticias'.tr;
+        return 'uniteve'.tr;
     }
   }
 
@@ -152,6 +159,8 @@ class HomePage extends GetView<HomePageController> {
         return Icons.restaurant_rounded;
       case HomeSection.shortcuts:
         return Icons.bolt_rounded;
+      case HomeSection.radio:
+        return Icons.radio_rounded;
       case HomeSection.transcript:
         return Icons.insights_rounded;
       case HomeSection.news:
@@ -289,6 +298,16 @@ class HomePage extends GetView<HomePageController> {
     });
   }
 
+  Widget _buildRadioSection(VoidCallback onMenu) {
+    return HomeSectionCard(
+      icon: _sectionIcon(HomeSection.radio),
+      title: _sectionTitle(HomeSection.radio),
+      onMenu: onMenu,
+      onTap: () => Get.toNamed(Routes.RADIO),
+      child: const _RadioPlayerContent(),
+    );
+  }
+
   Widget _buildHistoricoSection(VoidCallback onMenu) {
     return Obx(() {
       final stats = controller.transcriptStats.value;
@@ -340,29 +359,32 @@ class HomePage extends GetView<HomePageController> {
   }
 
   Widget _buildNoticiasSection(VoidCallback onMenu) {
-    return HomeSectionCard(
-      icon: _sectionIcon(HomeSection.news),
-      title: _sectionTitle(HomeSection.news),
-      onMenu: onMenu,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'noticias_em_breve'.tr,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
+    return Obx(() {
+      final items = controller.news.toList(growable: false);
+      final isLoading = controller.isLoadingNews.value;
+
+      return HomeSectionCard(
+        icon: _sectionIcon(HomeSection.news),
+        title: _sectionTitle(HomeSection.news),
+        onMenu: onMenu,
+        headerAction: IconButton(
+          tooltip: 'ver_tudo'.tr,
+          onPressed: () => Get.toNamed(Routes.UNITEVE),
+          icon: Icon(
+            Icons.chevron_right_rounded,
+            color: Colors.white.withValues(alpha: 0.7),
           ),
-          const SizedBox(height: 4),
-          Text(
-            'noticias_preparando_desc'.tr,
-            style: HomeSectionCard.secondaryText.copyWith(height: 1.4),
-          ),
-        ],
-      ),
-    );
+        ),
+        child: isLoading
+            ? HomeSectionCard.loading
+            : items.isEmpty
+            ? Text(
+                'noticias_indisponiveis'.tr,
+                style: HomeSectionCard.secondaryText,
+              )
+            : _NewsCarousel(items: items, onOpen: controller.openNews),
+      );
+    });
   }
 
   // ---------------- MENUS ----------------
@@ -531,6 +553,237 @@ class HomePage extends GetView<HomePageController> {
 }
 
 // ---------------- WIDGETS ----------------
+
+/// Carrossel de notícias da UniTV: uma por vez, troca sozinho a cada 6 s e
+/// pode ser arrastado; as bolinhas mostram a posição.
+class _NewsCarousel extends StatefulWidget {
+  const _NewsCarousel({required this.items, required this.onOpen});
+
+  final List<HomeNewsItem> items;
+  final ValueChanged<HomeNewsItem> onOpen;
+
+  @override
+  State<_NewsCarousel> createState() => _NewsCarouselState();
+}
+
+class _NewsCarouselState extends State<_NewsCarousel> {
+  int _current = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final items = widget.items;
+    final current = _current.clamp(0, items.length - 1);
+
+    return Column(
+      children: [
+        CarouselSlider(
+          options: CarouselOptions(
+            viewportFraction: 1,
+            aspectRatio: 16 / 9,
+            autoPlay: items.length > 1,
+            autoPlayInterval: const Duration(seconds: 6),
+            enableInfiniteScroll: items.length > 1,
+            onPageChanged: (index, _) => setState(() => _current = index),
+          ),
+          items: [
+            for (final item in items)
+              _NewsSlide(item: item, onTap: () => widget.onOpen(item)),
+          ],
+        ),
+        if (items.length > 1) ...[
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (int i = 0; i < items.length; i++)
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  width: i == current ? 16 : 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
+                    color: i == current
+                        ? AppColors.lightBlue()
+                        : Colors.white.withValues(alpha: 0.3),
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _NewsSlide extends StatelessWidget {
+  const _NewsSlide({required this.item, required this.onTap});
+
+  final HomeNewsItem item;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final date = item.publishedAt.toLocal();
+    final dateLabel =
+        '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}';
+
+    return Semantics(
+      button: true,
+      label: item.title,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Material(
+          color: Colors.black,
+          child: InkWell(
+            onTap: onTap,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.network(
+                  item.thumbnailUrl,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, progress) => progress == null
+                      ? child
+                      : ColoredBox(color: AppColors.darkBlue()),
+                  errorBuilder: (_, _, _) =>
+                      ColoredBox(color: AppColors.darkBlue()),
+                ),
+                // Degradê para o título ficar legível sobre qualquer capa.
+                const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Colors.transparent, Color(0xD9000000)],
+                      stops: [0.35, 1],
+                    ),
+                  ),
+                ),
+                Center(
+                  child: Icon(
+                    Icons.play_circle_fill_rounded,
+                    size: 48,
+                    color: Colors.white.withValues(alpha: 0.9),
+                  ),
+                ),
+                Positioned(
+                  left: 12,
+                  right: 12,
+                  bottom: 10,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        item.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          height: 1.25,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(dateLabel, style: HomeSectionCard.secondaryText),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Player da Rádio Pop Goiaba no card: logo, faixa atual e play/pause. Usa o
+/// mesmo RadioController (permanente) da tela da rádio.
+class _RadioPlayerContent extends StatelessWidget {
+  const _RadioPlayerContent();
+
+  static const Color _liveColor = Color(0xFFF87171);
+
+  @override
+  Widget build(BuildContext context) {
+    if (!Get.isRegistered<RadioController>()) return const SizedBox.shrink();
+    final radio = Get.find<RadioController>();
+
+    return Obx(() {
+      final isPlaying = radio.playbackState.value == PlaybackState.playing;
+      // Lê o Rx de metadata aqui para o Obx atualizar ao trocar de faixa.
+      radio.metadata.value;
+      final track = radio.showMetadata();
+
+      return Row(
+        children: [
+          // Goiaba de fone, a mesma da tela da rádio (fundo transparente).
+          Image.asset(
+            'assets/radio/images/pop-goiaba_3_sf.png',
+            width: 56,
+            height: 56,
+            fit: BoxFit.contain,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isPlaying
+                            ? _liveColor
+                            : Colors.white.withValues(alpha: 0.4),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'ao_vivo'.tr,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  track,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: HomeSectionCard.secondaryText,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Material(
+            color: AppColors.lightBlue(),
+            shape: const CircleBorder(),
+            child: IconButton(
+              tooltip: isPlaying ? 'pausar'.tr : 'tocar'.tr,
+              onPressed: radio.toggleState,
+              icon: Icon(
+                isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                color: AppColors.darkBlue(),
+                size: 28,
+              ),
+            ),
+          ),
+        ],
+      );
+    });
+  }
+}
 
 /// Conteúdo do restaurante padrão: campus · turno e os itens do cardápio.
 class _CampusMealContent extends StatelessWidget {
