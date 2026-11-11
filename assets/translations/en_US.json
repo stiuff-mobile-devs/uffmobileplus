@@ -334,7 +334,7 @@
   "ir_para_pagamento": "Go to payment",
   "refeicao_contagem_singular": "@count meal",
   "refeicao_contagem_plural": "@count meals",
-  "recarregar_cartao_pagamento": "Recharge Card - Payment",
+  "recarregar_cartao_pagamento": "Top-up payment",
   "valor_da_recarga": "Top-up amount",
   "siga_os_passos_recarga": "To complete the top-up payment, follow the steps below:",
   "passo_1_acesse_o": "1. Access ",
@@ -630,5 +630,9 @@
   "ru_medico_residente": "Medical resident",
   "ru_pos_doc": "Postdoctoral researcher",
   "ru_recarregar": "Recharge card",
-  "ru_refeicoes": "Meals"
+  "ru_refeicoes": "Meals",
+  "ru_ver_valores_para": "Show amounts for",
+  "ru_por_refeicao": "per meal",
+  "recarga_valor_vazio": "Enter the top-up amount",
+  "recarga_link_erro": "Could not open PagTesouro. Try again."
 }

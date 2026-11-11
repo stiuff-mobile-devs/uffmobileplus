@@ -81,12 +81,8 @@ class PayRestaurantController extends GetxController {
   int? get mealsAvailable => MealPrices.mealsFor(balanceValue, mealPrice);
 
   /// Saldo zerado/negativo ou menor que o valor de uma refeição.
-  bool get isBalanceInsufficient {
-    final balance = balanceValue;
-    final price = mealPrice;
-    if (balance == null) return false;
-    return balance <= 0 || (price != null && balance < price);
-  }
+  bool get isBalanceInsufficient =>
+      MealPrices.isInsufficient(balanceValue, mealPrice);
 
   bool get showRechargeButton =>
       forceShowRechargeButton || isBalanceInsufficient;

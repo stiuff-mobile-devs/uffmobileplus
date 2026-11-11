@@ -334,14 +334,14 @@
   "ir_para_pagamento": "Ir para o pagamento",
   "refeicao_contagem_singular": "@count refeição",
   "refeicao_contagem_plural": "@count refeições",
-  "recarregar_cartao_pagamento": "Recarregar Cartão - Pagamento",
+  "recarregar_cartao_pagamento": "Pagamento da recarga",
   "valor_da_recarga": "Valor da recarga",
   "siga_os_passos_recarga": "Para concluir o pagamento da recarga, siga os passos a seguir:",
   "passo_1_acesse_o": "1. Acesse o ",
   "passo_2_siga_instrucoes": "2. Siga as instruções do site;",
   "passo_3_apos_confirmacao": "3. Após a confirmação do pagamento no ",
   "aguarde_processamento": ", aguarde o processamento.",
-  "link_pagtesouro_validade_msg": "O link do PagTesouro só pode ser utilizado uma vez e tem duração de 1 hora. Caso o pagamento não seja feita nestas condições, será necessário repetir o passo inicial da recarga.",
+  "link_pagtesouro_validade_msg": "O link do PagTesouro só pode ser utilizado uma vez e tem duração de 1 hora. Caso o pagamento não seja feito nestas condições, será necessário repetir o passo inicial da recarga.",
   "ir_para_pagtesouro": "Ir para o PagTesouro",
   "busuff_ainda_beta": "O Busuff ainda está em beta",
   "beta": "Beta",
@@ -630,5 +630,9 @@
   "ru_medico_residente": "Médico residente",
   "ru_pos_doc": "Pesquisador de pós-doutorado",
   "ru_recarregar": "Recarregar cartão",
-  "ru_refeicoes": "Refeições"
+  "ru_refeicoes": "Refeições",
+  "ru_ver_valores_para": "Ver valores para",
+  "ru_por_refeicao": "por refeição",
+  "recarga_valor_vazio": "Informe o valor da recarga",
+  "recarga_link_erro": "Não foi possível abrir o PagTesouro. Tente de novo."
 }

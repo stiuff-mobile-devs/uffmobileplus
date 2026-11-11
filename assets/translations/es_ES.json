@@ -334,7 +334,7 @@
   "ir_para_pagamento": "Ir al pago",
   "refeicao_contagem_singular": "@count comida",
   "refeicao_contagem_plural": "@count comidas",
-  "recarregar_cartao_pagamento": "Recargar Tarjeta - Pago",
+  "recarregar_cartao_pagamento": "Pago de la recarga",
   "valor_da_recarga": "Monto de la recarga",
   "siga_os_passos_recarga": "Para completar el pago de la recarga, siga los siguientes pasos:",
   "passo_1_acesse_o": "1. Acceda a ",
@@ -630,5 +630,9 @@
   "ru_medico_residente": "Médico residente",
   "ru_pos_doc": "Investigador posdoctoral",
   "ru_recarregar": "Recargar tarjeta",
-  "ru_refeicoes": "Comidas"
+  "ru_refeicoes": "Comidas",
+  "ru_ver_valores_para": "Ver valores para",
+  "ru_por_refeicao": "por comida",
+  "recarga_valor_vazio": "Ingresa el valor de la recarga",
+  "recarga_link_erro": "No se pudo abrir PagTesouro. Inténtalo de nuevo."
 }

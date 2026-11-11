@@ -86,6 +86,12 @@ class MealPrices {
     return (balance * 100).round() ~/ (price * 100).round();
   }
 
+  /// Saldo zerado/negativo ou menor que o valor de uma refeição.
+  static bool isInsufficient(double? balance, double? price) {
+    if (balance == null) return false;
+    return balance <= 0 || (price != null && balance < price);
+  }
+
   /// "0,70" → formato brasileiro com vírgula.
   static String format(double value) =>
       value.toStringAsFixed(2).replaceAll('.', ',');

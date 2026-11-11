@@ -334,7 +334,7 @@
   "ir_para_pagamento": "Zur Zahlung",
   "refeicao_contagem_singular": "@count Mahlzeit",
   "refeicao_contagem_plural": "@count Mahlzeiten",
-  "recarregar_cartao_pagamento": "Karte Aufladen - Zahlung",
+  "recarregar_cartao_pagamento": "Zahlung der Aufladung",
   "valor_da_recarga": "Aufladebetrag",
   "siga_os_passos_recarga": "Um die Aufladungszahlung abzuschließen, befolgen Sie die folgenden Schritte:",
   "passo_1_acesse_o": "1. Öffnen Sie ",
@@ -630,5 +630,9 @@
   "ru_medico_residente": "Assistenzarzt",
   "ru_pos_doc": "Postdoktorand",
   "ru_recarregar": "Karte aufladen",
-  "ru_refeicoes": "Mahlzeiten"
+  "ru_refeicoes": "Mahlzeiten",
+  "ru_ver_valores_para": "Beträge anzeigen für",
+  "ru_por_refeicao": "pro Mahlzeit",
+  "recarga_valor_vazio": "Gib den Aufladebetrag ein",
+  "recarga_link_erro": "PagTesouro konnte nicht geöffnet werden. Versuche es erneut."
 }

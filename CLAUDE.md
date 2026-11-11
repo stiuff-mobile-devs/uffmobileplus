@@ -59,7 +59,7 @@ Os `external_modules` são independentes: não conversam com os `internal_module
 - Restaurante importa `internal_modules/login` (`AuthGoogleService`, instanciado com `new` em pagar/recarga/extrato/catraca) e `internal_modules/user` (`UserData`, `UserDataController` registrado em `cardapio_bindings`).
 - `cardapio/ui/pages/restaurants_page.dart` importa `HomePageController` da dashboard (dependência circular com a Home).
 - `lib/app/data/connections/sctm_service.dart` e `lib/app/data/data_bases/hive_service.dart` importam modelos de `restaurante` (camada compartilhada conhecendo o módulo).
-- DI fora do padrão no Restaurante: `cardapio_bindings` usa `Get.put` (não `lazyPut`); `menu_widget`/`meal_form_widget` e `RestaurantsController` fazem `Get.put` fora de bindings; `RestaurantModulesPage` usa `GetBuilder(init: ...)` duplicando a binding; `recharge_card_controller` cria `ExternalModulesServices()` novo.
+- DI fora do padrão no Restaurante: `cardapio_bindings` usa `Get.put` (não `lazyPut`); `menu_widget`/`meal_form_widget` e `RestaurantsController` fazem `Get.put` fora de bindings; `RestaurantModulesPage` usa `GetBuilder(init: ...)` duplicando a binding.
 
 ### Módulos críticos: Restaurante e Carteirinha Digital
 São os módulos mais usados do app. **Antes de alterar qualquer regra de negócio** neles — valores/preço, pagamento, saldo, extrato, recarga, catraca/validação de acesso (online/offline), QR code e validade da carteirinha, permissões por vínculo/grupo GDI — **pare, explique a mudança e espere aprovação explícita**.

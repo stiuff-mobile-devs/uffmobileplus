@@ -334,7 +334,7 @@
   "ir_para_pagamento": "Vai al pagamento",
   "refeicao_contagem_singular": "@count pasto",
   "refeicao_contagem_plural": "@count pasti",
-  "recarregar_cartao_pagamento": "Ricarica Carta - Pagamento",
+  "recarregar_cartao_pagamento": "Pagamento della ricarica",
   "valor_da_recarga": "Importo della ricarica",
   "siga_os_passos_recarga": "Per completare il pagamento della ricarica, segui questi passaggi:",
   "passo_1_acesse_o": "1. Accedi a ",
@@ -630,5 +630,9 @@
   "ru_medico_residente": "Medico specializzando",
   "ru_pos_doc": "Ricercatore post-dottorato",
   "ru_recarregar": "Ricarica carta",
-  "ru_refeicoes": "Pasti"
+  "ru_refeicoes": "Pasti",
+  "ru_ver_valores_para": "Vedi importi per",
+  "ru_por_refeicao": "per pasto",
+  "recarga_valor_vazio": "Inserisci l'importo della ricarica",
+  "recarga_link_erro": "Impossibile aprire PagTesouro. Riprova."
 }

@@ -4,8 +4,11 @@ import 'package:intl/intl.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/utils/message_dialogs.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/recharge_card/data/repository/recharge_card_repository.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/utils/meal_prices.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/services/auth_google_service.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
+import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class RechargeCardController extends GetxController {
@@ -13,37 +16,56 @@ class RechargeCardController extends GetxController {
 
   late ExternalModulesServices externalModulesServices;
   RechargeCardRepository rechargeCardRepository = RechargeCardRepository();
-   late final AuthGoogleService _authGoogle = AuthGoogleService();
+  late final AuthGoogleService _authGoogle = AuthGoogleService();
 
   RxBool isLoading = false.obs;
 
-  RxList<bool> selectedValues = RxList<bool>.filled(10, false);
+  /// Quantidade de botões rápidos (1 a 10 refeições).
+  static const int quickOptions = 10;
 
-  RxList<String> textPrices = RxList<String>.from([
-    "0,70",
-    "1,40",
-    "2,10",
-    "2,80",
-    "3,50",
-    "4,20",
-    "4,90",
-    "5,60",
-    "6,30",
-    "7,00",
-  ]);
+  RxList<bool> selectedValues = RxList<bool>.filled(quickOptions, false);
 
-  /// Contador de refeições avulsas (começa em 10 = R$ 7,00)
+  /// Contador de refeições avulsas (começa em 10).
   RxInt mealCount = 10.obs;
 
-  static const double pricePerMeal = 0.70;
+  // ── Valor por perfil (só exibição) ────────────────────────────────────
 
-  String get mealCountPrice {
-    final value = mealCount.value * pricePerMeal;
-    return NumberFormat.currency(
-      locale: 'pt_BR',
-      symbol: '',
-      decimalDigits: 2,
-    ).format(value).trim();
+  /// Perfil do usuário, para o painel do topo.
+  final Rxn<ProfileTypes> profileType = Rxn<ProfileTypes>();
+
+  /// Saldo atual (texto do servidor) e seu carregamento. Não bloqueia a tela.
+  final RxString currentBalance = "".obs;
+  final RxBool isBalanceLoading = false.obs;
+
+  /// Valor por refeição usado na grade e no contador. Começa no valor do
+  /// perfil; o usuário pode trocar no seletor (0,70 / 14,50).
+  final RxDouble selectedPrice = MealPrices.student.obs;
+
+  double? get profilePrice => MealPrices.priceFor(profileType.value);
+  double? get balanceValue => MealPrices.parseBalance(currentBalance.value);
+
+  static final NumberFormat _brl = NumberFormat.currency(
+    locale: 'pt_BR',
+    symbol: '',
+    decimalDigits: 2,
+  );
+
+  String _formatValue(double value) => _brl.format(value).trim();
+
+  /// Valores dos botões rápidos: 1 a 10 refeições no preço selecionado.
+  List<String> get textPrices => List.generate(
+        quickOptions,
+        (i) => _formatValue((i + 1) * selectedPrice.value),
+      );
+
+  String get mealCountPrice =>
+      _formatValue(mealCount.value * selectedPrice.value);
+
+  void setSelectedPrice(double price) {
+    if (selectedPrice.value == price) return;
+    selectedPrice.value = price;
+    _clearGridSelection();
+    priceFieldController.clear();
   }
 
   void incrementMealCount() {
@@ -86,11 +108,30 @@ class RechargeCardController extends GetxController {
 
   @override
   Future<void> onInit() async {
-    externalModulesServices = ExternalModulesServices();
+    super.onInit();
+    externalModulesServices = Get.find<ExternalModulesServices>();
     await externalModulesServices.initialize();
     userIdUFF = externalModulesServices.getUserIdUFF();
 
-    super.onInit();
+    profileType.value = externalModulesServices.getUserProfileType();
+    selectedPrice.value = profilePrice ?? MealPrices.student;
+
+    _loadBalance();
+  }
+
+  Future<void> _loadBalance() async {
+    isBalanceLoading.value = true;
+    try {
+      final token = await externalModulesServices.getAccessToken() ?? "";
+      final balance =
+          await rechargeCardRepository.getUserBalance(userIdUFF, token);
+      currentBalance.value = balance.currentBalance ?? "";
+    } catch (e) {
+      debugPrint('Erro ao carregar saldo na recarga: $e');
+      currentBalance.value = "";
+    } finally {
+      isBalanceLoading.value = false;
+    }
   }
 
   void formatCurrency() {
@@ -109,12 +150,11 @@ class RechargeCardController extends GetxController {
   }
 
   void setSelectedValue(int i) {
-    // Use .value para modificar a RxList reativa
     for (int j = 0; j < selectedValues.length; j++) {
       selectedValues[j] = false;
     }
     selectedValues[i] = true;
-    selectedValues.refresh(); // Força a atualização
+    selectedValues.refresh();
 
     priceFieldController.text = textPrices[i];
     priceFieldController.selection = TextSelection.fromPosition(
@@ -122,8 +162,23 @@ class RechargeCardController extends GetxController {
     );
   }
 
+  /// Valor digitado/selecionado em reais ("1.234,56" → 1234.56).
+  double get _fieldAmount =>
+      double.tryParse(
+        priceFieldController.text
+            .trim()
+            .replaceAll('.', '')
+            .replaceAll(',', '.'),
+      ) ??
+      0;
+
   void goToPayment() async {
-   isLoading.value = true;
+    if (_fieldAmount <= 0) {
+      AppPopups.warning('recarga_valor_vazio'.tr);
+      return;
+    }
+
+    isLoading.value = true;
     String userAcessToken =
         await externalModulesServices.getAccessToken() ?? "";
     try {
@@ -147,13 +202,14 @@ class RechargeCardController extends GetxController {
   }
 
   void launchPaymentUrl(String url, BuildContext context) async {
-    final uri = Uri.parse(url);
+    final uri = Uri.tryParse(url);
 
-    if (await canLaunchUrl(uri)) {
+    if (uri != null && url.isNotEmpty && await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
-      Navigator.pop(context);
+      if (context.mounted) Navigator.pop(context);
     } else {
-      throw 'Could not launch $url';
+      debugPrint('Não foi possível abrir o link de recarga: $url');
+      AppPopups.error('recarga_link_erro'.tr);
     }
   }
 }

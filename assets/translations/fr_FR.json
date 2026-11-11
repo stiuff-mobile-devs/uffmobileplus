@@ -334,7 +334,7 @@
   "ir_para_pagamento": "Aller au paiement",
   "refeicao_contagem_singular": "@count repas",
   "refeicao_contagem_plural": "@count repas",
-  "recarregar_cartao_pagamento": "Recharger la Carte - Paiement",
+  "recarregar_cartao_pagamento": "Paiement de la recharge",
   "valor_da_recarga": "Montant de la recharge",
   "siga_os_passos_recarga": "Pour finaliser le paiement de la recharge, suivez les étapes ci-dessous :",
   "passo_1_acesse_o": "1. Accédez à ",
@@ -630,5 +630,9 @@
   "ru_medico_residente": "Médecin résident",
   "ru_pos_doc": "Chercheur postdoctoral",
   "ru_recarregar": "Recharger la carte",
-  "ru_refeicoes": "Repas"
+  "ru_refeicoes": "Repas",
+  "ru_ver_valores_para": "Voir les montants pour",
+  "ru_por_refeicao": "par repas",
+  "recarga_valor_vazio": "Indiquez le montant de la recharge",
+  "recarga_link_erro": "Impossible d'ouvrir PagTesouro. Réessayez."
 }

@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/utils/ui_components/app_bars.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/recharge_card/controller/recharge_card_controller.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/utils/meal_balance_panel.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/utils/meal_prices.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
@@ -15,9 +17,7 @@ class RechargeCardPage extends GetView<RechargeCardController> {
     return Scaffold(
       backgroundColor: AppColors.darkBlue(),
       resizeToAvoidBottomInset: true,
-      appBar: AppBars.build(
-        title: 'recarregar_cartao'.tr,
-      ),
+      appBar: AppBars.build(title: 'recarregar_cartao'.tr),
       body: Obx(
         () => controller.isLoading.value
             ? Center(child: CustomProgressDisplay())
@@ -41,79 +41,117 @@ class RechargeCardPage extends GetView<RechargeCardController> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
+                          // ── Saldo, refeições e valor do perfil ───────────
+                          Obx(
+                            () => MealBalancePanel(
+                              balance: controller.balanceValue,
+                              price: controller.profilePrice,
+                              profileKey: MealPrices.profileLabelKey(
+                                controller.profileType.value,
+                              ),
+                              isLoading: controller.isBalanceLoading.value,
+                            ),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // ── Seletor do valor por refeição ─────────────────
+                          Obx(
+                            () => _PriceSelector(
+                              selected: controller.selectedPrice.value,
+                              profilePrice: controller.profilePrice,
+                              onChanged: (price) {
+                                FocusScope.of(context).unfocus();
+                                controller.setSelectedPrice(price);
+                              },
+                            ),
+                          ),
+
+                          const SizedBox(height: 14),
+
                           // ── Grade fixa 2 colunas ──────────────────────────
-                          Obx(() {
-                            // padding horizontal total = 32 (16 cada lado)
-                            final availableWidth =
-                                MediaQuery.of(context).size.width - 32;
-                            final itemWidth = (availableWidth - 10) / 2;
-                            return Wrap(
-                              spacing: 10,
-                              runSpacing: 10,
-                              children: List.generate(10, (i) {
-                                final meals = i + 1;
-                                final isSelected =
-                                    controller.selectedValues[i];
-                                return GestureDetector(
-                                  onTap: () {
-                                    // Fecha o teclado antes de selecionar
-                                    FocusScope.of(context).unfocus();
-                                    SystemChannels.textInput
-                                        .invokeMethod('TextInput.hide');
-                                    controller.setSelectedValue(i);
-                                  },
-                                  child: SizedBox(
-                                    width: itemWidth,
-                                    child: AnimatedContainer(
-                                      duration: const Duration(
-                                          milliseconds: 150),
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 14,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: isSelected
-                                            ? const Color(0xff104389)
-                                            : Colors.transparent,
-                                        border: Border.all(
-                                          color: isSelected
-                                              ? Colors.blue[100]!
-                                              : Colors.grey[500]!,
-                                          width: 2,
+                          LayoutBuilder(
+                            builder: (context, constraints) => Obx(() {
+                              final itemWidth = (constraints.maxWidth - 10) / 2;
+                              final prices = controller.textPrices;
+                              return Wrap(
+                                spacing: 10,
+                                runSpacing: 10,
+                                children: List.generate(prices.length, (i) {
+                                  final meals = i + 1;
+                                  final isSelected =
+                                      controller.selectedValues[i];
+                                  return GestureDetector(
+                                    onTap: () {
+                                      // Fecha o teclado antes de selecionar
+                                      FocusScope.of(context).unfocus();
+                                      SystemChannels.textInput.invokeMethod(
+                                        'TextInput.hide',
+                                      );
+                                      controller.setSelectedValue(i);
+                                    },
+                                    child: SizedBox(
+                                      width: itemWidth,
+                                      child: AnimatedContainer(
+                                        duration: const Duration(
+                                          milliseconds: 150,
                                         ),
-                                        borderRadius:
-                                            BorderRadius.circular(10),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              "R\$ ${controller.textPrices[i]}",
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                color: isSelected
-                                                    ? Colors.white
-                                                    : Colors.blue[100],
-                                                fontWeight: FontWeight.w600,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 14,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: isSelected
+                                              ? const Color(0xff104389)
+                                              : Colors.transparent,
+                                          border: Border.all(
+                                            color: isSelected
+                                                ? Colors.blue[100]!
+                                                : Colors.grey[500]!,
+                                            width: 2,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: FittedBox(
+                                                fit: BoxFit.scaleDown,
+                                                alignment: Alignment.centerLeft,
+                                                child: Text(
+                                                  "R\$ ${prices[i]}",
+                                                  maxLines: 1,
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: isSelected
+                                                        ? Colors.white
+                                                        : Colors.blue[100],
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          Text(
-                                            'refeicoes_abrev'.trParams(
-                                                {'count': '$meals'}),
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.white70,
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              'refeicoes_abrev'.trParams({
+                                                'count': '$meals',
+                                              }),
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.white70,
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              }),
-                            );
-                          }),
+                                  );
+                                }),
+                              );
+                            }),
+                          ),
 
                           const SizedBox(height: 14),
 
@@ -131,8 +169,9 @@ class RechargeCardPage extends GetView<RechargeCardController> {
                               },
                               onSelect: () {
                                 FocusScope.of(context).unfocus();
-                                SystemChannels.textInput
-                                    .invokeMethod('TextInput.hide');
+                                SystemChannels.textInput.invokeMethod(
+                                  'TextInput.hide',
+                                );
                                 controller.selectMealCountButton();
                               },
                             ),
@@ -148,8 +187,7 @@ class RechargeCardPage extends GetView<RechargeCardController> {
                                 symbol: '',
                               ),
                             ],
-                            keyboardType:
-                                const TextInputType.numberWithOptions(
+                            keyboardType: const TextInputType.numberWithOptions(
                               decimal: true,
                               signed: false,
                             ),
@@ -176,8 +214,7 @@ class RechargeCardPage extends GetView<RechargeCardController> {
                                 fontSize: 14,
                                 color: Colors.white54,
                               ),
-                              helperText:
-                                  'valor_recarga_a_ser_efetuada'.tr,
+                              helperText: 'valor_recarga_a_ser_efetuada'.tr,
                               helperStyle: const TextStyle(
                                 fontSize: 14,
                                 color: Colors.white70,
@@ -198,8 +235,9 @@ class RechargeCardPage extends GetView<RechargeCardController> {
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
-                                borderSide:
-                                    const BorderSide(color: Colors.white),
+                                borderSide: const BorderSide(
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
@@ -291,10 +329,12 @@ class _MealCountButton extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       mealCount == 1
-                          ? 'refeicao_contagem_singular'
-                              .trParams({'count': '$mealCount'})
-                          : 'refeicao_contagem_plural'
-                              .trParams({'count': '$mealCount'}),
+                          ? 'refeicao_contagem_singular'.trParams({
+                              'count': '$mealCount',
+                            })
+                          : 'refeicao_contagem_plural'.trParams({
+                              'count': '$mealCount',
+                            }),
                       style: const TextStyle(
                         fontSize: 13,
                         color: Colors.white70,
@@ -343,6 +383,113 @@ class _SideButton extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
           child: Icon(icon, color: Colors.white, size: 22),
+        ),
+      ),
+    );
+  }
+}
+
+/// Seletor do valor por refeição usado na grade e no contador. Marca com
+/// "Seu valor" a opção do perfil do usuário.
+class _PriceSelector extends StatelessWidget {
+  const _PriceSelector({
+    required this.selected,
+    required this.profilePrice,
+    required this.onChanged,
+  });
+
+  final double selected;
+  final double? profilePrice;
+  final ValueChanged<double> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final options = [MealPrices.student, MealPrices.staff];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'ru_ver_valores_para'.tr,
+          style: TextStyle(fontSize: 14, color: Colors.blue[100]),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            for (final price in options) ...[
+              Expanded(
+                child: _PriceOption(
+                  price: price,
+                  isSelected: selected == price,
+                  isProfile: profilePrice == price,
+                  onTap: () => onChanged(price),
+                ),
+              ),
+              if (price != options.last) const SizedBox(width: 10),
+            ],
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _PriceOption extends StatelessWidget {
+  const _PriceOption({
+    required this.price,
+    required this.isSelected,
+    required this.isProfile,
+    required this.onTap,
+  });
+
+  final double price;
+  final bool isSelected;
+  final bool isProfile;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: isSelected ? const Color(0xff104389) : Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: BorderSide(
+          color: isSelected ? Colors.blue[100]! : Colors.grey[500]!,
+          width: 2,
+        ),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  'R\$ ${MealPrices.format(price)}',
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: isSelected ? Colors.white : Colors.blue[100],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                isProfile ? 'seu_valor'.tr : 'ru_por_refeicao'.tr,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isProfile ? Colors.green[300] : Colors.white70,
+                  fontWeight: isProfile ? FontWeight.w600 : FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
