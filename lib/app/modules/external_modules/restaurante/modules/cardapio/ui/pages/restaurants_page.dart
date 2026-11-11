@@ -316,7 +316,7 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
                 splashColor: controller.evenDarkerBlue,
                 onTap: () {
                   Get.to(
-                    MenuPage(
+                    () => MenuPage(
                       location: location,
                     ),
                     transition: Transition.rightToLeft,
@@ -399,7 +399,7 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
                           () {
                         if (controller.isAdminModeEnabled() ?? false) {
                           Get.to(
-                            const MealFormPage(),
+                            () => const MealFormPage(),
                             transition: Transition.rightToLeft,
                           );
                         }

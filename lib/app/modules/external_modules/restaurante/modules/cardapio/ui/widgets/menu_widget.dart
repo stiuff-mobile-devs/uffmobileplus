@@ -65,16 +65,12 @@ class _MenuWidgetState extends State<MenuWidget> {
               },
               onLongPress: () => menuListController.handlePress(index, meal),
               child: HorizontalMargin(
-                left: (menuListController.containerLeftValues.isEmpty
-                    ? 0
-                    : menuListController.containerLeftValues[index]),
+                left: menuListController.leftValueAt(index),
                 right: 0,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
                   child: Opacity(
-                    opacity: (menuListController.containerOpacityValues.isEmpty
-                        ? 1.0
-                        : menuListController.containerOpacityValues[index]),
+                    opacity: menuListController.opacityValueAt(index),
                     child: Stack(
                       children: [
                         //_buildAcceptedStatus(index, meal),
@@ -175,7 +171,7 @@ class _MenuWidgetState extends State<MenuWidget> {
                 splashColor: Colors.blue.withOpacity(0.2),
                 onTap: () async {
                   Get.to(
-                    DetailsPage(
+                    () => DetailsPage(
                       meal: meal,
                     ),
                     transition: Transition.rightToLeft,
@@ -509,18 +505,16 @@ class _MenuWidgetState extends State<MenuWidget> {
 
   @override
   Widget build(BuildContext context) {
+    // Já vem ordenada por data (MenuController.fetchMeals). Não ordenar
+    // aqui: mexer na RxList durante o build notifica os Obx.
     var currentMeals = menuController.MMController.getMeals();
-    currentMeals.sort((a, b) => DateTime.parse(a.date.toString())
-        .compareTo(DateTime.parse(b.date.toString())));
     int howManyMealsToday = menuController.MMController.getMeals()
         .where((meal) => menuController.checkDate(
             DateTime.parse(meal.date.toString()), meal.campus))
         .length;
-    // Initializing
-    menuController.containerLeftValues
-        .addAll(List.generate(currentMeals.length, (index) => 0.0));
-    menuController.containerOpacityValues
-        .addAll(List.generate(currentMeals.length, (index) => 1.0));
+    // As listas de arraste (RxList) não são alteradas aqui: mudar uma RxList
+    // durante o build dispara "setState() called during build". Elas crescem
+    // sob demanda no gesto (MenuListController._ensureLength).
     return (menuController.restaurantsController.isFetchLoading == 1 ||
             (menuController.restaurantsController.isFetchLoading == 0 &&
                 howManyMealsToday == 0))

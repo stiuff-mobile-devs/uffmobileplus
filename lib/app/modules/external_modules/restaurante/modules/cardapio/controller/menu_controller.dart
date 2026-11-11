@@ -39,11 +39,16 @@ class MenuController extends GetxController {
   }
 
   Future<void> fetchMeals() async {
-    _meals.value = await restaurantController.fetchWithRetries(
+    final meals = await restaurantController.fetchWithRetries(
       Get.context!,
       () => restaurantRepository
           .getMealsByCampus(Campus.getSigla(selectedLocation.name)),
     ) as List<MealModel>;
+    // Ordena por data aqui, ao receber: ordenar a RxList dentro do build do
+    // MenuWidget notificava os Obx e dava "setState() called during build".
+    meals.sort((a, b) => DateTime.parse(a.date.toString())
+        .compareTo(DateTime.parse(b.date.toString())));
+    _meals.value = meals;
     update();
   }
 
@@ -99,9 +104,11 @@ class MenuController extends GetxController {
   RxList<MealModel> mealsPressedOnto = <MealModel>[].obs;
 
   void handleEditAction(RxList<MealModel> mealsPressed) {
+    // Captura o item antes: a lista pode mudar até a rota ser construída.
+    final meal = mealsPressed.first;
     Get.to(
-      MealFormPage(
-        predefinition: mealsPressed.first,
+      () => MealFormPage(
+        predefinition: meal,
       ),
       transition: Transition.rightToLeft,
     );
@@ -290,7 +297,29 @@ class MenuListController extends GetxController {
     super.dispose();
   }
 
+  /// Posição horizontal do cartão [i] (0.0 se ainda não foi arrastado).
+  double leftValueAt(int i) =>
+      i >= 0 && i < containerLeftValues.length ? containerLeftValues[i] : 0.0;
+
+  /// Opacidade do cartão [i] (1.0 se ainda não foi arrastado).
+  double opacityValueAt(int i) => i >= 0 && i < containerOpacityValues.length
+      ? containerOpacityValues[i]
+      : 1.0;
+
+  /// Garante espaço nas listas até o índice [i]. Chamado só em gestos (fora
+  /// do build), pois alterar as RxList notifica os Obx dos cartões.
+  void _ensureLength(int i) {
+    if (i < 0) return;
+    while (containerLeftValues.length <= i) {
+      containerLeftValues.add(0.0);
+    }
+    while (containerOpacityValues.length <= i) {
+      containerOpacityValues.add(1.0);
+    }
+  }
+
   void updateOpacity(int index, double dragPercentage) {
+    _ensureLength(index);
     if (index >= 0 && index < containerOpacityValues.length) {
       containerOpacityValues[index] = (1.0 - dragPercentage).clamp(0.0, 1.0);
     }
@@ -324,6 +353,7 @@ class MenuListController extends GetxController {
 
   void handleDragUpdate(int index, double deltaDx, double screenWidth) {
     if (restaurantsController.isAdminModeEnabled() ?? false) {
+      _ensureLength(index);
       if (index >= 0 && index < containerLeftValues.length) {
         containerLeftValues[index] += deltaDx * 2;
         containerLeftValues[index] =
@@ -403,7 +433,7 @@ class MenuListController extends GetxController {
 
   Future<void> handleDragEnd(int index, MealModel meal) async {
     if (restaurantsController.isAdminModeEnabled() ?? false) {
-      if (containerOpacityValues[index] == 0) {
+      if (opacityValueAt(index) == 0) {
         int resposta = await MMController.showDeletionDialog(Get.context!);
         Future.delayed(const Duration(milliseconds: 1000), () async {
           if (resposta == 200) {

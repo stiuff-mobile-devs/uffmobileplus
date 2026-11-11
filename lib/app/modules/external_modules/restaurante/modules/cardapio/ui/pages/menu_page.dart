@@ -117,7 +117,7 @@ class _MenuPageState extends State<MenuPage> with TickerProviderStateMixin {
                     const SizedBox(width: 25),
                     _buildActionButton(Icons.add_circle, () {
                       Get.to(
-                        const MealFormPage(),
+                        () => const MealFormPage(),
                         transition: Transition.rightToLeft,
                       );
                     }),
