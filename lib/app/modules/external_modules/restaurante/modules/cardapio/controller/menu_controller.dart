@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/cardapio/controller/restaurants_controller.dart';
-import '../../../../../../utils/ui_components/custom_alert_dialog.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
 import '../data/models/campus_model.dart';
 import '../data/models/meal_model.dart';
 import '../data/models/user_meal_model.dart';
@@ -69,11 +69,10 @@ class MenuController extends GetxController {
     fetchMeals().then((_) {
       fetchAcceptedMeals();
     }).catchError((error) {
-      Get.snackbar(
-        'Erro',
-        'nao_foi_possivel_carregar_refeicoes'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-        colorText: Colors.white,
+      debugPrint('Erro ao carregar refeições: $error');
+      AppPopups.error(
+        'msg_verifique_internet'.tr,
+        title: 'nao_foi_possivel_carregar_refeicoes'.tr,
       );
     });
   }
@@ -136,25 +135,21 @@ class MenuController extends GetxController {
 
   Future<int> showDeletionDialog(BuildContext context,
       {isMultiple = false}) async {
-    var result = -1;
-    await customAlertDialog(
-      context,
-      title: 'aviso'.tr,
-      desc: (isMultiple)
+    // Mantém o contrato antigo: 200 confirma, -1 cancela.
+    final confirmed = await AppPopups.confirm(
+      title: (isMultiple)
+          ? 'excluir_refeicoes_titulo'.tr
+          : 'excluir_refeicao_titulo'.tr,
+      message: (isMultiple)
           ? 'confirmar_exclusao_refeicoes_multi'.tr
           : 'confirmar_exclusao_refeicao'.tr,
-      onConfirm: () {
-        result = 200;
-      },
-      onCancel: () {
-        result = -1;
-      },
-      btnCancelText: 'nao'.tr,
-      btnConfirmText: 'sim'.tr,
-      dismissOnTouchOutside: false,
-      dismissOnBackKeyPress: false,
-    ).show();
-    return result;
+      icon: Icons.delete_outline_rounded,
+      confirmText: 'excluir'.tr,
+      cancelText: 'cancelar'.tr,
+      destructive: true,
+      dismissible: false,
+    );
+    return confirmed ? 200 : -1;
   }
 
   Future<void> removeMeal(MealModel meal,
@@ -164,33 +159,28 @@ class MenuController extends GetxController {
       int resposta = await restaurantRepository.updateMeal(meal);
       if (notifyStatus) {
         if (resposta == 200) {
-          Get.snackbar(
-            Campus.getName(meal.campus!),
+          AppPopups.success(
             (!multipleRemovals)
                 ? 'refeicao_removida_sucesso'.tr
                 : 'refeicoes_removidas_sucesso'.tr,
-            snackPosition: SnackPosition.BOTTOM,
-            colorText: Colors.white,
+            title: Campus.getName(meal.campus!),
           );
         } else {
-          Get.snackbar(
-            'Erro',
-            (!multipleRemovals)
+          AppPopups.error(
+            'msg_tente_mais_tarde'.tr,
+            title: (!multipleRemovals)
                 ? 'nao_foi_possivel_remover_refeicao'.tr
                 : 'nao_foi_possivel_remover_ao_menos_uma'.tr,
-            snackPosition: SnackPosition.BOTTOM,
-            colorText: Colors.white,
           );
         }
       }
     } catch (e) {
-      Get.snackbar(
-        'Erro',
-        (!multipleRemovals)
+      debugPrint('Erro ao remover refeição: $e');
+      AppPopups.error(
+        'msg_verifique_internet'.tr,
+        title: (!multipleRemovals)
             ? 'nao_foi_possivel_remover_refeicao'.tr
             : 'nao_foi_possivel_remover_ao_menos_uma'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-        colorText: Colors.white,
       );
     }
   }
@@ -426,11 +416,9 @@ class MenuListController extends GetxController {
           } else if (resposta == -1) {
             resetContainerState(index);
           } else {
-            Get.snackbar(
-              'Erro',
-              'nao_foi_possivel_remover_refeicao'.tr,
-              snackPosition: SnackPosition.BOTTOM,
-              colorText: Colors.white,
+            AppPopups.error(
+              'msg_tente_mais_tarde'.tr,
+              title: 'nao_foi_possivel_remover_refeicao'.tr,
             );
           }
         });

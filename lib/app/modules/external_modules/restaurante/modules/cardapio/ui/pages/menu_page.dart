@@ -1,10 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_bars.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/cardapio/ui/widgets/custom_polygon.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/cardapio/ui/widgets/menu_widget.dart';
 import '../../../../../../../routes/app_routes.dart';
-import '../../../../../../../utils/color_pallete.dart';
 import '../../controller/menu_controller.dart' as menu;
 import '../../controller/restaurants_controller.dart';
 import '../../data/models/campus_model.dart';
@@ -532,20 +532,8 @@ class _MenuPageState extends State<MenuPage> with TickerProviderStateMixin {
       builder: (controller) {
         return Scaffold(
           backgroundColor: controller.restaurantController.darkBlue,
-// Replace the existing `appBar: customAppBar(...),` with this:
-          appBar: AppBar(
-            centerTitle: true,
-            elevation: 8,
-            foregroundColor: Colors.white,
-            title: Text('refeicoes'.tr),
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
-            ),
-            flexibleSpace: Container(
-              decoration: BoxDecoration(
-                gradient: AppColors.appBarTopGradient(),
-              ),
-            ),
+          appBar: AppBars.build(
+            title: 'refeicoes'.tr,
             actions: [
               IconButton(
                 onPressed: () {

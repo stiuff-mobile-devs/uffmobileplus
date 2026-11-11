@@ -134,7 +134,12 @@ class RechargeCardController extends GetxController {
         await _authGoogle.getFirebaseIdToken() ?? "",
       );
     } catch (e) {
-      await MessageDialogs.showErrorDialog(Get.context);
+      debugPrint('Erro ao gerar link de recarga: $e');
+      await MessageDialogs.showErrorDialog(
+        Get.context,
+        title: 'recarga_erro_titulo'.tr,
+        message: 'msg_verifique_internet'.tr,
+      );
     } finally {
       isLoading.value = false;
     }

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
 import 'package:uffmobileplus/app/utils/gdi_groups.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/cardapio/controller/google_groups_controller.dart';
 import '../data/models/campus_model.dart';
@@ -120,11 +121,9 @@ class RestaurantsController extends GetxController {
       if (i == 4 && result == null) {
         // isFetchLoading = -1;
         if (showTimeout) {
-          Get.snackbar(
-            'Erro: Timeout',
-            'A operação atingiu o tempo limite. Por favor, recarregue a página.',
-            snackPosition: SnackPosition.BOTTOM,
-            colorText: Colors.white,
+          AppPopups.error(
+            'msg_atualize_tela'.tr,
+            title: 'tempo_esgotado_titulo'.tr,
           );
         }
       } else {

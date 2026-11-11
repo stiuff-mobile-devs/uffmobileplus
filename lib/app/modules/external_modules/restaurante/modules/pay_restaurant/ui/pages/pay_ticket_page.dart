@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_bars.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/controller/pay_restaurant_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/utils/card_details.dart';
@@ -15,17 +16,9 @@ class PayTicketPage extends GetView<PayRestaurantController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        elevation: 8,
-        foregroundColor: Colors.white,
-        title: Text('ticket_de_pagamento'.tr),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
-        ),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
-        ),
+      backgroundColor: AppColors.darkBlue(),
+      appBar: AppBars.build(
+        title: 'ticket_de_pagamento'.tr,
       ),
       body: Obx(
         () => controller.isPaymentProcessing.value

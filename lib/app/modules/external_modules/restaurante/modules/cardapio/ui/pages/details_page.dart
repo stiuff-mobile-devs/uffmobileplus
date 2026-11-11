@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_bars.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/cardapio/ui/widgets/custom_polygon.dart';
-import '../../../../../../../utils/color_pallete.dart';
 import '../../controller/details_controller.dart';
 import '../../data/models/campus_model.dart';
 import '../../data/models/meal_model.dart';
@@ -240,19 +240,8 @@ class _DetailsPageState extends State<DetailsPage> {
       builder: (controller) {
         return Scaffold(
           backgroundColor: detailsController.restaurantsController.darkBlue,
-          appBar: AppBar(
-            centerTitle: true,
-            elevation: 8,
-            foregroundColor: Colors.white,
-            title: Text("detalhes_refeicao".tr),
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
-            ),
-            flexibleSpace: Container(
-              decoration: BoxDecoration(
-                gradient: AppColors.appBarTopGradient(),
-              ),
-            ),
+          appBar: AppBars.build(
+            title: "detalhes_refeicao".tr,
           ),
           body: Stack(
             children: [

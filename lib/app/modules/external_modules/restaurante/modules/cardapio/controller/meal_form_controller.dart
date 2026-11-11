@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/cardapio/controller/restaurants_controller.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
 import '../data/models/campus_model.dart';
 import '../data/models/meal_model.dart';
 import '../data/repository/restaurant_repository.dart';
@@ -80,40 +81,15 @@ class MealFormController extends GetxController {
 
   Future<void> showLoadingModal(
       BuildContext context, Completer<void> completer) async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return Center(
-          child: AlertDialog(
-            insetPadding: const EdgeInsets.all(0),
-            contentPadding: const EdgeInsets.fromLTRB(15, 15, 5, 15),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  children: [
-                    const CircularProgressIndicator(),
-                    const SizedBox(width: 20),
-                    Text('enviando'.tr),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
+    AppPopups.showLoading('enviando'.tr);
     Future.delayed(const Duration(seconds: 10), () {
       // Completer::: IssueFix - Timeout após modal ser fechado.
       if (!completer.isCompleted) {
         completer.complete();
-        Get.back();
-        Get.snackbar(
-          'erro_timeout'.tr,
-          'operacao_atingiu_tempo_limite'.tr,
-          snackPosition: SnackPosition.BOTTOM,
-          colorText: Colors.white,
+        AppPopups.hideLoading();
+        AppPopups.error(
+          'msg_confira_cardapio'.tr,
+          title: 'tempo_esgotado_titulo'.tr,
         );
       }
     });
@@ -153,7 +129,8 @@ class MealFormController extends GetxController {
       if (!completer.isCompleted) {
         completer.complete();
       }
-      Navigator.pop(context); // Fechar o modal quando a operação termina
+      // Fecha o carregamento (não faz nada se o tempo já esgotou e ele fechou).
+      AppPopups.hideLoading();
     }
   }
 
@@ -207,7 +184,8 @@ class MealFormController extends GetxController {
       if (!completer.isCompleted) {
         completer.complete();
       }
-      Navigator.pop(context); // Fechar o modal quando a operação termina
+      // Fecha o carregamento (não faz nada se o tempo já esgotou e ele fechou).
+      AppPopups.hideLoading();
     }
   }
 
@@ -221,119 +199,63 @@ class MealFormController extends GetxController {
     }
   }
 
+  /// Data · turno · campus da refeição, para o usuário saber qual falhou.
+  String _mealContext(DateTime? lastDate, String? lastShift, String campus) {
+    final date =
+        "${lastDate?.day ?? 0}/${lastDate?.month ?? 0}/${lastDate?.year ?? 0}";
+    return 'erro_campus_data_turno'.trParams({
+      'campus': campus,
+      'date': date,
+      'shift': lastShift ?? '',
+    });
+  }
+
+  /// Título = o que aconteceu; mensagem = motivo/o que fazer + qual refeição.
+  void _showMealError(String titleKey, String reasonKey, String mealContext) {
+    AppPopups.error('${reasonKey.tr}\n$mealContext', title: titleKey.tr);
+  }
+
   void _handleResponse(BuildContext context, int response, DateTime? lastDate,
       String? lastShift, String campus) {
-    String formattedDate =
-        "${lastDate?.day ?? 0}/${lastDate?.month ?? 0}/${lastDate?.year ?? 0}";
-    String shiftMessage = lastShift ?? '';
+    final mealContext = _mealContext(lastDate, lastShift, campus);
 
     if (response == 201 || response == 200) {
-      if (chosenDates.length * selectedShifts.length > 1) {
-        Get.snackbar(
-          campus,
-          'refeicoes_adicionadas_sucesso'.tr,
-          snackPosition: SnackPosition.BOTTOM,
-          colorText: Colors.white,
-        );
-      } else {
-        Get.snackbar(
-          campus,
-          'refeicao_adicionada_sucesso'.tr,
-          snackPosition: SnackPosition.BOTTOM,
-          colorText: Colors.white,
-        );
-      }
+      AppPopups.success(
+        chosenDates.length * selectedShifts.length > 1
+            ? 'refeicoes_adicionadas_sucesso'.tr
+            : 'refeicao_adicionada_sucesso'.tr,
+        title: campus,
+      );
     } else if (response == 500) {
-      Get.snackbar(
-        'erro_campus_data_turno'.trParams({
-          'campus': campus,
-          'date': formattedDate,
-          'shift': shiftMessage,
-        }),
-        'refeicao_ja_reservada'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-        colorText: Colors.white,
-      );
+      _showMealError(
+          'nao_foi_possivel_criar_refeicao', 'refeicao_ja_reservada', mealContext);
     } else if (response == 403) {
-      Get.snackbar(
-        'erro_campus_data_turno'.trParams({
-          'campus': campus,
-          'date': formattedDate,
-          'shift': shiftMessage,
-        }),
-        'horario_criacao_expirado'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-        colorText: Colors.white,
-      );
+      _showMealError('nao_foi_possivel_criar_refeicao',
+          'horario_criacao_expirado', mealContext);
     } else {
-      Get.snackbar(
-        'erro_campus_data_turno'.trParams({
-          'campus': campus,
-          'date': formattedDate,
-          'shift': shiftMessage,
-        }),
-        'nao_foi_possivel_criar_refeicao'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-        colorText: Colors.white,
-      );
+      _showMealError(
+          'nao_foi_possivel_criar_refeicao', 'msg_tente_mais_tarde', mealContext);
     }
   }
 
   void _handleEditResponse(BuildContext context, int response,
       DateTime? lastDate, String? lastShift, String campus, bool many) {
-    String formattedDate =
-        "${lastDate?.day ?? 0}/${lastDate?.month ?? 0}/${lastDate?.year ?? 0}";
-    String shiftMessage = lastShift ?? '';
+    final mealContext = _mealContext(lastDate, lastShift, campus);
 
     if (response == 201 || response == 200) {
-      if (many) {
-        Get.snackbar(
-          campus,
-          'refeicoes_alteradas_sucesso'.tr,
-          snackPosition: SnackPosition.BOTTOM,
-          colorText: Colors.white,
-        );
-      } else {
-        Get.snackbar(
-          campus,
-          'refeicao_alterada_sucesso'.tr,
-          snackPosition: SnackPosition.BOTTOM,
-          colorText: Colors.white,
-        );
-      }
-    } else if (response == 500) {
-      Get.snackbar(
-        'erro_campus_data_turno'.trParams({
-          'campus': campus,
-          'date': formattedDate,
-          'shift': shiftMessage,
-        }),
-        'refeicao_nao_pode_ser_removida'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-        colorText: Colors.white,
+      AppPopups.success(
+        many
+            ? 'refeicoes_alteradas_sucesso'.tr
+            : 'refeicao_alterada_sucesso'.tr,
+        title: campus,
       );
     } else if (response == 403) {
-      Get.snackbar(
-        'erro_campus_data_turno'.trParams({
-          'campus': campus,
-          'date': formattedDate,
-          'shift': shiftMessage,
-        }),
-        'horario_edicao_expirado'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-        colorText: Colors.white,
-      );
+      _showMealError('nao_foi_possivel_editar_refeicao',
+          'horario_edicao_expirado', mealContext);
     } else {
-      Get.snackbar(
-        'erro_campus_data_turno'.trParams({
-          'campus': campus,
-          'date': formattedDate,
-          'shift': shiftMessage,
-        }),
-        'nao_foi_possivel_editar_refeicao'.tr,
-        snackPosition: SnackPosition.BOTTOM,
-        colorText: Colors.white,
-      );
+      // Inclui o 500, que antes mostrava por engano "não pôde ser removida".
+      _showMealError('nao_foi_possivel_editar_refeicao', 'msg_tente_mais_tarde',
+          mealContext);
     }
   }
 }

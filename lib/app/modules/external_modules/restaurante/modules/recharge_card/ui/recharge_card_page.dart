@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_bars.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/recharge_card/controller/recharge_card_controller.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.dart';
@@ -12,18 +13,10 @@ class RechargeCardPage extends GetView<RechargeCardController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.darkBlue(),
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        centerTitle: true,
-        elevation: 8,
-        foregroundColor: Colors.white,
-        title: Text('recarregar_cartao'.tr),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
-        ),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
-        ),
+      appBar: AppBars.build(
+        title: 'recarregar_cartao'.tr,
       ),
       body: Obx(
         () => controller.isLoading.value

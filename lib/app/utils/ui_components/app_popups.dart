@@ -412,11 +412,13 @@ class AppPopups {
     IconData? icon,
     required List<PopupOption<T>> options,
     T? selected,
+    bool dismissible = true,
   }) {
     return sheet<T>(
       title: title,
       message: message,
       icon: icon,
+      dismissible: dismissible,
       child: Builder(
         builder: (ctx) {
           final scheme = Theme.of(ctx).colorScheme;

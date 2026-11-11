@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../../../../routes/app_routes.dart';
-import '../../../../../../../utils/ui_components/custom_app_bar.dart';
+import 'package:uffmobileplus/app/utils/color_pallete.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_bars.dart';
 import '../../controller/restaurants_controller.dart';
 import '../../data/models/meal_model.dart';
 import '../widgets/meal_form_widget.dart';
@@ -25,9 +26,9 @@ class _MealFormPageState extends State<MealFormPage> {
     return GetBuilder(
       builder: (RestaurantsController restaurantsController) {
         return Scaffold(
-          appBar: customAppBar(
-            'formulario_refeicao'.tr,
-            borderRadius: 0,
+          backgroundColor: AppColors.darkBlue(),
+          appBar: AppBars.build(
+            title: 'formulario_refeicao'.tr,
             actions: [
               IconButton(
                   onPressed: () {

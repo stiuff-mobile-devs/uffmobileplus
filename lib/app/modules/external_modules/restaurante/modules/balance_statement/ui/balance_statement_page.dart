@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_bars.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/balance_statement/controller/balance_statement_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/balance_statement/utils/balance_card.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/balance_statement/utils/balance_filter.dart';
@@ -15,12 +16,10 @@ class BalanceStatementPage extends GetView<BalanceStatementController> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-    appBar: AppBar(
-        centerTitle: true,
-        elevation: 8,
-        foregroundColor: Colors.white,
-        title: Text('saldo_e_extrato'.tr),
-        actions: [
+    backgroundColor: AppColors.darkBlue(),
+    appBar: AppBars.build(
+      title: 'saldo_e_extrato'.tr,
+      actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'atualizar'.tr,
@@ -29,13 +28,7 @@ class BalanceStatementPage extends GetView<BalanceStatementController> {
             },
           ),
         ],
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
-        ),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
-        ),
-      ),
+    ),
 
       body: Obx(
         () => controller.isBusy.value

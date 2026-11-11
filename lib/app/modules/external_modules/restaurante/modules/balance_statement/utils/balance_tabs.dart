@@ -16,51 +16,59 @@ class BalanceTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Abas dentro do conteúdo (abaixo do card de saldo). Antes era um
+    // Scaffold + AppBar aninhado usado só como faixa de abas.
     return DefaultTabController(
       length: 3,
-      child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        extendBody: false,
-        primary: false,
-        appBar: AppBar(
-          elevation: 2,
-          automaticallyImplyLeading: false,
-          backgroundColor: const Color(0xff052750),
-          title: TabBar(
-            labelColor: Colors.white, 
-            unselectedLabelColor: Colors.white, 
-            labelStyle: TextStyle(fontSize: 14),
-            indicatorColor:Color.fromARGB(255, 0, 141, 47), 
-            tabs: <Widget>[
-              Tab(text: 'extrato'.tr),
-              Tab(text: 'recargas'.tr),
-              Tab(text: 'pagamentos'.tr),
-            ],
+      child: Column(
+        children: [
+          Material(
+            color: const Color(0xff052750),
+            elevation: 2,
+            child: TabBar(
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.white,
+              labelStyle: const TextStyle(fontSize: 14),
+              indicatorColor: const Color.fromARGB(255, 0, 141, 47),
+              tabs: <Widget>[
+                Tab(text: 'extrato'.tr),
+                Tab(text: 'recargas'.tr),
+                Tab(text: 'pagamentos'.tr),
+              ],
+            ),
           ),
-        ),
-        body: Container(
-          decoration: BoxDecoration(
-                    gradient: AppColors.darkBlueToBlackGradient(),
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: AppColors.darkBlueToBlackGradient(),
+              ),
+              child: TabBarView(
+                physics: const NeverScrollableScrollPhysics(),
+                children: <Widget>[
+                  BalanceTabStatement(userBalance.statement ?? [], period),
+                  BalanceTabStatement(
+                    userBalance.statement!
+                        .where(
+                          (element) =>
+                              element.category!.contains(Constants.CREDIT),
+                        )
+                        .toList(),
+                    period,
                   ),
-          child: TabBarView(
-            physics: const NeverScrollableScrollPhysics(),
-            children: <Widget>[
-              BalanceTabStatement(userBalance.statement?? [], period),
-              BalanceTabStatement(
-                  userBalance.statement!
-                      .where((element) =>
-                          element.category!.contains(Constants.CREDIT))
-                      .toList(),
-                  period),
-              BalanceTabStatement(
-                  userBalance.statement!
-                      .where((element) =>
-                          element.category!.contains(Constants.DEBIT))
-                      .toList(),
-                  period),
-            ],
+                  BalanceTabStatement(
+                    userBalance.statement!
+                        .where(
+                          (element) =>
+                              element.category!.contains(Constants.DEBIT),
+                        )
+                        .toList(),
+                    period,
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

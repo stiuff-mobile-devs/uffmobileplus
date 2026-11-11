@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_bars.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/controller/pay_restaurant_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/utils/card_details.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
@@ -11,17 +12,9 @@ class PayRestaurantPage extends GetView<PayRestaurantController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        elevation: 8,
-        foregroundColor: Colors.white,
-        title: Text('pagar_restaurante'.tr),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
-        ),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
-        ),
+      backgroundColor: AppColors.darkBlue(),
+      appBar: AppBars.build(
+        title: 'pagar_restaurante'.tr,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),

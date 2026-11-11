@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/controller/restaurant_modules_controller.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/utils/restaurante_help.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_bars.dart';
 
 class RestaurantModulesPage extends StatelessWidget {
   const RestaurantModulesPage({super.key});
@@ -10,6 +12,11 @@ class RestaurantModulesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.darkBlue(),
+      appBar: AppBars.build(
+        title: 'restaurante_universitario'.tr,
+        actions: [AppBars.helpAction(RestauranteHelp.modulos)],
+      ),
       body: Container(
         decoration: BoxDecoration(
           gradient: AppColors.darkBlueToBlackGradient(),
@@ -34,28 +41,6 @@ class RestaurantModulesPage extends StatelessWidget {
 
                   return CustomScrollView(
                     slivers: [
-                      SliverAppBar(
-                        foregroundColor: Colors.white,
-                        title: Text('restaurante_universitario'.tr),
-                        centerTitle: true,
-                        elevation: 8,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(
-                            bottom: Radius.circular(10),
-                          ),
-                        ),
-                        flexibleSpace: Container(
-                          decoration: BoxDecoration(
-                            gradient: AppColors.appBarTopGradient(),
-                          ),
-                        ),
-                        actions: <Widget>[
-                          IconButton(
-                            onPressed: () {},
-                            icon: const Icon(Icons.question_mark),
-                          ),
-                        ],
-                      ),
                       SliverPadding(
                         padding: const EdgeInsets.fromLTRB(16, 18, 16, 20),
                         sliver: SliverGrid(

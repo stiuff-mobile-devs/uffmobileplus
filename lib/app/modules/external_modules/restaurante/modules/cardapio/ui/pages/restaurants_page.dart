@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_bars.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/home_page_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/cardapio/ui/widgets/custom_polygon.dart';
 import '../../../../../../../utils/color_pallete.dart';
-import '../../../../../../../utils/ui_components/custom_alert_dialog.dart';
 import '../../../../../../../utils/ui_components/custom_progress_display.dart';
 import '../../controller/restaurants_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -54,45 +55,32 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
     }
   }
 
-  void _showDefaultRestaurantDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: prefs?.getString('default_restaurant') != null,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('restaurante_padrao'.tr),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: restaurantsController.locations.map((loc) {
-                bool isDefault = prefs?.getString('default_restaurant') == loc.name;
-                return ListTile(
-                  title: Text(
-                    loc.name,
-                    style: TextStyle(
-                      fontWeight: isDefault ? FontWeight.bold : FontWeight.normal,
-                    ),
-                  ),
-                  trailing: isDefault
-                      ? const Icon(Icons.check_circle, color: Colors.green)
-                      : null,
-                  onTap: () async {
-                    await prefs!.setString('default_restaurant', loc.name);
-                    setState(() {});
-                    
-                    if (Get.isRegistered<HomePageController>()) {
-                      Get.find<HomePageController>().reloadCampusMeals();
-                    }
-                    
-                    Navigator.of(context).pop();
-                  },
-                );
-              }).toList(),
-            ),
+  Future<void> _showDefaultRestaurantDialog() async {
+    final current = prefs?.getString('default_restaurant');
+    final choice = await AppPopups.choose<String>(
+      title: 'restaurante_padrao'.tr,
+      message: 'restaurante_padrao_desc'.tr,
+      icon: Icons.restaurant_rounded,
+      selected: current,
+      // Na primeira vez a escolha é obrigatória (como antes).
+      dismissible: current != null,
+      options: [
+        for (final loc in restaurantsController.locations)
+          PopupOption(
+            value: loc.name,
+            label: loc.name,
+            icon: Icons.storefront_outlined,
           ),
-        );
-      },
+      ],
     );
+    if (choice == null || prefs == null) return;
+
+    await prefs!.setString('default_restaurant', choice);
+    if (mounted) setState(() {});
+
+    if (Get.isRegistered<HomePageController>()) {
+      Get.find<HomePageController>().reloadCampusMeals();
+    }
   }
 
   void _showGdiFailureSign() {
@@ -463,20 +451,9 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
           _showGdiFailureSign();
         }
         return Scaffold(
-          backgroundColor: Colors.blueAccent,
-          appBar: AppBar(
-            centerTitle: true,
-            elevation: 8,
-            foregroundColor: Colors.white,
-            title: Text('restaurantes'.tr),
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
-            ),
-            flexibleSpace: Container(
-              decoration: BoxDecoration(
-                gradient: AppColors.appBarTopGradient(),
-              ),
-            ),
+          backgroundColor: AppColors.darkBlue(),
+          appBar: AppBars.build(
+            title: 'restaurantes'.tr,
             actions: [
               IconButton(
                 icon: const Icon(Icons.settings),

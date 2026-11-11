@@ -39,6 +39,36 @@ When adding to an existing module, match that module's existing pattern rather t
 
 `lib/app/utils/` holds general-purpose utilities shared app-wide. Convention (per README): a module's own `utils/` may reference anything in its module, but `lib/app/utils/` may only import other general utils or external packages — keep it free of module-specific imports.
 
+### Independência dos módulos
+Os `external_modules` são independentes: não conversam com os `internal_modules` nem entre si.
+
+| De → Para | Permitido? |
+|---|---|
+| módulo externo → `lib/app/utils` (kit de UI `AppBars`/`AppPopups`, cores, traduções, helpers) | ✅ |
+| módulo externo → `lib/app/data` (serviços compartilhados, ex.: `ExternalModulesServices`, `sctm_service`) | ✅ |
+| módulo externo → `internal_modules/...` | ❌ |
+| módulo externo → outro `external_modules/...` | ❌ |
+| `lib/app/utils` e `lib/app/data` → qualquer módulo | ❌ (a camada compartilhada nunca conhece módulos) |
+| `internal_modules/dashboard` → módulos externos | ⚠️ exceção: a dashboard é a vitrine (cards da Home) e pode ler dos externos; nunca o contrário. Prefira navegar por rota (`Get.toNamed`) a importar páginas |
+
+- Usar `AppBars`/`AppPopups` **não** quebra a independência: a dependência é só módulo → kit. Mantenha o kit livre de qualquer import de `modules/` e de modelos de módulos; textos chegam já traduzidos por quem chama.
+- A URL de ajuda de telas de um módulo externo fica **dentro do módulo** (ex.: `restaurante/utils/restaurante_help.dart`) e é passada a `AppBars.helpAction(url)`; `HelpGuides` é só para telas internas.
+- Dentro de um módulo com submódulos (ex.: `restaurante/modules/*`), compartilhar código é permitido, mas prefira colocar o que é comum no nível do módulo pai.
+
+**Violações conhecidas (dívida, corrigir quando mexer na regra):**
+- Restaurante importa `internal_modules/login` (`AuthGoogleService`, instanciado com `new` em pagar/recarga/extrato/catraca) e `internal_modules/user` (`UserData`, `UserDataController` registrado em `cardapio_bindings`).
+- `cardapio/ui/pages/restaurants_page.dart` importa `HomePageController` da dashboard (dependência circular com a Home).
+- `lib/app/data/connections/sctm_service.dart` e `lib/app/data/data_bases/hive_service.dart` importam modelos de `restaurante` (camada compartilhada conhecendo o módulo).
+- DI fora do padrão no Restaurante: `cardapio_bindings` usa `Get.put` (não `lazyPut`); `menu_widget`/`meal_form_widget` e `RestaurantsController` fazem `Get.put` fora de bindings; `RestaurantModulesPage` usa `GetBuilder(init: ...)` duplicando a binding; `recharge_card_controller` cria `ExternalModulesServices()` novo.
+
+### Módulos críticos: Restaurante e Carteirinha Digital
+São os módulos mais usados do app. **Antes de alterar qualquer regra de negócio** neles — valores/preço, pagamento, saldo, extrato, recarga, catraca/validação de acesso (online/offline), QR code e validade da carteirinha, permissões por vínculo/grupo GDI — **pare, explique a mudança e espere aprovação explícita**.
+- Mudanças só visuais (layout, AppBar, pop-ups, textos) seguem normalmente.
+- Mudança de regra de negócio vai em **commit separado** da parte visual, para facilitar a revisão.
+- Problemas de regra encontrados no caminho são **listados para o usuário**, não corrigidos por conta própria.
+
+**Catraca (`restaurante/modules/catraca`) é ainda mais sensível:** controla a entrada no RU (validação online/offline, débito, transações salvas no Hive/Firebase). Ela **nunca entra em mudanças em lote** do Restaurante ou do app (migração de AppBar/pop-ups, troca de textos, refatorações, renomear chaves de tradução que ela usa). Só é alterada numa tarefa **dedicada e individual**, pedida explicitamente, com o plano explicado antes e aprovação do usuário — inclusive para mudanças só visuais. Em commit próprio, sem misturar com outros arquivos.
+
 ### Routing
 `lib/app/routes/app_pages.dart` defines `AppPages.pages`, a `GetPage` list pairing each route with its page widget and binding(s). `lib/app/routes/app_routes.dart` defines route name constants (`abstract class Routes`). Standard GetX navigation (`Get.toNamed`, etc.) throughout.
 
@@ -56,15 +86,16 @@ Custom GetX-native i18n (`lib/app/utils/translations/`), **not** Flutter's `.arb
 To add a new translated string, add the key to **all 6** JSON files, not just one. `test/translations/translation_integrity_test.dart` checks that every locale has the same keys as `pt_BR`, no empty values, no duplicate keys, and that every `.tr` key used in `lib/` exists in `pt_BR.json`. Before checking for a new key, grep `pt_BR.json` — many texts already have a key.
 
 ### AppBars (`AppBars`)
-Ponto único: `lib/app/utils/ui_components/app_bars.dart`. **Obrigatório nos `internal_modules`** (exceto a tela especial `lock_develop_mode`); os `external_modules` ainda usam `customAppBar`/blocos próprios — migre-os quando for mexer neles.
+Ponto único: `lib/app/utils/ui_components/app_bars.dart`. **Obrigatório nos `internal_modules`** (exceto a tela especial `lock_develop_mode`) e no `restaurante` (já migrado, **exceto a catraca**, que segue com o visual antigo até uma tarefa dedicada); os demais `external_modules` ainda usam `customAppBar`/blocos próprios — migre-os quando for mexer neles.
 - Nunca use `AppBar(...)`/`SliverAppBar(...)` direto nas telas: `appBar: AppBars.build(title: ..., actions: [...])`.
 - Visual único: degradê vertical `AppColors.mediumBlue()` → `AppColors.darkBlue()`, raio inferior 16, título centralizado, texto/ícones brancos, status bar clara.
 - A seta de voltar e o ícone do menu (quando há drawer) são automáticos; passe `leading` só para comportamentos especiais (ex.: WebView volta no histórico). Filtros/abas vão em `bottom`.
 - Dê ao `Scaffold` `backgroundColor: AppColors.darkBlue()`, senão os cantos arredondados da AppBar mostram o fundo branco padrão.
-- Botão de ajuda: `AppBars.helpAction(HelpGuides.<tela>)`. As URLs dos guias online ficam em `lib/app/utils/help_guides.dart`; enquanto for `null`, o botão avisa que o manual está em construção.
+- Botão de ajuda: `AppBars.helpAction(url)`. Telas internas usam `HelpGuides.<tela>` (`lib/app/utils/help_guides.dart`); módulos externos guardam a URL no próprio módulo (ver "Independência dos módulos"). Enquanto for `null`, o botão avisa que o manual está em construção.
+- Título reativo: `AppBars.build(titleWidget: Obx(() => Text(...)))`.
 
 ### Pop-ups e snackbars (`AppPopups`)
-Ponto único: `lib/app/utils/ui_components/app_popups.dart`. **Obrigatório nos `internal_modules`**; os `external_modules` ainda usam o padrão antigo (`Get.snackbar`, `customAlertDialog`/AwesomeDialog etc.) — migre-os para `AppPopups` quando for mexer neles.
+Ponto único: `lib/app/utils/ui_components/app_popups.dart`. **Obrigatório nos `internal_modules`** e no `restaurante` (já migrado, **exceto a catraca**); os demais `external_modules` ainda usam o padrão antigo (`Get.snackbar`, `customAlertDialog`/AwesomeDialog etc.) — migre-os para `AppPopups` quando for mexer neles.
 - Nunca use `showDialog`, `Get.dialog`, `Get.defaultDialog`, `Get.snackbar`, `Get.bottomSheet`, `showModalBottomSheet`, `ScaffoldMessenger` ou `customAlertDialog` direto nas telas/controllers.
 - Mensagem rápida: `AppPopups.success/error/warning/info(texto, title: opcional)` (snackbar flutuante via `ScaffoldMessenger`, não quebra o `Get.back()`).
 - Confirmação: `await AppPopups.confirm(...)` → `bool` (bottom sheet; `destructive: true` para desconectar/excluir; `type:` para mudar a cor do ícone).
@@ -73,6 +104,7 @@ Ponto único: `lib/app/utils/ui_components/app_popups.dart`. **Obrigatório nos 
 - Dentro das folhas, feche com `Navigator.of(ctx).pop(valor)` usando o `ctx` da folha, nunca `Get.back()`.
 - Visual: sempre o azul-escuro da marca (`AppPopups.theme`), independente do `ThemeData` global (o app não define um).
 - Mensagens ao usuário são amigáveis e traduzidas; o detalhe técnico (`$e`) vai só para `debugPrint`, nunca para o pop-up.
+- Escrita: **título = o que aconteceu** (ex.: "Não foi possível carregar o cardápio"); **mensagem = o que fazer** (ex.: "Verifique sua internet e tente de novo."). Frases curtas, sem jargão, sem código HTTP.
 - Use `withValues(alpha: x)` (não `withOpacity`) e `PopScope` (não `WillPopScope`) em código novo.
 
 ### App bootstrap (`lib/main.dart`)

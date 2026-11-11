@@ -66,15 +66,21 @@ class PayRestaurantController extends GetxController {
         await _authGoogle.getFirebaseIdToken() ?? "",
       );
     } catch (e) {
-      print(e);
-      if (e is Exception && e.toString().isNotEmpty) {
-        await MessageDialogs.showErrorDialog(
-          Get.context,
-          message: e.toString(),
-        );
-      } else {
-        await MessageDialogs.showErrorDialog(Get.context);
-      }
+      debugPrint('Erro ao gerar código de pagamento: $e');
+      // O servidor costuma explicar o motivo (lançado como Exception(texto)).
+      // Mostra só esse texto, sem o prefixo "Exception: "; erros de rede ou
+      // outros detalhes técnicos viram uma mensagem genérica.
+      final raw = e.toString();
+      final serverMessage = raw.startsWith('Exception: ')
+          ? raw.substring('Exception: '.length).trim()
+          : '';
+      await MessageDialogs.showErrorDialog(
+        Get.context,
+        title: 'pagamento_erro_titulo'.tr,
+        message: serverMessage.isNotEmpty
+            ? serverMessage
+            : 'msg_verifique_internet'.tr,
+      );
     } finally {
       isPaymentProcessing.value = false;
       isLoading.value = false;
