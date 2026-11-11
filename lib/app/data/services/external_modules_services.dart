@@ -4,6 +4,7 @@ import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
 import 'package:uffmobileplus/app/utils/gdi_groups.dart';
+import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
 
 class ExternalModulesServices extends GetxService {
   late UserDataController _userDataController;
@@ -78,6 +79,12 @@ class ExternalModulesServices extends GetxService {
 
   Future<String?> getAccessToken() {
     return _auth.getAccessToken();
+  }
+
+  /// Perfil escolhido pelo usuário (graduação, docente...). `null` se ainda
+  /// não houver usuário salvo.
+  ProfileTypes? getUserProfileType() {
+    return _userData.profileType;
   }
 
   String getUserBondId() {

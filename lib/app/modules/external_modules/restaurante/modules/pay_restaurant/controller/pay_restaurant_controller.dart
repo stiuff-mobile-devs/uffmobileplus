@@ -6,9 +6,11 @@ import 'package:screen_brightness/screen_brightness.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/data/services/screen_protector_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/data/repository/pay_restaurant_repository.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/utils/meal_prices.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/utils/message_dialogs.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/services/auth_google_service.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
+import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
 
 class PayRestaurantController extends GetxController {
   PayRestaurantController();
@@ -29,6 +31,14 @@ class PayRestaurantController extends GetxController {
   RxString currentBalance = "".obs;
   Map<String, dynamic> paymentCode = {};
 
+  /// Perfil do usuário, usado só para exibir o valor da refeição.
+  final Rxn<ProfileTypes> profileType = Rxn<ProfileTypes>();
+
+  /// TESTE: mostra o botão de recarga sempre, para conferir o visual.
+  /// Voltar para `false` (regra final: aparece com saldo menor que uma
+  /// refeição).
+  bool forceShowRechargeButton = false;
+
   ScreenProtectorService screenProtector = ScreenProtectorService();
 
   @override
@@ -43,9 +53,46 @@ class PayRestaurantController extends GetxController {
     userIdUFF = externalModulesServices.getUserIdUFF();
     userImageUrl = externalModulesServices.getUserPhotoUrl() ?? "";
 
+    _loadProfile();
     getUserBalance();
 
     super.onInit();
+  }
+
+  /// Rebusca saldo e perfil (botão de atualizar da tela).
+  void reloadData() {
+    _loadProfile();
+    getUserBalance();
+  }
+
+  Future<void> _loadProfile() async {
+    // Garante o usuário salvo carregado antes de ler o perfil.
+    await externalModulesServices.initialize();
+    profileType.value = externalModulesServices.getUserProfileType();
+  }
+
+  /// Valor da refeição do perfil; `null` se o perfil não come no RU.
+  double? get mealPrice => MealPrices.priceFor(profileType.value);
+
+  /// Saldo como número; `null` se não foi possível carregar.
+  double? get balanceValue => MealPrices.parseBalance(currentBalance.value);
+
+  /// Quantas refeições o saldo paga no valor do perfil.
+  int? get mealsAvailable => MealPrices.mealsFor(balanceValue, mealPrice);
+
+  /// Saldo zerado/negativo ou menor que o valor de uma refeição.
+  bool get isBalanceInsufficient {
+    final balance = balanceValue;
+    final price = mealPrice;
+    if (balance == null) return false;
+    return balance <= 0 || (price != null && balance < price);
+  }
+
+  bool get showRechargeButton =>
+      forceShowRechargeButton || isBalanceInsufficient;
+
+  void goToRecharge() {
+    Get.toNamed(Routes.RECHARGE_CARD);
   }
 
   void goToPaymentHelpScreen() {
