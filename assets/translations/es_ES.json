@@ -601,5 +601,6 @@
   "tocar": "Reproducir",
   "pausar": "Pausar",
   "ver_tudo": "Ver todo",
-  "noticias_indisponiveis": "No fue posible cargar las noticias ahora."
+  "noticias_indisponiveis": "No fue posible cargar las noticias ahora.",
+  "segure_arraste_dica": "Consejo: mantén presionada la tarjeta y arrástrala para moverla."
 }

@@ -601,5 +601,6 @@
   "tocar": "Lire",
   "pausar": "Pause",
   "ver_tudo": "Tout voir",
-  "noticias_indisponiveis": "Impossible de charger les actualités pour le moment."
+  "noticias_indisponiveis": "Impossible de charger les actualités pour le moment.",
+  "segure_arraste_dica": "Astuce : maintenez la carte appuyée et faites-la glisser pour la déplacer."
 }

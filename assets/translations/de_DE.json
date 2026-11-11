@@ -601,5 +601,6 @@
   "tocar": "Abspielen",
   "pausar": "Pausieren",
   "ver_tudo": "Alle anzeigen",
-  "noticias_indisponiveis": "Die Nachrichten konnten gerade nicht geladen werden."
+  "noticias_indisponiveis": "Die Nachrichten konnten gerade nicht geladen werden.",
+  "segure_arraste_dica": "Tipp: Halte die Karte gedrückt und ziehe sie an eine neue Stelle."
 }

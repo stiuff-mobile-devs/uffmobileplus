@@ -601,5 +601,6 @@
   "tocar": "Play",
   "pausar": "Pause",
   "ver_tudo": "See all",
-  "noticias_indisponiveis": "Couldn't load the news right now."
+  "noticias_indisponiveis": "Couldn't load the news right now.",
+  "segure_arraste_dica": "Tip: press and hold a card, then drag it to move it."
 }

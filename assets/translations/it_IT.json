@@ -601,5 +601,6 @@
   "tocar": "Riproduci",
   "pausar": "Pausa",
   "ver_tudo": "Vedi tutto",
-  "noticias_indisponiveis": "Impossibile caricare le notizie al momento."
+  "noticias_indisponiveis": "Impossibile caricare le notizie al momento.",
+  "segure_arraste_dica": "Suggerimento: tieni premuta la scheda e trascinala per spostarla."
 }

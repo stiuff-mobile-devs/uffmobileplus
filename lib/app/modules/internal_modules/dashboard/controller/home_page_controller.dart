@@ -569,6 +569,25 @@ class HomePageController extends GetxController {
     _persistSectionPrefs();
   }
 
+  /// Reordena pelo arrasto na Home. Índices da lista **visível**, com
+  /// [newIndex] já ajustado (o que o `onReorderItem` entrega). As seções
+  /// ocultas continuam nas posições em que estavam.
+  void reorderVisibleSection(int oldIndex, int newIndex) {
+    final visible = visibleSections;
+    if (oldIndex < 0 || oldIndex >= visible.length) return;
+    final moved = visible.removeAt(oldIndex);
+    visible.insert(newIndex.clamp(0, visible.length), moved);
+
+    // Preenche as posições que eram das visíveis com a nova sequência.
+    var next = 0;
+    final order = [
+      for (final s in sectionOrder)
+        hiddenSections.contains(s) ? s : visible[next++],
+    ];
+    sectionOrder.assignAll(order);
+    _persistSectionPrefs();
+  }
+
   void hideSection(HomeSection section) {
     hiddenSections.add(section);
     _persistSectionPrefs();

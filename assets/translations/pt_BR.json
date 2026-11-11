@@ -601,5 +601,6 @@
   "tocar": "Tocar",
   "pausar": "Pausar",
   "ver_tudo": "Ver tudo",
-  "noticias_indisponiveis": "Não foi possível carregar as notícias agora."
+  "noticias_indisponiveis": "Não foi possível carregar as notícias agora.",
+  "segure_arraste_dica": "Dica: segure a caixinha e arraste para mudar de lugar."
 }

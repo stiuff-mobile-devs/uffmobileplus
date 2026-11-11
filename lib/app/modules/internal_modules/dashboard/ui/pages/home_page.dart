@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/utils/ui_components/app_bars.dart';
@@ -59,7 +60,9 @@ class HomePage extends GetView<HomePageController> {
               ? const SizedBox.expand(child: CustomProgressDisplay())
               : SafeArea(
                   bottom: false,
-                  child: ListView(
+                  // Segurar uma caixinha e arrastar muda a ordem das seções
+                  // (o "⋮" continua como alternativa).
+                  child: ReorderableListView.builder(
                     physics: const BouncingScrollPhysics(),
                     padding: EdgeInsets.fromLTRB(
                       _gap,
@@ -67,40 +70,83 @@ class HomePage extends GetView<HomePageController> {
                       _gap,
                       bottomPadding,
                     ),
-                    children: [
-                      for (int i = 0; i < sections.length; i++) ...[
-                        if (i > 0) const SizedBox(height: _gap),
-                        _buildSection(
-                          context,
-                          sections[i],
-                          isFirst: i == 0,
-                          isLast: i == sections.length - 1,
-                        ),
-                      ],
-                      if (hiddenCount > 0) ...[
-                        const SizedBox(height: 8),
-                        Center(
-                          child: TextButton.icon(
-                            onPressed: _showHiddenSections,
-                            icon: Icon(
-                              Icons.visibility_outlined,
-                              size: 18,
-                              color: AppColors.lightBlue(),
-                            ),
-                            label: Text(
-                              'mostrar_secoes_ocultas'.trParams({
-                                'n': '$hiddenCount',
-                              }),
-                              style: TextStyle(color: AppColors.lightBlue()),
-                            ),
+                    buildDefaultDragHandles: false,
+                    itemCount: sections.length,
+                    onReorderStart: (_) => HapticFeedback.mediumImpact(),
+                    onReorderItem: controller.reorderVisibleSection,
+                    proxyDecorator: _liftedSection,
+                    itemBuilder: (context, i) {
+                      final section = sections[i];
+                      // Toque longo inicia o arrasto; toque normal, rolagem e
+                      // carrossel continuam funcionando.
+                      return ReorderableDelayedDragStartListener(
+                        key: ValueKey(section),
+                        index: i,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            bottom: i == sections.length - 1 ? 0 : _gap,
+                          ),
+                          child: _buildSection(
+                            context,
+                            section,
+                            isFirst: i == 0,
+                            isLast: i == sections.length - 1,
                           ),
                         ),
-                      ],
-                    ],
+                      );
+                    },
+                    footer: hiddenCount == 0
+                        ? null
+                        : Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Center(
+                              child: TextButton.icon(
+                                onPressed: _showHiddenSections,
+                                icon: Icon(
+                                  Icons.visibility_outlined,
+                                  size: 18,
+                                  color: AppColors.lightBlue(),
+                                ),
+                                label: Text(
+                                  'mostrar_secoes_ocultas'.trParams({
+                                    'n': '$hiddenCount',
+                                  }),
+                                  style: TextStyle(
+                                    color: AppColors.lightBlue(),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                   ),
                 ),
         );
       }),
+    );
+  }
+
+  /// Visual da caixinha enquanto é arrastada: um pouco maior e com sombra.
+  static Widget _liftedSection(
+    Widget child,
+    int index,
+    Animation<double> animation,
+  ) {
+    return AnimatedBuilder(
+      animation: animation,
+      child: child,
+      builder: (context, child) {
+        final t = Curves.easeOut.transform(animation.value);
+        return Transform.scale(
+          scale: 1 + 0.03 * t,
+          child: Material(
+            color: Colors.transparent,
+            elevation: 12 * t,
+            shadowColor: Colors.black,
+            borderRadius: BorderRadius.circular(HomeSectionCard.radius),
+            child: child,
+          ),
+        );
+      },
     );
   }
 
@@ -112,11 +158,8 @@ class HomePage extends GetView<HomePageController> {
     required bool isFirst,
     required bool isLast,
   }) {
-    void openMenu() => _showSectionMenu(
-      section,
-      canMoveUp: !isFirst,
-      canMoveDown: !isLast,
-    );
+    void openMenu() =>
+        _showSectionMenu(section, canMoveUp: !isFirst, canMoveDown: !isLast);
 
     switch (section) {
       case HomeSection.studyPlan:
@@ -182,9 +225,7 @@ class HomePage extends GetView<HomePageController> {
             ? HomeSectionCard.loading
             : classes.isEmpty
             ? Text('nenhuma_aula_hoje'.tr, style: HomeSectionCard.secondaryText)
-            : Column(
-                children: classes.map(_buildDisciplineRow).toList(),
-              ),
+            : Column(children: classes.map(_buildDisciplineRow).toList()),
       );
     });
   }
@@ -327,7 +368,10 @@ class HomePage extends GetView<HomePageController> {
         child: isLoading
             ? HomeSectionCard.loading
             : stats == null
-            ? Text('dados_indisponiveis'.tr, style: HomeSectionCard.secondaryText)
+            ? Text(
+                'dados_indisponiveis'.tr,
+                style: HomeSectionCard.secondaryText,
+              )
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -396,6 +440,7 @@ class HomePage extends GetView<HomePageController> {
   }) async {
     final action = await AppPopups.choose<_SectionAction>(
       title: _sectionTitle(section),
+      message: 'segure_arraste_dica'.tr,
       icon: _sectionIcon(section),
       options: [
         if (canMoveUp)
@@ -846,8 +891,8 @@ class _ShortcutGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final labelLine = MediaQuery.textScalerOf(context).scale(_labelSize) *
-        _labelLineHeight;
+    final labelLine =
+        MediaQuery.textScalerOf(context).scale(_labelSize) * _labelLineHeight;
     final itemHeight = _iconSize + 6 + labelLine * 2 + 12;
 
     return LayoutBuilder(
