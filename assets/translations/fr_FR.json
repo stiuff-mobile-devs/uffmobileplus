@@ -249,14 +249,9 @@
   "ler_codigo": "Lire le code",
   "validar_manualmente": "Valider Manuellement",
   "sem_info_ultimos_dias": "Aucune information pour les @period derniers jours",
-  "valor_debitado_dois_pontos": "Montant débité :",
-  "valor_creditado": "Montant crédité :",
-  "extrato": "Relevé",
   "recargas": "Recharges",
   "pagamentos": "Paiements",
-  "periodo": "Période :",
   "ultimos_dias": "@days derniers jours",
-  "aplicar_filtros": "Appliquer les Filtres",
   "erro_carregar_detalhes": "Erreur lors du chargement des détails : @error",
   "nenhum_dado_disponivel": "Aucune donnée disponible",
   "enviando": "Envoi en cours...",
@@ -636,5 +631,6 @@
   "recarga_valor_vazio": "Indiquez le montant de la recharge",
   "recarga_link_erro": "Impossible d'ouvrir PagTesouro. Réessayez.",
   "ru_simulando": "Simulation à R$ @valor. Ce n'est peut-être pas votre prix.",
-  "ru_valor_perfil": "Affichage de votre prix : R$ @valor"
+  "ru_valor_perfil": "Affichage de votre prix : R$ @valor",
+  "ru_periodo_titulo": "Période du relevé"
 }

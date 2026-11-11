@@ -249,14 +249,9 @@
   "ler_codigo": "Code lesen",
   "validar_manualmente": "Manuell Validieren",
   "sem_info_ultimos_dias": "Keine Informationen für die letzten @period Tage",
-  "valor_debitado_dois_pontos": "Abgebuchter Betrag:",
-  "valor_creditado": "Gutgeschriebener Betrag:",
-  "extrato": "Auszug",
   "recargas": "Aufladungen",
   "pagamentos": "Zahlungen",
-  "periodo": "Zeitraum:",
   "ultimos_dias": "Letzte @days Tage",
-  "aplicar_filtros": "Filter Anwenden",
   "erro_carregar_detalhes": "Fehler beim Laden der Details: @error",
   "nenhum_dado_disponivel": "Keine Daten verfügbar",
   "enviando": "Wird gesendet...",
@@ -636,5 +631,6 @@
   "recarga_valor_vazio": "Gib den Aufladebetrag ein",
   "recarga_link_erro": "PagTesouro konnte nicht geöffnet werden. Versuche es erneut.",
   "ru_simulando": "Simulation mit R$ @valor. Vielleicht ist das nicht dein Preis.",
-  "ru_valor_perfil": "Dein Preis wird angezeigt: R$ @valor"
+  "ru_valor_perfil": "Dein Preis wird angezeigt: R$ @valor",
+  "ru_periodo_titulo": "Zeitraum des Auszugs"
 }

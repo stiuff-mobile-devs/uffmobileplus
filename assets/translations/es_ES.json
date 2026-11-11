@@ -249,14 +249,9 @@
   "ler_codigo": "Leer código",
   "validar_manualmente": "Validar Manualmente",
   "sem_info_ultimos_dias": "Sin información para los últimos @period días",
-  "valor_debitado_dois_pontos": "Monto debitado:",
-  "valor_creditado": "Monto acreditado:",
-  "extrato": "Extracto",
   "recargas": "Recargas",
   "pagamentos": "Pagos",
-  "periodo": "Período:",
   "ultimos_dias": "Últimos @days días",
-  "aplicar_filtros": "Aplicar Filtros",
   "erro_carregar_detalhes": "Error al cargar detalles: @error",
   "nenhum_dado_disponivel": "No hay datos disponibles",
   "enviando": "Enviando...",
@@ -636,5 +631,6 @@
   "recarga_valor_vazio": "Ingresa el valor de la recarga",
   "recarga_link_erro": "No se pudo abrir PagTesouro. Inténtalo de nuevo.",
   "ru_simulando": "Simulando R$ @valor. Puede que no sea tu precio.",
-  "ru_valor_perfil": "Mostrando tu precio: R$ @valor"
+  "ru_valor_perfil": "Mostrando tu precio: R$ @valor",
+  "ru_periodo_titulo": "Período del extracto"
 }

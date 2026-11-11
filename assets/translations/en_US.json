@@ -249,14 +249,9 @@
   "ler_codigo": "Read code",
   "validar_manualmente": "Validate Manually",
   "sem_info_ultimos_dias": "No information for the last @period days",
-  "valor_debitado_dois_pontos": "Amount debited:",
-  "valor_creditado": "Amount credited:",
-  "extrato": "Statement",
   "recargas": "Top-ups",
   "pagamentos": "Payments",
-  "periodo": "Period:",
   "ultimos_dias": "Last @days days",
-  "aplicar_filtros": "Apply Filters",
   "erro_carregar_detalhes": "Error loading details: @error",
   "nenhum_dado_disponivel": "No data available",
   "enviando": "Sending...",
@@ -636,5 +631,6 @@
   "recarga_valor_vazio": "Enter the top-up amount",
   "recarga_link_erro": "Could not open PagTesouro. Try again.",
   "ru_simulando": "Simulating R$ @valor. It may not be your price.",
-  "ru_valor_perfil": "Showing your price: R$ @valor"
+  "ru_valor_perfil": "Showing your price: R$ @valor",
+  "ru_periodo_titulo": "Statement period"
 }

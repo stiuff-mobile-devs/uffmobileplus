@@ -249,14 +249,9 @@
   "ler_codigo": "Leggi codice",
   "validar_manualmente": "Convalida Manualmente",
   "sem_info_ultimos_dias": "Nessuna informazione per gli ultimi @period giorni",
-  "valor_debitado_dois_pontos": "Importo addebitato:",
-  "valor_creditado": "Importo accreditato:",
-  "extrato": "Estratto Conto",
   "recargas": "Ricariche",
   "pagamentos": "Pagamenti",
-  "periodo": "Periodo:",
   "ultimos_dias": "Ultimi @days giorni",
-  "aplicar_filtros": "Applica Filtri",
   "erro_carregar_detalhes": "Errore nel caricamento dei dettagli: @error",
   "nenhum_dado_disponivel": "Nessun dato disponibile",
   "enviando": "Invio in corso...",
@@ -636,5 +631,6 @@
   "recarga_valor_vazio": "Inserisci l'importo della ricarica",
   "recarga_link_erro": "Impossibile aprire PagTesouro. Riprova.",
   "ru_simulando": "Simulazione a R$ @valor. Potrebbe non essere il tuo prezzo.",
-  "ru_valor_perfil": "Mostrando il tuo prezzo: R$ @valor"
+  "ru_valor_perfil": "Mostrando il tuo prezzo: R$ @valor",
+  "ru_periodo_titulo": "Periodo dell'estratto"
 }
