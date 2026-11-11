@@ -634,5 +634,7 @@
   "ru_ver_valores_para": "Show amounts for",
   "ru_por_refeicao": "per meal",
   "recarga_valor_vazio": "Enter the top-up amount",
-  "recarga_link_erro": "Could not open PagTesouro. Try again."
+  "recarga_link_erro": "Could not open PagTesouro. Try again.",
+  "ru_simulando": "Simulating R$ @valor. It may not be your price.",
+  "ru_valor_perfil": "Showing your price: R$ @valor"
 }

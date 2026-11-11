@@ -61,6 +61,10 @@ class RechargeCardController extends GetxController {
   String get mealCountPrice =>
       _formatValue(mealCount.value * selectedPrice.value);
 
+  /// O valor da grade é diferente do valor do perfil (modo simulação).
+  bool get isSimulating =>
+      profilePrice != null && selectedPrice.value != profilePrice;
+
   void setSelectedPrice(double price) {
     if (selectedPrice.value == price) return;
     selectedPrice.value = price;

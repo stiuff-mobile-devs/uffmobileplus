@@ -634,5 +634,7 @@
   "ru_ver_valores_para": "Beträge anzeigen für",
   "ru_por_refeicao": "pro Mahlzeit",
   "recarga_valor_vazio": "Gib den Aufladebetrag ein",
-  "recarga_link_erro": "PagTesouro konnte nicht geöffnet werden. Versuche es erneut."
+  "recarga_link_erro": "PagTesouro konnte nicht geöffnet werden. Versuche es erneut.",
+  "ru_simulando": "Simulation mit R$ @valor. Vielleicht ist das nicht dein Preis.",
+  "ru_valor_perfil": "Dein Preis wird angezeigt: R$ @valor"
 }

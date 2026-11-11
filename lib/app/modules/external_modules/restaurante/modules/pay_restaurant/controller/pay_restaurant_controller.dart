@@ -34,6 +34,10 @@ class PayRestaurantController extends GetxController {
   /// Perfil do usuário, usado só para exibir o valor da refeição.
   final Rxn<ProfileTypes> profileType = Rxn<ProfileTypes>();
 
+  /// Valor por refeição mostrado no painel. Começa no valor do perfil; o
+  /// usuário pode trocar no seletor (0,70 / 14,50). Só muda a visualização.
+  final RxDouble selectedPrice = MealPrices.student.obs;
+
   /// TESTE: mostra o botão de recarga sempre, para conferir o visual.
   /// Voltar para `false` (regra final: aparece com saldo menor que uma
   /// refeição).
@@ -69,7 +73,15 @@ class PayRestaurantController extends GetxController {
     // Garante o usuário salvo carregado antes de ler o perfil.
     await externalModulesServices.initialize();
     profileType.value = externalModulesServices.getUserProfileType();
+    selectedPrice.value = mealPrice ?? MealPrices.student;
   }
+
+  void setSelectedPrice(double price) => selectedPrice.value = price;
+
+  /// O valor mostrado é diferente do valor do perfil (modo simulação).
+  bool get isSimulating =>
+      mealPrice != null && selectedPrice.value != mealPrice;
+
 
   /// Valor da refeição do perfil; `null` se o perfil não come no RU.
   double? get mealPrice => MealPrices.priceFor(profileType.value);
@@ -80,9 +92,10 @@ class PayRestaurantController extends GetxController {
   /// Quantas refeições o saldo paga no valor do perfil.
   int? get mealsAvailable => MealPrices.mealsFor(balanceValue, mealPrice);
 
-  /// Saldo zerado/negativo ou menor que o valor de uma refeição.
+  /// Saldo zerado/negativo ou menor que o valor de uma refeição, no valor
+  /// escolhido no seletor (acompanha a visualização, como o painel).
   bool get isBalanceInsufficient =>
-      MealPrices.isInsufficient(balanceValue, mealPrice);
+      MealPrices.isInsufficient(balanceValue, selectedPrice.value);
 
   bool get showRechargeButton =>
       forceShowRechargeButton || isBalanceInsufficient;

@@ -634,5 +634,7 @@
   "ru_ver_valores_para": "Ver valores para",
   "ru_por_refeicao": "por refeição",
   "recarga_valor_vazio": "Informe o valor da recarga",
-  "recarga_link_erro": "Não foi possível abrir o PagTesouro. Tente de novo."
+  "recarga_link_erro": "Não foi possível abrir o PagTesouro. Tente de novo.",
+  "ru_simulando": "Simulando R$ @valor. Talvez não seja o seu valor.",
+  "ru_valor_perfil": "Mostrando o seu valor: R$ @valor"
 }

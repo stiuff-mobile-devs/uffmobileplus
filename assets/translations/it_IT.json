@@ -634,5 +634,7 @@
   "ru_ver_valores_para": "Vedi importi per",
   "ru_por_refeicao": "per pasto",
   "recarga_valor_vazio": "Inserisci l'importo della ricarica",
-  "recarga_link_erro": "Impossibile aprire PagTesouro. Riprova."
+  "recarga_link_erro": "Impossibile aprire PagTesouro. Riprova.",
+  "ru_simulando": "Simulazione a R$ @valor. Potrebbe non essere il tuo prezzo.",
+  "ru_valor_perfil": "Mostrando il tuo prezzo: R$ @valor"
 }

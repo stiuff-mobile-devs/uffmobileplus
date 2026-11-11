@@ -634,5 +634,7 @@
   "ru_ver_valores_para": "Voir les montants pour",
   "ru_por_refeicao": "par repas",
   "recarga_valor_vazio": "Indiquez le montant de la recharge",
-  "recarga_link_erro": "Impossible d'ouvrir PagTesouro. Réessayez."
+  "recarga_link_erro": "Impossible d'ouvrir PagTesouro. Réessayez.",
+  "ru_simulando": "Simulation à R$ @valor. Ce n'est peut-être pas votre prix.",
+  "ru_valor_perfil": "Affichage de votre prix : R$ @valor"
 }

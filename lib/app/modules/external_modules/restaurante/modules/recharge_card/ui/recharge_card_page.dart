@@ -4,7 +4,9 @@ import 'package:get/get.dart';
 import 'package:uffmobileplus/app/utils/ui_components/app_bars.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/recharge_card/controller/recharge_card_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/utils/meal_balance_panel.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/utils/meal_price_selector.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/utils/meal_prices.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/utils/meal_simulation_banner.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
@@ -17,7 +19,18 @@ class RechargeCardPage extends GetView<RechargeCardController> {
     return Scaffold(
       backgroundColor: AppColors.darkBlue(),
       resizeToAvoidBottomInset: true,
-      appBar: AppBars.build(title: 'recarregar_cartao'.tr),
+      appBar: AppBars.build(
+        title: 'recarregar_cartao'.tr,
+        actions: [
+          Obx(
+            () => mealPriceAppBarAction(
+              selected: controller.selectedPrice.value,
+              profilePrice: controller.profilePrice,
+              onChanged: controller.setSelectedPrice,
+            ),
+          ),
+        ],
+      ),
       body: Obx(
         () => controller.isLoading.value
             ? Center(child: CustomProgressDisplay())
@@ -32,128 +45,111 @@ class RechargeCardPage extends GetView<RechargeCardController> {
                   decoration: BoxDecoration(
                     gradient: AppColors.darkBlueToBlackGradient(),
                   ),
+                  // Tela fixa: só a grade de valores rola (Expanded abaixo).
                   child: SafeArea(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 20,
-                      ),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           // ── Saldo, refeições e valor do perfil ───────────
-                          Obx(
-                            () => MealBalancePanel(
-                              balance: controller.balanceValue,
-                              price: controller.profilePrice,
-                              profileKey: MealPrices.profileLabelKey(
-                                controller.profileType.value,
+                          // Some com o teclado aberto, para o campo de valor
+                          // e o botão continuarem cabendo na tela.
+                          if (MediaQuery.viewInsetsOf(context).bottom == 0) ...[
+                            Obx(
+                              () => MealBalancePanel(
+                                balance: controller.balanceValue,
+                                price: controller.profilePrice,
+                                profileKey: MealPrices.profileLabelKey(
+                                  controller.profileType.value,
+                                ),
+                                isLoading: controller.isBalanceLoading.value,
                               ),
-                              isLoading: controller.isBalanceLoading.value,
                             ),
-                          ),
 
-                          const SizedBox(height: 20),
+                            const SizedBox(height: 16),
+                          ],
 
-                          // ── Seletor do valor por refeição ─────────────────
-                          Obx(
-                            () => _PriceSelector(
-                              selected: controller.selectedPrice.value,
-                              profilePrice: controller.profilePrice,
-                              onChanged: (price) {
-                                FocusScope.of(context).unfocus();
-                                controller.setSelectedPrice(price);
-                              },
-                            ),
-                          ),
-
-                          const SizedBox(height: 14),
-
-                          // ── Grade fixa 2 colunas ──────────────────────────
-                          LayoutBuilder(
-                            builder: (context, constraints) => Obx(() {
-                              final itemWidth = (constraints.maxWidth - 10) / 2;
-                              final prices = controller.textPrices;
-                              return Wrap(
-                                spacing: 10,
-                                runSpacing: 10,
-                                children: List.generate(prices.length, (i) {
-                                  final meals = i + 1;
-                                  final isSelected =
-                                      controller.selectedValues[i];
-                                  return GestureDetector(
-                                    onTap: () {
-                                      // Fecha o teclado antes de selecionar
-                                      FocusScope.of(context).unfocus();
-                                      SystemChannels.textInput.invokeMethod(
-                                        'TextInput.hide',
-                                      );
-                                      controller.setSelectedValue(i);
-                                    },
-                                    child: SizedBox(
-                                      width: itemWidth,
-                                      child: AnimatedContainer(
-                                        duration: const Duration(
-                                          milliseconds: 150,
-                                        ),
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 14,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: isSelected
-                                              ? const Color(0xff104389)
-                                              : Colors.transparent,
-                                          border: Border.all(
-                                            color: isSelected
-                                                ? Colors.blue[100]!
-                                                : Colors.grey[500]!,
-                                            width: 2,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                              child: FittedBox(
-                                                fit: BoxFit.scaleDown,
-                                                alignment: Alignment.centerLeft,
-                                                child: Text(
-                                                  "R\$ ${prices[i]}",
-                                                  maxLines: 1,
-                                                  style: TextStyle(
-                                                    fontSize: 15,
-                                                    color: isSelected
-                                                        ? Colors.white
-                                                        : Colors.blue[100],
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 6),
-                                            Text(
-                                              'refeicoes_abrev'.trParams({
-                                                'count': '$meals',
-                                              }),
-                                              style: const TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.white70,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
+                          // ── Grade 2 colunas x 5 linhas (1 a 10 refeições) ──
+                          // Linhas com Expanded: divide o espaço real, sem
+                          // conta de largura (a borda da moldura não quebra).
+                          // É a única parte que rola; o resto fica fixo.
+                          Expanded(
+                            child: SingleChildScrollView(
+                              // respiro para o brilho da moldura não cortar
+                              padding: const EdgeInsets.all(4),
+                              child: Obx(() {
+                                final simulating = controller.isSimulating;
+                                final prices = controller.textPrices;
+                                void select(int i) {
+                                  FocusScope.of(context).unfocus();
+                                  SystemChannels.textInput.invokeMethod(
+                                    'TextInput.hide',
                                   );
-                                }),
-                              );
-                            }),
+                                  controller.setSelectedValue(i);
+                                }
+
+                                return MealSimulationFrame(
+                                  isSimulating: simulating,
+                                  flashKey: controller.selectedPrice.value,
+                                  radius: 12,
+                                  showIdleBorder: false,
+                                  child: Padding(
+                                    padding: EdgeInsets.all(
+                                      simulating ? 12 : 0,
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        for (
+                                          int row = 0;
+                                          row < (prices.length + 1) ~/ 2;
+                                          row++
+                                        ) ...[
+                                          if (row > 0)
+                                            const SizedBox(height: 10),
+                                          Row(
+                                            children: [
+                                              for (
+                                                int col = 0;
+                                                col < 2;
+                                                col++
+                                              ) ...[
+                                                if (col > 0)
+                                                  const SizedBox(width: 10),
+                                                Expanded(
+                                                  child:
+                                                      row * 2 + col <
+                                                          prices.length
+                                                      ? _QuickValueTile(
+                                                          price:
+                                                              prices[row * 2 +
+                                                                  col],
+                                                          meals:
+                                                              row * 2 + col + 1,
+                                                          isSelected:
+                                                              controller
+                                                                  .selectedValues[row *
+                                                                      2 +
+                                                                  col],
+                                                          onTap: () => select(
+                                                            row * 2 + col,
+                                                          ),
+                                                        )
+                                                      : const SizedBox.shrink(),
+                                                ),
+                                              ],
+                                            ],
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ),
                           ),
 
-                          const SizedBox(height: 14),
+                          const SizedBox(height: 12),
 
                           Obx(
                             () => _MealCountButton(
@@ -177,7 +173,7 @@ class RechargeCardPage extends GetView<RechargeCardController> {
                             ),
                           ),
 
-                          const SizedBox(height: 28),
+                          const SizedBox(height: 16),
 
                           TextField(
                             inputFormatters: [
@@ -242,7 +238,7 @@ class RechargeCardPage extends GetView<RechargeCardController> {
                             ),
                           ),
 
-                          const SizedBox(height: 40),
+                          const SizedBox(height: 16),
 
                           FloatingActionButton.extended(
                             heroTag: 'goToPayment',
@@ -262,8 +258,6 @@ class RechargeCardPage extends GetView<RechargeCardController> {
                               controller.goToPayment();
                             },
                           ),
-
-                          const SizedBox(height: 20),
                         ],
                       ),
                     ),
@@ -389,107 +383,58 @@ class _SideButton extends StatelessWidget {
   }
 }
 
-/// Seletor do valor por refeição usado na grade e no contador. Marca com
-/// "Seu valor" a opção do perfil do usuário.
-class _PriceSelector extends StatelessWidget {
-  const _PriceSelector({
-    required this.selected,
-    required this.profilePrice,
-    required this.onChanged,
-  });
-
-  final double selected;
-  final double? profilePrice;
-  final ValueChanged<double> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final options = [MealPrices.student, MealPrices.staff];
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'ru_ver_valores_para'.tr,
-          style: TextStyle(fontSize: 14, color: Colors.blue[100]),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            for (final price in options) ...[
-              Expanded(
-                child: _PriceOption(
-                  price: price,
-                  isSelected: selected == price,
-                  isProfile: profilePrice == price,
-                  onTap: () => onChanged(price),
-                ),
-              ),
-              if (price != options.last) const SizedBox(width: 10),
-            ],
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-class _PriceOption extends StatelessWidget {
-  const _PriceOption({
+/// Botão rápido da grade: valor e quantidade de refeições.
+class _QuickValueTile extends StatelessWidget {
+  const _QuickValueTile({
     required this.price,
+    required this.meals,
     required this.isSelected,
-    required this.isProfile,
     required this.onTap,
   });
 
-  final double price;
+  final String price;
+  final int meals;
   final bool isSelected;
-  final bool isProfile;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: isSelected ? const Color(0xff104389) : Colors.transparent,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-        side: BorderSide(
-          color: isSelected ? Colors.blue[100]! : Colors.grey[500]!,
-          width: 2,
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xff104389) : Colors.transparent,
+          border: Border.all(
+            color: isSelected ? Colors.blue[100]! : Colors.grey[500]!,
+            width: 2,
+          ),
+          borderRadius: BorderRadius.circular(10),
         ),
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(10),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              FittedBox(
+        child: Row(
+          children: [
+            Expanded(
+              child: FittedBox(
                 fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
                 child: Text(
-                  'R\$ ${MealPrices.format(price)}',
+                  "R\$ $price",
                   maxLines: 1,
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
                     color: isSelected ? Colors.white : Colors.blue[100],
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
-              const SizedBox(height: 2),
-              Text(
-                isProfile ? 'seu_valor'.tr : 'ru_por_refeicao'.tr,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: isProfile ? Colors.green[300] : Colors.white70,
-                  fontWeight: isProfile ? FontWeight.w600 : FontWeight.w400,
-                ),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              'refeicoes_abrev'.trParams({'count': '$meals'}),
+              style: const TextStyle(fontSize: 12, color: Colors.white70),
+            ),
+          ],
         ),
       ),
     );

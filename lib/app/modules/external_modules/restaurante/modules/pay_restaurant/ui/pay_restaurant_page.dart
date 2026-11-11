@@ -4,6 +4,7 @@ import 'package:uffmobileplus/app/utils/ui_components/app_bars.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/controller/pay_restaurant_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/utils/card_details.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/utils/meal_balance_panel.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/utils/meal_price_selector.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/utils/meal_prices.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.dart';
@@ -22,6 +23,13 @@ class PayRestaurantPage extends GetView<PayRestaurantController> {
       appBar: AppBars.build(
         title: 'pagar_restaurante'.tr,
         actions: [
+          Obx(
+            () => mealPriceAppBarAction(
+              selected: controller.selectedPrice.value,
+              profilePrice: controller.mealPrice,
+              onChanged: controller.setSelectedPrice,
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'atualizar'.tr,
@@ -60,7 +68,13 @@ class PayRestaurantPage extends GetView<PayRestaurantController> {
                                   16,
                                   8,
                                 ),
-                                child: _content(constraints.maxWidth),
+                                // Obx próprio: o builder do LayoutBuilder
+                                // roda fora do Obx de cima, então as
+                                // leituras aqui (seletor, saldo) não seriam
+                                // observadas.
+                                child: Obx(
+                                  () => _content(constraints.maxWidth),
+                                ),
                               ),
                             ),
                           ),
@@ -93,13 +107,18 @@ class PayRestaurantPage extends GetView<PayRestaurantController> {
         // entre o cartão e o rodapé.
         const Spacer(),
         const SizedBox(height: 16),
+        // O painel mostra o valor escolhido na AppBar; o nome do perfil só
+        // aparece quando o valor é o do próprio perfil.
         MealBalancePanel(
           balance: controller.balanceValue,
-          price: controller.mealPrice,
-          profileKey: MealPrices.profileLabelKey(controller.profileType.value),
+          price: controller.selectedPrice.value,
+          profileKey: controller.selectedPrice.value == controller.mealPrice
+              ? MealPrices.profileLabelKey(controller.profileType.value)
+              : null,
           onRecharge: controller.showRechargeButton
               ? controller.goToRecharge
               : null,
+          isSimulating: controller.isSimulating,
         ),
         const SizedBox(height: 16),
         Text(

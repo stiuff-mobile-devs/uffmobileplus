@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/utils/meal_prices.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/utils/meal_simulation_banner.dart';
 import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
 
 /// Painel do RU com saldo e refeições lado a lado, o valor da refeição do
@@ -22,6 +23,10 @@ class MealBalancePanel extends StatelessWidget {
   /// Mostra o botão "Recarregar cartão" quando informado.
   final VoidCallback? onRecharge;
 
+  /// [price] é um valor escolhido na AppBar, diferente do valor do perfil:
+  /// o painel fica com a borda âmbar.
+  final bool isSimulating;
+
   const MealBalancePanel({
     super.key,
     required this.balance,
@@ -29,6 +34,7 @@ class MealBalancePanel extends StatelessWidget {
     required this.profileKey,
     this.isLoading = false,
     this.onRecharge,
+    this.isSimulating = false,
   });
 
   @override
@@ -52,16 +58,14 @@ class MealBalancePanel extends StatelessWidget {
     final balanceText = isLoading
         ? '…'
         : balance == null
-            ? '—'
-            : 'R\$ ${MealPrices.format(balance!)}';
+        ? '—'
+        : 'R\$ ${MealPrices.format(balance!)}';
     final mealsText = isLoading ? '…' : (meals == null ? '—' : '$meals');
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
-      ),
+    return MealSimulationFrame(
+      isSimulating: isSimulating,
+      flashKey: price,
+      background: Colors.white.withValues(alpha: 0.08),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -221,14 +225,14 @@ class _Metric extends StatelessWidget {
         FittedBox(
           fit: BoxFit.scaleDown,
           alignment: Alignment.centerLeft,
-          child: Text(
-            value,
-            maxLines: 1,
+          child: AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 300),
             style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
               color: valueColor,
             ),
+            child: Text(value, maxLines: 1),
           ),
         ),
       ],
