@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/utils/ui_components/app_bars.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/choose_profile/controller/choose_profile_controller.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_umm_model.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
 import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.dart';
@@ -213,134 +214,36 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
     );
   }
 
-  AccordionSection employeeSelection() {
-    return AccordionSection(
-      header: Text(
-        "tecnico_administrativo".tr,
-        style: TextStyle(
-          fontWeight: FontWeight.w700,
-          fontSize: 22,
-          color: Colors.white,
-        ),
-      ),
-      leftIcon: const Icon(Icons.account_box, color: Colors.white),
-      content: ListView.separated(
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: controller.employeeQtd,
-        separatorBuilder: (context, index) =>
-            Divider(thickness: 1.5, color: AppColors.darkBlue()),
-        itemBuilder: (context, index) {
-          return Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () {
-                controller.saveUserDataBeforeChooseProfile(
-                  ProfileTypes.employee,
-                  controller.activeBonds()[index].vinculacao!.matricula!,
-                );
-              },
-              child: Container(
-                color: Colors.transparent,
-                width: double.infinity,
-                padding: EdgeInsets.all(8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            controller.postDocBonds()[index].vinculacao?.vinculo ?? '',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            "${'matricula'.tr}: ${controller.activeBonds()[index].vinculacao!.matricula}",
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Icon(Icons.arrow_circle_right_outlined, size: 22),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-      headerBackgroundColor: AppColors.darkBlue(),
-      contentBorderColor: AppColors.darkBlue(),
-    );
-  }
+  AccordionSection employeeSelection() => _bondAccordion(
+        title: 'tecnico_administrativo'.tr,
+        profileType: ProfileTypes.employee,
+        bonds: controller.bondsOf(UffBondIds.employee),
+      );
 
-  AccordionSection teacherAccordion() {
-    return AccordionSection(
-      header: Text(
-        'docente'.tr,
-        style: TextStyle(
-          fontWeight: FontWeight.w700,
-          fontSize: 22,
-          color: Colors.white,
-        ),
-      ),
-      leftIcon: const Icon(Icons.account_box, color: Colors.white),
-      content: ListView.separated(
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: controller.teacherQtd,
-        separatorBuilder: (context, index) =>
-            Divider(thickness: 1.5, color: AppColors.darkBlue()),
-        itemBuilder: (context, index) {
-          return Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () {
-                controller.saveUserDataBeforeChooseProfile(
-                  ProfileTypes.teacher,
-                  controller.activeBonds()[index].vinculacao!.matricula!,
-                );
-              },
-              child: Container(
-                color: Colors.transparent,
-                width: double.infinity,
-                padding: EdgeInsets.all(8),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            controller.postDocBonds()[index].vinculacao?.vinculo ?? '',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            "${'matricula'.tr}: ${controller.activeBonds()[index].vinculacao!.matricula}",
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Icon(Icons.arrow_circle_right_outlined, size: 22),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-      headerBackgroundColor: AppColors.darkBlue(),
-      contentBorderColor: AppColors.darkBlue(),
-    );
-  }
+  AccordionSection teacherAccordion() => _bondAccordion(
+        title: 'docente'.tr,
+        profileType: ProfileTypes.teacher,
+        bonds: controller.bondsOf(UffBondIds.teacher),
+      );
 
-  AccordionSection outsourcedAccordion() {
+  AccordionSection outsourcedAccordion() => _bondAccordion(
+        title: 'terceirizado'.tr,
+        profileType: ProfileTypes.outsourced,
+        bonds: controller.bondsOf(UffBondIds.outsourced),
+        showMatricula: false,
+      );
+
+  /// Seção de vínculos de servidor (técnico, docente, terceirizado). Cada
+  /// item usa a lista só daquele tipo, então o índice é sempre o certo.
+  AccordionSection _bondAccordion({
+    required String title,
+    required ProfileTypes profileType,
+    required List<InnerObject> bonds,
+    bool showMatricula = true,
+  }) {
     return AccordionSection(
       header: Text(
-        'terceirizado'.tr,
+        title,
         style: TextStyle(
           fontWeight: FontWeight.w700,
           fontSize: 22,
@@ -351,17 +254,18 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
       content: ListView.separated(
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
-        itemCount: controller.outsourcedQtd,
+        itemCount: bonds.length,
         separatorBuilder: (context, index) =>
             Divider(thickness: 1.5, color: AppColors.darkBlue()),
         itemBuilder: (context, index) {
+          final vinculacao = bonds[index].vinculacao;
           return Material(
             color: Colors.transparent,
             child: InkWell(
               onTap: () {
                 controller.saveUserDataBeforeChooseProfile(
-                  ProfileTypes.outsourced,
-                  controller.activeBonds()[index].vinculacao!.matricula!, //Todo: Verificar os !
+                  profileType,
+                  vinculacao?.matricula ?? '',
                 );
               },
               child: Container(
@@ -377,9 +281,13 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            controller.postDocBonds()[index].vinculacao?.vinculo ?? '',
+                            vinculacao?.vinculo ?? '',
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
+                          if (showMatricula)
+                            Text(
+                              "${'matricula'.tr}: ${vinculacao?.matricula ?? ''}",
+                            ),
                         ],
                       ),
                     ),

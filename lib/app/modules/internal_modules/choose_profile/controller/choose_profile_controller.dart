@@ -248,17 +248,17 @@ class ChooseProfileController extends GetxController {
     return outer[1].innerObjects ?? [];
   }
 
-  /// Só os vínculos de pesquisador de pós-doutorado (a lista da tela usa
-  /// este índice, não o de todos os vínculos).
-  List<InnerObject> postDocBonds() {
+  /// Só os vínculos ativos de um tipo (cada seção da tela usa o índice
+  /// desta lista, não o de todos os vínculos).
+  List<InnerObject> bondsOf(String vinculoId) {
     return activeBonds()
-        .where(
-          (bond) =>
-              bond.vinculacao?.vinculoId ==
-              UffBondIds.post_doc_researcher_student,
-        )
+        .where((bond) => bond.vinculacao?.vinculoId == vinculoId)
         .toList();
   }
+
+  /// Só os vínculos de pesquisador de pós-doutorado.
+  List<InnerObject> postDocBonds() =>
+      bondsOf(UffBondIds.post_doc_researcher_student);
 
   Future<void> saveUserDataBeforeChooseProfile(
     ProfileTypes profileType,

@@ -8,11 +8,10 @@ import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
 class ExternalModulesController extends GetxController {
   ExternalModulesController();
 
-  
   UserDataRepository userDataRepository = UserDataRepository();
   UserData _usermodel = UserData();
-  
-   @override
+
+  @override
   Future<void> onInit() async {
     super.onInit();
     await reload();
@@ -64,6 +63,16 @@ class ExternalModulesController extends GetxController {
     ),
 
     ExternalModules(
+      iconSrc: 'assets/busuff/icons/onibus.svg',
+      subtitle: 'BusUFF',
+      page: Routes.BUSUFF,
+      url: '',
+      interrogation: false,
+      availableFor: everyoneLogged,
+      gdiGroups: null,
+    ),
+
+    ExternalModules(
       iconSrc: 'assets/icons/plano.svg',
       subtitle: 'plano_estudos',
       page: Routes.STUDY_PLAN,
@@ -73,7 +82,7 @@ class ExternalModulesController extends GetxController {
       gdiGroups: null,
     ),
 
-     ExternalModules(
+    ExternalModules(
       iconSrc: 'assets/icons/historico.svg',
       subtitle: 'historico',
       page: Routes.HISTORICO,
@@ -84,39 +93,9 @@ class ExternalModulesController extends GetxController {
     ),
 
     ExternalModules(
-      iconSrc: 'assets/busuff/icons/onibus.svg',
-      subtitle: 'BusUFF',
-      page: Routes.BUSUFF,
-      url: '',
-      interrogation: false,
-      availableFor: everyoneLogged,
-      gdiGroups: null,
-    ),
-    
-    ExternalModules(
-      iconSrc: 'assets/cdc/icons/cdc.svg',
-      subtitle: 'central_de_comunicacao',
-      page: Routes.CDC,
-      url: '',
-      interrogation: false,
-      availableFor: everyone,
-      gdiGroups: null,
-    ),
-
-    ExternalModules(
-      iconSrc: 'assets/icons/banco_de_ideias.svg',
-      subtitle: 'banco_de_ideias',
-      page: Routes.BANCO_DE_IDEIAS,
-      url: '',
-      interrogation: false,
-      availableFor: everyone,
-      gdiGroups: null,
-    ),
-
-    ExternalModules(
-      iconSrc: 'assets/radio/icons/radio.svg',
-      subtitle: 'radio_pop_goiaba',
-      page: Routes.RADIO,
+      iconSrc: 'assets/icons/uniteve.svg',
+      subtitle: 'uniteve',
+      page: Routes.UNITEVE,
       url: '',
       interrogation: false,
       availableFor: everyone,
@@ -134,15 +113,96 @@ class ExternalModulesController extends GetxController {
     ),
 
     ExternalModules(
-      iconSrc: 'assets/icons/uniteve.svg',
-      subtitle: 'uniteve',
-      page: Routes.UNITEVE,
+      iconSrc: 'assets/icons/repositorio_uff.svg',
+      subtitle: 'repositorio_institucional',
+      page: Routes.REPOSITORIO_INSTITUCIONAL,
+      url: '',
+      interrogation: false,
+      availableFor: everyoneLogged,
+      gdiGroups: null,
+    ),
+
+    ExternalModules(
+      iconSrc: 'assets/icons/ead.svg',
+      subtitle: 'ead',
+      page: Routes.EAD,
+      url: '',
+      interrogation: false,
+      availableFor: everyoneLogged,
+      gdiGroups: null,
+    ),
+
+    ExternalModules(
+      iconSrc: 'assets/icons/internacional.svg',
+      subtitle: 'internacional',
+      page: Routes.INTERNACIONAL,
+      url: '',
+      interrogation: false,
+      availableFor: everyoneLogged,
+      gdiGroups: null,
+    ),
+
+    ExternalModules(
+      iconSrc: 'assets/icons/atendimento.svg',
+      subtitle: 'central_de_atendimento',
+      page: Routes.CENTRAL_DE_ATENDIMENTO,
+      url: '',
+      interrogation: false,
+      availableFor: everyoneLogged,
+      gdiGroups: null,
+    ),
+
+    ExternalModules(
+      iconSrc: 'assets/icons/sos.svg',
+      subtitle: 'sos',
+      page: Routes.SOS,
+      url: '',
+      interrogation: false,
+      availableFor: everyoneLogged,
+      gdiGroups: null,
+    ),
+
+    ExternalModules(
+      iconSrc: 'assets/radio/icons/radio.svg',
+      subtitle: 'radio_pop_goiaba',
+      page: Routes.RADIO,
       url: '',
       interrogation: false,
       availableFor: everyone,
       gdiGroups: null,
     ),
 
+    ExternalModules(
+      iconSrc: 'assets/icons/banco_de_ideias.svg',
+      subtitle: 'banco_de_ideias',
+      page: Routes.BANCO_DE_IDEIAS,
+      url: '',
+      interrogation: false,
+      availableFor: everyone,
+      gdiGroups: null,
+    ),
+
+    ExternalModules(
+      iconSrc: 'assets/cdc/icons/cdc.svg',
+      subtitle: 'central_de_comunicacao',
+      page: Routes.CDC,
+      url: '',
+      interrogation: false,
+      availableFor: everyone,
+      gdiGroups: null,
+    ),
+
+    ExternalModules(
+      iconSrc: 'assets/carteirinha_digital/icons/validador_carteirinha.svg',
+      subtitle: 'validador_carteirinha',
+      page: Routes.CARTEIRINHA_VALIDADOR,
+      url: '',
+      interrogation: false,
+      availableFor: everyoneLogged,
+      gdiGroups: null,
+    ),
+
+    /*
     ExternalModules(
       iconSrc: 'assets/icons/monitora_uff.png',
       subtitle: 'monitora_uff',
@@ -159,74 +219,13 @@ class ExternalModulesController extends GetxController {
          null,
         ),
       ],
-    ),
-
-    ExternalModules(
-      iconSrc: 'assets/icons/ead.svg',
-      subtitle: 'ead',
-      page: Routes.EAD,
-      url: '',
-      interrogation: false,
-      availableFor: everyoneLogged,
-      gdiGroups: null,
-    ),
-
-    ExternalModules(
-      iconSrc: 'assets/icons/repositorio_uff.svg',
-      subtitle: 'repositorio_institucional',
-      page: Routes.REPOSITORIO_INSTITUCIONAL,
-      url: '',
-      interrogation: false,
-      availableFor: everyoneLogged,
-      gdiGroups: null,
-    ),
-
-    ExternalModules(
-      iconSrc: 'assets/icons/internacional.svg',
-      subtitle: 'internacional',
-      page: Routes.INTERNACIONAL,
-      url: '',
-      interrogation: false,
-      availableFor: everyoneLogged,
-      gdiGroups: null,
-    ),
-    
-    ExternalModules(
-      iconSrc: 'assets/icons/sos.svg',
-      subtitle: 'sos',
-      page: Routes.SOS,
-      url: '',
-      interrogation: false,
-      availableFor: everyoneLogged,
-      gdiGroups: null,
-    ),
-    
-    ExternalModules(
-      iconSrc: 'assets/icons/atendimento.svg',
-      subtitle: 'central_de_atendimento',
-      page: Routes.CENTRAL_DE_ATENDIMENTO,
-      url: '',
-      interrogation: false,
-      availableFor: everyoneLogged,
-      gdiGroups: null,
-    ),
-
-    ExternalModules(
-      iconSrc: 'assets/carteirinha_digital/icons/validador_carteirinha.svg',
-      subtitle: 'validador_carteirinha',
-      page: Routes.CARTEIRINHA_VALIDADOR,
-      url: '',
-      interrogation: false,
-      availableFor: everyoneLogged,
-      gdiGroups: null,
-    ),
+    ),*/
   ];
 
   // Começa com o catálogo completo, como antes, para os atalhos salvos não
   // serem descartados enquanto o filtro do perfil ainda não rodou.
-  late final RxList<ExternalModules> externalModulesList = RxList<ExternalModules>.of(_allModules);
-
- 
+  late final RxList<ExternalModules> externalModulesList =
+      RxList<ExternalModules>.of(_allModules);
 
   // TODO: parece redundante; melhor usar Get.toNamed direto?
   void navigateTo(
@@ -248,14 +247,18 @@ class ExternalModulesController extends GetxController {
   Future<void> filterButtonList(
     ProfileTypes currentProfile,
     List<GdiGroups> currentGdiGroups,
-    List<GdiGroups> currentGdiGroupsGoogle
+    List<GdiGroups> currentGdiGroupsGoogle,
   ) async {
-    externalModulesList.assignAll(_allModules.where((button) => !_isHidden(
-      button,
-      currentProfile,
-      currentGdiGroups,
-      currentGdiGroupsGoogle,
-    )));
+    externalModulesList.assignAll(
+      _allModules.where(
+        (button) => !_isHidden(
+          button,
+          currentProfile,
+          currentGdiGroups,
+          currentGdiGroupsGoogle,
+        ),
+      ),
+    );
   }
 
   bool _isHidden(
@@ -269,13 +272,15 @@ class ExternalModulesController extends GetxController {
 
     if (button.gdiGroups == null) return false;
 
-     if (currentGdiGroupsGoogle.any(
-        (userGroup) =>
-            userGroup.email == 'grupos.harpia@id.uff.br' || userGroup.email == 'bombeiros.harpia@id.uff.br' || userGroup.email == 'campo-monitorauff.harpia@id.uff.br'
-      )) {
-        return false;
-      }
-      
+    if (currentGdiGroupsGoogle.any(
+      (userGroup) =>
+          userGroup.email == 'grupos.harpia@id.uff.br' ||
+          userGroup.email == 'bombeiros.harpia@id.uff.br' ||
+          userGroup.email == 'campo-monitorauff.harpia@id.uff.br',
+    )) {
+      return false;
+    }
+
     final hasGroupMatch = button.gdiGroups!.any(
       (btnGroup) =>
           currentGdiGroups.any((userGroup) => userGroup.gid == btnGroup.gid),
@@ -288,6 +293,7 @@ class ExternalModulesController extends GetxController {
 class ExternalModules {
   final List<ProfileTypes> availableFor;
   final String iconSrc;
+
   /// Translation KEY, not display text.
   ///
   /// These lists are field initialisers, evaluated once when the controller is
