@@ -8,6 +8,7 @@ import 'package:uffmobileplus/app/data/services/app_availability_service.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/data/services/deep_link_service.dart';
 import 'package:uffmobileplus/app/data/services/responsive_layout_service.dart';
+import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/controller/restaurant_modules_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/cardapio/controller/restaurants_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/cardapio/data/models/campus_model.dart';
@@ -399,8 +400,10 @@ class HomePageController extends GetxController {
       final filteredSaved = saved.where(validRoutes.contains).toList();
 
       const defaultShortcuts = <String>[
-        '/carteirinha_digital',
-        '/pay_restaurant',
+        Routes.CARTEIRINHA_DIGITAL,
+        Routes.PAY_RESTAURANT,
+        Routes.RESTAURANT_MODULES,
+        Routes.BUSUFF,
       ];
 
       // Corrige contas que ficaram com todos os serviços marcados como atalho
