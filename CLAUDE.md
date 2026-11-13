@@ -124,3 +124,10 @@ Mensagem em português, curta, minúscula, no formato `tipo: descrição` (segui
 - `beta: x.y.z` para marcar versões beta — ex.: `beta: 7.0.2`
 
 Um commit por mudança coesa; não inclua arquivos gerados em `linux/flutter/ephemeral/` ou `macos/Flutter/ephemeral/`.
+
+### Fluxo de trabalho por tarefa (branches, commits e PRs)
+- **Uma branch por tarefa**, criada a partir da `origin/testing` **atualizada** (rode `git fetch origin` antes e crie a partir de `origin/testing`, não de uma `testing` local desatualizada).
+- **Commit só após aprovação humana**: mostre o que mudou e espere o OK explícito antes de rodar `git commit`.
+- **PR só após aprovação humana**: não abra o pull request sem o OK explícito do usuário.
+- **Merge na `origin/testing` somente via PR**; nunca faça push direto nela (nem `git push origin testing`).
+- Cada aprovação vale só para aquela ação: o OK para commitar não autoriza abrir o PR.
