@@ -17,6 +17,27 @@ UFF Mobile Plus — a Flutter app for Universidade Federal Fluminense students/s
 
 No CI is configured (no `.github/workflows`, no Codemagic/Bitrise/fastlane config) — `flutter analyze` and `flutter test` are the only automated checks available locally.
 
+## Ferramental do agente
+Ferramental do agente é tudo que estende o que o agente consegue fazer: skills, servidores MCP, subagentes e comandos, venham de plugins, da conta ou do próprio harness. O projeto habilita os plugins `dart-flutter` e `google-cloud-developer` (`.claude/settings.json`). **Priorize o ferramental disponível sempre que ele cobrir a tarefa**, em vez de improvisar com Bash ou responder de memória.
+
+| Tarefa | Use primeiro |
+|---|---|
+| Análise estática | MCP `analyze_files` ou skill `dart-run-static-analysis` |
+| Dependências | MCP `pub`/`pub_dev_search`; conflitos: skill `dart-resolve-package-conflicts` |
+| Entender um pacote | MCP `read_package_uris`/`rip_grep_packages` (lê o código do pacote em vez de supor a API) |
+| Testes | skills `dart-add-unit-test` e `flutter-add-widget-test` |
+| Erros em execução e layout | skills `dart-fix-runtime-errors` e `flutter-fix-layout-issues`; MCP `get_runtime_errors`, `widget_inspector`, `hot_reload` (precisam de app rodando, conectado via `dtd`) |
+| Documentação Google (Flutter, Dart, Firebase, Google Cloud) | skill `retrieving-developer-knowledge` / MCP `developer-knowledge`, antes de responder de memória |
+| Comandos `gcloud` | skill `gcloud` |
+
+**Precedência: as convenções deste arquivo e as boas práticas do GetX vêm antes das sugestões do ferramental.** Use uma skill pelo fluxo (como investigar, testar, validar), não pela arquitetura que ela propõe. Conflitos conhecidos:
+- `flutter-setup-localization` (`.arb`/`gen-l10n`/`intl`) → não use; o app tem i18n próprio com GetX (ver "Internationalization").
+- `flutter-setup-declarative-routing` (`go_router`) → não use; rotas são `GetPage` em `app_pages.dart` + `Get.toNamed`.
+- `flutter-apply-architecture-best-practices` → a camada é Provider → Repository → Service → Controller (`GetxController`) com DI só por bindings do GetX; nada de `ChangeNotifier`, Riverpod, Bloc ou `GetIt`.
+- `flutter-use-http-package` → vale para as chamadas HTTP, mas elas ficam no Provider do módulo ou em `lib/app/data/connections/`, nunca no controller ou na tela.
+- Qualquer skill que gere UI → use `AppBars`/`AppPopups`, cores de `AppColors` e textos `.tr` nos 6 JSONs.
+- `dart fix --apply` e outras correções automáticas → só nos arquivos da tarefa; nunca em lote no app inteiro (a catraca não entra em mudanças em lote).
+
 ## Architecture
 
 ### Module layout
