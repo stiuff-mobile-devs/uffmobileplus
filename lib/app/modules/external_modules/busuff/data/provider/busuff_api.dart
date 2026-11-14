@@ -1,46 +1,34 @@
 import 'dart:convert';
 import 'package:flutter/material.dart' show debugPrint;
-import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:uffmobileplus/app/modules/external_modules/busuff/data/model/busuff_model.dart';
-
-const baseUrl = 'https://app.uff.br/umm/api/busuff/get_gps';
-const CITSMART = 'https://citsmart.uff.br/citsmart/galeriaImagens/1/45/';
-const String NITEROI_ROTA1 = '15106.png';
-const String NITEROI_ROTA2 = '15107.png';
-const String VOLTA_REDONDA = '15109.png';
-const String CAMPOS_ROTA1 = '15104.png';
-const String CAMPOS_ROTA2 = '15105.png';
-const String PADUA = '15108.png';
-const String ANGRA = '15103.png';
 
 class BusuffApiClient {
   BusuffApiClient();
 
-  Future<List<BusuffModel>?> getLastPosition() async {
-    List<BusuffModel> busuffs = [];
+  /// Última posição conhecida de cada ônibus, por placa. Só devolve as placas
+  /// pedidas em [plates]. Retorna `null` se a requisição falhar.
+  Future<Map<String, BusuffModel>?> getLastPositions(Set<String> plates) async {
     Uri url = Uri.https('app.uff.br', '/autointelligence/vehicles');
     try {
       final response = await http.get(url);
-      if (response == null) return null;
-      if (response.statusCode == 200) {
-        dynamic jsonResponse = jsonDecode(response.body);
-        for (var element in jsonResponse) {
-          if (element["placa"] == "LMB7157" || element["placa"] == "LRN5595") {
-            var a = BusuffModel.fromJson(
-              element["gps_data"] as Map<String, dynamic>,
-            );
-            busuffs.add(a);
-          }
-        }
-        return busuffs;
-      } else {
+      if (response.statusCode != 200) {
         debugPrint(
-          'Error -getLastPosition\n status code: ${response.statusCode} \n body response: ${response.body}',
+          'Error -getLastPositions\n status code: ${response.statusCode} \n body response: ${response.body}',
         );
+        return null;
       }
+      final Map<String, BusuffModel> positions = {};
+      for (var element in jsonDecode(response.body)) {
+        final plate = element["placa"];
+        final gps = element["gps_data"];
+        if (plates.contains(plate) && gps is Map<String, dynamic>) {
+          positions[plate] = BusuffModel.fromJson(gps);
+        }
+      }
+      return positions;
     } catch (e) {
-      debugPrint("error fetching last position: $e");
+      debugPrint("error fetching last positions: $e");
     }
     return null;
   }

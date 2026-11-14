@@ -26,19 +26,21 @@ class BusuffModel {
     speed = double.parse(json['speed']);
     speedAccuracy = (json['speed_accuracy'] as int).toDouble();
     heading = double.parse(json['heading']);
-    timestamp = DateTime.parse(json['created_at']).add(const Duration(hours: -3));
+    // created_at vem em UTC ("...Z"); toLocal mantém o instante correto para
+    // calcular há quanto tempo a posição foi enviada.
+    timestamp = DateTime.parse(json['created_at']).toLocal();
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['latitude'] = this.latitude;
-    data['longitude'] = this.longitude;
-    data['altitude'] = this.altitude;
-    data['accuracy'] = this.accuracy;
-    data['speed'] = this.speed;
-    data['speed_accuracy'] = this.speedAccuracy;
-    data['heading'] = this.heading;
-    data['timestamp'] = this.timestamp;
-    return data;
+    return {
+      'latitude': latitude,
+      'longitude': longitude,
+      'altitude': altitude,
+      'accuracy': accuracy,
+      'speed': speed,
+      'speed_accuracy': speedAccuracy,
+      'heading': heading,
+      'timestamp': timestamp,
+    };
   }
 }

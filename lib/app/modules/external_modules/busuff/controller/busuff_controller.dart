@@ -2,253 +2,277 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:geolocator/geolocator.dart';
 
 import 'package:uffmobileplus/app/modules/external_modules/busuff/data/model/busuff_model.dart';
 import 'package:uffmobileplus/app/modules/external_modules/busuff/data/model/route_model.dart';
 import 'package:uffmobileplus/app/modules/external_modules/busuff/data/provider/busuff_api.dart';
-import 'package:uffmobileplus/app/routes/app_routes.dart';
-import 'package:uffmobileplus/app/utils/color_pallete.dart';
-import 'package:uffmobileplus/app/utils/ui_components/custom_alert_dialog.dart';
+import 'package:uffmobileplus/app/modules/external_modules/busuff/data/provider/busuff_preferences.dart';
+import 'package:uffmobileplus/app/modules/external_modules/busuff/utils/bus_status.dart';
+import 'package:uffmobileplus/app/modules/external_modules/busuff/utils/busuff_routes.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
 
 class BusuffController extends GetxController {
   BusuffController();
 
   final MapController mapController = MapController();
-  final BusuffApiClient busuffApiClient = BusuffApiClient();
+  final BusuffApiClient _api = BusuffApiClient();
+  final BusuffPreferences _preferences = BusuffPreferences();
 
-  StreamSubscription<Position>? positionStream;
-  LatLng? currentPanning;
-  Timer? busUffTimer;
+  final List<MunicipioModel> municipios = busuffMunicipios;
+  final Rx<MunicipioModel> municipio = busuffMunicipios.first.obs;
+  final RxInt routeIndex = 0.obs;
 
-  RxBool isLoading = false.obs;
-  bool showBusuffButton = false;
-  bool permissionGranted = false;
-  bool canAskForPermission = false;
+  /// Última posição de cada ônibus, por placa.
+  final RxMap<String, BusuffModel> positions = <String, BusuffModel>{}.obs;
+  final Rxn<LatLng> userPosition = Rxn<LatLng>();
 
-  List<BusuffModel> busuffs = [];
-  List<RouteModel> routeList = [];
+  /// Relógio usado no "atualizado há X"; avança a cada consulta à API.
+  final Rx<DateTime> now = DateTime.now().obs;
 
-  int currentMapIndex = 0;
-  int busuffSelectionIndex = 0;
-  int currentRouteIndex = 0;
+  static const Duration _pollInterval = Duration(seconds: 5);
+  static const LocationSettings _locationSettings = LocationSettings(
+    accuracy: LocationAccuracy.high,
+    distanceFilter: 15,
+  );
 
-  String currentImgUrl = '';
+  Timer? _pollTimer;
+  StreamSubscription<Position>? _positionStream;
+  bool _mapReady = false;
+  bool _locating = false;
+
+  RouteModel get route => municipio.value.routes[routeIndex.value];
+  BusuffModel? get bus => route.isTracked ? positions[route.plate] : null;
+  BusStatus get busStatus => busStatusOf(bus, now.value);
+
+  String routeLabel(RouteModel r) => r.number == null
+      ? 'busuff_rota_unica'.tr
+      : 'busuff_rota_n'.trParams({'n': '${r.number}'});
 
   @override
-  void onInit() {
-    super.onInit();
-
-    routeList = [
-      RouteModel('Niterói 1', true, 'niteroi_1.jpeg'),
-      RouteModel('Niterói 2', false, 'niteroi_2.jpeg'),
-      RouteModel('Campos 1', false, 'campos_1.jpeg'),
-      RouteModel('Campos 2', false, 'campos_2.jpeg'),
-      RouteModel('Santo Antônio de Pádua', false, 'padua.jpeg'),
-      RouteModel('Angra dos Reis', false, 'angra.jpeg'),
-      RouteModel('Volta Redonda', false, ''),
-    ];
-
-    currentRouteIndex = 0;
-    currentImgUrl = routeList.first.routeUrl;
+  void onReady() {
+    super.onReady();
+    _restoreSelection();
   }
 
-  // Latitude do user - instantaneo
-  final RxDouble _currentUserLat = 0.0.obs;
-  double get currentUserLat => _currentUserLat.value;
-  set currentUserLat(value) => _currentUserLat.value = value;
-
-  // Longitude do user - instantaneo
-  final RxDouble _currentUserLong = 0.0.obs;
-  double get currentUserLong => _currentUserLong.value;
-  set currentUserLong(value) => _currentUserLong.value = value;
-
-  final List<LatLng> positions = [
-    LatLng(-22.901861605776794, -43.12946240402702), // Niteroi 1
-    LatLng(-22.898102677293497, -43.11267001291845), // Niteroi 2
-
-    LatLng(-22.898102677293497, -43.11267001291845), // Campos 1
-    LatLng(-22.898102677293497, -43.11267001291845), // Campos 2
-    LatLng(-21.5339815355232, -42.18628863683549), // Santo Antônio
-    LatLng(-22.898102677293497, -43.11267001291845), // Angra dos Reis
-    LatLng(-22.50617992579754, -44.09447740720085), // Volta Redonda
-  ];
-
-  void centerOnUser() {
-    centerMapOnPosition(currentUserLat, currentUserLong);
+  @override
+  void onClose() {
+    _pollTimer?.cancel();
+    _positionStream?.cancel();
+    mapController.dispose();
+    super.onClose();
   }
 
-  void centerOnBus() {
-    if (busuffs.isEmpty) {
-      return;
+  // ---------------- SELEÇÃO ----------------
+
+  Future<void> _restoreSelection() async {
+    final (savedId, savedRoute) = await _preferences.load();
+    final saved = municipios.firstWhereOrNull((m) => m.id == savedId);
+    if (saved != null) {
+      municipio.value = saved;
+      routeIndex.value = savedRoute.clamp(0, saved.routes.length - 1);
     }
-    var bus = busuffs[busuffSelectionIndex];
-    centerMapOnPosition(bus.latitude!, bus.longitude!);
-    busuffSelectionIndex = (busuffSelectionIndex + 1) % busuffs.length;
+    _onSelectionChanged(save: false);
   }
 
-  void centerMapOnPosition(double lat, double long) {
-    mapController.move(LatLng(lat, long), mapController.camera.zoom);
-  }
-
-  void onTapRoutes(bool selected, int selectedIndex) {
-    //TODO: save the city on storage
-    Set<int> s = Set.from({2, 3, 5});
-    if (!s.contains(selectedIndex)) {
-      currentMapIndex = selectedIndex;
-      try {
-        mapController.move(positions[selectedIndex], 15.5);
-      } catch (e) {
-        currentPanning = positions[selectedIndex];
-      }
-    }
-    if (selectedIndex != currentRouteIndex) {
-      routeList[selectedIndex].selected = selected; //true
-      routeList[currentRouteIndex].selected = false;
-      currentImgUrl = routeList[selectedIndex].routeUrl;
-      currentRouteIndex = selectedIndex;
-      update();
-    }
-  }
-
-  void goDocBus() {
-    Get.toNamed(
-      Routes.WEB_VIEW,
-      arguments: {
-        'url':
-            'https://citsmart.uff.br/citsmart/pages/knowledgeBasePortal/knowledgeBasePortal.load#/knowledge/3259',
-        'title': 'BusUFF',
-      },
+  Future<void> chooseMunicipio() async {
+    final chosen = await AppPopups.choose<MunicipioModel>(
+      title: 'busuff_escolha_municipio'.tr,
+      message: 'busuff_lembrar_escolha'.tr,
+      icon: Icons.location_city_rounded,
+      selected: municipio.value,
+      options: municipios
+          .map(
+            (m) => PopupOption(
+              value: m,
+              label: m.name,
+              description: _municipioDescription(m),
+              icon: m.isTracked
+                  ? Icons.sensors_rounded
+                  : Icons.map_outlined,
+            ),
+          )
+          .toList(),
     );
+    if (chosen == null || chosen == municipio.value) return;
+    municipio.value = chosen;
+    routeIndex.value = 0;
+    _onSelectionChanged();
   }
 
-  void onTabTap(
-    int index,
-    TabController tabController,
-    BuildContext context,
-  ) async {
-    //TODO: add the animateTo from controller
-    if (index == 1) {
-      // tabController!.animateTo(0);
-      // await customAlertDialog(
-      //   Get.context!,
-      //   title: 'Volta Redonda',
-      //   desc: 'alert_voltaredonda'.tr,
-      //   dismissOnBackKeyPress: false,
-      //   dismissOnTouchOutside: true,
-      // ).show();
-      // return;
-      if (!await checkLocationService()) {
-        showToastFeedback(context);
-        tabController.animateTo(0);
-      } else if (!await hasLocationPermission()) {
-        await permissionDialog();
-        if (canAskForPermission) {
-          if (await requestlocationPermissions()) {
-            handleLocationInformation();
-          } else {
-            tabController.animateTo(0);
-          }
-        } else {
-          tabController.animateTo(0);
-        }
-      } else {
-        handleLocationInformation();
-      }
+  String _municipioDescription(MunicipioModel m) {
+    final count = '${m.routes.length}';
+    if (m.isTracked) return 'busuff_desc_ao_vivo'.trParams({'n': count});
+    if (!m.routes.any((r) => r.hasItinerary)) {
+      return 'busuff_desc_sem_itinerario'.tr;
+    }
+    return m.routes.length > 1
+        ? 'busuff_desc_itinerarios'.trParams({'n': count})
+        : 'busuff_desc_itinerario'.tr;
+  }
+
+  void selectRoute(int index) {
+    if (index == routeIndex.value) return;
+    routeIndex.value = index;
+    _onSelectionChanged();
+  }
+
+  /// [save] é false só na abertura da tela, quando a seleção vem das
+  /// preferências; é também o único momento em que pedimos a permissão de
+  /// localização sem o usuário tocar no botão.
+  void _onSelectionChanged({bool save = true}) {
+    if (save) _preferences.save(municipio.value.id, routeIndex.value);
+    if (municipio.value.isTracked) {
+      _startPolling();
+      _startLocation(askPermission: !save);
+      _fitRoute();
+    } else {
+      _pollTimer?.cancel();
+      _pollTimer = null;
+      _mapReady = false; // o mapa sai da tela
     }
   }
 
-  Future<void> handleLocationInformation() async {
-    LocationSettings locationSettings = const LocationSettings(
-      distanceFilter: 15,
-    );
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-    currentUserLat = position.latitude;
-    currentUserLong = position.longitude;
-    positionStream =
-        Geolocator.getPositionStream(locationSettings: locationSettings).listen(
-          (newPos) {
-            currentUserLat = newPos.latitude;
-            currentUserLong = newPos.longitude;
-          },
-        );
-    busUffTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
-      await fetchLastKnownBusPosition();
-    });
-    centerMapOnPosition(currentUserLat, currentUserLong);
+  // ---------------- POSIÇÃO DOS ÔNIBUS ----------------
+
+  void _startPolling() {
+    if (_pollTimer != null) return;
+    _fetchPositions();
+    _pollTimer = Timer.periodic(_pollInterval, (_) => _fetchPositions());
   }
 
-  Future<bool> checkLocationService() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    return serviceEnabled ? true : false;
+  Future<void> _fetchPositions() async {
+    final plates = municipio.value.routes
+        .where((r) => r.isTracked)
+        .map((r) => r.plate!)
+        .toSet();
+    final result = await _api.getLastPositions(plates);
+    // Em caso de falha mantém a última posição; o status mostra a idade dela.
+    if (result != null) positions.assignAll(result);
+    now.value = DateTime.now();
   }
 
-  void showToastFeedback(BuildContext context) {
-    ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-      SnackBar(
-        content: Text('ative_servico_localizacao'.tr),
-        backgroundColor: AppColors.darkBlue(),
-        duration: const Duration(seconds: 2),
+  // ---------------- MAPA ----------------
+
+  void onMapReady() {
+    _mapReady = true;
+    _fitRoute();
+  }
+
+  void _fitRoute() {
+    final points = [...route.polyline, ...route.dashedPolyline];
+    if (!_mapReady || points.isEmpty) return;
+    mapController.fitCamera(
+      CameraFit.bounds(
+        bounds: LatLngBounds.fromPoints(points),
+        // Folga para os botões à direita e o cartão da rota embaixo.
+        padding: const EdgeInsets.fromLTRB(40, 40, 80, 200),
       ),
     );
   }
 
-  Future<bool> hasLocationPermission() async {
-    LocationPermission permission;
+  void _moveTo(LatLng target) {
+    if (!_mapReady) return;
+    mapController.move(target, mapController.camera.zoom);
+  }
 
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever ||
-        permission == LocationPermission.unableToDetermine) {
-      permissionGranted = false;
-      // Permissions are denied forever, handle appropriately.
-      // return Future.error(
-      //     'Location permissions are permanently denied, we cannot request permissions.');
-      return false;
+  void centerOnBus() {
+    final b = bus;
+    // Sem sinal o marcador não aparece, então não há para onde centralizar.
+    if (b == null || busStatus == BusStatus.noSignal) {
+      AppPopups.info(
+        'busuff_sem_posicao_msg'.tr,
+        title: 'busuff_sem_posicao_titulo'.tr,
+      );
+      return;
     }
-    permissionGranted = true;
-    return true;
+    _moveTo(LatLng(b.latitude!, b.longitude!));
   }
 
-  Future<bool> permissionDialog() async {
-    await customAlertDialog(
-      Get.context!,
-      title: 'location'.tr,
-      desc: 'location_vr'.tr,
-      onConfirm: onConfirm,
-      btnCancelText: 'cancelar'.tr,
-      onCancel: onCancel,
-      dismissOnBackKeyPress: false,
-      dismissOnTouchOutside: false,
-    ).show();
-    return permissionGranted;
+  Future<void> centerOnUser() async {
+    final position = userPosition.value;
+    if (position != null) {
+      _moveTo(position);
+      return;
+    }
+    await _startLocation(askPermission: true, fromButton: true);
   }
 
-  bool onConfirm() {
-    canAskForPermission = true;
-    return true;
-  }
+  // ---------------- LOCALIZAÇÃO DO USUÁRIO ----------------
 
-  bool onCancel() {
-    canAskForPermission = false;
-    return false;
-  }
-
-  Future<bool> requestlocationPermissions() async {
-    await Geolocator.requestPermission();
-    if (await hasLocationPermission()) {
-      return true;
-    } else {
-      return false;
+  /// Liga o ponto do usuário no mapa. O mapa funciona sem ele: sem serviço
+  /// ou sem permissão, só avisamos quando o usuário tocou no botão.
+  Future<void> _startLocation({
+    required bool askPermission,
+    bool fromButton = false,
+  }) async {
+    if (_positionStream != null || _locating) return;
+    _locating = true;
+    try {
+      await _listenToLocation(askPermission, fromButton);
+    } finally {
+      _locating = false;
     }
   }
 
-  Future<void> fetchLastKnownBusPosition() async {
-    busuffs = await busuffApiClient.getLastPosition() ?? [];
-    update();
+  Future<void> _listenToLocation(bool askPermission, bool fromButton) async {
+
+    if (!await Geolocator.isLocationServiceEnabled()) {
+      if (fromButton) {
+        AppPopups.show(
+          'busuff_localizacao_desligada_msg'.tr,
+          title: 'busuff_localizacao_desligada_titulo'.tr,
+          type: PopupType.warning,
+          actionLabel: 'busuff_ativar'.tr,
+          onAction: () => Geolocator.openLocationSettings(),
+        );
+      }
+      return;
+    }
+
+    var permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied && askPermission) {
+      final accepted = await AppPopups.confirm(
+        title: 'busuff_permissao_titulo'.tr,
+        message: 'busuff_permissao_msg'.tr,
+        icon: Icons.my_location_rounded,
+        confirmText: 'busuff_permitir'.tr,
+        cancelText: 'busuff_agora_nao'.tr,
+      );
+      if (accepted) permission = await Geolocator.requestPermission();
+    }
+
+    if (permission != LocationPermission.always &&
+        permission != LocationPermission.whileInUse) {
+      if (fromButton) {
+        AppPopups.show(
+          'busuff_sem_permissao_msg'.tr,
+          title: 'busuff_sem_permissao_titulo'.tr,
+          type: PopupType.warning,
+          actionLabel: 'busuff_abrir_ajustes'.tr,
+          onAction: () => Geolocator.openAppSettings(),
+        );
+      }
+      return;
+    }
+
+    try {
+      final p = await Geolocator.getCurrentPosition(
+        locationSettings: _locationSettings,
+      );
+      userPosition.value = LatLng(p.latitude, p.longitude);
+      if (fromButton) _moveTo(userPosition.value!);
+    } catch (e) {
+      debugPrint('busuff: erro ao obter a localização: $e');
+    }
+
+    _positionStream =
+        Geolocator.getPositionStream(locationSettings: _locationSettings)
+            .listen(
+              (p) => userPosition.value = LatLng(p.latitude, p.longitude),
+              onError: (e) => debugPrint('busuff: erro na localização: $e'),
+            );
   }
 }
