@@ -10,6 +10,7 @@ import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/c
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/services/auth_google_service.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'dart:async';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class CatracaController extends GetxController {
   CatracaController();
@@ -101,7 +102,8 @@ class CatracaController extends GetxController {
       debugPrint('A conexão demorou muito para responder.');
       areas.value = await getOffLineAreas();
       _updateStatusMessage(false);
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'buscar áreas da catraca');
       areas.value = await getOffLineAreas();
       _updateStatusMessage(false);
     }
@@ -134,7 +136,8 @@ class CatracaController extends GetxController {
         selectedArea.value.id.toString(),
         await _authGoogle.getFirebaseIdToken() ?? "",
       );
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'buscar transações online da catraca');
       debugPrint('Erro ao buscar transações online: $e');
     }
     
@@ -210,7 +213,8 @@ class CatracaController extends GetxController {
 
           isSctmCompleted = responseMessage["valid"] ?? false;
           _updateStatusMessage(true);
-        } catch (e) {
+        } catch (e, s) {
+          CrashReporter.recordError(e, s, reason: 'validar pagamento online na catraca');
           debugPrint('Erro ao validar pagamento online: $e');
           _transactionResultMessages('', false, true, '');
           _updateStatusMessage(false);
@@ -254,7 +258,8 @@ class CatracaController extends GetxController {
                   true,
                   idIdentificacaoIduff ?? '-',
                 );
-              } catch (e) {
+              } catch (e, s) {
+                CrashReporter.recordError(e, s, reason: 'salvar transação offline da catraca');
                 debugPrint('Erro ao salvar transação offline: $e');
                 _transactionResultMessages(
                   'erro_salvar_transacao_offline'.tr,
@@ -272,7 +277,8 @@ class CatracaController extends GetxController {
               "",
             );
           }
-        } catch (e) {
+        } catch (e, s) {
+          CrashReporter.recordError(e, s, reason: 'validar pagamento offline na catraca');
           debugPrint('Erro ao validar pagamento offline: $e');
           _transactionResultMessages(
             'erro_validar_pagamento_offline'.tr,
@@ -282,7 +288,8 @@ class CatracaController extends GetxController {
           );
         }
       }
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'ler qr code na catraca');
       debugPrint('Erro ao ler código QR code: $e');
       _transactionResultMessages('erro_ler_qr_code'.tr, false, false, "");
     }
@@ -332,7 +339,8 @@ class CatracaController extends GetxController {
           true,
           cpf,
         );
-      } catch (e) {
+      } catch (e, s) {
+        CrashReporter.recordError(e, s, reason: 'salvar validação manual por cpf na catraca');
         debugPrint('Erro ao salvar transação offline: $e');
         _transactionResultMessages(
           'falha_salvar_transacao_offline'.tr,
@@ -415,11 +423,13 @@ class CatracaController extends GetxController {
         
         debugPrint('Batch of ${currentBatch.length} transactions synced successfully!');
         
-      } catch (e) {
+      } catch (e, s) {
+        CrashReporter.recordError(e, s, reason: 'sincronizar lote de transações offline da catraca');
         debugPrint('Error syncing batch ($i to $end): $e');
       }
     }
-  } catch (e) {
+  } catch (e, s) {
+    CrashReporter.recordError(e, s, reason: 'sincronizar transações offline da catraca');
     debugPrint('General error in offline synchronization: $e');
   }
 }
