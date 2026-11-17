@@ -13,6 +13,7 @@ import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/modules/home/ui/widgets/user_destination.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class BancoDeIdeiasController extends GetxController {
   BancoDeIdeiasController({
@@ -149,7 +150,8 @@ class BancoDeIdeiasController extends GetxController {
           );
           await usuarioApiService.preencherVinculo(draft.tipoUsuario);
           return await usuarioApiService.carregarUsuarioAtual() ?? usuario;
-        } catch (err) {
+        } catch (err, s) {
+          CrashReporter.recordError(err, s, reason: 'completar vínculo do usuário no banco de ideias');
           // A transient failure must not interrupt access by an existing user.
           debugPrint('Falha ao completar vinculo silenciosamente: $err');
         }
@@ -249,7 +251,8 @@ class BancoDeIdeiasController extends GetxController {
         mode: LaunchMode.externalApplication,
       );
       if (opened) return;
-    } catch (_) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'abrir link de solicitação de acesso');
       // Keep the access notice available if the browser cannot be opened.
     }
     if (!isClosed) {

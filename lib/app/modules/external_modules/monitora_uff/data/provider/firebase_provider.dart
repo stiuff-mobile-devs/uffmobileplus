@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/location_point.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_model.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class FirebaseProvider {
   final String firebaseAppName = 'harpia';
@@ -151,7 +152,8 @@ class FirebaseProvider {
     try {
       await collectionRef.doc(email).update({'timestamp': DateTime.now()});
       debugPrint("Heartbeat atualizado com sucesso!");
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'atualizar heartbeat no monitora uff');
       debugPrint("Erro ao atualizar heartbeat: $e");
     }
   }

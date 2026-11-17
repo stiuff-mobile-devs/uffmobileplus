@@ -7,6 +7,7 @@ import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/modul
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/models/crud_table.dart';
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/provider/crud_api_service.dart';
 import 'package:uffmobileplus/app/ui/widgets/responsive_uff_logo.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class AdminCrudTablePage extends StatefulWidget {
   AdminCrudTablePage({
@@ -53,7 +54,8 @@ class _AdminCrudTablePageState extends State<AdminCrudTablePage> {
         _records = records;
         _isLoading = false;
       });
-    } catch (error) {
+    } catch (error, s) {
+      CrashReporter.recordError(error, s, reason: 'listar registros admin do banco de ideias');
       if (!mounted) {
         return;
       }
@@ -120,7 +122,8 @@ class _AdminCrudTablePageState extends State<AdminCrudTablePage> {
       );
       _showMessage('bdi_registro_excluido'.tr);
       await _loadRecords();
-    } catch (error) {
+    } catch (error, s) {
+      CrashReporter.recordError(error, s, reason: 'excluir registro admin do banco de ideias');
       _showMessage(error.toString());
     }
   }

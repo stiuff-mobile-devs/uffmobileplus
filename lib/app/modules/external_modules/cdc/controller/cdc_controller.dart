@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/modules/external_modules/cdc/data/models/cdc_chat_room_model.dart';
 import 'package:uffmobileplus/app/modules/external_modules/cdc/data/repository/cdc_repository.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class CdcController extends GetxController {
   final ExternalModulesServices _externalModulesServices =
@@ -31,7 +32,8 @@ class CdcController extends GetxController {
           .getAvailableChatRooms(userCourse: userCourse);
 
       chatRooms.assignAll(rooms);
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'carregar salas de chat do cdc');
       chatRooms.clear();
       Get.snackbar('erro'.tr, 'nao_foi_possivel_carregar_salas_chat'.tr);
     } finally {

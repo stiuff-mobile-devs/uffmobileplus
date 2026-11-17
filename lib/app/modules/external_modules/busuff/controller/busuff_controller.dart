@@ -13,6 +13,7 @@ import 'package:uffmobileplus/app/modules/external_modules/busuff/data/provider/
 import 'package:uffmobileplus/app/modules/external_modules/busuff/utils/bus_status.dart';
 import 'package:uffmobileplus/app/modules/external_modules/busuff/utils/busuff_routes.dart';
 import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class BusuffController extends GetxController {
   BusuffController();
@@ -264,7 +265,8 @@ class BusuffController extends GetxController {
       );
       userPosition.value = LatLng(p.latitude, p.longitude);
       if (fromButton) _moveTo(userPosition.value!);
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'obter localização do usuário no busuff');
       debugPrint('busuff: erro ao obter a localização: $e');
     }
 

@@ -13,6 +13,7 @@ import 'package:uffmobileplus/app/modules/external_modules/sos/data/services/sos
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/utils/ui_components/custom_alert_dialog.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class SosController extends GetxController {
   final ExternalModulesServices _externalModulesServices =
@@ -59,7 +60,8 @@ class SosController extends GetxController {
       }
 
       _isUserLoaded = true;
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'carregar dados do usuário no sos');
       _mostrarDialogoBloqueio("erro".tr, "nao_foi_possivel_carregar_dados".tr);
       return;
     }
@@ -112,7 +114,8 @@ class SosController extends GetxController {
       }
 
       _isPermissionGranted = true;
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'verificar permissão de localização no sos');
       _mostrarDialogoBloqueio("erro".tr, "falha_ao_verificar_gps".tr);
     }
   }
@@ -177,7 +180,8 @@ class SosController extends GetxController {
       // o app estiver em segundo plano (ex: usuário abriu o Google Meet)
       try {
         await _startBackgroundService();
-      } catch (e) {
+      } catch (e, s) {
+        CrashReporter.recordError(e, s, reason: 'iniciar serviço em segundo plano do sos');
         // Non-fatal: SOS já foi enviado ao servidor, background não iniciou
       }
 
@@ -193,7 +197,8 @@ class SosController extends GetxController {
         snackPosition: SnackPosition.BOTTOM,
         margin: const EdgeInsets.all(10),
       );
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'enviar alerta sos');
       Get.snackbar(
         "erro".tr,
         "sos_falha_envio".tr,
@@ -259,7 +264,8 @@ class SosController extends GetxController {
     // Manda o background service enviar o stop para a API e encerrar
     try {
       _service.invoke('stopSos');
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'parar rastreamento do sos');
       // ignore
     }
 

@@ -6,6 +6,7 @@ import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/modules/external_modules/transcript/data/models/transcript_model.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class TranscriptProvider {
   final ExternalModulesServices _transcriptService =
@@ -55,7 +56,8 @@ class TranscriptProvider {
           "Transcript API failed.\n Status Code: ${response.statusCode}",
         );
       }
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'carregar histórico escolar');
       debugPrint('error on get_history from API');
     }
     return null;

@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import '../models/study_plan_model.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class StudyPlanProvider {
   final ExternalModulesServices _studyPlanService =
@@ -53,7 +54,8 @@ class StudyPlanProvider {
       } else {
         debugPrint('StudyPlan api failed.\n Status Code: ${response.statusCode}');
       }
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'carregar plano de estudos');
       debugPrint('error on getStudyPlan from api: $e');
     }
 

@@ -18,6 +18,7 @@ import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/l
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_model.dart';
 import 'package:uffmobileplus/app/data/services/foreground_service.dart';
 import 'package:uffmobileplus/app/data/services/harpia_claims_service.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class TrackingController extends GetxController with WidgetsBindingObserver {
   final FlutterBackgroundService _service = FlutterBackgroundService();
@@ -177,7 +178,8 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
             if (hasPoints) {
               usersWithPointsOnObservedDay.add(email);
             }
-          } catch (e) {
+          } catch (e, s) {
+            CrashReporter.recordError(e, s, reason: 'verificar pontos do dia no monitora uff');
             debugPrint('[TrackingController] Erro ao verificar pontos de $email: $e');
           }
         }());
@@ -286,7 +288,8 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
       (users) {
         firebaseUsers.value = users;
       },
-      onError: (e) {
+      onError: (Object e, StackTrace s) {
+        CrashReporter.recordError(e, s, reason: 'acompanhar usuários do grupo no monitora uff');
         debugPrint('[TrackingController] Erro no stream do grupo $groupEmail: $e');
       },
     );
@@ -618,7 +621,8 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
         true,
         grupoAtivo: activeGroupEmail,
       );
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'ativar rastreamento no monitora uff');
       debugPrint('[TrackingController] Erro ao atualizar isTracked: $e');
       Get.snackbar(
         'Erro ao iniciar rastreamento',
@@ -641,7 +645,8 @@ class TrackingController extends GetxController with WidgetsBindingObserver {
     isTrackingEnabled.value = false;
     try {
       await FirebaseProvider().updateIsTracked(userCtrl.user!.email, false);
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'desativar rastreamento no monitora uff');
       debugPrint('[TrackingController] Erro ao desativar isTracked: $e');
     }
   }
