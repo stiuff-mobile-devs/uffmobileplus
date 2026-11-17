@@ -124,7 +124,8 @@ class AuthGoogleController extends GetxController {
   Future<void> _ensureDriveFolder({required bool interactive}) async {
     try {
       await GoogleDriveService().ensureFolderExists(interactive: interactive);
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'garantir pasta no google drive');
       debugPrint('Erro ao garantir pasta no Drive: $e');
     }
   }
@@ -167,7 +168,8 @@ class AuthGoogleController extends GetxController {
         email,
       );
       await _userDataRepository.updateGdiGroupsGoogle(gdiGroups);
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'atualizar grupos gdi google');
       debugPrint("Erro ao obter grupos GDI Google: $e");
     }
   }
@@ -204,7 +206,8 @@ class AuthGoogleController extends GetxController {
           );
         }
       }
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'registrar token cdc no login google');
       debugPrint("Erro ao registrar token CDC: $e");
     }
   }
@@ -232,7 +235,8 @@ class AuthGoogleController extends GetxController {
           return token; // Retorna o token do Firebase para iOS
         }
       }
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'obter token fcm do dispositivo');
       debugPrint("Erro ao obter token do dispositivo: $e");
       return null;
     }

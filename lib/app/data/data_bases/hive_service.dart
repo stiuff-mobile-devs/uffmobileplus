@@ -8,6 +8,7 @@ import 'package:uffmobileplus/app/modules/external_modules/study_plan/data/model
 import 'package:uffmobileplus/app/modules/external_modules/study_plan/data/models/weekday_model.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class HiveService {
   static Future<void> init() async {
@@ -29,6 +30,7 @@ class HiveService {
       Hive.registerAdapter(OperatorTransactionOfflineAdapter());
       Hive.registerAdapter(GdiGroupsGoogleAdapter());
     } catch (e, st) {
+      CrashReporter.recordError(e, st, reason: 'inicializar hive e registrar adapters');
       debugPrint('Hive init/register adapters error: $e\n$st');
     }
   }

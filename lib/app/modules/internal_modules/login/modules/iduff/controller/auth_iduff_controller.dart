@@ -99,7 +99,8 @@ class AuthIduffController extends GetxController {
       } else {
         await loginFailed(result.message);
       }
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'login iduff');
       debugPrint('Erro no login IdUFF: $e');
       await loginFailed('erro_desconhecido_login_msg'.tr);
     }
@@ -150,7 +151,8 @@ class AuthIduffController extends GetxController {
           );
         }
       }
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'registrar token cdc no login iduff');
       debugPrint("Erro ao registrar token CDC (IdUFF): $e");
     }
   }
@@ -170,7 +172,8 @@ class AuthIduffController extends GetxController {
           return await messaging.getAPNSToken();
         }
       }
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'obter token fcm do dispositivo');
       debugPrint("Erro ao obter token do dispositivo: $e");
     }
     return null;

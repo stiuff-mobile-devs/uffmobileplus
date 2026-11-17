@@ -9,6 +9,7 @@ import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/u
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
 import 'package:uffmobileplus/app/utils/errors_mensages.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 enum KeycloakEnvironment { homologacao, production }
 
@@ -115,7 +116,8 @@ class AuthIduffService {
 
         debugPrint("Passou pelo novo acesso");
       }
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'autorizar login iduff');
       debugPrint("error on authorize: $e");
       return AuthResult(false, ErrorMessage.erro003);
     }
@@ -145,7 +147,8 @@ class AuthIduffService {
       );
 
       return authorizationResponse;
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'abrir tela de login iduff');
       debugPrint("Erro no getAuthorization: $e");
       return null;
     }
@@ -170,7 +173,8 @@ class AuthIduffService {
       );
 
       return tokenResponse;
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'trocar código por token iduff');
       debugPrint("Erro no getAccess: $e");
       return null;
     }
@@ -235,7 +239,8 @@ class AuthIduffService {
       await _userDataRepository.saveUserIduffModel(userAuth);
 
       return AuthResult(true, "success");
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'salvar dados do login iduff');
       debugPrint("Erro em Authorize: $e");
       return AuthResult(false, ErrorMessage.erro004);
     }
@@ -307,7 +312,8 @@ class AuthIduffService {
       if (refreshToken == null) return false;
 
       tokenResponse = await _getNewAccessToken(refreshToken);
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'renovar token iduff no login automático');
       return false;
     }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 
 class UserDataProvider {
@@ -32,7 +33,8 @@ class UserDataProvider {
     try {
       final box = await _getBox();
       return box.get(_userKey);
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'ler dados do usuário no hive');
       return null;
     }
   }
@@ -42,7 +44,8 @@ class UserDataProvider {
       final box = await _getBox();
       await box.clear();
       return "success";
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'limpar dados do usuário no hive');
       return "Erro ao limpar dados do usuário do Hive: $e";
     }
   }
@@ -51,7 +54,8 @@ class UserDataProvider {
     try {
       final box = await _getBox();
       return box.containsKey(_userKey);
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'verificar dados do usuário no hive');
       debugPrint("Erro ao verificar existência de dados do usuário: $e");
       return false;
     }
@@ -66,7 +70,8 @@ class UserDataProvider {
         return textoQrCodeCarteirinha;
       }
       return "Usuario não encontrado";
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'atualizar qr code da carteirinha no hive');
       return "Erro ao atualizar status de login no Hive: $e";
     }
   }
@@ -80,7 +85,8 @@ class UserDataProvider {
         return "success";
       }
       return "Usuario não encontrado";
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'atualizar atalhos no hive');
       return "Erro ao atualizar atalhos no Hive: $e";
     }
   }
@@ -95,7 +101,8 @@ class UserDataProvider {
         await saveUserData(UserData(gdiGroupsGoogle: gdiGroupsGoogle));
       }
       return "success";
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'atualizar grupos gdi do google no hive');
       return "Erro ao atualizar grupos GDI Google no Hive: $e";
     }
   }
@@ -109,7 +116,8 @@ class UserDataProvider {
         await user.save();
       }
       return "success";
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'limpar grupos gdi do google no hive');
       return "Erro ao limpar grupos GDI Google no Hive: $e";
     }
   }
@@ -133,7 +141,8 @@ class UserDataProvider {
         );
       }
       return "success";
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'atualizar token do cdc no hive');
       return "Erro ao atualizar token CDC no Hive: $e";
     }
   }

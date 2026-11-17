@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 
 class UserIduffProvider {
@@ -59,7 +60,8 @@ class UserIduffProvider {
         return "success";
       }
       return "Usuário não encontrado no Hive";
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'remover dados do iduff do hive');
       return "Erro ao deletar dados do iduff do Hive: $e";
     }
   }
@@ -93,7 +95,8 @@ class UserIduffProvider {
         return "success";
       }
       return "Usuário não encontrado no Hive";
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'limpar dados de perfil do iduff no hive');
       return "Erro ao limpar dados do iduff do Hive: $e";
     }
   }

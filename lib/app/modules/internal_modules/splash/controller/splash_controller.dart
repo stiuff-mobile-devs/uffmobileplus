@@ -2,6 +2,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:flutter/foundation.dart'; // Add this import for kDebugMode
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 import 'package:uffmobileplus/app/data/services/update_version_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/lock_develop_mode/controller/lock_develop_mode_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/controller/auth_iduff_controller.dart';
@@ -59,7 +60,8 @@ class SplashController extends GetxController
           debugPrint("Auto Login failed");
           Get.offAllNamed(Routes.LOGIN);
         }
-      } catch (e) {
+      } catch (e, s) {
+        CrashReporter.recordError(e, s, reason: 'login automático no splash');
         debugPrint("Error during auto login: $e");
         Get.offAllNamed(Routes.LOGIN);
       }
@@ -118,7 +120,8 @@ class SplashController extends GetxController
       } else {
         debugPrint('Permissão negada: O usuário recusou as notificações.');
       }
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'pedir permissão de notificação');
       debugPrint('Erro ao solicitar permissão de notificação: $e');
     }
   }

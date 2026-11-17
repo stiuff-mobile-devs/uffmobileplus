@@ -86,7 +86,8 @@ class ChooseProfileController extends GetxController {
       hasControlPermission.value = groups.any(
         (group) => group.gid == GdiGroupsEnum.controladoresDeAcesso.id,
       );
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'verificar permissão de controle de acesso');
       debugPrint("Error checking control permission: $e");
       hasControlPermission.value = false;
     }
@@ -105,7 +106,8 @@ class ChooseProfileController extends GetxController {
 
     try {
       userUmm = await userUmmRepository.getUserData(iduff, await _auth.getAccessToken() ?? "");
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'buscar dados do usuário na umm');
       debugPrint("Error fetching user data: $e");
       await _failAndLogout(
         'erro_carregar_dados_usuario'.tr,
@@ -270,7 +272,8 @@ class ChooseProfileController extends GetxController {
     try {
       await _userDataController.saveUserData(userUmm, matricula, profileType);
       Get.offAllNamed(Routes.HOME);
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'salvar dados do perfil escolhido');
       debugPrint("Erro ao salvar dados do perfil ($profileType): $e");
       isBusy.value = false;
       await _failAndLogout(

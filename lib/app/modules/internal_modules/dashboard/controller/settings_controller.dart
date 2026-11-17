@@ -88,7 +88,8 @@ class SettingsController extends GetxController {
       final token = await _authGoogleController.getFirebaseIdToken();
       UserGoogleModel? user = await _userDataRepository.getUserGoogleModel();
       await _authGoogleController.getGdiGroupsGoogle(token!, user?.email ?? "", true);
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'atualizar dados do google');
       debugPrint('Erro ao atualizar dados do Google: $e');
       AppPopups.error(
         'erro_atualizar_dados_google_msg'.tr,

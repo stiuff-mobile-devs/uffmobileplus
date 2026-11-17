@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:googleapis/youtube/v3.dart' as youtube;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uffmobileplus/app/data/services/app_availability_service.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/data/services/deep_link_service.dart';
 import 'package:uffmobileplus/app/data/services/responsive_layout_service.dart';
@@ -156,7 +157,8 @@ class HomePageController extends GetxController {
         🖼️ Foto URL:  ${userPhotoUrl.value}
         ---------------------------
         ''');
-    } catch (_) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'carregar dados do perfil na home');
       userName.value = '-';
       userMatricula.value = '-';
       userEmail.value = '-';
@@ -180,7 +182,8 @@ class HomePageController extends GetxController {
         });
       }
       todayClasses.assignAll(disciplines ?? const <Discipline>[]);
-    } catch (_) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'carregar aulas do dia na home');
     } finally {
       isLoadingTodayClasses.value = false;
     }
@@ -190,7 +193,8 @@ class HomePageController extends GetxController {
     try {
       final transcriptModel = await _transcriptRepository.getTranscript(false);
       transcriptStats.value = transcriptModel?.transcript;
-    } catch (_) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'carregar histórico na home');
     } finally {
       isLoadingTranscript.value = false;
     }
@@ -214,7 +218,8 @@ class HomePageController extends GetxController {
                 .getPlaylistItems(playlistId: id)
                 .timeout(const Duration(seconds: 10));
             return (items ?? const []).map((i) => HomeNewsItem.from(i, id));
-          } catch (e) {
+          } catch (e, s) {
+            CrashReporter.recordError(e, s, reason: 'carregar playlist da unitv na home');
             debugPrint('Erro ao carregar playlist $id da UniTV: $e');
             return const <HomeNewsItem?>[];
           }
@@ -230,7 +235,8 @@ class HomePageController extends GetxController {
         ..sort((a, b) => b.publishedAt.compareTo(a.publishedAt));
 
       news.assignAll(all.take(_newsLimit));
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'carregar notícias da home');
       debugPrint('Erro ao carregar notícias da UniTV: $e');
       news.clear();
     } finally {
@@ -294,7 +300,8 @@ class HomePageController extends GetxController {
         hasDefaultRestaurant.value = false;
         campusMeals.clear();
       }
-    } catch (_) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'carregar restaurante padrão na home');
     } finally {
       isLoadingCampusMeals.value = false;
     }
@@ -367,7 +374,9 @@ class HomePageController extends GetxController {
           }
         }
       }
-    } catch (_) {}
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'buscar refeição do dia na home');
+    }
 
     return TodayCampusMeal(
       campus: campus,
@@ -419,13 +428,17 @@ class HomePageController extends GetxController {
       }
 
       _rebuildShortcutCaches();
-    } catch (_) {}
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'carregar atalhos salvos');
+    }
   }
 
   Future<void> _persistShortcuts() async {
     try {
       await _userDataRepository.updateShortcutRoutes(shortcutRoutes.toList());
-    } catch (_) {}
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'salvar atalhos');
+    }
   }
 
   void addShortcut(DashboardShortcut service) {
@@ -518,7 +531,8 @@ class HomePageController extends GetxController {
             .map((n) => byName[n])
             .whereType<HomeSection>(),
       );
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'carregar seções da home');
       debugPrint('Erro ao carregar seções da Home: $e');
     }
   }
@@ -551,7 +565,8 @@ class HomePageController extends GetxController {
         _sectionsHiddenKey,
         hiddenSections.map((s) => s.name).toList(),
       );
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'salvar seções da home');
       debugPrint('Erro ao salvar seções da Home: $e');
     }
   }

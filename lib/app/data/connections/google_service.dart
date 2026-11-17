@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:uffmobileplus/app/config/secrets.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:http/http.dart' as http;
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class GoogleService {
   Future<GdiGroupsGoogle> getGdiGroupsGoogle(String token, String email) async {
@@ -36,7 +37,8 @@ class GoogleService {
       } else {
         throw Exception('Falha ao buscar grupos GDI: ${response.statusCode}');
       }
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'buscar grupos gdi google');
       debugPrint("Erro ao obter grupos GDI: $e");
       return GdiGroupsGoogle(DateTime.now(), []);
     }
@@ -67,7 +69,8 @@ class GoogleService {
       } else {
         throw Exception('Falha ao buscar membros do grupo: ${response.statusCode}');
       }
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'buscar membros de grupo google');
       debugPrint("Erro ao obter membros do grupo $groupEmail: $e");
       return [];
     }

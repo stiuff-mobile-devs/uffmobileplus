@@ -6,6 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:uffmobileplus/app/config/secrets.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class AuthGoogleService {
   static GoogleSignInAccount? currentAccount;
@@ -59,7 +60,8 @@ class AuthGoogleService {
       }
 
       return await _signIn(account);
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'login google');
       debugPrint('Error initializing GoogleSignIn: $e');
       return null;
     }
@@ -85,7 +87,8 @@ class AuthGoogleService {
           'Logado com sucesso no Firebase Harpia: ${userCredentialHarpia.user?.uid}',
         );
       }
-      catch(e){
+      catch(e, s){
+        CrashReporter.recordError(e, s, reason: 'login google no firebase harpia');
         debugPrint('Error logging into other Harpia Firebase app: $e');
       }
 
@@ -96,7 +99,8 @@ class AuthGoogleService {
         debugPrint(
           'Logado com sucesso no Firebase Banco de Ideias: ${userCredentialBancoDeIdeias.user?.uid}',
         );
-      } catch (e) {
+      } catch (e, s) {
+        CrashReporter.recordError(e, s, reason: 'login google no firebase banco de ideias');
         debugPrint('Error logging into Banco de Ideias Firebase apps: $e');
       }
 
@@ -107,7 +111,8 @@ class AuthGoogleService {
         debugPrint(
           'Logado com sucesso no Firebase Catraca: ${userCredentialCatraca.user?.uid}',
         );
-      } catch (e) {
+      } catch (e, s) {
+        CrashReporter.recordError(e, s, reason: 'login google no firebase catraca');
         debugPrint('Error logging into Catraca Firebase apps: $e');
       }
 
@@ -118,12 +123,14 @@ class AuthGoogleService {
         debugPrint(
           'Logado com sucesso no Firebase Cardapio: ${userCredentialCardapio.user?.uid}',
         );
-      } catch (e) {
+      } catch (e, s) {
+        CrashReporter.recordError(e, s, reason: 'login google no firebase cardápio');
         debugPrint('Error logging into cardapio Firebase apps: $e');
       }
 
       return await _createUserDoc(userCredential);
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'autenticar google no firebase');
       debugPrint('Error during Google sign-in: $e');
       return null;
     }
@@ -141,7 +148,8 @@ class AuthGoogleService {
       );
 
       return userDoc;
-    } catch (err) {
+    } catch (err, s) {
+      CrashReporter.recordError(err, s, reason: 'criar documento do usuário google');
       debugPrint(err.toString());
       return null;
     }
@@ -215,7 +223,8 @@ class AuthGoogleService {
         currentAccount = account;
       }
       return account;
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'autenticar google para o drive');
       debugPrint('AuthGoogleService: Falha na autenticação interativa - $e');
       return null;
     }

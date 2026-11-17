@@ -45,7 +45,8 @@ void onStart(ServiceInstance service) async {
       debugPrint(
         '[ForegroundService] Auth Harpia disponível no background: ${currentUser.email}',
       );
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'renovar token harpia no segundo plano');
       debugPrint('[ForegroundService] Erro ao refresh token Harpia: $e');
     }
   } else {
@@ -158,7 +159,9 @@ Future<void> updateLocation(
         try {
           final harpiaAuth = fb.FirebaseAuth.instanceFor(app: Firebase.app('harpia'));
           await harpiaAuth.currentUser?.getIdToken(true);
-        } catch (_) {}
+        } catch (e, s) {
+          CrashReporter.recordError(e, s, reason: 'renovar token harpia após permissão negada');
+        }
       } else {
         debugPrint('[ForegroundService] Erro ao atualizar localização: $e');
       }

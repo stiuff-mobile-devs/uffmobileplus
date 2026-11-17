@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:uffmobileplus/app/config/secrets.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class UmmService {
   Future<bool> getStatus() async {
@@ -26,7 +27,8 @@ class UmmService {
       // Erro específico de rede (sem internet ou DNS falhou)
       debugPrint("Erro: Sem conexão de rede para alcançar o UMM.");
       return false;
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'checar status do umm');
       // Qualquer outro erro inesperado
       debugPrint("Erro desconhecido ao checar status: $e");
       return false;
@@ -46,7 +48,8 @@ class UmmService {
         List<dynamic> jsonResponse = jsonDecode(response.body);
         return jsonResponse.map((group) => GdiGroups.fromJson(group)).toList();
       }
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'buscar grupos gdi');
       debugPrint("Erro ao buscar grupos GDI: $e");
       return [];
     }

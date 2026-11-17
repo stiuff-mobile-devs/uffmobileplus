@@ -3,6 +3,7 @@ import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/controller/auth_google_controller.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class GoogleAuthClient extends http.BaseClient {
   final Map<String, String> _headers;
@@ -43,7 +44,8 @@ class GoogleDriveService {
       final authClient = GoogleAuthClient(authHeaders);
       return drive.DriveApi(authClient);
       
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'inicializar api do google drive');
       debugPrint('GoogleDriveService: Erro ao inicializar Drive API - $e');
       return null;
     }
@@ -70,7 +72,8 @@ class GoogleDriveService {
 
       debugPrint('GoogleDriveService: Pasta encontrada. ID: ${files.first.id}');
       return files.first.id;
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'verificar pasta no google drive');
       debugPrint('GoogleDriveService: Erro ao verificar se a pasta existe - $e');
       return null;
     }
@@ -96,7 +99,8 @@ class GoogleDriveService {
       debugPrint('Pasta criada com sucesso no Drive! ID: ${result.id}');
       return result.id;
       
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'criar pasta no google drive');
       debugPrint('GoogleDriveService: Erro ao tentar criar a pasta - $e');
       return null;
     }
