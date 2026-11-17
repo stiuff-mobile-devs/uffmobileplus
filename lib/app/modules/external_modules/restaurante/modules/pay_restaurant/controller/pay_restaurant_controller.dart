@@ -11,6 +11,7 @@ import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/p
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/services/auth_google_service.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class PayRestaurantController extends GetxController {
   PayRestaurantController();
@@ -121,7 +122,8 @@ class PayRestaurantController extends GetxController {
         userAcessToken,
         await _authGoogle.getFirebaseIdToken() ?? "",
       );
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'gerar código de pagamento do restaurante');
       debugPrint('Erro ao gerar código de pagamento: $e');
       // O servidor costuma explicar o motivo (lançado como Exception(texto)).
       // Mostra só esse texto, sem o prefixo "Exception: "; erros de rede ou
@@ -180,7 +182,8 @@ class PayRestaurantController extends GetxController {
         payRestaurantRepository.getUserBalance(userIdUFF, userAcessToken),
       ]);
       currentBalance.value = userBalance[0].currentBalance ?? "Erro";
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'carregar saldo do cartão do restaurante');
       currentBalance.value = "Erro";
     } finally {
       isLoading.value = false;

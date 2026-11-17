@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -63,7 +64,58 @@ void main() {
       );
     });
 
+    test('ignora Firebase sem conexão', () {
+      expect(
+        CrashReporter.isExpected(
+          FirebaseException(plugin: 'cloud_firestore', code: 'unavailable'),
+        ),
+        isTrue,
+      );
+      expect(
+        CrashReporter.isExpected(
+          FirebaseException(
+            plugin: 'firebase_auth',
+            code: 'network-request-failed',
+          ),
+        ),
+        isTrue,
+      );
+    });
+
+    test('ignora erro de rede relançado como Exception genérica', () {
+      expect(
+        CrashReporter.isExpected(
+          Exception(
+            'Erro ao buscar áreas: SocketException: Failed host lookup',
+          ),
+        ),
+        isTrue,
+      );
+      expect(
+        CrashReporter.isExpected(
+          Exception(
+            'Erro ao salvar lote no Firebase: [cloud_firestore/unavailable] '
+            'The service is currently unavailable.',
+          ),
+        ),
+        isTrue,
+      );
+    });
+
     test('relata erros reais', () {
+      expect(
+        CrashReporter.isExpected(
+          FirebaseException(
+            plugin: 'cloud_firestore',
+            code: 'permission-denied',
+          ),
+        ),
+        isFalse,
+      );
+      expect(
+        CrashReporter.isExpected(Exception('Erro ao buscar áreas: FormatException')),
+        isFalse,
+      );
       expect(CrashReporter.isExpected(Exception('x')), isFalse);
       expect(CrashReporter.isExpected(const FormatException('x')), isFalse);
       expect(CrashReporter.isExpected(StateError('x')), isFalse);
@@ -81,6 +133,44 @@ void main() {
         ),
         isFalse,
       );
+    });
+  });
+
+  group('CrashReporter.shouldReport', () {
+    setUp(CrashReporter.resetRepeats);
+
+    final t0 = DateTime(2026, 1, 1, 12);
+
+    test('relata a primeira ocorrência', () {
+      expect(CrashReporter.shouldReport('a|TypeError', t0), isTrue);
+    });
+
+    test('segura a repetição dentro do intervalo', () {
+      CrashReporter.shouldReport('a|TypeError', t0);
+      expect(
+        CrashReporter.shouldReport(
+          'a|TypeError',
+          t0.add(const Duration(minutes: 4)),
+        ),
+        isFalse,
+      );
+    });
+
+    test('volta a relatar depois do intervalo', () {
+      CrashReporter.shouldReport('a|TypeError', t0);
+      expect(
+        CrashReporter.shouldReport(
+          'a|TypeError',
+          t0.add(CrashReporter.repeatWindow),
+        ),
+        isTrue,
+      );
+    });
+
+    test('pontos ou tipos diferentes não se bloqueiam', () {
+      CrashReporter.shouldReport('a|TypeError', t0);
+      expect(CrashReporter.shouldReport('b|TypeError', t0), isTrue);
+      expect(CrashReporter.shouldReport('a|FormatException', t0), isTrue);
     });
   });
 }

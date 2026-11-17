@@ -9,6 +9,7 @@ import 'package:uffmobileplus/app/modules/external_modules/restaurante/utils/mea
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/services/auth_google_service.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 /// Filtro de tipo do extrato.
 enum StatementFilter { all, credit, debit }
@@ -99,7 +100,8 @@ class BalanceStatementController extends GetxController {
         await _authGoogle.getFirebaseIdToken() ?? "",
         period: filters["period"],
       );
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'carregar extrato do restaurante');
       debugPrint("Erro ao obter o extrato do usuário: $e");
       hasError.value = true;
     } finally {

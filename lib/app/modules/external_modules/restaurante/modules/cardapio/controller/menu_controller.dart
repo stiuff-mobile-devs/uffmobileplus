@@ -8,6 +8,7 @@ import '../data/models/meal_model.dart';
 import '../data/models/user_meal_model.dart';
 import '../data/repository/restaurant_repository.dart';
 import '../ui/pages/meal_form_page.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class MenuController extends GetxController {
   MenuController();
@@ -73,7 +74,8 @@ class MenuController extends GetxController {
   void fetchCards() {
     fetchMeals().then((_) {
       fetchAcceptedMeals();
-    }).catchError((error) {
+    }).catchError((Object error, StackTrace s) {
+      CrashReporter.recordError(error, s, reason: 'carregar refeições do cardápio');
       debugPrint('Erro ao carregar refeições: $error');
       AppPopups.error(
         'msg_verifique_internet'.tr,
@@ -181,7 +183,8 @@ class MenuController extends GetxController {
           );
         }
       }
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'remover refeição do cardápio');
       debugPrint('Erro ao remover refeição: $e');
       AppPopups.error(
         'msg_verifique_internet'.tr,

@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/data/connections/google_service.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class CardapioGoogleGroupsController extends GetxController {
   final GoogleService _googleService = GoogleService();
@@ -61,6 +62,7 @@ class CardapioGoogleGroupsController extends GetxController {
 
       isAdmin.value = isMember;
     } catch(e, stack) {
+      CrashReporter.recordError(e, stack, reason: 'verificar administrador do cardápio');
       debugPrint('$e\n$stack');
       _loadError.value = '$e';
       isAdmin.value = false;

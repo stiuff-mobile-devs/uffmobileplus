@@ -3,6 +3,7 @@ import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/c
 
 import '../models/meal_model.dart';
 import '../models/user_meal_model.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class RestaurantProvider {
   final RestaurantAPI restaurantAPI = RestaurantAPI();
@@ -73,6 +74,7 @@ class RestaurantProvider {
         // Bug fix: Reloads on Keycloak issue. Do NOT remove it.
         return await _exec(() => f());
       }
+      CrashReporter.recordError(e, stackTrace, reason: 'executar operação do cardápio');
     }
     return null;
   }

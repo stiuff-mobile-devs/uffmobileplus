@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/cardapio/data/provider/restaurant_api.dart';
 import '../models/meal_model.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class MealResource {
   final ExternalModulesServices _menuService = Get.find<ExternalModulesServices>();
@@ -28,11 +29,12 @@ class MealResource {
       // );
       // return _processGetResponse(response);
       return await _getMealsByCampusOnFirestore(campus);
-    } catch (e) {
+    } catch (e, s) {
       _logError('getMealsByCampus', e);
       if (e.toString() == 'Null check operator used on a null value') {
         rethrow;
       }
+      CrashReporter.recordError(e, s, reason: 'carregar cardápio do restaurante');
     }
 
     return null;
@@ -63,11 +65,12 @@ class MealResource {
       await _createMealOnFirestore(meal);
       return 201;
       // return _processWriteResponse(response, "Refeição criada com sucesso.");
-    } catch (e) {
+    } catch (e, s) {
       _logError('createMeal', e);
       if (e.toString() == 'Null check operator used on a null value') {
         rethrow;
       }
+      CrashReporter.recordError(e, s, reason: 'criar refeição no cardápio');
     }
 
     return 0;
@@ -106,11 +109,12 @@ class MealResource {
       //   response,
       //   "Refeição atualizada com sucesso.",
       // );
-    } catch (e) {
+    } catch (e, s) {
       _logError('updateMeal', e);
       if (e.toString() == 'Null check operator used on a null value') {
         rethrow;
       }
+      CrashReporter.recordError(e, s, reason: 'atualizar refeição no cardápio');
     }
 
     return 0;
@@ -140,7 +144,8 @@ class MealResource {
         headers: {'Authorization': 'Bearer $accessToken'},
       );
       return _processWriteResponse(response, "Refeição deletada com sucesso.");
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'excluir refeição do cardápio');
       _logError('deleteMeal', e);
     }
 
