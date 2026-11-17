@@ -10,6 +10,7 @@ import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
 import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class RechargeCardController extends GetxController {
   RechargeCardController();
@@ -130,7 +131,8 @@ class RechargeCardController extends GetxController {
       final balance =
           await rechargeCardRepository.getUserBalance(userIdUFF, token);
       currentBalance.value = balance.currentBalance ?? "";
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'carregar saldo na tela de recarga');
       debugPrint('Erro ao carregar saldo na recarga: $e');
       currentBalance.value = "";
     } finally {
@@ -192,7 +194,8 @@ class RechargeCardController extends GetxController {
         userAcessToken,
         await _authGoogle.getFirebaseIdToken() ?? "",
       );
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'gerar link de recarga do cartão');
       debugPrint('Erro ao gerar link de recarga: $e');
       await MessageDialogs.showErrorDialog(
         Get.context,

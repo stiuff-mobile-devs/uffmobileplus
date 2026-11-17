@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/area.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/operator_transaction.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/pay_restaurant/data/model/user_balance.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class SctmService {
   // ===== Restaurante =====
@@ -94,7 +95,8 @@ class SctmService {
           }
         }
       }
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'validar pagamento no sctm');
       print('Erro ao validar pagamento: $e');
     }
 
@@ -195,7 +197,8 @@ class SctmService {
               .toList();
         }
       }
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'buscar transações do operador no sctm');
       print('Erro ao buscar transações: $e');
     }
 
@@ -346,7 +349,9 @@ class SctmService {
           return responseDecoded["content"]["atualizado"];
         }
       }
-    } catch (e) {}
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'atualizar pagamentos do usuário no sctm');
+    }
     return false;
   }
 
@@ -369,7 +374,8 @@ class SctmService {
     } on SocketException catch (_) {
       debugPrint("Erro: Sem conexão de rede para alcançar o UMM.");
       return false;
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'checar status do sctm');
       debugPrint("Erro desconhecido ao checar status: $e");
       return false;
     }

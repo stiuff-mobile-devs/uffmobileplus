@@ -6,6 +6,7 @@ import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import '../models/meal_model.dart';
 import '../models/user_meal_model.dart';
 import 'restaurant_api.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class UserMealResource {
   UserMealResource();
@@ -59,11 +60,12 @@ class UserMealResource {
         response,
         "Refeição confirmada com sucesso.",
       );
-    } catch (e) {
+    } catch (e, s) {
       _logError('confirm', e);
       if (e.toString() == 'Null check operator used on a null value') {
         rethrow;
       }
+      CrashReporter.recordError(e, s, reason: 'confirmar presença na refeição');
     }
 
     return null;
@@ -100,11 +102,12 @@ class UserMealResource {
         headers: {'Authorization': 'Bearer $accessToken'},
       );
       return _processGetMealAcceptedResponse(response, givenMeal);
-    } catch (e) {
+    } catch (e, s) {
       _logError('getMealAccepted', e);
       if (e.toString() == 'Null check operator used on a null value') {
         rethrow;
       }
+      CrashReporter.recordError(e, s, reason: 'buscar refeição confirmada pelo usuário');
     }
 
     return null;
@@ -121,11 +124,12 @@ class UserMealResource {
         headers: {'Authorization': 'Bearer $accessToken'},
       );
       return _processGetMealsAcceptedResponse(response);
-    } catch (e) {
+    } catch (e, s) {
       _logError('getMealsAccepted', e);
       if (e.toString() == 'Null check operator used on a null value') {
         rethrow;
       }
+      CrashReporter.recordError(e, s, reason: 'buscar refeições confirmadas pelo usuário');
     }
 
     return null;
