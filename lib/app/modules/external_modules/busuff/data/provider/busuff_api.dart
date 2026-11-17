@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart' show debugPrint;
 import 'package:http/http.dart' as http;
 import 'package:uffmobileplus/app/modules/external_modules/busuff/data/model/busuff_model.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class BusuffApiClient {
   BusuffApiClient();
@@ -27,7 +28,8 @@ class BusuffApiClient {
         }
       }
       return positions;
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'buscar posição dos ônibus');
       debugPrint("error fetching last positions: $e");
     }
     return null;

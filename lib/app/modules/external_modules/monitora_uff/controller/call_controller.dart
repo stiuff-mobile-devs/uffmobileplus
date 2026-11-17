@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class CallController extends GetxController {
     Future<void> launchGoogleMeet(String email) async {
@@ -36,7 +37,8 @@ class CallController extends GetxController {
           // Caso não esteja instalado, abre no Safari como fallback
           await launchUrl(meetWebUri, mode: LaunchMode.externalApplication);
         }
-      } catch (e) {
+      } catch (e, s) {
+        CrashReporter.recordError(e, s, reason: 'abrir google meet');
         if (kDebugMode) {
           print('Não foi possível abrir o Google Meet no iOS: $e');
         }

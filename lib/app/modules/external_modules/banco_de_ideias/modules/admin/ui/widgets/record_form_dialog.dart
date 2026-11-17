@@ -5,6 +5,7 @@ import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/
 import 'record_form_content.dart';
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/modules/admin/controller/record_form_controller.dart';
 import 'record_form_dialog_view.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class RecordFormDialog extends StatefulWidget {
   const RecordFormDialog({
@@ -50,7 +51,8 @@ class _RecordFormDialogState extends State<RecordFormDialog> {
     try {
       await _controller.loadOptions();
       if (mounted) setState(() => _isLoading = false);
-    } catch (error) {
+    } catch (error, s) {
+      CrashReporter.recordError(error, s, reason: 'carregar opções do formulário do banco de ideias');
       if (mounted) {
         setState(() {
           _error = error.toString();
@@ -66,7 +68,8 @@ class _RecordFormDialogState extends State<RecordFormDialog> {
     try {
       await widget.onSave(_controller.payload());
       if (mounted) Navigator.of(context).pop(true);
-    } catch (error) {
+    } catch (error, s) {
+      CrashReporter.recordError(error, s, reason: 'salvar registro no banco de ideias');
       _showError(error);
     }
   }

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/models/crud_table.dart';
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/provider/crud_api_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/modules/admin/utils/admin_crud_helpers.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class AdminRecordFormDialog extends StatefulWidget {
   const AdminRecordFormDialog({
@@ -82,7 +83,8 @@ class _AdminRecordFormDialogState extends State<AdminRecordFormDialog> {
       }
 
       setState(() => _isLoadingOptions = false);
-    } catch (error) {
+    } catch (error, s) {
+      CrashReporter.recordError(error, s, reason: 'carregar opções do formulário admin do banco de ideias');
       if (!mounted) {
         return;
       }
@@ -117,7 +119,8 @@ class _AdminRecordFormDialogState extends State<AdminRecordFormDialog> {
       if (mounted) {
         Navigator.of(context).pop(true);
       }
-    } catch (error) {
+    } catch (error, s) {
+      CrashReporter.recordError(error, s, reason: 'salvar registro admin do banco de ideias');
       if (!mounted) {
         return;
       }

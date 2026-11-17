@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/data/services/screen_protector_service.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class CarteirinhaDigitalController extends GetxController {
   RxBool isBusy = false.obs;
@@ -38,7 +39,8 @@ class CarteirinhaDigitalController extends GetxController {
     _externalModulesServices = Get.find<ExternalModulesServices>();
     try {
       await _externalModulesServices.initialize();
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'carregar dados da carteirinha');
       Get.snackbar(
         '',
         '',

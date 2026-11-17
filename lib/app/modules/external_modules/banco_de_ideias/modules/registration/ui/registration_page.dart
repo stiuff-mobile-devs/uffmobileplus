@@ -11,6 +11,7 @@ import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/modul
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/modules/registration/ui/widgets/user_type_segment.dart';
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/provider/crud_api_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/provider/usuario_api_service.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key});
@@ -63,7 +64,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
         _cursoId = _moduleController.registrationDraft?.cursoId;
         _isLoading = false;
       });
-    } catch (err) {
+    } catch (err, s) {
+      CrashReporter.recordError(err, s, reason: 'carregar opções de cadastro do banco de ideias');
       if (!mounted) {
         return;
       }
@@ -97,7 +99,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
       }
 
       _moduleController.reloadUsuario();
-    } catch (err) {
+    } catch (err, s) {
+      CrashReporter.recordError(err, s, reason: 'cadastrar usuário no banco de ideias');
       if (!mounted) {
         return;
       }

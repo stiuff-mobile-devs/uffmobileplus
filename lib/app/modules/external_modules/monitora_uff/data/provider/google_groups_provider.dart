@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class GoogleGroupsProvider {
   final String _hiveBox = 'google_groups_data';
@@ -18,7 +19,8 @@ class GoogleGroupsProvider {
       if (kDebugMode) {
         print('Saved Group Entities in Hive for: $groupEmail');
       }
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'salvar cache de grupos google no hive');
       if (kDebugMode) {
         print('Error saving Group Entities in Hive: $e');
       }
@@ -56,7 +58,8 @@ class GoogleGroupsProvider {
         print('Read Group Entities from Hive for: $groupEmail');
       }
       return entities;
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'ler cache de grupos google no hive');
       if (kDebugMode) {
         print('Error reading Group Entities from Hive: $e');
       }

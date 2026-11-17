@@ -6,6 +6,7 @@ import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/data/rep
 import 'package:uffmobileplus/app/data/services/harpia_claims_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/google_group_member_model.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/google_group_model.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class HarpiaGoogleGroupsController extends GetxController {
   final GoogleGroupsRepository _repository = GoogleGroupsRepository();
@@ -124,7 +125,8 @@ class HarpiaGoogleGroupsController extends GetxController {
       if (_observableGoogleGroups.isNotEmpty && selectedGroup.value == null) {
         await updateObservedUsers(_observableGoogleGroups.first, forceRefresh: forceRefresh);
       }
-    } catch(e, stack) {
+    } catch (e, stack) {
+      CrashReporter.recordError(e, stack, reason: 'carregar grupos do monitora uff');
       debugPrint('$e\n$stack');
       _loadError.value = '$e';
       _observableGoogleGroups.clear();
@@ -189,7 +191,8 @@ class HarpiaGoogleGroupsController extends GetxController {
             )
           )
           .toList();
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'carregar membros do grupo do monitora uff');
       debugPrint("Erro ao buscar membros do grupo ${selectedGroup.email}: $e");
       observedMembers.clear();
     }

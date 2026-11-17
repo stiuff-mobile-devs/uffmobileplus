@@ -6,6 +6,7 @@ import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/data/pro
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/google_group_member_model.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/models/user_model.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class UserController extends GetxController {
   final _user = Rxn<UserModel>();
@@ -51,7 +52,8 @@ class UserController extends GetxController {
               nome: _googleName,
             ));
             _user.value = await _initializeUser();
-          } catch (e) {
+          } catch (e, s) {
+            CrashReporter.recordError(e, s, reason: 'criar documento do usuário no monitora uff');
             debugPrint('[UserController] Erro ao criar doc do usuário: $e');
           }
         } else {
@@ -60,7 +62,8 @@ class UserController extends GetxController {
           );
         }
       }
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'carregar usuário atual do monitora uff');
       debugPrint('[UserController] Erro ao carregar usuário atual: $e');
     } finally {
       isLoading.value = false;
@@ -76,7 +79,8 @@ class UserController extends GetxController {
 
       final user = await FirebaseProvider().getUserByEmail(email);
       return user;
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'buscar usuário do monitora uff no firestore');
       debugPrint('[UserController] Erro ao buscar usuário no Firestore: $e');
       return null;
     }

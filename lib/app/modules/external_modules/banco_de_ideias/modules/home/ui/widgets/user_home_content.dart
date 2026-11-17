@@ -14,6 +14,7 @@ import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/modul
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/modules/ideas/ui/widgets/idea_list.dart';
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/modules/profile/ui/widgets/profile_content.dart';
 import 'user_destination.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class UserHomeContent extends StatefulWidget {
   const UserHomeContent({
@@ -117,7 +118,8 @@ class _UserHomeContentState extends State<UserHomeContent> {
         ),
       );
       return true;
-    } catch (error) {
+    } catch (error, s) {
+      CrashReporter.recordError(error, s, reason: 'favoritar ideia');
       if (!mounted) {
         return false;
       }
@@ -191,7 +193,8 @@ class _UserHomeContentState extends State<UserHomeContent> {
         SnackBar(content: Text('bdi_ideia_excluida_sucesso'.tr)),
       );
       return true;
-    } catch (error) {
+    } catch (error, s) {
+      CrashReporter.recordError(error, s, reason: 'excluir ideia');
       if (!mounted) {
         return false;
       }

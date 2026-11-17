@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:radio_player/radio_player.dart';
 import 'package:siri_wave/siri_wave.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 /// Player da Rádio Pop Goiaba, compartilhado entre o card da Home e a tela
 /// da rádio (registrado como permanente na `DashboardBinding`).
@@ -100,7 +101,8 @@ class RadioController extends GetxController with WidgetsBindingObserver {
       }
       playbackState.value = PlaybackState.buffering;
       await RadioPlayer.play();
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'tocar a rádio');
       debugPrint('Erro ao tocar a rádio: $e');
       await stop();
     }
@@ -115,7 +117,8 @@ class RadioController extends GetxController with WidgetsBindingObserver {
     if (!hadSession) return;
     try {
       await RadioPlayer.reset();
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'encerrar o player da rádio');
       debugPrint('Erro ao encerrar o player da rádio: $e');
     }
   }

@@ -5,6 +5,7 @@ import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/data/provider/ideia_api_service.dart';
 import 'idea_form_widgets.dart';
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/modules/ideas/ui/widgets/idea_state_widgets.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class IdeaCreateDialog extends StatefulWidget {
   const IdeaCreateDialog({
@@ -98,7 +99,8 @@ class _IdeaCreateDialogState extends State<IdeaCreateDialog> {
       if (mounted) {
         Navigator.of(context).pop(true);
       }
-    } catch (error) {
+    } catch (error, s) {
+      CrashReporter.recordError(error, s, reason: 'salvar ideia');
       if (!mounted) {
         return;
       }
