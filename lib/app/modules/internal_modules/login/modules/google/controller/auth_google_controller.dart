@@ -4,10 +4,12 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 import 'package:uffmobileplus/app/data/services/google_drive_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/services/auth_google_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/utils/crash_reporter_user.dart';
 import 'package:uffmobileplus/app/data/services/harpia_claims_service.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 
@@ -61,6 +63,7 @@ class AuthGoogleController extends GetxController {
           return null;
         }
 
+        await syncCrashReporterUser();
         unawaited(_ensureDriveFolder(interactive: true));
         if (navigate) Get.offAllNamed(Routes.HOME);
         return user;
@@ -108,6 +111,7 @@ class AuthGoogleController extends GetxController {
       String? token = await _authGoogle.getFirebaseIdToken();
       await getGdiGroupsGoogle(token ?? '', hasLogged.email ?? "", false);
       HarpiaClaimsService.syncClaims();
+      await syncCrashReporterUser();
       unawaited(_ensureDriveFolder(interactive: false));
       if (navigate) Get.offAllNamed(Routes.HOME);
       return true;
@@ -135,6 +139,9 @@ class AuthGoogleController extends GetxController {
     await _authGoogle.logoutGoogle();
     await _userDataRepository.deleteUserGoogleModel();
     await _userDataRepository.clearGdiGroupsGoogle();
+    // Pode sobrar a sessão IdUFF: recalcula em vez de limpar tudo
+    CrashReporter.log('logout google');
+    await syncCrashReporterUser();
   }
 
   Future<void> getGdiGroupsGoogle(String token, String email, bool forceUpdate) async {

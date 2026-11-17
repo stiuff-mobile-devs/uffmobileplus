@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 import 'package:uffmobileplus/app/modules/external_modules/monitora_uff/data/provider/firebase_provider.dart';
 import 'package:uffmobileplus/firebase_options_harpia.dart';
 import 'package:uffmobileplus/firebase_options_uffmobileplus.dart';
@@ -30,6 +31,10 @@ void onStart(ServiceInstance service) async {
     name: 'harpia',
     options: FirebaseOptionsHarpia.currentPlatform,
   );
+
+  // Este isolate não passa pelo main(): instala aqui o relato de erros
+  await CrashReporter.init();
+  CrashReporter.log('isolate: monitora_uff em segundo plano');
 
   // Verificar e atualizar o token no isolate de background
   final harpiaAuth = fb.FirebaseAuth.instanceFor(app: Firebase.app('harpia'));

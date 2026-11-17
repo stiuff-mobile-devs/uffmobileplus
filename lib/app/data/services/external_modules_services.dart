@@ -3,6 +3,7 @@ import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/s
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/utils/crash_reporter_user.dart';
 import 'package:uffmobileplus/app/utils/gdi_groups.dart';
 import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
 
@@ -33,6 +34,10 @@ class ExternalModulesServices extends GetxService {
     _userGoogleModel =
         (await _userDataRepository.getUserGoogleModel()) ??
         UserGoogleModel(email: '');
+
+    // Roda a cada abertura da Home e após um novo login: mantém o usuário
+    // (hash) e o perfil atuais nos relatórios do Crashlytics.
+    await syncCrashReporterUser();
   }
 
   Future<String> getEmail() async {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/home_page_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/controller/login_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/controller/auth_google_controller.dart';
@@ -29,6 +30,7 @@ class SettingsController extends GetxController {
   Future<void> logout() async {
     await _userDataRepository.deleteUserIduffModel();
     await _userDataRepository.clearUserData();
+    CrashReporter.clearUser();
      loginController.logoutGoogle();
   }
 
@@ -49,6 +51,7 @@ class SettingsController extends GetxController {
     // consulta a UMM de novo em vez de reaproveitar os dados da conta anterior.
     await _userDataRepository.clearIduffProfileData();
     await UserUmmRepository().deleteUserUmmModel();
+    CrashReporter.clearUser();
     Get.offAllNamed(Routes.LOGIN);
   }
 
