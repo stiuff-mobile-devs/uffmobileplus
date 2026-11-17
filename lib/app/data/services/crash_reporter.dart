@@ -5,6 +5,7 @@ import 'dart:isolate';
 import 'dart:ui';
 
 import 'package:crypto/crypto.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -31,6 +32,13 @@ class CrashReporter {
   static bool get enabled => !kDebugMode || _forceInDebug;
 
   static String? _lastRoute;
+
+  /// Intervalo mínimo entre dois relatos do mesmo erro no mesmo ponto.
+  /// Evita que polling, timers e novas tentativas inundem o console: o
+  /// número de usuários afetados continua certo, só o de eventos cai.
+  static const Duration repeatWindow = Duration(minutes: 5);
+
+  static final Map<String, DateTime> _lastReported = {};
 
   static FirebaseCrashlytics get _crashlytics => FirebaseCrashlytics.instance;
 
@@ -92,8 +100,24 @@ class CrashReporter {
       log('${reason ?? 'erro'} (esperado): ${error.runtimeType}');
       return;
     }
+    if (!shouldReport('${reason ?? ''}|${error.runtimeType}', DateTime.now())) {
+      return;
+    }
     _run(() => _crashlytics.recordError(error, stack, reason: reason));
   }
+
+  /// Se um erro identificado por [key] (ponto + tipo) pode ser relatado
+  /// agora, ou se o mesmo já foi relatado dentro de [repeatWindow].
+  @visibleForTesting
+  static bool shouldReport(String key, DateTime now) {
+    final last = _lastReported[key];
+    if (last != null && now.difference(last) < repeatWindow) return false;
+    _lastReported[key] = now;
+    return true;
+  }
+
+  @visibleForTesting
+  static void resetRepeats() => _lastReported.clear();
 
   /// Breadcrumb: mensagem que vai junto do próximo relatório. Não coloque
   /// dados pessoais, tokens ou URLs com query.
@@ -157,6 +181,16 @@ class CrashReporter {
         error is http.ClientException) {
       return true;
     }
+    // Firebase (Firestore, Auth...) sem conexão.
+    if (error is FirebaseException && _firebaseOfflineCodes.contains(error.code)) {
+      return true;
+    }
+    // Erro de rede relançado como `Exception('...: $e')`, que perde o tipo
+    // original. Só vale para `Exception`, nunca para `Error` (bug de código).
+    if (error is Exception) {
+      final text = error.toString();
+      if (_wrappedNetworkMarkers.any(text.contains)) return true;
+    }
     if (error is GoogleSignInException &&
         error.code == GoogleSignInExceptionCode.canceled) {
       return true;
@@ -169,6 +203,22 @@ class CrashReporter {
     }
     return false;
   }
+
+  static const Set<String> _firebaseOfflineCodes = {
+    'unavailable',
+    'network-request-failed',
+    'deadline-exceeded',
+  };
+
+  static const List<String> _wrappedNetworkMarkers = [
+    'SocketException',
+    'TimeoutException',
+    'HandshakeException',
+    'ClientException',
+    'Failed host lookup',
+    '[cloud_firestore/unavailable]',
+    'network-request-failed',
+  ];
 
   static void _setKey(String key, Object value) {
     _run(() => _crashlytics.setCustomKey(key, value));
