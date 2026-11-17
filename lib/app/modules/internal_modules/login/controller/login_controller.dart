@@ -11,6 +11,7 @@ import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/gdi_groups.dart';
 import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class LoginController extends GetxController {
   bool showQrCode = false;
@@ -95,7 +96,8 @@ class LoginController extends GetxController {
       );
       if (isExpired) debugPrint("Iduff bond: refresh token is expired.");
       return !isExpired;
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'verificar vínculo iduff salvo');
       debugPrint("Error checking Iduff bond: $e");
       return false;
     }
@@ -122,7 +124,8 @@ class LoginController extends GetxController {
       ]);
       hasActiveIduffBondObs.value = results[0];
       hasActiveGoogleBondObs.value = results[1];
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'carregar estado dos vínculos');
       debugPrint("Error loading bond states: $e");
     }
   }
@@ -180,7 +183,8 @@ class LoginController extends GetxController {
         }
       }
       return await _loginGoogleController.loginGoogle(navigate: navigate);
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'login google pela tela de login');
       // O erro já foi mostrado ao usuário; tentar de novo aqui abria o
       // seletor de contas uma segunda vez.
       debugPrint('Erro no login Google: $e');

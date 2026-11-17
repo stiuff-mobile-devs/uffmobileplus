@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:uffmobileplus/app/config/secrets.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_umm_model.dart';
 
@@ -43,7 +44,8 @@ class UserUMMProvider {
       var box = await Hive.openBox<UserUmmModel>(_ummCollectionPath);
       await box.put(_ummKey, userUmm);
       return "success";
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'salvar dados da umm no hive');
       debugPrint("saveUserUmmModel - erro: $e");
       return "Erro ao salvar dados do UserUmmModel no Hive: $e";
     }
@@ -53,7 +55,8 @@ class UserUMMProvider {
     try {
       var box = await Hive.openBox<UserUmmModel>(_ummCollectionPath);
       return box.get(_ummKey);
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'ler dados da umm no hive');
       debugPrint("Erro ao obter dados do UserUmmModel do Hive: $e");
       return UserUmmModel();
     }
@@ -64,7 +67,8 @@ class UserUMMProvider {
       var box = await Hive.openBox<UserUmmModel>(_ummCollectionPath);
       await box.delete(_ummKey);
       return "success";
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'remover dados da umm do hive');
       return "Erro ao deletar dados do UserUmmModel do Hive: $e";
     }
   }
@@ -74,7 +78,8 @@ class UserUMMProvider {
       var box = await Hive.openBox<UserUmmModel>(_ummCollectionPath);
       await box.clear();
       return "success";
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'limpar dados da umm no hive');
       return "Erro ao limpar dados do UserUmmModel do Hive: $e";
     }
   }
@@ -83,7 +88,8 @@ class UserUMMProvider {
     try {
       var box = await Hive.openBox<UserUmmModel>(_ummCollectionPath);
       return box.containsKey(_ummKey);
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'verificar dados da umm no hive');
       debugPrint("Erro ao verificar existência de dados do UserUmmModel: $e");
       return false;
     }

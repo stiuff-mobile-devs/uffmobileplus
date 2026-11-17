@@ -6,9 +6,11 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/utils/crash_reporter_user.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 const String _supportEmail = 'atendimento@id.uff.br';
 
@@ -72,6 +74,7 @@ class AuthIduffController extends GetxController {
     // vazia (branca) enquanto o token do CDC era registrado.
     isLoading.value = true;
     await _registerTokenCdc();
+    await syncCrashReporterUser();
     Get.offAllNamed(Routes.CHOOSE_PROFILE);
 
     // Só no login feito pelo usuário (no automático do splash, não).
@@ -96,7 +99,8 @@ class AuthIduffController extends GetxController {
       } else {
         await loginFailed(result.message);
       }
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'login iduff');
       debugPrint('Erro no login IdUFF: $e');
       await loginFailed('erro_desconhecido_login_msg'.tr);
     }
@@ -147,7 +151,8 @@ class AuthIduffController extends GetxController {
           );
         }
       }
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'registrar token cdc no login iduff');
       debugPrint("Erro ao registrar token CDC (IdUFF): $e");
     }
   }
@@ -167,7 +172,8 @@ class AuthIduffController extends GetxController {
           return await messaging.getAPNSToken();
         }
       }
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'obter token fcm do dispositivo');
       debugPrint("Erro ao obter token do dispositivo: $e");
     }
     return null;

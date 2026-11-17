@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hive/hive.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 
 enum UserRole { user }
@@ -58,7 +59,8 @@ class UserGoogleProvider {
         await box.put(_userKey, UserData(userGoogleModel: user));
       }
       return "success";
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'salvar usuário google no hive');
       return "Erro ao salvar usuário Google no Hive: $e";
     }
   }
@@ -93,7 +95,8 @@ class UserGoogleProvider {
       }
 
       return "Usuário não encontrado no Hive";
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'remover usuário google do hive');
       return "Erro ao deletar usuário Google do Hive: $e";
     }
   }

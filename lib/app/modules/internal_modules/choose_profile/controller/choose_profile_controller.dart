@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
@@ -85,7 +86,8 @@ class ChooseProfileController extends GetxController {
       hasControlPermission.value = groups.any(
         (group) => group.gid == GdiGroupsEnum.controladoresDeAcesso.id,
       );
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'verificar permissão de controle de acesso');
       debugPrint("Error checking control permission: $e");
       hasControlPermission.value = false;
     }
@@ -104,7 +106,8 @@ class ChooseProfileController extends GetxController {
 
     try {
       userUmm = await userUmmRepository.getUserData(iduff, await _auth.getAccessToken() ?? "");
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'buscar dados do usuário na umm');
       debugPrint("Error fetching user data: $e");
       await _failAndLogout(
         'erro_carregar_dados_usuario'.tr,
@@ -269,7 +272,8 @@ class ChooseProfileController extends GetxController {
     try {
       await _userDataController.saveUserData(userUmm, matricula, profileType);
       Get.offAllNamed(Routes.HOME);
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'salvar dados do perfil escolhido');
       debugPrint("Erro ao salvar dados do perfil ($profileType): $e");
       isBusy.value = false;
       await _failAndLogout(
@@ -305,6 +309,7 @@ class ChooseProfileController extends GetxController {
   void _logoutIduff() {
     _userDataRepository.deleteUserIduffModel();
     userUmmRepository.deleteUserUmmModel();
+    CrashReporter.clearUser();
     Get.offAllNamed(Routes.LOGIN);
   }
 }

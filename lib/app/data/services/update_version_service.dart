@@ -5,6 +5,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 enum UpdateStatus { upToDate, optionalUpdate, forceUpdate }
 
@@ -87,7 +88,8 @@ class UpdateVersionService {
       } else if (_isVersionLower(currentVersion, latestVersion)) {
         return UpdateStatus.optionalUpdate;
       }
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'comparar versões do remote config');
       debugPrint("Erro ao comparar versões no Firebase: $e");
     }
     return UpdateStatus.upToDate;

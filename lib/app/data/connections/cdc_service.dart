@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:uffmobileplus/app/config/secrets.dart';
 import 'package:http/http.dart' as http;
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class CdcService {
   /// Registra o device token na CDC.
@@ -38,7 +39,8 @@ class CdcService {
         );
         return false;
       }
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'registrar token cdc');
       debugPrint("Erro ao conectar com servidor CDC: $e");
       return false;
     }

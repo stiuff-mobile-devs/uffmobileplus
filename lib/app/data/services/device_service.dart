@@ -1,5 +1,6 @@
 import 'package:device_info_plus/device_info_plus.dart';
 import 'dart:io';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class DeviceService {
   static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
@@ -13,7 +14,8 @@ class DeviceService {
         return await _getIOSBuildNumber();
       }
       return 'Desconhecido';
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'obter build number do dispositivo');
       return 'Erro ao obter build number: $e';
     }
   }

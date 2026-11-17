@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
 import 'package:open_settings_plus/open_settings_plus.dart';
 import 'package:safe_device/safe_device.dart';
@@ -17,7 +18,8 @@ class LockDevelopModeController extends GetxController {
         return false;
       }
       return await SafeDevice.isDevelopmentModeEnable;
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'verificar modo desenvolvedor');
       debugPrint("Error checking development mode: $e");
       return true; // Permitir acesso em caso de erro para evitar bloqueios indevidos
     }
@@ -61,7 +63,8 @@ class LockDevelopModeController extends GetxController {
               title: 'erro'.tr,
             );
         }
-      } catch (e) {
+      } catch (e, s) {
+        CrashReporter.recordError(e, s, reason: 'abrir configurações do aparelho');
         debugPrint('Erro ao abrir as configurações: $e');
         AppPopups.error(
           'nao_foi_possivel_abrir_as_configuracoes'.tr,

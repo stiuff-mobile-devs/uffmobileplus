@@ -72,6 +72,8 @@ dependencies:
   in_app_update: ^5.0.0
   firebase_remote_config: ^6.5.3
   screen_brightness: ^2.1.11
+  firebase_crashlytics: ^5.2.7
+  crypto: ^3.0.7
   
 dev_dependencies:
   flutter_test:

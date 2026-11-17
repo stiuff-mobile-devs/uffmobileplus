@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/data/data_bases/firebase_service.dart';
 import 'package:uffmobileplus/app/data/data_bases/hive_service.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 import 'package:uffmobileplus/app/data/services/deep_link_service.dart';
 import 'package:uffmobileplus/app/data/services/push_notification_service.dart';
 import 'package:uffmobileplus/app/routes/app_pages.dart';
@@ -18,6 +19,10 @@ Future<void> main() async {
   await AppTranslation.load();
 
   await FirebaseService.init();
+
+  // Relato de erros (Crashlytics): logo após o Firebase, para pegar o resto
+  await CrashReporter.init();
+
   await HiveService.init();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
@@ -43,6 +48,7 @@ Future<void> main() async {
       locale: initialLocale,
       fallbackLocale: const Locale('pt', 'BR'),
       getPages: AppPages.pages,
+      routingCallback: CrashReporter.onRouting,
     ),
   );
 }

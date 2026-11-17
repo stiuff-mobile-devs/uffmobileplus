@@ -2,6 +2,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 /// Serviço centralizado para sincronização e validação dos Custom Claims
 /// do Harpia (`harpia_roles`).
@@ -57,7 +58,8 @@ class HarpiaClaimsService {
       final roles = data?['harpia_roles'];
       debugPrint('[HarpiaClaimsService] Claims sincronizados com sucesso: $roles');
       return roles is Map<String, dynamic> ? roles : null;
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'sincronizar claims do harpia');
       debugPrint('[HarpiaClaimsService] Erro ao sincronizar claims: $e');
       return null;
     }
@@ -84,7 +86,8 @@ class HarpiaClaimsService {
 
       if (harpiaRoles == null || harpiaRoles is! Map) return null;
       return Map<String, dynamic>.from(harpiaRoles);
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'ler claims do harpia');
       debugPrint('[HarpiaClaimsService] Erro ao ler claims: $e');
       return null;
     }

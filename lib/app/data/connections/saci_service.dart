@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:uffmobileplus/app/config/secrets.dart';
 import 'package:http/http.dart' as http;
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 
 class SaciService {
@@ -26,7 +27,8 @@ Future<bool> getStatus() async {
       // Erro específico de rede (sem internet ou DNS falhou)
       debugPrint("Erro: Sem conexão de rede para alcançar o UMM.");
       return false;
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'checar status do saci');
       // Qualquer outro erro inesperado
       debugPrint("Erro desconhecido ao checar status: $e");
       return false;
@@ -58,7 +60,8 @@ Future<List<dynamic>> getSaciData(String? token, String? iduffUsuario, AuthIduff
       }
     }
    }
-    catch(e){
+    catch(e, s){
+      CrashReporter.recordError(e, s, reason: 'obter dados da carteirinha no saci');
       debugPrint("Erro ao obter dados do SACI: $e");
       return [];
     }
