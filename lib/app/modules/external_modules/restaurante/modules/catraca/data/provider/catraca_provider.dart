@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/operator_transaction_offline.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
 class CatracaOnlineProvider {
   final String _collectionPath = "operator_transactions";
@@ -54,7 +55,8 @@ class CatracaOnlineProvider {
           ? Hive.box<OperatorTransactionOffline>(_collectionPath)
           : await Hive.openBox<OperatorTransactionOffline>(_collectionPath);
       return box.values.toList();
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'ler transações offline da catraca no hive');
       return [];
     }
   }
@@ -69,7 +71,8 @@ class CatracaOnlineProvider {
       return box.values
           .where((tx) => tx.isSynced == true)
           .toList();
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'ler transações sincronizadas da catraca no hive');
       debugPrint('Erro ao buscar transações sincronizadas do Hive: $e');
       return [];
     }
@@ -146,7 +149,8 @@ class CatracaOnlineProvider {
           : await Hive.openBox<OperatorTransactionOffline>(_collectionPath);
       await box.delete(id);
       return "success";
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'remover transação offline da catraca do hive');
       debugPrint("Erro ao deletar transação offline: $e");
       return "Erro ao deletar transação offline: $e";
     }
@@ -184,11 +188,13 @@ class CatracaOnlineProvider {
       
       debugPrint('${keysToDelete.length} transações antigas foram sincronizadas e limpas do Hive.');
 
-    } catch (e) {
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'sincronizar transações antigas da catraca antes da limpeza');
       debugPrint("Sem internet ou erro no Firebase. Nenhuma transação apagada para evitar perda de dados: $e");
     }
 
-  } catch (e) {
+  } catch (e, s) {
+    CrashReporter.recordError(e, s, reason: 'limpar transações offline antigas da catraca');
     debugPrint("Erro geral ao limpar transações offline: $e");
   }
 }
