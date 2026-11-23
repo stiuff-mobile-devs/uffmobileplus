@@ -4,11 +4,15 @@ import 'package:get/get.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/area.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/catraca_transaction_item.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/catraca_validation_result.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/utils/cpf_mask.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/operator_transaction.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/operator_transaction_offline.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/repository/catraca_repository.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/services/auth_google_service.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
 import 'dart:async';
 import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 
@@ -49,11 +53,22 @@ class CatracaController extends GetxController {
   late RxList<OperatorTransactionOffline> operatorTransactionsOffline =
       <OperatorTransactionOffline>[].obs;
 
-  late RxList<OperatorTransactionOffline> operatorTransactionsFromFirebase =
-      <OperatorTransactionOffline>[].obs;
+  /// Lista única da tela de validar pagamento: offline do operador nas
+  /// últimas 24h (todos os campi) + online do SCTM do campus atual.
+  final RxList<CatracaTransactionItem> recentItems =
+      <CatracaTransactionItem>[].obs;
 
-  Rx<OperatorTransactionModel> selectedTransaction =
-      OperatorTransactionModel().obs;
+  /// Refeições do Hive ainda não enviadas ao Firebase (de qualquer operador,
+  /// pois a sincronização envia todas).
+  final RxInt pendingSyncCount = 0.obs;
+  final RxBool isSyncing = false.obs;
+
+  final Rxn<CatracaTransactionItem> selectedItem =
+      Rxn<CatracaTransactionItem>();
+
+  /// Desfecho da última validação, para a tela de resultado.
+  final Rxn<CatracaValidationResult> lastResult =
+      Rxn<CatracaValidationResult>();
 
   String? operatorIdUff;
   String? operatorEmailGoogle;
@@ -151,14 +166,8 @@ class CatracaController extends GetxController {
       debugPrint('Erro ao buscar transações offline: $e');
     }
 
-    try {
-      operatorTransactionsFromFirebase.value = await repository
-          .getOperatorTransactionsSynced(
-          );
-    } catch (e) {
-      debugPrint('Erro ao buscar transações offline do firebase: $e');
-    }
-
+    // Limpa antes: se a busca falhar, não mostra as online do campus anterior.
+    operatorTransactions.clear();
     try {
       operatorTransactions.value = await repository.getOperatorTransactions(
         operatorIdUff ?? '',
@@ -177,21 +186,87 @@ class CatracaController extends GetxController {
     catch(e){
       debugPrint('Erro ao sincronizar transações offline: $e');
     }
+    await _buildRecentItems();
     isTransactionBusy.value = false;
   }
 
-  Future<void> loadingQrCodeData() async {
+  /// Monta [recentItems] e [pendingSyncCount] a partir do Hive (relido, pois a
+  /// sincronização acima pode ter marcado itens como enviados) e da lista
+  /// online já buscada.
+  Future<void> _buildRecentItems() async {
+    try {
+      operatorTransactionsOffline.value = await repository
+          .getOperatorTransactionsOffline();
+    } catch (e) {
+      debugPrint('Erro ao reler transações offline: $e');
+    }
+
+    final offline = operatorTransactionsOffline;
+    pendingSyncCount.value = offline.where((tx) => tx.isSynced != true).length;
+
+    // Mesmo valor gravado em idOperator nas validações offline.
+    final operator = operatorEmailGoogle ?? operatorEmailUff ?? '';
+    final since = DateTime.now().subtract(const Duration(hours: 24));
+
+    final items = <CatracaTransactionItem>[
+      ...offline
+          .where((tx) => tx.idOperator == operator && tx.entryTime.isAfter(since))
+          .map(CatracaTransactionItem.fromOffline),
+      ...operatorTransactions.map(
+        (tx) => CatracaTransactionItem.fromOnline(
+          tx,
+          campus: selectedArea.value.nome,
+          operator: operator.isEmpty ? null : operator,
+        ),
+      ),
+    ];
+
+    items.sort((a, b) {
+      if (a.date == null && b.date == null) return 0;
+      if (a.date == null) return 1;
+      if (b.date == null) return -1;
+      return b.date!.compareTo(a.date!);
+    });
+    recentItems.assignAll(items);
+  }
+
+  /// Botão "Sincronizar" da tela de validar pagamento: envia os pendentes ao
+  /// Firebase (mesma rotina automática) e recarrega a lista.
+  Future<void> syncNow() async {
+    if (isSyncing.value) return;
+    isSyncing.value = true;
+    try {
+      await syncOfflineTransactions();
+      await fetchOperatorTransactions();
+      if (pendingSyncCount.value > 0) {
+        AppPopups.warning(
+          'msg_verifique_internet'.tr,
+          title: 'catraca_sincronizacao_falhou'.tr,
+        );
+      } else {
+        AppPopups.success('catraca_tudo_sincronizado'.tr);
+      }
+    } finally {
+      isSyncing.value = false;
+    }
+  }
+
+  /// Lê e valida um QR code. Retorna `false` quando a leitura é cancelada
+  /// (nada a mostrar).
+  Future<bool> loadingQrCodeData() async {
     isReadQRCodeBusy.value = true;
 
     try {
       isTransactionBusy.value = true;
       bool isSctmCompleted = false;
+      // Resposta do SCTM quando ele recusa e a refeição segue para o offline.
+      String? sctmRefusal;
       String? qrCodeScanRes = await _scanQRCode();
 
       if (qrCodeScanRes == null || qrCodeScanRes == "-1") {
+        // O leitor já fechou; não há tela extra para tirar da pilha.
         isReadQRCodeBusy.value = false;
-        Get.back();
-        return;
+        return false;
       }
 
       final expCarteirinhaPagamento = RegExp(
@@ -243,6 +318,26 @@ class CatracaController extends GetxController {
 
           isSctmCompleted = responseMessage["valid"] ?? false;
           _updateStatusMessage(true);
+
+          if (isSctmCompleted) {
+            final name = responseMessage["name"]?.toString();
+            _setResult(
+              CatracaResultKind.approvedSctm,
+              name: name,
+              item: CatracaTransactionItem.fromOnline(
+                OperatorTransactionModel(
+                  name: name,
+                  value: responseMessage["message"]?.toString(),
+                  area: selectedArea.value.nome,
+                  date: DateTime.now(),
+                ),
+                campus: selectedArea.value.nome,
+                operator: operatorEmailGoogle ?? operatorEmailUff,
+              ),
+            );
+          } else {
+            sctmRefusal = responseMessage["message"]?.toString();
+          }
         } catch (e, s) {
           CrashReporter.recordError(e, s, reason: 'validar pagamento online na catraca');
           debugPrint('Erro ao validar pagamento online: $e');
@@ -276,6 +371,11 @@ class CatracaController extends GetxController {
                 true,
                 idIdentificacaoIduff ?? '-',
               );
+              _setResult(
+                CatracaResultKind.duplicate,
+                name: idIdentificacaoIduff,
+                sctmMessage: sctmRefusal,
+              );
             } else {
               // Salvando no banco local
               try {
@@ -288,6 +388,14 @@ class CatracaController extends GetxController {
                   true,
                   idIdentificacaoIduff ?? '-',
                 );
+                _setResult(
+                  CatracaResultKind.savedOffline,
+                  name: idIdentificacaoIduff,
+                  item: CatracaTransactionItem.fromOffline(
+                    operatorTransactionOffline,
+                  ),
+                  sctmMessage: sctmRefusal,
+                );
               } catch (e, s) {
                 CrashReporter.recordError(e, s, reason: 'salvar transação offline da catraca');
                 debugPrint('Erro ao salvar transação offline: $e');
@@ -296,6 +404,11 @@ class CatracaController extends GetxController {
                   false,
                   true,
                   idIdentificacaoIduff ?? '-',
+                );
+                _setResult(
+                  CatracaResultKind.error,
+                  message: 'erro_salvar_transacao_offline'.tr,
+                  name: idIdentificacaoIduff,
                 );
               }
             }
@@ -306,6 +419,7 @@ class CatracaController extends GetxController {
               false,
               "",
             );
+            _setResult(CatracaResultKind.invalidCode);
           }
         } catch (e, s) {
           CrashReporter.recordError(e, s, reason: 'validar pagamento offline na catraca');
@@ -316,15 +430,20 @@ class CatracaController extends GetxController {
             false,
             "",
           );
+          _setResult(
+            CatracaResultKind.error,
+            message: 'erro_validar_pagamento_offline'.tr,
+          );
         }
       }
     } catch (e, s) {
       CrashReporter.recordError(e, s, reason: 'ler qr code na catraca');
       debugPrint('Erro ao ler código QR code: $e');
       _transactionResultMessages('erro_ler_qr_code'.tr, false, false, "");
+      _setResult(CatracaResultKind.error, message: 'erro_ler_qr_code'.tr);
     }
     isReadQRCodeBusy.value = false;
-    return;
+    return true;
   }
 
   Future<List<AreaModel>> getOffLineAreas() async {
@@ -357,6 +476,7 @@ class CatracaController extends GetxController {
     );
     if (isDuplicate) {
       _transactionResultMessages('transacao_duplicada'.tr, false, true, cpf);
+      _setResult(CatracaResultKind.duplicate, name: maskCpf(cpf));
     } else {
       try {
         await repository.saveOperatorTransactionsOffline(
@@ -369,6 +489,11 @@ class CatracaController extends GetxController {
           true,
           cpf,
         );
+        _setResult(
+          CatracaResultKind.savedOffline,
+          name: maskCpf(cpf),
+          item: CatracaTransactionItem.fromOffline(operatorTransactionOffline),
+        );
       } catch (e, s) {
         CrashReporter.recordError(e, s, reason: 'salvar validação manual por cpf na catraca');
         debugPrint('Erro ao salvar transação offline: $e');
@@ -377,6 +502,11 @@ class CatracaController extends GetxController {
           false,
           true,
           cpf,
+        );
+        _setResult(
+          CatracaResultKind.error,
+          message: 'falha_salvar_transacao_offline'.tr,
+          name: maskCpf(cpf),
         );
       }
     }
@@ -388,10 +518,39 @@ class CatracaController extends GetxController {
     Get.toNamed(Routes.VALIDAR_PAGAMENTO);
   }
 
-  void readCode() async {
-    await loadingQrCodeData();
+  Future<void> readCode() async {
+    final hasResult = await loadingQrCodeData();
     isTransactionBusy.value = false;
+    if (hasResult) await _showResult();
+  }
+
+  /// Abre o resultado sempre por cima da lista: o "voltar" do resultado leva à
+  /// lista, sem empilhar resultados ou a tela manual.
+  Future<void> _showResult() async {
+    await _buildRecentItems();
+    Get.until(
+      (route) =>
+          route.settings.name == Routes.VALIDAR_PAGAMENTO || route.isFirst,
+    );
     Get.toNamed(Routes.RESULTADO_PAGE);
+  }
+
+  void _setResult(
+    CatracaResultKind kind, {
+    String? message,
+    String? name,
+    CatracaTransactionItem? item,
+    String? sctmMessage,
+  }) {
+    lastResult.value = CatracaValidationResult(
+      kind: kind,
+      message: message,
+      name: name,
+      item: item,
+      sctmMessage: (sctmMessage == null || sctmMessage.trim().isEmpty)
+          ? null
+          : sctmMessage,
+    );
   }
 
 
@@ -404,16 +563,12 @@ class CatracaController extends GetxController {
     Get.toNamed(Routes.VALIDAR_MANUALMENTE);
   }
 
-  void getResultPage() {
-    Get.toNamed(Routes.RESULTADO_PAGE);
-  }
+  /// Depois da liberação manual.
+  Future<void> getResultPage() => _showResult();
 
-   void goToDetalhado(OperatorTransactionModel transaction) {
-    selectedTransaction.value = transaction;
-    Get.toNamed(
-      Routes.RESULTADO_DETALHADO_PAGE,
-      arguments: {'operatorTransaction': transaction},
-    );
+  void goToDetalhado(CatracaTransactionItem item) {
+    selectedItem.value = item;
+    Get.toNamed(Routes.RESULTADO_DETALHADO_PAGE);
   }
 
   Future<void> syncOfflineTransactions() async {

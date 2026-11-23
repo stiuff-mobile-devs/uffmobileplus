@@ -61,23 +61,6 @@ class CatracaOnlineProvider {
     }
   }
 
-  Future<List<OperatorTransactionOffline>>
-  getOperatorTransactionsSynced() async {
-    try {
-      final box = Hive.isBoxOpen(_collectionPath)
-          ? Hive.box<OperatorTransactionOffline>(_collectionPath)
-          : await Hive.openBox<OperatorTransactionOffline>(_collectionPath);
-
-      return box.values
-          .where((tx) => tx.isSynced == true)
-          .toList();
-    } catch (e, s) {
-      CrashReporter.recordError(e, s, reason: 'ler transações sincronizadas da catraca no hive');
-      debugPrint('Erro ao buscar transações sincronizadas do Hive: $e');
-      return [];
-    }
-  }
-
   Future<String> saveOperatorTransactionToFirebase(
     OperatorTransactionOffline operatorTransactionOffline,
   ) async {

@@ -48,12 +48,6 @@ class CatracaOnlineRepository {
     return await catracaOnlineProvider.getOperatorTransactionsOffline();
   }
 
-  Future<List<OperatorTransactionOffline>>
-  getOperatorTransactionsSynced() async {
-    return await catracaOnlineProvider.getOperatorTransactionsSynced(
-    );
-  }
-
   Future<String> saveOperatorTransactionToFirebase(
     OperatorTransactionOffline operatorTransactionOffline,
   ) async {
