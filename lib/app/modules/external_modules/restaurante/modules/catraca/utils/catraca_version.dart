@@ -5,5 +5,5 @@
 class CatracaVersion {
   CatracaVersion._();
 
-  static const String current = '1.0.0';
+  static const String current = '1.0.1';
 }
