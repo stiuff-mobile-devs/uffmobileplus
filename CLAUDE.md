@@ -89,6 +89,8 @@ São os módulos mais usados do app. **Antes de alterar qualquer regra de negóc
 - Problemas de regra encontrados no caminho são **listados para o usuário**, não corrigidos por conta própria.
 
 **Catraca (`restaurante/modules/catraca`) é ainda mais sensível:** controla a entrada no RU (validação online/offline, débito, transações salvas no Hive/Firebase). Ela **nunca entra em mudanças em lote** do Restaurante ou do app (migração de AppBar/pop-ups, troca de textos, refatorações, renomear chaves de tradução que ela usa). Só é alterada numa tarefa **dedicada e individual**, pedida explicitamente, com o plano explicado antes e aprovação do usuário — inclusive para mudanças só visuais. Em commit próprio, sem misturar com outros arquivos.
+- **Versão da catraca**: `catraca/utils/catraca_version.dart` (`CatracaVersion.current`, aparece na tela de informações). Suba a cada mudança na catraca, no mesmo commit: patch para correção, minor para funcionalidade/visual.
+- Todas as telas da catraca usam `catracaAppBar(title:, onRefresh:)` (`catraca/utils/catraca_app_bar.dart`): `AppBars` + botão de atualizar + "?" que abre a tela de informações (`Routes.CATRACA_INFO`). O estado online/offline aparece no `CatracaStatusBadge`, no corpo da tela.
 
 ### Routing
 `lib/app/routes/app_pages.dart` defines `AppPages.pages`, a `GetPage` list pairing each route with its page widget and binding(s). `lib/app/routes/app_routes.dart` defines route name constants (`abstract class Routes`). Standard GetX navigation (`Get.toNamed`, etc.) throughout.
@@ -107,7 +109,7 @@ Custom GetX-native i18n (`lib/app/utils/translations/`), **not** Flutter's `.arb
 To add a new translated string, add the key to **all 6** JSON files, not just one. `test/translations/translation_integrity_test.dart` checks that every locale has the same keys as `pt_BR`, no empty values, no duplicate keys, and that every `.tr` key used in `lib/` exists in `pt_BR.json`. Before checking for a new key, grep `pt_BR.json` — many texts already have a key.
 
 ### AppBars (`AppBars`)
-Ponto único: `lib/app/utils/ui_components/app_bars.dart`. **Obrigatório nos `internal_modules`** (exceto a tela especial `lock_develop_mode`) e no `restaurante` (já migrado, **exceto a catraca**, que segue com o visual antigo até uma tarefa dedicada); os demais `external_modules` ainda usam `customAppBar`/blocos próprios — migre-os quando for mexer neles.
+Ponto único: `lib/app/utils/ui_components/app_bars.dart`. **Obrigatório nos `internal_modules`** (exceto a tela especial `lock_develop_mode`) e no `restaurante` (já migrado, inclusive a catraca, via `catracaAppBar`); os demais `external_modules` ainda usam `customAppBar`/blocos próprios — migre-os quando for mexer neles.
 - Nunca use `AppBar(...)`/`SliverAppBar(...)` direto nas telas: `appBar: AppBars.build(title: ..., actions: [...])`.
 - Visual único: degradê vertical `AppColors.mediumBlue()` → `AppColors.darkBlue()`, raio inferior 16, título centralizado, texto/ícones brancos, status bar clara.
 - A seta de voltar e o ícone do menu (quando há drawer) são automáticos; passe `leading` só para comportamentos especiais (ex.: WebView volta no histórico). Filtros/abas vão em `bottom`.
@@ -116,7 +118,7 @@ Ponto único: `lib/app/utils/ui_components/app_bars.dart`. **Obrigatório nos `i
 - Título reativo: `AppBars.build(titleWidget: Obx(() => Text(...)))`.
 
 ### Pop-ups e snackbars (`AppPopups`)
-Ponto único: `lib/app/utils/ui_components/app_popups.dart`. **Obrigatório nos `internal_modules`** e no `restaurante` (já migrado, **exceto a catraca**); os demais `external_modules` ainda usam o padrão antigo (`Get.snackbar`, `customAlertDialog`/AwesomeDialog etc.) — migre-os para `AppPopups` quando for mexer neles.
+Ponto único: `lib/app/utils/ui_components/app_popups.dart`. **Obrigatório nos `internal_modules`** e no `restaurante` (já migrado, **exceto a catraca**, que ainda usa `ScaffoldMessenger`/`Get.snackbar` em `validar_manualmente_page.dart`); os demais `external_modules` ainda usam o padrão antigo (`Get.snackbar`, `customAlertDialog`/AwesomeDialog etc.) — migre-os para `AppPopups` quando for mexer neles.
 - Nunca use `showDialog`, `Get.dialog`, `Get.defaultDialog`, `Get.snackbar`, `Get.bottomSheet`, `showModalBottomSheet`, `ScaffoldMessenger` ou `customAlertDialog` direto nas telas/controllers.
 - Mensagem rápida: `AppPopups.success/error/warning/info(texto, title: opcional)` (snackbar flutuante via `ScaffoldMessenger`, não quebra o `Get.back()`).
 - Confirmação: `await AppPopups.confirm(...)` → `bool` (bottom sheet; `destructive: true` para desconectar/excluir; `type:` para mudar a cor do ícone).

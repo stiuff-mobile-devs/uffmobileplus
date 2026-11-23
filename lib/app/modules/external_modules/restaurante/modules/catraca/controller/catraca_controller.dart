@@ -30,6 +30,15 @@ class CatracaController extends GetxController {
   RxBool isOfflineMode = false.obs;
   RxString statusMessage = 'catraca_online'.tr.obs;
 
+  /// Conexão com a internet e o SCTM, mostrada no selo online/offline das
+  /// telas. Só exibição: o caminho online/offline de cada validação continua
+  /// sendo decidido na hora da validação.
+  RxBool isConnected = true.obs;
+  RxBool isCheckingConnection = false.obs;
+
+  /// Horário do último lote de refeições offline enviado ao Firebase.
+  Rxn<DateTime> lastSyncAt = Rxn<DateTime>();
+
   Rx<AreaModel> selectedArea = AreaModel().obs;
 
   late RxList<AreaModel> areas = <AreaModel>[].obs;
@@ -108,6 +117,27 @@ class CatracaController extends GetxController {
       _updateStatusMessage(false);
     }
     isAreaBusy.value = false;
+  }
+
+  /// Refaz o teste de internet + SCTM e atualiza o selo online/offline.
+  Future<void> checkConnection() async {
+    if (isCheckingConnection.value) return;
+    isCheckingConnection.value = true;
+    try {
+      final hasInternet = await InternetConnection().hasInternetAccess;
+      isConnected.value = hasInternet && await repository.getSctmStatus();
+    } catch (e) {
+      debugPrint('Erro ao verificar conexão da catraca: $e');
+      isConnected.value = false;
+    } finally {
+      isCheckingConnection.value = false;
+    }
+  }
+
+  /// Refresh da tela de validar pagamento: conexão + transações.
+  Future<void> refreshTransactions() async {
+    await checkConnection();
+    await fetchOperatorTransactions();
   }
 
   Future<void> fetchOperatorTransactions() async {
@@ -420,6 +450,7 @@ class CatracaController extends GetxController {
 
         // Atualiza o status das transações no banco local
         await repository.saveOperatorTransactionsOfflineBatch(syncedBatch);
+        lastSyncAt.value = DateTime.now();
         
         debugPrint('Batch of ${currentBatch.length} transactions synced successfully!');
         
@@ -463,9 +494,11 @@ class CatracaController extends GetxController {
     if (isOnline) {
       statusMessage.value = 'catraca_online'.tr;
       isOfflineMode.value = false;
+      isConnected.value = true;
     } else {
       statusMessage.value = 'catraca_offline'.tr;
       isOfflineMode.value = true;
+      isConnected.value = false;
     }
   }
 

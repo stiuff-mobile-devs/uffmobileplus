@@ -20,6 +20,7 @@ abstract class Routes {
   static const LEITOR_QRCODE = '/leitor_qrcode';
   static const RESULTADO_DETALHADO_PAGE = '/resultado_detalhado_page';
   static const VALIDAR_MANUALMENTE = '/validar_manualmente';
+  static const CATRACA_INFO = '/catraca_info';
   static const BANDEJAPP = '/cardapio';
   static const PAY_RESTAURANT = '/pay_restaurant';
   static const PAY_RESTAURANT_TICKET = '/restaurante/pay_restaurant/ticket';

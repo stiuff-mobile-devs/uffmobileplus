@@ -1,4 +1,6 @@
+import 'package:uffmobileplus/app/data/connections/saci_service.dart';
 import 'package:uffmobileplus/app/data/connections/sctm_service.dart';
+import 'package:uffmobileplus/app/data/connections/umm_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/area.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/operator_transaction.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/operator_transaction_offline.dart';
@@ -94,5 +96,10 @@ class CatracaOnlineRepository {
   );
 }
 
-  
+  // Status dos sistemas (tela de informações e refresh da catraca).
+  Future<bool> getSctmStatus() => sctmService.getStatus();
+
+  Future<bool> getSaciStatus() => SaciService().getStatus();
+
+  Future<bool> getUmmStatus() => UmmService().getStatus();
 }

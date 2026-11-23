@@ -3,6 +3,8 @@ import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/s
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/user/utils/bond_status.dart'
+    as bond_status;
 import 'package:uffmobileplus/app/modules/internal_modules/user/utils/crash_reporter_user.dart';
 import 'package:uffmobileplus/app/utils/gdi_groups.dart';
 import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
@@ -99,6 +101,12 @@ class ExternalModulesServices extends GetxService {
   List<GdiGroups>? getUserGdiGroups() {
     return _userData.gdiGroups;
   }
+
+  /// Há uma sessão IdUFF ativa (refresh token salvo e não expirado).
+  Future<bool> hasActiveIduffBond() => bond_status.hasActiveIduffBond();
+
+  /// Há uma sessão Google ativa (conta salva + sessão Firebase válida).
+  Future<bool> hasActiveGoogleBond() => bond_status.hasActiveGoogleBond();
 
   String? getUserEmailGoogle() {
     return _userGoogleModel.email;

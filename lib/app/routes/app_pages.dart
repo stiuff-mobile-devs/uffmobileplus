@@ -44,6 +44,7 @@ import 'package:uffmobileplus/app/modules/external_modules/radio/bindings/radio_
 import 'package:uffmobileplus/app/modules/external_modules/radio/ui/radio_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/bindings/catraca_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/ui/catraca_online_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/ui/pages/catraca_info_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/ui/pages/resultado_detalhado_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/ui/pages/resultado_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/ui/pages/validar_manualmente_page.dart';
@@ -172,6 +173,12 @@ abstract class AppPages {
     GetPage(
       name: Routes.VALIDAR_MANUALMENTE,
       page: () => ValidarManualmentePage(),
+      binding: CatracaOnlineBindings(),
+    ),
+
+    GetPage(
+      name: Routes.CATRACA_INFO,
+      page: () => const CatracaInfoPage(),
       binding: CatracaOnlineBindings(),
     ),
 

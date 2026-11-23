@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/controller/catraca_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/utils/transaction_list.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/utils/catraca_app_bar.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/utils/catraca_status_badge.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/utils/ui_components/custom_progress_display.dart';
 
@@ -11,29 +13,11 @@ class ValidarPagamentoPage extends GetView<CatracaController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        elevation: 8,
-        foregroundColor: Colors.white,
-        title: Obx(() => Text(controller.statusMessage.value)),
-        actions: [
-         
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'atualizar'.tr,
-            onPressed: () {
-              controller.fetchOperatorTransactions();
-            },
-          ),
-        ],
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
-        ),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(gradient: AppColors.appBarTopGradient()),
-        ),
+      backgroundColor: AppColors.darkBlue(),
+      appBar: catracaAppBar(
+        title: 'catraca_validar_pagamento'.tr,
+        onRefresh: controller.refreshTransactions,
       ),
-
       body: Obx(
         () => controller.isTransactionBusy.value
             ? Center(child: CustomProgressDisplay())
@@ -46,8 +30,12 @@ class ValidarPagamentoPage extends GetView<CatracaController> {
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        const Padding(
+                          padding: EdgeInsets.only(top: 12),
+                          child: CatracaStatusBadge(),
+                        ),
                         Container(
-                          margin: EdgeInsets.only(top: 12),
+                          margin: EdgeInsets.only(top: 4),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

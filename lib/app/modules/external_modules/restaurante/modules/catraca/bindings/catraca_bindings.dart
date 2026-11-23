@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/controller/catraca_controller.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/controller/catraca_info_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/utils/leitor_qr_code.dart';
 
 class CatracaOnlineBindings implements Bindings {
@@ -8,5 +9,7 @@ class CatracaOnlineBindings implements Bindings {
     Get.lazyPut<CatracaController>(() => CatracaController());
 
     Get.lazyPut<LeitorQrCodeController>(() => LeitorQrCodeController());
+
+    Get.lazyPut<CatracaInfoController>(() => CatracaInfoController());
   }
 }
