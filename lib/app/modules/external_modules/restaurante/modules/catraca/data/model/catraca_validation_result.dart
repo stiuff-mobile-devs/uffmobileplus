@@ -29,7 +29,6 @@ class CatracaValidationResult {
     this.message,
     this.name,
     this.item,
-    this.sctmMessage,
   });
 
   final CatracaResultKind kind;
@@ -42,9 +41,6 @@ class CatracaValidationResult {
 
   /// A refeição registrada (SCTM ou offline), para abrir o detalhe.
   final CatracaTransactionItem? item;
-
-  /// Resposta do SCTM quando ele recusou antes de a refeição ser salva offline.
-  final String? sctmMessage;
 
   bool get isSuccess =>
       kind == CatracaResultKind.approvedSctm ||

@@ -135,6 +135,9 @@ class AuthGoogleController extends GetxController {
     Get.offAllNamed(Routes.LOGIN);
   }
 
+  /// Desconecta o Google sem trocar de tela (ex.: pela catraca).
+  Future<void> disconnect() => _clearGoogleSession();
+
   /// Sai da conta Google e apaga o que é dela (usuário e grupos GDI), sem navegar.
   Future<void> _clearGoogleSession() async {
     await _authGoogle.logoutGoogle();

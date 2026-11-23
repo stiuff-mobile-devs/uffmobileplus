@@ -89,7 +89,8 @@ São os módulos mais usados do app. **Antes de alterar qualquer regra de negóc
 - Problemas de regra encontrados no caminho são **listados para o usuário**, não corrigidos por conta própria.
 
 **Catraca (`restaurante/modules/catraca`) é ainda mais sensível:** controla a entrada no RU (validação online/offline, débito, transações salvas no Hive/Firebase). Ela **nunca entra em mudanças em lote** do Restaurante ou do app (migração de AppBar/pop-ups, troca de textos, refatorações, renomear chaves de tradução que ela usa). Só é alterada numa tarefa **dedicada e individual**, pedida explicitamente, com o plano explicado antes e aprovação do usuário — inclusive para mudanças só visuais. Em commit próprio, sem misturar com outros arquivos.
-- **Versão da catraca**: `catraca/utils/catraca_version.dart` (`CatracaVersion.current`, aparece na tela de informações). Suba a cada mudança na catraca, no mesmo commit: patch para correção, minor para funcionalidade/visual.
+- **Versão da catraca**: `catraca/utils/catraca_version.dart` (`CatracaVersion.current`, aparece na tela de informações). **Não suba por conta própria**: quem muda é o mantenedor, manualmente, junto com uma versão nova do UFF Mobile Plus.
+- **Termos da catraca** (textos ao operador): a refeição é **Debitada** (validada no SCTM, verde), **Pendente** (salva no aparelho por fora do SCTM, laranja) ou **Registrada** (enviada ao Firebase, azul). O selo do topo é **SCTM ativo** / **Contingência**. Não use "offline" para a refeição.
 - Todas as telas da catraca usam `catracaAppBar(title:, onRefresh:)` (`catraca/utils/catraca_app_bar.dart`): `AppBars` + botão de atualizar + "?" que abre a tela de informações (`Routes.CATRACA_INFO`). O estado online/offline aparece no `CatracaStatusBadge`, no corpo da tela.
 
 ### Routing

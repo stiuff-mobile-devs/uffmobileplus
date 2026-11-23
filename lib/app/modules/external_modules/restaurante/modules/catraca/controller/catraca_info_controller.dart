@@ -78,6 +78,25 @@ class CatracaInfoController extends GetxController {
     }
   }
 
+  /// Toque na vinculação IdUFF: os dois caminhos saem da catraca
+  /// (autenticação ou login), então avisa antes.
+  Future<void> onIduffTap() => _externalModulesServices.toggleIduffBond(
+    loginNote: 'catraca_nota_sair_para_iduff'.tr,
+    logoutNote: 'catraca_nota_sem_iduff'.tr,
+  );
+
+  /// Toque na vinculação Google: conecta ou desconecta sem sair da catraca.
+  Future<void> onGoogleTap() async {
+    final changed = await _externalModulesServices.toggleGoogleBond(
+      logoutNote: 'catraca_nota_sem_google'.tr,
+    );
+    if (!changed) return;
+    if (Get.isRegistered<CatracaController>()) {
+      await Get.find<CatracaController>().reloadOperator();
+    }
+    await refreshAll();
+  }
+
   Future<void> _loadBonds() async {
     final results = await Future.wait([
       _externalModulesServices.hasActiveIduffBond(),

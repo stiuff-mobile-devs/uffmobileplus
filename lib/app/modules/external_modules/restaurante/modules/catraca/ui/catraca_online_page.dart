@@ -17,6 +17,20 @@ class CatracaOnlinePage extends GetView<CatracaController> {
 
   @override
   Widget build(BuildContext context) {
+    // Sair da catraca com refeições pendentes: avisa que estão seguras e
+    // oferece sincronizar antes.
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        final navigator = Navigator.of(context);
+        if (await controller.confirmLeave()) navigator.pop();
+      },
+      child: _buildScaffold(),
+    );
+  }
+
+  Widget _buildScaffold() {
     return Scaffold(
       backgroundColor: AppColors.darkBlue(),
       appBar: catracaAppBar(

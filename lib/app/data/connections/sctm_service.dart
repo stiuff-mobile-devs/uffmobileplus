@@ -61,7 +61,11 @@ class SctmService {
         },
       );
 
-      http.Response response = await http.post(uri);
+      // Sem timeout, uma rede ruim prendia a catraca; ao estourar, a
+      // validação segue para o modo offline.
+      http.Response response = await http
+          .post(uri)
+          .timeout(const Duration(seconds: 8));
 
       if (response.statusCode == 200) {
         Map responseMap = json.decode(response.body);
@@ -69,6 +73,9 @@ class SctmService {
         if (responseMap is Map) {
           if (responseMap["status"] == "0") {
             return {
+              // O SCTM respondeu de fato (aprovou ou recusou). Quando false,
+              // houve falha de comunicação e a catraca pode seguir offline.
+              "responded": true,
               "valid": true,
               "message":
                   responseMap["content"]?["valor_debitado"] ??
@@ -85,7 +92,11 @@ class SctmService {
               name = responseMap["content"]["nome"];
             }
 
-            final result = {"valid": false, "message": message};
+            final result = <String, dynamic>{
+              "responded": true,
+              "valid": false,
+              "message": message,
+            };
 
             if (name != null) {
               result["name"] = name;
@@ -100,7 +111,11 @@ class SctmService {
       print('Erro ao validar pagamento: $e');
     }
 
-    return {"valid": false, "message": "Erro na comunicação com o servidor"};
+    return {
+      "responded": false,
+      "valid": false,
+      "message": "Erro na comunicação com o servidor",
+    };
   }
 
   Future<List<AreaModel>> getAreas(

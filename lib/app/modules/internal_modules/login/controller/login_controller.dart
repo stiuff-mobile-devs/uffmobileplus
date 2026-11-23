@@ -75,13 +75,17 @@ class LoginController extends GetxController {
     await _loadBondStates();
   }
 
+  /// Atalho da catraca no login: aparece mesmo sem sessão, para o operador
+  /// usar a catraca offline com os dados do Hive. Vale o grupo vindo do
+  /// IdUFF ou do Google (regra única em `isCatracaOperator`).
   void _checkAdminPermission(final gdi) {
-    final groups = _user.gdiGroups;
-    if (groups == null || groups.isEmpty) {
-      hasAdminPermission.value = false;
-      return;
-    }
-    hasAdminPermission.value = groups.any((group) => group.gid == gdi);
+    hasAdminPermission.value = isCatracaOperator(
+      iduffGids: (_user.gdiGroups ?? []).map((g) => g.gid),
+      googleGids: (_user.gdiGroupsGoogle?.gdiGroups ?? []).map((g) => g.gid),
+      googleEmails: (_user.gdiGroupsGoogle?.gdiGroups ?? []).map(
+        (g) => g.email,
+      ),
+    );
   }
 
   void loginIDUFF() {

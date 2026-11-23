@@ -59,6 +59,7 @@ class CatracaInfoPage extends GetView<CatracaInfoController> {
               active: controller.hasIduffBond.value,
               email: controller.iduffEmail.value,
               loading: controller.isLoading.value,
+              onTap: controller.onIduffTap,
             ),
             const Divider(color: Colors.white12, height: 24),
             _BondTile(
@@ -67,6 +68,7 @@ class CatracaInfoPage extends GetView<CatracaInfoController> {
               active: controller.hasGoogleBond.value,
               email: controller.googleEmail.value,
               loading: controller.isLoading.value,
+              onTap: controller.onGoogleTap,
             ),
             if (!controller.isLoading.value &&
                 controller.googleEmail.value != null &&
@@ -115,7 +117,7 @@ class CatracaInfoPage extends GetView<CatracaInfoController> {
             _ConnectionTile(label: 'SACI', status: controller.saci.value),
             _ConnectionTile(label: 'UMM', status: controller.umm.value),
             _ConnectionTile(
-              label: 'Firebase',
+              label: 'catraca_registro_firebase'.tr,
               status: pending == null ? null : pending == 0,
               loadingWhenNull: controller.isLoading.value,
               detail: [
@@ -125,8 +127,8 @@ class CatracaInfoPage extends GetView<CatracaInfoController> {
                     'horario': DateFormat('dd/MM HH:mm').format(lastSync),
                   }),
               ].join('\n'),
-              okLabel: 'catraca_sincronizado'.tr,
-              badLabel: 'catraca_pendente'.tr,
+              okLabel: 'catraca_estado_registrada'.tr,
+              badLabel: 'catraca_estado_pendente'.tr,
             ),
           ],
         );
@@ -246,6 +248,7 @@ class _BondTile extends StatelessWidget {
     required this.active,
     required this.email,
     required this.loading,
+    required this.onTap,
   });
 
   final String name;
@@ -254,8 +257,28 @@ class _BondTile extends StatelessWidget {
   final String? email;
   final bool loading;
 
+  /// Conecta (inativa) ou desconecta (ativa) a vinculação.
+  final VoidCallback onTap;
+
   @override
   Widget build(BuildContext context) {
+    return InkWell(
+      onTap: loading ? null : onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          children: [
+            Expanded(child: _content()),
+            const SizedBox(width: 8),
+            const Icon(Icons.chevron_right_rounded, color: Colors.white38),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _content() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -291,6 +314,17 @@ class _BondTile extends StatelessWidget {
           usage,
           style: const TextStyle(color: Colors.white54, fontSize: 12),
         ),
+        if (!loading) ...[
+          const SizedBox(height: 4),
+          Text(
+            active ? 'catraca_toque_desconectar'.tr : 'catraca_toque_conectar'.tr,
+            style: TextStyle(
+              color: AppColors.lightBlue(),
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -344,8 +378,8 @@ class _ConnectionTile extends StatelessWidget {
           ),
           _StatusChip(
             status: status,
-            okLabel: okLabel ?? 'online'.tr,
-            badLabel: badLabel ?? 'catraca_offline_selo'.tr,
+            okLabel: okLabel ?? 'catraca_disponivel'.tr,
+            badLabel: badLabel ?? 'catraca_indisponivel'.tr,
             showLoading: loadingWhenNull,
           ),
         ],

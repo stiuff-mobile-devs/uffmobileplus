@@ -136,15 +136,15 @@ class RestaurantModulesController extends GetxController {
 
     if (button.gdiGroups == null) return false;
 
+    // Catraca: regra única de operador (grupo pelo IdUFF ou pelo Google).
     if (button.gdiGroups!.any(
       (btnGroup) => btnGroup.gid == GdiGroupsEnum.controladoresDeAcesso.id,
     )) {
-      if (currentGdiGroupsGoogle.any(
-        (userGroup) =>
-            userGroup.email == 'controladores-de-acesso-ru.proaes@id.uff.br',
-      )) {
-        return false;
-      }
+      return !isCatracaOperator(
+        iduffGids: currentGdiGroups.map((g) => g.gid),
+        googleGids: currentGdiGroupsGoogle.map((g) => g.gid),
+        googleEmails: currentGdiGroupsGoogle.map((g) => g.email),
+      );
     }
     bool hasGroupMatch = button.gdiGroups!.any(
       (btnGroup) =>

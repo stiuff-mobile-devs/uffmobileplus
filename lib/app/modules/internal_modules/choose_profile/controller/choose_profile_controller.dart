@@ -78,13 +78,12 @@ class ChooseProfileController extends GetxController {
 
   void _checkControlPermission() {
     try {
-      final groups = _user.gdiGroups;
-      if (groups == null || groups.isEmpty) {
-        hasControlPermission.value = false;
-        return;
-      }
-      hasControlPermission.value = groups.any(
-        (group) => group.gid == GdiGroupsEnum.controladoresDeAcesso.id,
+      // Regra única da catraca: grupo pelo IdUFF ou pelo Google.
+      final google = _user.gdiGroupsGoogle?.gdiGroups ?? [];
+      hasControlPermission.value = isCatracaOperator(
+        iduffGids: (_user.gdiGroups ?? []).map((g) => g.gid),
+        googleGids: google.map((g) => g.gid),
+        googleEmails: google.map((g) => g.email),
       );
     } catch (e, s) {
       CrashReporter.recordError(e, s, reason: 'verificar permissão de controle de acesso');

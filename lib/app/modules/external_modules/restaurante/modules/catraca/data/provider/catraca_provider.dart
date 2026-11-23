@@ -1,17 +1,58 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/area.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/data/model/operator_transaction_offline.dart';
 import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
+import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/utils/meal_shift.dart';
 
 class CatracaOnlineProvider {
   final String _collectionPath = "operator_transactions";
+  final String _areasBox = "catraca_areas";
+  final String _areasKey = "last_areas";
   final String _collectionPathFirebase =
-      "meals"; // para testes user meals_test
+      "meals_test"; // para testes user meals_test
   final FirebaseFirestore _firestore = FirebaseFirestore.instanceFor(
     app: Firebase.app("catraca"),
   );
+
+  /// Guarda a última lista de áreas do SCTM (JSON simples, sem adapter).
+  Future<void> saveAreas(List<AreaModel> areas) async {
+    try {
+      final box = Hive.isBoxOpen(_areasBox)
+          ? Hive.box<String>(_areasBox)
+          : await Hive.openBox<String>(_areasBox);
+      await box.put(
+        _areasKey,
+        jsonEncode([
+          for (final a in areas) {'id': a.id, 'nome': a.nome},
+        ]),
+      );
+    } catch (e) {
+      // Sem a lista salva a contingência usa a fixa; não é erro grave.
+      debugPrint('Erro ao salvar áreas da catraca: $e');
+    }
+  }
+
+  Future<List<AreaModel>> getSavedAreas() async {
+    try {
+      final box = Hive.isBoxOpen(_areasBox)
+          ? Hive.box<String>(_areasBox)
+          : await Hive.openBox<String>(_areasBox);
+      final raw = box.get(_areasKey);
+      if (raw == null || raw.isEmpty) return [];
+      return (jsonDecode(raw) as List)
+          .whereType<Map>()
+          .map((m) => AreaModel.fromJson(Map<String, dynamic>.from(m)))
+          .toList();
+    } catch (e) {
+      debugPrint('Erro ao ler áreas salvas da catraca: $e');
+      return [];
+    }
+  }
 
   Future<void> saveOperatorTransactionsOffline(
     OperatorTransactionOffline operatorTransactionOffline,
@@ -144,36 +185,52 @@ class CatracaOnlineProvider {
     final box = Hive.isBoxOpen(_collectionPath)
         ? Hive.box<OperatorTransactionOffline>(_collectionPath)
         : await Hive.openBox<OperatorTransactionOffline>(_collectionPath);
-        
+
     DateTime now = DateTime.now();
     DateTime limite24Horas = now.subtract(const Duration(hours: 24));
 
-    List<dynamic> keysToDelete = [];
-    List<OperatorTransactionOffline> transactionsToSync = [];
+    // Separa as antigas em já sincronizadas (podem sair direto) e pendentes
+    // (precisam chegar ao Firebase antes de sair do aparelho).
+    List<dynamic> syncedKeys = [];
+    Map<dynamic, OperatorTransactionOffline> pending = {};
 
-    // Separa quem passou de 24h (pegando a chave e o objeto)
     for (var key in box.keys) {
       OperatorTransactionOffline? transaction = box.get(key);
       if (transaction != null && transaction.entryTime.isBefore(limite24Horas)) {
-        keysToDelete.add(key);
-        transactionsToSync.add(transaction);
+        if (transaction.isSynced == true) {
+          syncedKeys.add(key);
+        } else {
+          pending[key] = transaction;
+        }
       }
     }
 
-    if (keysToDelete.isEmpty) return;
+    // Já estão no Firebase: apaga sem reenviar (reenviar custava 1 leitura
+    // por documento na checagem de existência).
+    if (syncedKeys.isNotEmpty) {
+      await box.deleteAll(syncedKeys);
+      debugPrint('${syncedKeys.length} transações antigas já sincronizadas foram limpas do Hive.');
+    }
 
-    try {
-      // Tenta garantir que todos os dados estejam na nuvem.
-    
-      await saveOperatorTransactionsToFirebaseBatch(transactionsToSync);
+    if (pending.isEmpty) return;
 
-      await box.deleteAll(keysToDelete);
-      
-      debugPrint('${keysToDelete.length} transações antigas foram sincronizadas e limpas do Hive.');
-
-    } catch (e, s) {
-      CrashReporter.recordError(e, s, reason: 'sincronizar transações antigas da catraca antes da limpeza');
-      debugPrint("Sem internet ou erro no Firebase. Nenhuma transação apagada para evitar perda de dados: $e");
+    // Pendentes: envia em lotes de 400 (o Firestore aceita até 500 escritas
+    // por commit) e só apaga cada lote depois de enviado.
+    const int batchSize = 400;
+    final keys = pending.keys.toList();
+    for (int i = 0; i < keys.length; i += batchSize) {
+      final chunkKeys =
+          keys.sublist(i, i + batchSize < keys.length ? i + batchSize : keys.length);
+      try {
+        await saveOperatorTransactionsToFirebaseBatch(
+          chunkKeys.map((k) => pending[k]!).toList(),
+        );
+        await box.deleteAll(chunkKeys);
+        debugPrint('${chunkKeys.length} transações antigas foram sincronizadas e limpas do Hive.');
+      } catch (e, s) {
+        CrashReporter.recordError(e, s, reason: 'sincronizar transações antigas da catraca antes da limpeza');
+        debugPrint("Sem internet ou erro no Firebase. Lote mantido no Hive para evitar perda de dados: $e");
+      }
     }
 
   } catch (e, s) {
@@ -187,54 +244,16 @@ class CatracaOnlineProvider {
     DateTime dateTimeToCheck,
   ) async {
     try {
-      int inicioAlmoco = 10; // 10:00
-      int fimAlmoco = 15; // 14:59
-      int inicioJanta = 16; // 16:00
-      int fimJanta = 20; // 19:59
-
       final box = Hive.isBoxOpen(_collectionPath)
           ? Hive.box<OperatorTransactionOffline>(_collectionPath)
           : await Hive.openBox<OperatorTransactionOffline>(_collectionPath);
-      //Descobre em qual turno a tentativa atual se encaixa
-      int horaAtual = dateTimeToCheck.hour;
-      bool noAlmoco =
-          horaAtual >= inicioAlmoco && horaAtual < fimAlmoco; // 10:00 às 14:59
-      bool naJanta =
-          horaAtual >= inicioJanta && horaAtual < fimJanta; // 16:00 às 19:59
-
-      // Se não estiver no horário de nenhum turno, não há o que duplicar
-      if (!noAlmoco && !naJanta) {
-        return false;
-      }
-
-      // Varre o Hive procurando se o ID já passou HOJE neste mesmo turno
-      bool existeDuplicado = box.values.any((transaction) {
-        // Verifica se é o mesmo IdUff do usuário
-        if (transaction.idUser == idUffUser) {
-          DateTime dataRegistro = transaction.entryTime;
-
-          bool mesmoDia =
-              dataRegistro.year == dateTimeToCheck.year &&
-              dataRegistro.month == dateTimeToCheck.month &&
-              dataRegistro.day == dateTimeToCheck.day;
-
-          if (mesmoDia) {
-            int horaRegistro = dataRegistro.hour;
-
-            // Se a tentativa é no Almoço, verifica se ele já almoçou hoje
-            if (noAlmoco) {
-              return horaRegistro >= inicioAlmoco && horaRegistro < fimAlmoco;
-            }
-
-            // Se a tentativa é na Janta, verifica se ele já jantou hoje
-            if (naJanta) {
-              return horaRegistro >= inicioJanta && horaRegistro < fimJanta;
-            }
-          }
-        }
-        return false;
-      });
-      return existeDuplicado;
+      // Mesmo usuário já passou hoje neste mesmo turno (regra em
+      // `isSameMealShift`; fora das janelas nunca é duplicado).
+      return box.values.any(
+        (transaction) =>
+            transaction.idUser == idUffUser &&
+            isSameMealShift(transaction.entryTime, dateTimeToCheck),
+      );
     } catch (e) {
       throw Exception("Erro ao verificar duplicidade no RU: $e");
     }

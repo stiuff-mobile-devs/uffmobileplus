@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/restaurante/modules/catraca/controller/catraca_controller.dart';
 
-/// Selo "Online"/"Offline" da catraca, mostrado logo abaixo da AppBar.
+/// Selo do topo da catraca: "SCTM ativo" quando o SCTM responde,
+/// "Contingência" quando não (as refeições ficam pendentes no aparelho).
 class CatracaStatusBadge extends StatelessWidget {
   const CatracaStatusBadge({super.key});
 
@@ -37,7 +38,7 @@ class CatracaStatusBadge extends StatelessWidget {
               ),
             const SizedBox(width: 6),
             Text(
-              online ? 'online'.tr : 'catraca_offline_selo'.tr,
+              online ? 'catraca_selo_sctm_ativo'.tr : 'catraca_selo_contingencia'.tr,
               style: TextStyle(
                 color: color,
                 fontSize: 12,

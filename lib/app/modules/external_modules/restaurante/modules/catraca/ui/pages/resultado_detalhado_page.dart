@@ -131,8 +131,8 @@ class _Detail extends StatelessWidget {
           icon: Icons.cloud_rounded,
           title: 'catraca_passo_firebase'.tr,
           subtitle: stage == _Stage.offlineSynced
-              ? 'catraca_sincronizado'.tr
-              : 'catraca_pendente'.tr,
+              ? null
+              : 'catraca_aguardando_internet'.tr,
           done: stage == _Stage.offlineSynced,
         ),
       ],

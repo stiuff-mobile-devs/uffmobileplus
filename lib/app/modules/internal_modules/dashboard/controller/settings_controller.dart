@@ -4,9 +4,9 @@ import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/home_page_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/controller/login_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/controller/auth_google_controller.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/login/utils/bond_actions.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
-import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_umm_repository.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
 
@@ -46,14 +46,7 @@ class SettingsController extends GetxController {
     if (ok) await logout();
   }
 
-  Future<void> logoutIduff() async {
-    // Apaga também matrícula/nome/curso/perfil: assim o próximo login IdUFF
-    // consulta a UMM de novo em vez de reaproveitar os dados da conta anterior.
-    await _userDataRepository.clearIduffProfileData();
-    await UserUmmRepository().deleteUserUmmModel();
-    CrashReporter.clearUser();
-    Get.offAllNamed(Routes.LOGIN);
-  }
+  Future<void> logoutIduff() => BondActions.logoutIduff();
 
   void changeMatricula() async {
     Get.offAllNamed(Routes.CHOOSE_PROFILE, arguments: {'ask_selection': true});
@@ -98,46 +91,14 @@ class SettingsController extends GetxController {
     }
   }
 
-  Future<void> _showIduffLoginConfirmation() async {
-    final ok = await AppPopups.confirm(
-      title: 'login_iduff_titulo'.tr,
-      message: 'login_iduff_confirmacao_msg'.tr,
-      icon: Icons.login_rounded,
-      confirmText: 'continuar'.tr,
-    );
-    if (ok) loginController.loginIDUFF();
-  }
+  Future<void> _showIduffLoginConfirmation() =>
+      BondActions.confirmIduffLogin();
 
-  Future<void> _showIduffLogoutConfirmation() async {
-    final ok = await AppPopups.confirm(
-      title: 'desconectar_iduff_titulo'.tr,
-      message: 'desconectar_iduff_confirmacao_msg'.tr,
-      icon: Icons.link_off_rounded,
-      confirmText: 'desconectar'.tr,
-      destructive: true,
-    );
-    if (ok) await logoutIduff();
-  }
+  Future<void> _showIduffLogoutConfirmation() =>
+      BondActions.confirmIduffLogout();
 
   Future<void> _showGoogleLoginConfirmation() async {
-    final ok = await AppPopups.confirm(
-      title: 'login_google_titulo'.tr,
-      message: 'login_google_confirmacao_msg'.tr,
-      icon: Icons.login_rounded,
-      confirmText: 'continuar'.tr,
-    );
-    if (!ok || !await loginController.confirmGoogleOnlyLoginIfNeeded()) return;
-
-    UserGoogleModel? user;
-    AppPopups.showLoading('conectando_google'.tr);
-    try {
-      user = await loginController.loginGoogle(
-        navigate: false,
-        skipGoogleOnlyConfirm: true,
-      );
-    } finally {
-      AppPopups.hideLoading();
-    }
+    final UserGoogleModel? user = await BondActions.confirmGoogleLogin();
 
     if (user == null) {
       await reloadBondStates();
@@ -162,13 +123,6 @@ class SettingsController extends GetxController {
   }
 
   Future<void> _showGoogleLogoutConfirmation() async {
-    final ok = await AppPopups.confirm(
-      title: 'desconectar_google_titulo'.tr,
-      message: 'desconectar_google_confirmacao_msg'.tr,
-      icon: Icons.link_off_rounded,
-      confirmText: 'desconectar'.tr,
-      destructive: true,
-    );
-    if (ok) _authGoogleController.logout();
+    await BondActions.confirmGoogleLogout();
   }
 }

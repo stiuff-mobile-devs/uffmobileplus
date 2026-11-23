@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/services/auth_google_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
+import 'package:uffmobileplus/app/modules/internal_modules/login/utils/bond_actions.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
@@ -17,6 +19,7 @@ class ExternalModulesServices extends GetxService {
   UserData _userData = UserData();
 
   late AuthIduffService _auth;
+  late final AuthGoogleService _authGoogle = AuthGoogleService();
 
   bool isExpired = false;
 
@@ -88,6 +91,10 @@ class ExternalModulesServices extends GetxService {
     return _auth.getAccessToken();
   }
 
+  /// Token do Firebase (conta Google) para as APIs que pedem `token_google`.
+  /// Renova o token na rede; quem chama deve limitar o tempo de espera.
+  Future<String?> getFirebaseIdToken() => _authGoogle.getFirebaseIdToken();
+
   /// Perfil escolhido pelo usuário (graduação, docente...). `null` se ainda
   /// não houver usuário salvo.
   ProfileTypes? getUserProfileType() {
@@ -107,6 +114,32 @@ class ExternalModulesServices extends GetxService {
 
   /// Há uma sessão Google ativa (conta salva + sessão Firebase válida).
   Future<bool> hasActiveGoogleBond() => bond_status.hasActiveGoogleBond();
+
+  /// Conecta ou desconecta o IdUFF com as confirmações das Configurações.
+  /// Os dois caminhos saem da tela atual (autenticação ou login).
+  Future<void> toggleIduffBond({String? loginNote, String? logoutNote}) async {
+    if (await hasActiveIduffBond()) {
+      await BondActions.confirmIduffLogout(note: logoutNote);
+    } else {
+      await BondActions.confirmIduffLogin(note: loginNote);
+    }
+  }
+
+  /// Conecta ou desconecta o Google sem sair da tela atual. Devolve `true`
+  /// se a vinculação mudou (e relê o usuário salvo).
+  Future<bool> toggleGoogleBond({String? logoutNote}) async {
+    final bool changed;
+    if (await hasActiveGoogleBond()) {
+      changed = await BondActions.confirmGoogleLogout(
+        note: logoutNote,
+        stayOnScreen: true,
+      );
+    } else {
+      changed = await BondActions.confirmGoogleLogin() != null;
+    }
+    if (changed) await initialize();
+    return changed;
+  }
 
   String? getUserEmailGoogle() {
     return _userGoogleModel.email;

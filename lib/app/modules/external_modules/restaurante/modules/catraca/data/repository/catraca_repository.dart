@@ -12,9 +12,20 @@ class CatracaOnlineRepository {
   CatracaOnlineProvider catracaOnlineProvider = CatracaOnlineProvider();
   SctmService sctmService = SctmService();
 
-  Future<List<AreaModel>> getAreas( iduff,  token, String tokenGoogle) async {
-    return await sctmService.getAreas(iduff, token, tokenGoogle);
+  Future<List<AreaModel>> getAreas(
+    String iduff,
+    String? token,
+    String tokenGoogle,
+  ) async {
+    return await sctmService.getAreas(iduff, token ?? '', tokenGoogle);
   }
+
+  /// Última lista de áreas que veio do SCTM, para usar na contingência.
+  Future<void> saveAreas(List<AreaModel> areas) =>
+      catracaOnlineProvider.saveAreas(areas);
+
+  Future<List<AreaModel>> getSavedAreas() =>
+      catracaOnlineProvider.getSavedAreas();
 
   Future<List<OperatorTransactionModel>> getOperatorTransactions(
     String iduff,

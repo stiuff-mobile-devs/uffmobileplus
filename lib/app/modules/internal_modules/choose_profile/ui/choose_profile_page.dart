@@ -307,7 +307,7 @@ class ChooseProfilePage extends GetView<ChooseProfileController> {
    AccordionSection postDocResearcherStudentAccordion() {
     return AccordionSection(
       header: Text(
-        'Pesquisador de Pós-Doutorado'.tr,
+        'perfil_pos_doutorado'.tr,
         style: TextStyle(
           fontWeight: FontWeight.w700,
           fontSize: 22,

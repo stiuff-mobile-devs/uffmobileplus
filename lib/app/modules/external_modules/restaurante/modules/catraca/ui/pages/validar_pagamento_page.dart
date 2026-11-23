@@ -263,7 +263,19 @@ class _TransactionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isSctm = item.source == CatracaTxSource.sctm;
-    final sourceColor = isSctm ? Colors.greenAccent : Colors.orangeAccent;
+    // Debitada (SCTM) · Pendente (no aparelho) · Registrada (Firebase)
+    final Color sourceColor;
+    final String stateLabel;
+    if (isSctm) {
+      sourceColor = Colors.greenAccent;
+      stateLabel = 'catraca_estado_debitada'.tr;
+    } else if (item.isSynced == true) {
+      sourceColor = Colors.lightBlueAccent;
+      stateLabel = 'catraca_estado_registrada'.tr;
+    } else {
+      sourceColor = Colors.orangeAccent;
+      stateLabel = 'catraca_estado_pendente'.tr;
+    }
     final time = item.date != null
         ? DateFormat('HH:mm').format(item.date!)
         : '--:--';
@@ -330,7 +342,7 @@ class _TransactionTile extends StatelessWidget {
                   border: Border.all(color: sourceColor.withValues(alpha: 0.7)),
                 ),
                 child: Text(
-                  isSctm ? 'SCTM' : 'catraca_offline_selo'.tr,
+                  stateLabel,
                   style: TextStyle(
                     color: sourceColor,
                     fontSize: 11,
@@ -338,18 +350,6 @@ class _TransactionTile extends StatelessWidget {
                   ),
                 ),
               ),
-              if (!isSctm) ...[
-                const SizedBox(width: 6),
-                Icon(
-                  item.isSynced == true
-                      ? Icons.cloud_done_rounded
-                      : Icons.cloud_upload_outlined,
-                  color: item.isSynced == true
-                      ? Colors.greenAccent
-                      : Colors.orangeAccent,
-                  size: 18,
-                ),
-              ],
               const Icon(Icons.chevron_right_rounded, color: Colors.white38),
             ],
           ),

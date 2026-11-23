@@ -1,9 +1,9 @@
 /// Versão do módulo Catraca, mostrada na tela de informações.
 ///
-/// Suba a cada mudança na catraca: patch (x.y.Z) para correções, minor
-/// (x.Y.0) para funcionalidade ou mudança visual.
+/// Não suba por conta própria: o mantenedor muda manualmente junto com uma
+/// versão nova do UFF Mobile Plus.
 class CatracaVersion {
   CatracaVersion._();
 
-  static const String current = '1.2.0';
+  static const String current = '1.0.0';
 }

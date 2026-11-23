@@ -80,10 +80,6 @@ class ResultadoPage extends GetView<CatracaController> {
                           ),
                         ),
                       ],
-                      if (result?.sctmMessage != null) ...[
-                        const SizedBox(height: 16),
-                        _SctmNote(message: result!.sctmMessage!),
-                      ],
                       if (result?.item != null) ...[
                         const SizedBox(height: 24),
                         TextButton.icon(
@@ -192,36 +188,5 @@ class _ResultLook {
           r.message,
         );
     }
-  }
-}
-
-/// Avisa que o SCTM recusou antes de a refeição seguir para o offline.
-class _SctmNote extends StatelessWidget {
-  const _SctmNote({required this.message});
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Icon(Icons.info_outline_rounded, color: Colors.white, size: 20),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'catraca_sctm_recusou'.trParams({'mensagem': message}),
-              style: const TextStyle(color: Colors.white, fontSize: 13),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
