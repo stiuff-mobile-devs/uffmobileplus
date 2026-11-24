@@ -4,5 +4,6 @@
 class CatracaHelp {
   CatracaHelp._();
 
-  static const String? manual = null;
+  static const String? manual =
+      'https://github.com/stiuff-mobile-devs/uffmobileplus/wiki/Manual-Catraca';
 }

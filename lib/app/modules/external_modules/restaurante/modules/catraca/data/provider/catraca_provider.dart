@@ -14,7 +14,7 @@ class CatracaOnlineProvider {
   final String _areasBox = "catraca_areas";
   final String _areasKey = "last_areas";
   final String _collectionPathFirebase =
-      "meals_test"; // para testes user meals_test
+      "meals"; // para testes user meals_test
   final FirebaseFirestore _firestore = FirebaseFirestore.instanceFor(
     app: Firebase.app("catraca"),
   );
