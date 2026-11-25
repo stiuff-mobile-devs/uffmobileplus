@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/external_modules/cdc/controller/cdc_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/cdc/ui/widgets/cdc_notifications_tab.dart';
 import 'package:uffmobileplus/app/modules/external_modules/cdc/ui/widgets/cdc_rooms_tab.dart';
-import 'package:uffmobileplus/app/modules/external_modules/cdc/utils/cdc_help.dart';
+import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 import 'package:uffmobileplus/app/utils/ui_components/app_bars.dart';
 
@@ -25,7 +25,11 @@ class CdcPage extends GetView<CdcController> {
               icon: const Icon(Icons.refresh_rounded),
               onPressed: controller.refreshAll,
             ),
-            AppBars.helpAction(CdcHelp.url),
+            IconButton(
+              tooltip: 'cdc_info_titulo'.tr,
+              icon: const Icon(Icons.help_outline_rounded),
+              onPressed: () => Get.toNamed(Routes.CDC_INFO),
+            ),
           ],
           bottom: TabBar(
             indicatorColor: Colors.white,

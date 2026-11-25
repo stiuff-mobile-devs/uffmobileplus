@@ -14,6 +14,8 @@ import 'package:uffmobileplus/app/modules/external_modules/bibliotecas/ui/biblio
 import 'package:uffmobileplus/app/modules/external_modules/busuff/binding/busuff_binding.dart';
 import 'package:uffmobileplus/app/modules/external_modules/busuff/ui/busuff_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/cdc/bindings/cdc_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/cdc/bindings/cdc_info_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/cdc/ui/cdc_info_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/cdc/ui/cdc_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/binding/banco_de_ideias_binding.dart';
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/ui/banco_de_ideias_page.dart';
@@ -244,6 +246,11 @@ abstract class AppPages {
     ),
 
     GetPage(name: Routes.CDC, page: () => CdcPage(), binding: CdcBindings()),
+    GetPage(
+      name: Routes.CDC_INFO,
+      page: () => const CdcInfoPage(),
+      binding: CdcInfoBindings(),
+    ),
 
     GetPage(
       name: Routes.BANCO_DE_IDEIAS,
