@@ -8,8 +8,8 @@ import 'package:uffmobileplus/app/modules/external_modules/cdc/ui/widgets/cdc_ro
 import 'package:uffmobileplus/app/ui/widgets/responsive_uff_logo.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
 
-/// Aba Salas: chips de filtro e as seções Obrigatórias, Da CDC e Minhas
-/// salas (nessa ordem). Arquivadas só aparecem no filtro delas.
+/// Aba Salas: filtros Todas/Arquivadas e uma lista única, com as
+/// obrigatórias primeiro. Arquivadas só aparecem no filtro delas.
 class CdcRoomsTab extends GetView<CdcController> {
   const CdcRoomsTab({super.key});
 
@@ -74,29 +74,16 @@ class CdcRoomsTab extends GetView<CdcController> {
       ];
     }
 
-    // Todas: obrigatórias sempre primeiro, depois Da CDC e Minhas salas.
-    return [
-      if (sections.required.isNotEmpty) ...[
-        _SectionHeader(title: 'cdc_obrigatorias'.tr),
-        ..._tiles(sections.required),
-      ],
-      if (sections.cdc.isNotEmpty) ...[
-        _SectionHeader(
-          title: 'cdc_da_cdc'.tr,
-          subtitle: 'cdc_da_cdc_subtitulo'.tr,
-        ),
-        ..._tiles(sections.cdc),
-      ],
-      if (sections.mine.isNotEmpty) ...[
-        _SectionHeader(title: 'cdc_minhas_salas'.tr),
-        ..._tiles(sections.mine),
-      ],
-      if (sections.of(CdcRoomFilter.all).isEmpty)
+    // Todas: lista única, com as obrigatórias sempre primeiro.
+    if (sections.active.isEmpty) {
+      return [
         CdcEmptyState(
           icon: Icons.archive_outlined,
           title: 'cdc_todas_arquivadas'.tr,
         ),
-    ];
+      ];
+    }
+    return _tiles(sections.active);
   }
 
   List<Widget> _tiles(List<CdcChatRoomModel> rooms) => [
@@ -130,36 +117,64 @@ class _FilterChips extends GetView<CdcController> {
       (CdcRoomFilter.archived, 'cdc_arquivadas'.tr, sections.archived.length),
     ];
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          for (final (value, label, count) in filters)
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: ChoiceChip(
-                label: Text('$label  $count'),
-                selected: value == selected,
-                showCheckmark: false,
-                onSelected: (_) => controller.selectFilter(value),
-                labelStyle: TextStyle(
-                  color: value == selected ? Colors.white : Colors.white70,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                ),
-                backgroundColor: Colors.white.withValues(alpha: 0.06),
-                selectedColor: AppColors.mediumBlue(),
-                side: BorderSide(
-                  color: value == selected
-                      ? AppColors.mediumBlue()
-                      : Colors.white.withValues(alpha: 0.15),
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
+    return Row(
+      children: [
+        for (final (value, label, count) in filters)
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: _FilterPill(
+              label: '$label  $count',
+              selected: value == selected,
+              onTap: () => controller.selectFilter(value),
             ),
-        ],
+          ),
+      ],
+    );
+  }
+}
+
+/// Pílula de filtro com cores próprias (o ChoiceChip do Material 3 ignora o
+/// fundo passado e deixava o não selecionado branco com texto branco).
+class _FilterPill extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _FilterPill({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final shape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(20),
+      side: BorderSide(
+        color: selected
+            ? AppColors.mediumBlue()
+            : Colors.white.withValues(alpha: 0.15),
+      ),
+    );
+    return Material(
+      color: selected
+          ? AppColors.mediumBlue()
+          : Colors.white.withValues(alpha: 0.08),
+      shape: shape,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: selected ? Colors.white : Colors.white70,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -16,8 +16,8 @@ class CdcNotificationsTab extends GetView<CdcController> {
     return RefreshIndicator(
       onRefresh: controller.refreshNotifications,
       child: Obx(() {
-        final items = controller.inbox.items.toList();
-        final unread = controller.inbox.unreadCount;
+        final items = controller.notifications.toList();
+        final unread = controller.unreadCount;
 
         return ListView(
           physics: const AlwaysScrollableScrollPhysics(),

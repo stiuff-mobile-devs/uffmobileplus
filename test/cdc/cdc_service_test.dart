@@ -26,7 +26,8 @@ void main() {
   final service = CdcService();
 
   group('CdcService.organize', () {
-    test('separa obrigatórias e salas da CDC, em ordem alfabética', () {
+    test('lista única: obrigatórias primeiro, cada grupo em ordem alfabética',
+        () {
       final sections = service.organize(
         cdcRooms: [
           room('b', name: 'Bravo'),
@@ -39,14 +40,13 @@ void main() {
         userCourse: 'Computação',
       );
 
-      expect(sections.required.map((r) => r.name), ['Mike', 'Zulu']);
-      expect(sections.cdc.map((r) => r.name), ['alfa', 'Bravo']);
-      expect(sections.of(CdcRoomFilter.all).map((r) => r.id), [
-        'm',
-        'z',
-        'a',
-        'b',
+      expect(sections.active.map((r) => r.name), [
+        'Mike',
+        'Zulu',
+        'alfa',
+        'Bravo',
       ]);
+      expect(sections.of(CdcRoomFilter.all), sections.active);
     });
 
     test('mostra só as salas do curso do usuário', () {
@@ -60,7 +60,7 @@ void main() {
         userCourse: ' computação ',
       );
 
-      expect(sections.cdc.map((r) => r.id), ['comp']);
+      expect(sections.active.map((r) => r.id), ['comp']);
     });
 
     test('arquivada sai da seção e vai para Arquivadas', () {
@@ -72,7 +72,7 @@ void main() {
         userCourse: '',
       );
 
-      expect(sections.cdc.map((r) => r.id), ['b']);
+      expect(sections.active.map((r) => r.id), ['b']);
       expect(sections.archived.map((r) => r.id), ['a']);
     });
 
@@ -85,7 +85,7 @@ void main() {
         userCourse: '',
       );
 
-      expect(sections.required.map((r) => r.id), ['r']);
+      expect(sections.active.map((r) => r.id), ['r']);
       expect(sections.archived, isEmpty);
       expect(service.canArchive(requiredRoom), isFalse);
     });
@@ -103,9 +103,9 @@ void main() {
         userCourse: '',
       );
 
-      expect(sections.cdc.single.id, 'cdc1');
-      expect(sections.cdc.single.isMember, isTrue);
-      expect(sections.mine.map((r) => r.id), ['spaces/BBB222']);
+      expect(sections.active.map((r) => r.id), ['cdc1', 'spaces/BBB222']);
+      expect(sections.active.first.isMember, isTrue);
+      expect(sections.active.last.category, CdcRoomCategory.mine);
     });
   });
 

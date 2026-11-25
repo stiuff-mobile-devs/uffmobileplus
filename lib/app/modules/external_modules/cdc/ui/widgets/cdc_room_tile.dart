@@ -104,9 +104,23 @@ class CdcRoomTile extends StatelessWidget {
     return Icons.chat_bubble_outline_rounded;
   }
 
+  /// Uma etiqueta principal por sala (Obrigatória, Oficial ou Google Chat) e,
+  /// na oficial em que o aluno já está no Chat, "Você participa".
   List<Widget> get _badges => [
-        if (room.isRequired)
-          _Badge(label: 'cdc_selo_obrigatoria'.tr, color: Colors.amber.shade300),
+        switch (room.category) {
+          CdcRoomCategory.required => _Badge(
+              label: 'cdc_selo_obrigatoria'.tr,
+              color: Colors.amber.shade300,
+            ),
+          CdcRoomCategory.cdc => _Badge(
+              label: 'cdc_selo_oficial'.tr,
+              color: AppColors.lightBlue(),
+            ),
+          CdcRoomCategory.mine => _Badge(
+              label: 'cdc_selo_google_chat'.tr,
+              color: Colors.white70,
+            ),
+        },
         if (room.isMember)
           _Badge(
             label: 'cdc_selo_voce_participa'.tr,

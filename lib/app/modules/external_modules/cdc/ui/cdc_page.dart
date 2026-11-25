@@ -32,7 +32,7 @@ class CdcPage extends GetView<CdcController> {
               Tab(text: 'cdc_aba_salas'.tr),
               Tab(
                 child: Obx(() {
-                  final unread = controller.inbox.unreadCount;
+                  final unread = controller.unreadCount;
                   return Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

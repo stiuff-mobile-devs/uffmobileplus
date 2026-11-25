@@ -9,12 +9,18 @@ import 'package:uffmobileplus/app/data/services/push_notification_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/cdc/data/models/cdc_chat_room_model.dart';
 import 'package:uffmobileplus/app/modules/external_modules/cdc/data/repository/cdc_repository.dart';
 import 'package:uffmobileplus/app/modules/external_modules/cdc/services/cdc_service.dart';
+import 'package:uffmobileplus/app/modules/external_modules/cdc/utils/cdc_mock_notifications.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
 
 enum _RoomAction { open, archive, unarchive }
 
 class CdcController extends GetxController {
+  /// Notificações de teste: `true` mostra exemplos fixos na aba Notificações
+  /// (só em memória, sem gravar no Hive); `false` mostra as reais.
+  /// Volte para `false` antes de publicar.
+  static const bool notificacoesDeTeste = false;
+
   final CdcRepository _repository;
   final CdcService _service;
 
@@ -24,9 +30,21 @@ class CdcController extends GetxController {
       Get.find<ExternalModulesServices>();
 
   /// Caixa de notificações (compartilhada com o serviço de push).
-  final NotificationInboxService inbox = NotificationInboxService();
+  final NotificationInboxService _inbox = NotificationInboxService();
 
-  final RxBool isLoading = false.obs;
+  /// Exemplos em memória quando [notificacoesDeTeste] está ligado.
+  final RxList<InboxNotification> _mock = <InboxNotification>[].obs;
+
+  bool get _useMock => notificacoesDeTeste;
+
+  /// Notificações mostradas na aba (exemplos ou a caixa real).
+  List<InboxNotification> get notifications =>
+      _useMock ? _mock : _inbox.items;
+
+  int get unreadCount => notifications.where((n) => !n.read).length;
+
+  /// Começa true para o primeiro frame já mostrar o carregamento.
+  final RxBool isLoading = true.obs;
   final RxBool loadFailed = false.obs;
   final Rx<CdcRoomFilter> filter = CdcRoomFilter.all.obs;
   final Rx<CdcRoomSections> sections = const CdcRoomSections().obs;
@@ -39,11 +57,18 @@ class CdcController extends GetxController {
   Set<String> _archivedKeys = <String>{};
   String _userKey = 'anonimo';
 
+  /// A carga fica no onReady (depois do primeiro frame): o controller nasce
+  /// durante o build da CdcPage, e mudar valores observados ali gera o erro
+  /// "setState() or markNeedsBuild() called during build".
   @override
-  void onInit() {
-    super.onInit();
+  void onReady() {
+    super.onReady();
     loadRooms();
-    inbox.load();
+    if (_useMock) {
+      _mock.assignAll(cdcMockNotifications());
+    } else {
+      _inbox.load();
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -151,12 +176,9 @@ class CdcController extends GetxController {
   Future<void> archive(CdcChatRoomModel room) async {
     if (!canArchive(room)) return;
     if (!await _setArchived(room, true)) return;
-    AppPopups.show(
-      'cdc_sala_arquivada'.tr,
-      type: PopupType.success,
-      actionLabel: 'desfazer'.tr,
-      onAction: () => _setArchived(room, false),
-    );
+    // Sem botão "Desfazer": snackbar com ação não fecha sozinho no Flutter
+    // 3.44 (persist). Para desfazer: filtro Arquivadas > Desarquivar.
+    AppPopups.success('cdc_sala_arquivada'.tr);
   }
 
   Future<void> unarchive(CdcChatRoomModel room) async {
@@ -191,12 +213,16 @@ class CdcController extends GetxController {
 
   /// Puxar para atualizar: busca de novo o que ficou na bandeja do celular.
   Future<void> refreshNotifications() async {
+    if (_useMock) {
+      _mock.assignAll(cdcMockNotifications());
+      return;
+    }
     await PushNotificationService().syncFromTray();
-    await inbox.load();
+    await _inbox.load();
   }
 
   Future<void> openNotification(InboxNotification notification) async {
-    if (!notification.read) inbox.markRead(notification.id);
+    if (!notification.read) _markRead(notification.id);
 
     final hasTarget = notification.link != null || _routeOf(notification) != null;
     await AppPopups.sheet<void>(
@@ -243,7 +269,22 @@ class CdcController extends GetxController {
     if (route != null) Get.toNamed(route);
   }
 
-  Future<void> markAllNotificationsRead() => inbox.markAllRead();
+  void _markRead(String id) {
+    if (!_useMock) {
+      _inbox.markRead(id);
+      return;
+    }
+    final i = _mock.indexWhere((n) => n.id == id);
+    if (i >= 0) _mock[i] = _mock[i].copyWith(read: true);
+  }
+
+  Future<void> markAllNotificationsRead() async {
+    if (_useMock) {
+      _mock.assignAll(_mock.map((n) => n.copyWith(read: true)).toList());
+      return;
+    }
+    await _inbox.markAllRead();
+  }
 
   Future<void> clearNotifications() async {
     final ok = await AppPopups.confirm(
@@ -253,6 +294,11 @@ class CdcController extends GetxController {
       confirmText: 'limpar'.tr,
       destructive: true,
     );
-    if (ok) await inbox.clear();
+    if (!ok) return;
+    if (_useMock) {
+      _mock.clear();
+    } else {
+      await _inbox.clear();
+    }
   }
 }
