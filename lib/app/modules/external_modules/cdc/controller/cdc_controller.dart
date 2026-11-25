@@ -15,6 +15,21 @@ import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
 
 enum _RoomAction { open, archive, unarchive }
 
+/// Situação das salas do Google Chat do usuário na Central.
+enum CdcGoogleChatStatus {
+  /// Nenhuma conta Google conectada no app.
+  notConnected,
+
+  /// A conta conectada não é @id.uff.br.
+  otherAccount,
+
+  /// Conta UFF conectada, mas sem a permissão de ver as salas do Chat.
+  noPermission,
+  loading,
+  ready,
+  error,
+}
+
 class CdcController extends GetxController {
   /// Notificações de teste: `true` mostra exemplos fixos na aba Notificações
   /// (só em memória, sem gravar no Hive); `false` mostra as reais.
@@ -53,7 +68,14 @@ class CdcController extends GetxController {
   late final int initialTab =
       (Get.arguments is Map && Get.arguments['aba'] == 'notificacoes') ? 1 : 0;
 
+  /// Só contas institucionais mostram salas do Google Chat.
+  static const String _uffEmailDomain = '@id.uff.br';
+
+  final Rx<CdcGoogleChatStatus> chatStatus =
+      CdcGoogleChatStatus.loading.obs;
+
   List<CdcChatRoomModel> _cdcRooms = const [];
+  List<CdcChatRoomModel> _chatRooms = const [];
   Set<String> _archivedKeys = <String>{};
   String _userKey = 'anonimo';
 
@@ -83,6 +105,8 @@ class CdcController extends GetxController {
       await _externalModulesServices.initialize();
       _userKey = _externalModulesServices.getUserStorageKey() ?? 'anonimo';
       _archivedKeys = await _repository.getArchivedKeys(_userKey);
+      // Mostra na hora as salas do Chat guardadas; a lista nova vem depois.
+      _chatRooms = await _repository.getCachedGoogleChatRooms(_userKey);
       _cdcRooms = await _repository.getCdcRooms();
       _organize();
     } catch (e, s) {
@@ -93,13 +117,85 @@ class CdcController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+    if (!loadFailed.value) await _loadGoogleChat();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Salas do Google Chat
+  // ---------------------------------------------------------------------------
+
+  String get _googleEmail =>
+      (_externalModulesServices.getUserEmailGoogle() ?? '').trim().toLowerCase();
+
+  /// Busca as salas do Chat do usuário. Com [interactive] = false não abre
+  /// nenhuma tela (só usa a permissão já dada).
+  Future<void> _loadGoogleChat({bool interactive = false}) async {
+    final email = _googleEmail;
+    if (email.isEmpty || !await _externalModulesServices.hasActiveGoogleBond()) {
+      _setChatRooms(const [], CdcGoogleChatStatus.notConnected);
+      return;
+    }
+    if (!email.endsWith(_uffEmailDomain)) {
+      _setChatRooms(const [], CdcGoogleChatStatus.otherAccount);
+      return;
+    }
+
+    chatStatus.value = CdcGoogleChatStatus.loading;
+    try {
+      final headers = await _externalModulesServices.getGoogleAuthHeaders(
+        [_repository.googleChatScope],
+        interactive: interactive,
+      );
+      if (headers == null) {
+        await _repository.clearCachedGoogleChatRooms(_userKey);
+        _setChatRooms(const [], CdcGoogleChatStatus.noPermission);
+        return;
+      }
+      final rooms = await _repository.getGoogleChatRooms(_userKey, headers);
+      _setChatRooms(rooms, CdcGoogleChatStatus.ready);
+    } catch (e, s) {
+      // Mantém as salas guardadas no aparelho.
+      CrashReporter.recordError(e, s, reason: 'carregar salas do google chat');
+      debugPrint('CDC: erro ao carregar salas do Google Chat - $e');
+      chatStatus.value = CdcGoogleChatStatus.error;
+    }
+  }
+
+  void _setChatRooms(List<CdcChatRoomModel> rooms, CdcGoogleChatStatus status) {
+    _chatRooms = rooms;
+    chatStatus.value = status;
+    _organize();
+  }
+
+  /// Botão do card: conecta a conta Google (se faltar), confere se é da UFF
+  /// e pede a permissão de ver as salas do Chat.
+  Future<void> connectGoogleChat() async {
+    if (!await _externalModulesServices.hasActiveGoogleBond()) {
+      // Sem conta ativa, o toggle só conecta (nunca desconecta).
+      final connected = await _externalModulesServices.toggleGoogleBond();
+      if (!connected) return;
+    }
+    if (!_googleEmail.endsWith(_uffEmailDomain)) {
+      _setChatRooms(const [], CdcGoogleChatStatus.otherAccount);
+      AppPopups.warning(
+        'cdc_google_chat_outra_conta_msg'.tr,
+        title: 'cdc_google_chat_outra_conta_titulo'.tr,
+      );
+      return;
+    }
+    await _loadGoogleChat(interactive: true);
+    if (chatStatus.value == CdcGoogleChatStatus.error) {
+      AppPopups.error(
+        'tente_novamente_mais_tarde'.tr,
+        title: 'cdc_google_chat_erro_titulo'.tr,
+      );
+    }
   }
 
   void _organize() {
     sections.value = _service.organize(
       cdcRooms: _cdcRooms,
-      // Fase 2: salas do Google Chat do usuário.
-      chatRooms: const [],
+      chatRooms: _chatRooms,
       archivedKeys: _archivedKeys,
       userCourse: _externalModulesServices.getUserCourse(),
     );

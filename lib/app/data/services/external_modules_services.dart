@@ -162,6 +162,15 @@ class ExternalModulesServices extends GetxService {
     return changed;
   }
 
+  /// Headers de autorização da conta Google para os [scopes], para os módulos
+  /// chamarem APIs do Google em nome do usuário. Com [interactive] = false
+  /// não abre tela e devolve `null` sem conta ou sem permissão.
+  Future<Map<String, String>?> getGoogleAuthHeaders(
+    List<String> scopes, {
+    bool interactive = false,
+  }) =>
+      _authGoogle.authorizationHeaders(scopes, interactive: interactive);
+
   String? getUserEmailGoogle() {
     return _userGoogleModel.email;
   }

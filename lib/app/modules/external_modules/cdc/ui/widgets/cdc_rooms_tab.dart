@@ -4,6 +4,7 @@ import 'package:uffmobileplus/app/modules/external_modules/cdc/controller/cdc_co
 import 'package:uffmobileplus/app/modules/external_modules/cdc/data/models/cdc_chat_room_model.dart';
 import 'package:uffmobileplus/app/modules/external_modules/cdc/services/cdc_service.dart';
 import 'package:uffmobileplus/app/modules/external_modules/cdc/ui/widgets/cdc_empty_state.dart';
+import 'package:uffmobileplus/app/modules/external_modules/cdc/ui/widgets/cdc_google_chat_card.dart';
 import 'package:uffmobileplus/app/modules/external_modules/cdc/ui/widgets/cdc_room_tile.dart';
 import 'package:uffmobileplus/app/ui/widgets/responsive_uff_logo.dart';
 import 'package:uffmobileplus/app/utils/color_pallete.dart';
@@ -41,6 +42,7 @@ class CdcRoomsTab extends GetView<CdcController> {
           ];
         } else if (sections.isEmpty) {
           children = [
+            const CdcGoogleChatCard(),
             CdcEmptyState(
               icon: Icons.forum_outlined,
               title: 'nenhuma_sala_disponivel_curso'.tr,
@@ -48,6 +50,7 @@ class CdcRoomsTab extends GetView<CdcController> {
           ];
         } else {
           children = [
+            const CdcGoogleChatCard(),
             _FilterChips(sections: sections, selected: filter),
             const SizedBox(height: 8),
             ..._roomList(sections, filter),

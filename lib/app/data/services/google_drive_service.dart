@@ -1,22 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
-import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/controller/auth_google_controller.dart';
+import 'package:uffmobileplus/app/data/connections/google_auth_client.dart';
 import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
-
-class GoogleAuthClient extends http.BaseClient {
-  final Map<String, String> _headers;
-  final http.Client _client = http.Client();
-
-  GoogleAuthClient(this._headers);
-
-  @override
-  Future<http.StreamedResponse> send(http.BaseRequest request) {
-    request.headers.addAll(_headers);
-    return _client.send(request);
-  }
-}
 
 class GoogleDriveService {
   final folderName = 'UFF+';

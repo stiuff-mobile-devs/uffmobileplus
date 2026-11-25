@@ -197,6 +197,28 @@ class AuthGoogleService {
     return null;
   }
 
+  /// Headers de autorização da conta Google para os [scopes] (APIs do
+  /// `googleapis`). Com [interactive] = false não abre nenhuma tela: devolve
+  /// `null` se não houver conta conectada ou se a permissão ainda não foi
+  /// dada. Com true, pede o login/permissão ao usuário quando faltar.
+  Future<Map<String, String>?> authorizationHeaders(
+    List<String> scopes, {
+    bool interactive = false,
+  }) async {
+    final account = await getDriveAccount(interactive: interactive);
+    if (account == null) return null;
+    try {
+      return await account.authorizationClient.authorizationHeaders(
+        scopes,
+        promptIfNecessary: interactive,
+      );
+    } on GoogleSignInException catch (e, s) {
+      // Cancelado pelo usuário é filtrado pelo CrashReporter.
+      CrashReporter.recordError(e, s, reason: 'autorizar escopos google');
+      return null;
+    }
+  }
+
   Future<GoogleSignInAccount?> getDriveAccount({bool interactive = true}) async {
     await _init; 
     
