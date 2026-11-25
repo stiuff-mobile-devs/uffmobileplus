@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
+import 'package:uffmobileplus/app/data/services/notification_inbox_service.dart';
 import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/controller/user_data_controller.dart';
@@ -309,6 +310,7 @@ class ChooseProfileController extends GetxController {
     _userDataRepository.deleteUserIduffModel();
     userUmmRepository.deleteUserUmmModel();
     CrashReporter.clearUser();
+    NotificationInboxService().clearUser();
     Get.offAllNamed(Routes.LOGIN);
   }
 }

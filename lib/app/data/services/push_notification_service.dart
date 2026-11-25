@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/data/models/inbox_notification.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
+import 'package:uffmobileplus/app/data/services/notification_inbox_service.dart';
 import 'package:uffmobileplus/app/routes/app_routes.dart';
 
 /// Handler de mensagens em background — DEVE ser top-level (fora de classes).
@@ -20,7 +25,10 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 /// - Exibir notificações no foreground via `flutter_local_notifications`
 /// - Tratar clique em notificações (background e app terminado) → navegar p/ CDC
 /// - Escutar `onTokenRefresh` para re-registrar o token no futuro
-class PushNotificationService {
+/// - Guardar as notificações na caixa de entrada ([NotificationInboxService]):
+///   ao chegar com o app aberto, ao tocar e, ao abrir/voltar ao app, as que
+///   ainda estão na bandeja do celular (chegaram com o app fechado)
+class PushNotificationService with WidgetsBindingObserver {
   static final PushNotificationService _instance =
       PushNotificationService._internal();
   factory PushNotificationService() => _instance;
@@ -67,6 +75,10 @@ class PushNotificationService {
 
     // 7. Escutar renovação de token
     _messaging.onTokenRefresh.listen(_onTokenRefresh);
+
+    // 8. Guardar o que chegou com o app fechado e repetir ao voltar ao app
+    WidgetsBinding.instance.addObserver(this);
+    await syncFromTray();
 
     debugPrint('✅ PushNotificationService inicializado');
   }
@@ -120,6 +132,8 @@ class PushNotificationService {
       'Notificação foreground: ${message.notification?.title} - ${message.notification?.body}',
     );
 
+    NotificationInboxService().addMessage(message);
+
     final notification = message.notification;
     if (notification == null) return;
 
@@ -151,6 +165,7 @@ class PushNotificationService {
     debugPrint(
       'Notificação clicada (background): ${message.notification?.title}',
     );
+    NotificationInboxService().addMessage(message, read: true);
     _navigateToCdc();
   }
 
@@ -161,6 +176,7 @@ class PushNotificationService {
       debugPrint(
         'App aberto via notificação (terminated): ${initialMessage.notification?.title}',
       );
+      await NotificationInboxService().addMessage(initialMessage, read: true);
       // Atrasa a navegação para garantir que o GetMaterialApp já inicializou
       Future.delayed(const Duration(seconds: 2), () {
         _navigateToCdc();
@@ -175,14 +191,53 @@ class PushNotificationService {
   }
 
   // ---------------------------------------------------------------------------
+  // Bandeja do celular
+  // ---------------------------------------------------------------------------
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) syncFromTray();
+  }
+
+  /// Guarda na caixa de entrada as notificações da CDC que estão na bandeja
+  /// do celular. É o único jeito de pegar as que chegaram com o app fechado,
+  /// quando o código do app não roda. Se o usuário apagou da bandeja sem
+  /// tocar, ela se perde.
+  Future<void> syncFromTray() async {
+    try {
+      final active = await _localNotifications.getActiveNotifications();
+      final trayItems = active
+          .where(_isCdcNotification)
+          .map(
+            (n) => InboxNotification.fromTray(
+              title: n.title,
+              body: n.body ?? n.bigText,
+            ),
+          )
+          .toList();
+      await NotificationInboxService().addFromTray(trayItems);
+    } catch (e, s) {
+      CrashReporter.recordError(e, s, reason: 'ler notificações da bandeja');
+    }
+  }
+
+  /// No Android, só o canal da CDC (é também o canal padrão do FCM no
+  /// manifest); assim as notificações fixas do SOS e do Monitora ficam de
+  /// fora. No iOS o app só mostra notificações da CDC.
+  bool _isCdcNotification(ActiveNotification n) {
+    if (Platform.isAndroid) return n.channelId == _androidChannel.id;
+    return true;
+  }
+
+  // ---------------------------------------------------------------------------
   // Navegação
   // ---------------------------------------------------------------------------
 
-  /// Navega para a tela da CDC.
+  /// Navega para a tela da CDC, já na aba Notificações.
   void _navigateToCdc() {
     // Verifica se já está na rota da CDC para evitar empilhamento
     if (Get.currentRoute != Routes.CDC) {
-      Get.toNamed(Routes.CDC);
+      Get.toNamed(Routes.CDC, arguments: {'aba': 'notificacoes'});
     }
   }
 

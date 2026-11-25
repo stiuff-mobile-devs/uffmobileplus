@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
+import 'package:uffmobileplus/app/data/services/notification_inbox_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/home_page_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/controller/login_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/controller/auth_google_controller.dart';
@@ -31,6 +32,7 @@ class SettingsController extends GetxController {
     await _userDataRepository.deleteUserIduffModel();
     await _userDataRepository.clearUserData();
     CrashReporter.clearUser();
+    NotificationInboxService().clearUser();
      loginController.logoutGoogle();
   }
 

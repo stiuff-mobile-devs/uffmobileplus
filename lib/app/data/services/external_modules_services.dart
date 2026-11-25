@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/data/services/notification_inbox_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/services/auth_google_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/utils/bond_actions.dart';
@@ -10,6 +11,7 @@ import 'package:uffmobileplus/app/modules/internal_modules/user/utils/bond_statu
 import 'package:uffmobileplus/app/modules/internal_modules/user/utils/crash_reporter_user.dart';
 import 'package:uffmobileplus/app/utils/gdi_groups.dart';
 import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
+import 'package:uffmobileplus/app/utils/user_storage_key.dart';
 
 class ExternalModulesServices extends GetxService {
   late UserDataController _userDataController;
@@ -43,6 +45,25 @@ class ExternalModulesServices extends GetxService {
     // Roda a cada abertura da Home e após um novo login: mantém o usuário
     // (hash) e o perfil atuais nos relatórios do Crashlytics.
     await syncCrashReporterUser();
+
+    // Caixa de notificações da Central de Comunicação: separa por usuário.
+    await NotificationInboxService().setUser(_storageSeed());
+  }
+
+  /// iduff ou, sem ele, o uid do Google. `null` sem usuário.
+  String? _storageSeed() {
+    final iduff = _userData.iduff;
+    if (iduff != null && iduff.isNotEmpty) return iduff;
+    final googleId = _userGoogleModel.id;
+    if (googleId != null && googleId.isNotEmpty) return googleId;
+    return null;
+  }
+
+  /// Chave para separar por usuário o que os módulos guardam no aparelho
+  /// (Hive). `null` sem usuário.
+  String? getUserStorageKey() {
+    final seed = _storageSeed();
+    return seed == null ? null : userStorageKey(seed);
   }
 
   Future<String> getEmail() async {

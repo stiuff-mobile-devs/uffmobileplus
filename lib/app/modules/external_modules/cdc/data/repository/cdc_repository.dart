@@ -1,14 +1,19 @@
 import 'package:uffmobileplus/app/modules/external_modules/cdc/data/models/cdc_chat_room_model.dart';
+import 'package:uffmobileplus/app/modules/external_modules/cdc/data/provider/cdc_archive_provider.dart';
 import 'package:uffmobileplus/app/modules/external_modules/cdc/data/provider/cdc_provider.dart';
 
 class CdcRepository {
-  final CdcProvider _provider = CdcProvider();
+  final CdcProvider _provider;
+  final CdcArchiveProvider _archiveProvider;
 
-  Future<List<CdcChatRoomModel>> getAvailableChatRooms({
-    required String userCourse,
-  }) async {
-    final List<CdcChatRoomModel> rooms = await _provider.getChatRooms();
+  CdcRepository(this._provider, this._archiveProvider);
 
-    return rooms.where((room) => room.isVisibleForCourse(userCourse)).toList();
-  }
+  /// Salas cadastradas pela CDC (todas; o filtro por curso fica no Service).
+  Future<List<CdcChatRoomModel>> getCdcRooms() => _provider.getChatRooms();
+
+  Future<Set<String>> getArchivedKeys(String userKey) =>
+      _archiveProvider.getArchivedKeys(userKey);
+
+  Future<void> saveArchivedKeys(String userKey, Set<String> keys) =>
+      _archiveProvider.saveArchivedKeys(userKey, keys);
 }

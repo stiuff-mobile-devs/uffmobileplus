@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
+import 'package:uffmobileplus/app/data/services/notification_inbox_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/controller/login_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/google/controller/auth_google_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
@@ -64,6 +65,7 @@ class BondActions {
     await UserDataRepository().clearIduffProfileData();
     await UserUmmRepository().deleteUserUmmModel();
     CrashReporter.clearUser();
+    NotificationInboxService().clearUser();
     Get.offAllNamed(Routes.LOGIN);
   }
 
