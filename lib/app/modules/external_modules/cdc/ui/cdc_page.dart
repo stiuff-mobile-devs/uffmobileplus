@@ -19,7 +19,14 @@ class CdcPage extends GetView<CdcController> {
         backgroundColor: AppColors.darkBlue(),
         appBar: AppBars.build(
           title: 'central_de_comunicacao'.tr,
-          actions: [AppBars.helpAction(CdcHelp.url)],
+          actions: [
+            IconButton(
+              tooltip: 'cdc_atualizar'.tr,
+              icon: const Icon(Icons.refresh_rounded),
+              onPressed: controller.refreshAll,
+            ),
+            AppBars.helpAction(CdcHelp.url),
+          ],
           bottom: TabBar(
             indicatorColor: Colors.white,
             indicatorWeight: 3,

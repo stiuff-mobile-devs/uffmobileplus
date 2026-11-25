@@ -138,4 +138,52 @@ void main() {
       expect(model.category, CdcRoomCategory.required);
     });
   });
+
+  group('CdcService.isStale', () {
+    final now = DateTime(2026, 11, 25, 12);
+
+    test('nunca buscada precisa buscar', () {
+      expect(service.isStale(null, now), isTrue);
+    });
+
+    test('vale por 24h', () {
+      expect(
+        service.isStale(now.subtract(const Duration(hours: 23)), now),
+        isFalse,
+      );
+      expect(
+        service.isStale(now.subtract(const Duration(hours: 24)), now),
+        isTrue,
+      );
+    });
+
+    test('data no futuro (relógio mudou) busca de novo', () {
+      expect(
+        service.isStale(now.add(const Duration(minutes: 5)), now),
+        isTrue,
+      );
+    });
+  });
+
+  group('CdcChatRoomModel cache', () {
+    test('ida e volta preserva a sala oficial', () {
+      final original = room(
+        'x',
+        required: true,
+        allCourses: false,
+        courses: ['Computação'],
+      );
+      final copy = CdcChatRoomModel.fromCacheMap(original.toMap());
+
+      expect(copy.toMap(), original.toMap());
+    });
+
+    test('ida e volta preserva a origem Google Chat', () {
+      final original = room('spaces/A1', origin: CdcRoomOrigin.googleChat);
+      final copy = CdcChatRoomModel.fromCacheMap(original.toMap());
+
+      expect(copy.origin, CdcRoomOrigin.googleChat);
+      expect(copy.archiveKey, original.archiveKey);
+    });
+  });
 }

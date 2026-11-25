@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:uffmobileplus/app/modules/external_modules/cdc/controller/cdc_controller.dart';
 import 'package:uffmobileplus/app/modules/external_modules/cdc/data/models/cdc_chat_room_model.dart';
 import 'package:uffmobileplus/app/modules/external_modules/cdc/services/cdc_service.dart';
@@ -17,7 +18,7 @@ class CdcRoomsTab extends GetView<CdcController> {
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      onRefresh: controller.loadRooms,
+      onRefresh: controller.refreshAll,
       child: Obx(() {
         final sections = controller.sections.value;
         final filter = controller.filter.value;
@@ -37,7 +38,7 @@ class CdcRoomsTab extends GetView<CdcController> {
               title: 'nao_foi_possivel_carregar_salas_chat'.tr,
               message: 'msg_verifique_internet'.tr,
               actionLabel: 'tentar_novamente'.tr,
-              onAction: controller.loadRooms,
+              onAction: controller.refreshAll,
             ),
           ];
         } else if (sections.isEmpty) {
@@ -54,6 +55,7 @@ class CdcRoomsTab extends GetView<CdcController> {
             _FilterChips(sections: sections, selected: filter),
             const SizedBox(height: 8),
             ..._roomList(sections, filter),
+            _UpdatedAt(date: controller.updatedAt.value),
           ];
         }
 
@@ -213,6 +215,30 @@ class _SectionHeader extends StatelessWidget {
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+/// "Atualizado em dd/MM às HH:mm": a lista é a guardada no aparelho.
+class _UpdatedAt extends StatelessWidget {
+  final DateTime? date;
+  const _UpdatedAt({required this.date});
+
+  @override
+  Widget build(BuildContext context) {
+    final d = date;
+    if (d == null) return const SizedBox.shrink();
+    final local = d.toLocal();
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Text(
+        'cdc_atualizado_em'.trParams({
+          'data': DateFormat('dd/MM').format(local),
+          'hora': DateFormat('HH:mm').format(local),
+        }),
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: Colors.white38, fontSize: 12),
       ),
     );
   }

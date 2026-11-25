@@ -97,7 +97,29 @@ class CdcController extends GetxController {
   // Salas
   // ---------------------------------------------------------------------------
 
-  Future<void> loadRooms() async {
+  /// Quando as salas oficiais foram buscadas pela última vez.
+  final Rxn<DateTime> updatedAt = Rxn<DateTime>();
+  DateTime? _chatUpdatedAt;
+
+  /// Abre com as salas guardadas no aparelho e só busca de novo se passaram
+  /// 24h ([CdcService.cacheDuration]) ou com [force] (botão de atualizar).
+  Future<void> loadRooms({bool force = false}) => _load(force: force);
+
+  /// Botão ⟳ e puxar a lista: busca tudo de novo na hora.
+  Future<void> refreshAll() async {
+    final ok = await _load(force: true);
+    await refreshNotifications();
+    if (!ok) {
+      AppPopups.error(
+        'msg_verifique_internet'.tr,
+        title: 'cdc_erro_atualizar_titulo'.tr,
+      );
+    }
+  }
+
+  /// Devolve false se uma busca necessária falhou.
+  Future<bool> _load({required bool force}) async {
+    var ok = true;
     try {
       isLoading.value = true;
       loadFailed.value = false;
@@ -105,19 +127,48 @@ class CdcController extends GetxController {
       await _externalModulesServices.initialize();
       _userKey = _externalModulesServices.getUserStorageKey() ?? 'anonimo';
       _archivedKeys = await _repository.getArchivedKeys(_userKey);
-      // Mostra na hora as salas do Chat guardadas; a lista nova vem depois.
-      _chatRooms = await _repository.getCachedGoogleChatRooms(_userKey);
-      _cdcRooms = await _repository.getCdcRooms();
+
+      final cachedChat = await _repository.getCachedGoogleChatRooms(_userKey);
+      _chatRooms = cachedChat.rooms;
+      _chatUpdatedAt = cachedChat.updatedAt;
+
+      final cached = await _repository.getCachedCdcRooms(_userKey);
+      _cdcRooms = cached.rooms;
+      updatedAt.value = cached.updatedAt;
       _organize();
+
+      if (force || _service.isStale(cached.updatedAt, DateTime.now())) {
+        ok = await _fetchCdcRooms(hasCache: cached.updatedAt != null);
+      }
     } catch (e, s) {
       CrashReporter.recordError(e, s, reason: 'carregar salas de chat do cdc');
       debugPrint('CDC: erro ao carregar salas - $e');
       loadFailed.value = true;
       sections.value = const CdcRoomSections();
+      ok = false;
     } finally {
       isLoading.value = false;
     }
-    if (!loadFailed.value) await _loadGoogleChat();
+    if (loadFailed.value) return false;
+    final chatOk = await _loadGoogleChat(force: force);
+    return ok && chatOk;
+  }
+
+  /// Busca as salas oficiais no Firestore. Sem nada guardado, a falha vira
+  /// a tela de erro; com salas guardadas, elas continuam na tela.
+  Future<bool> _fetchCdcRooms({required bool hasCache}) async {
+    try {
+      final fresh = await _repository.fetchCdcRooms(_userKey);
+      _cdcRooms = fresh.rooms;
+      updatedAt.value = fresh.updatedAt;
+      _organize();
+      return true;
+    } catch (e, s) {
+      if (!hasCache) rethrow;
+      CrashReporter.recordError(e, s, reason: 'atualizar salas de chat do cdc');
+      debugPrint('CDC: usando salas guardadas, busca falhou - $e');
+      return false;
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -127,17 +178,27 @@ class CdcController extends GetxController {
   String get _googleEmail =>
       (_externalModulesServices.getUserEmailGoogle() ?? '').trim().toLowerCase();
 
-  /// Busca as salas do Chat do usuário. Com [interactive] = false não abre
-  /// nenhuma tela (só usa a permissão já dada).
-  Future<void> _loadGoogleChat({bool interactive = false}) async {
+  /// Situação e salas do Chat do usuário. A API só é chamada se as salas
+  /// guardadas venceram, com [force] ou com [interactive] (depois de o
+  /// usuário tocar em Conectar/Permitir). Devolve false se a busca falhou.
+  Future<bool> _loadGoogleChat({
+    bool interactive = false,
+    bool force = false,
+  }) async {
     final email = _googleEmail;
     if (email.isEmpty || !await _externalModulesServices.hasActiveGoogleBond()) {
-      _setChatRooms(const [], CdcGoogleChatStatus.notConnected);
-      return;
+      await _dropChatRooms(CdcGoogleChatStatus.notConnected);
+      return true;
     }
     if (!email.endsWith(_uffEmailDomain)) {
-      _setChatRooms(const [], CdcGoogleChatStatus.otherAccount);
-      return;
+      await _dropChatRooms(CdcGoogleChatStatus.otherAccount);
+      return true;
+    }
+    if (!force &&
+        !interactive &&
+        !_service.isStale(_chatUpdatedAt, DateTime.now())) {
+      _setChatRooms(_chatRooms, CdcGoogleChatStatus.ready);
+      return true;
     }
 
     chatStatus.value = CdcGoogleChatStatus.loading;
@@ -147,18 +208,30 @@ class CdcController extends GetxController {
         interactive: interactive,
       );
       if (headers == null) {
-        await _repository.clearCachedGoogleChatRooms(_userKey);
-        _setChatRooms(const [], CdcGoogleChatStatus.noPermission);
-        return;
+        await _dropChatRooms(CdcGoogleChatStatus.noPermission);
+        return true;
       }
-      final rooms = await _repository.getGoogleChatRooms(_userKey, headers);
-      _setChatRooms(rooms, CdcGoogleChatStatus.ready);
+      final fresh = await _repository.fetchGoogleChatRooms(_userKey, headers);
+      _chatUpdatedAt = fresh.updatedAt;
+      _setChatRooms(fresh.rooms, CdcGoogleChatStatus.ready);
+      return true;
     } catch (e, s) {
       // Mantém as salas guardadas no aparelho.
       CrashReporter.recordError(e, s, reason: 'carregar salas do google chat');
       debugPrint('CDC: erro ao carregar salas do Google Chat - $e');
       chatStatus.value = CdcGoogleChatStatus.error;
+      return false;
     }
+  }
+
+  /// Sem conta UFF ou sem permissão: tira as salas do Chat da tela e do
+  /// aparelho.
+  Future<void> _dropChatRooms(CdcGoogleChatStatus status) async {
+    if (_chatRooms.isNotEmpty || _chatUpdatedAt != null) {
+      await _repository.clearGoogleChatRooms(_userKey);
+      _chatUpdatedAt = null;
+    }
+    _setChatRooms(const [], status);
   }
 
   void _setChatRooms(List<CdcChatRoomModel> rooms, CdcGoogleChatStatus status) {
@@ -176,15 +249,15 @@ class CdcController extends GetxController {
       if (!connected) return;
     }
     if (!_googleEmail.endsWith(_uffEmailDomain)) {
-      _setChatRooms(const [], CdcGoogleChatStatus.otherAccount);
+      await _dropChatRooms(CdcGoogleChatStatus.otherAccount);
       AppPopups.warning(
         'cdc_google_chat_outra_conta_msg'.tr,
         title: 'cdc_google_chat_outra_conta_titulo'.tr,
       );
       return;
     }
-    await _loadGoogleChat(interactive: true);
-    if (chatStatus.value == CdcGoogleChatStatus.error) {
+    final ok = await _loadGoogleChat(interactive: true, force: true);
+    if (!ok) {
       AppPopups.error(
         'tente_novamente_mais_tarde'.tr,
         title: 'cdc_google_chat_erro_titulo'.tr,

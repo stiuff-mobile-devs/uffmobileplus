@@ -62,6 +62,17 @@ class CdcService {
 
   bool canArchive(CdcChatRoomModel room) => !room.isRequired;
 
+  /// Por quanto tempo as salas guardadas no aparelho valem antes de buscar
+  /// de novo (o botão de atualizar busca na hora).
+  static const Duration cacheDuration = Duration(hours: 24);
+
+  /// A lista guardada precisa ser buscada de novo: nunca foi buscada, passou
+  /// de [cacheDuration] ou a data está no futuro (relógio do aparelho mudou).
+  bool isStale(DateTime? updatedAt, DateTime now) {
+    if (updatedAt == null || updatedAt.isAfter(now)) return true;
+    return now.difference(updatedAt) >= cacheDuration;
+  }
+
   List<CdcChatRoomModel> _sorted(Iterable<CdcChatRoomModel> rooms) =>
       rooms.toList()
         ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));

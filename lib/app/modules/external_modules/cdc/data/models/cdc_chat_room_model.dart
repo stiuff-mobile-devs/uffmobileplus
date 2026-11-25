@@ -63,6 +63,38 @@ class CdcChatRoomModel {
     );
   }
 
+  /// Para guardar no Hive (cache das salas).
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'name': name,
+        'link': link,
+        'type': type,
+        'all_courses': allCourses,
+        'courses': courses,
+        'required': isRequired,
+        'origin': origin.name,
+      };
+
+  /// Lê uma sala guardada com [toMap].
+  factory CdcChatRoomModel.fromCacheMap(Map<dynamic, dynamic> map) {
+    final base = CdcChatRoomModel.fromMap(
+      id: (map['id'] ?? '').toString(),
+      map: map.map((k, v) => MapEntry(k.toString(), v)),
+    );
+    return CdcChatRoomModel(
+      id: base.id,
+      name: base.name,
+      link: base.link,
+      type: base.type,
+      allCourses: base.allCourses,
+      courses: base.courses,
+      isRequired: base.isRequired,
+      origin: map['origin'] == CdcRoomOrigin.googleChat.name
+          ? CdcRoomOrigin.googleChat
+          : CdcRoomOrigin.cdc,
+    );
+  }
+
   CdcRoomCategory get category {
     if (isRequired) return CdcRoomCategory.required;
     return origin == CdcRoomOrigin.cdc
