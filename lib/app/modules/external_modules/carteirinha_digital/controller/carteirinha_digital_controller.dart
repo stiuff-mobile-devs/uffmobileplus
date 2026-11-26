@@ -7,6 +7,7 @@ import 'package:uffmobileplus/app/data/services/external_modules_services.dart';
 import 'package:uffmobileplus/app/data/services/screen_protector_service.dart';
 import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/utils/carteirinha_last_update.dart';
+import 'package:uffmobileplus/app/utils/ui_components/app_popups.dart';
 
 class CarteirinhaDigitalController extends GetxController {
   final RxBool isBusy = true.obs;
@@ -28,6 +29,14 @@ class CarteirinhaDigitalController extends GetxController {
   String getUserValidity() => validity.value;
   String getUserBond() => _externalModulesServices.getUserBond();
 
+  /// Há dados de carteirinha salvos (entrou com o IdUFF).
+  bool get hasUser => getUserIdUFF().isNotEmpty;
+
+  /// Botão "Entrar com IdUFF" da tela sem login (sai da carteirinha).
+  Future<void> loginIduff() => _externalModulesServices.loginIduff(
+    note: 'carteirinha_nota_sair_para_iduff'.tr,
+  );
+
   @override
   void onInit() {
     super.onInit();
@@ -43,26 +52,9 @@ class CarteirinhaDigitalController extends GetxController {
       await _externalModulesServices.initialize();
     } catch (e, s) {
       CrashReporter.recordError(e, s, reason: 'carregar dados da carteirinha');
-      Get.snackbar(
-        '',
-        '',
-        snackPosition: SnackPosition.BOTTOM,
-        snackStyle: SnackStyle.FLOATING,
-        margin: const EdgeInsets.all(12),
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        titleText: Text(
-          'erro'.tr,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        messageText: Text(
-          'erro_carregar_dados_carteirinha'.tr,
-          style: TextStyle(color: Colors.white, fontSize: 16),
-        ),
+      AppPopups.error(
+        'tente_novamente_mais_tarde'.tr,
+        title: 'carteirinha_erro_carregar_titulo'.tr,
       );
     }
     // Mostra na hora o que está salvo e tenta atualizar em seguida; sem
@@ -97,26 +89,9 @@ class CarteirinhaDigitalController extends GetxController {
       // (issue #39); o resto é falta de internet.
       debugPrint('Erro ao atualizar a carteirinha: $e');
       if (silent) return;
-      Get.snackbar(
-        '',
-        '',
-        snackPosition: SnackPosition.BOTTOM,
-        snackStyle: SnackStyle.FLOATING,
-        margin: const EdgeInsets.all(12),
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        titleText: Text(
-          'erro'.tr,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        messageText: Text(
-          'erro_atualizar_qr_code'.tr,
-          style: TextStyle(color: Colors.white, fontSize: 16),
-        ),
+      AppPopups.error(
+        'msg_verifique_internet'.tr,
+        title: 'carteirinha_erro_atualizar_titulo'.tr,
       );
     } finally {
       isRefreshing.value = false;

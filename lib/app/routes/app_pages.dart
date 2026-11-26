@@ -21,6 +21,8 @@ import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/bindi
 import 'package:uffmobileplus/app/modules/external_modules/banco_de_ideias/ui/banco_de_ideias_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/binding/carteirinha_digital_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/ui/carteirinha_digital_page.dart';
+import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/binding/carteirinha_info_bindings.dart';
+import 'package:uffmobileplus/app/modules/external_modules/carteirinha_digital/ui/carteirinha_info_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/repositorio_institucional/bindings/repositorio_institucional_bindings.dart';
 import 'package:uffmobileplus/app/modules/external_modules/repositorio_institucional/ui/repositorio_institucional_page.dart';
 import 'package:uffmobileplus/app/modules/external_modules/internacional/bindings/internacional_bindings.dart';
@@ -280,6 +282,11 @@ abstract class AppPages {
         CarteirinhaDigitalBindings(),
         UserDataBindings(),
       ],
+    ),
+    GetPage(
+      name: Routes.CARTEIRINHA_INFO,
+      page: () => const CarteirinhaInfoPage(),
+      binding: CarteirinhaInfoBindings(),
     ),
     // Plano de Estudos - Externo
     GetPage(

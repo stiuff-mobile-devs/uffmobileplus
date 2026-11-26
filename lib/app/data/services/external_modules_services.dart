@@ -133,6 +133,10 @@ class ExternalModulesServices extends GetxService {
   /// Há uma sessão Google ativa (conta salva + sessão Firebase válida).
   Future<bool> hasActiveGoogleBond() => bond_status.hasActiveGoogleBond();
 
+  /// Confirma e abre o login IdUFF (sai da tela atual).
+  Future<void> loginIduff({String? note}) =>
+      BondActions.confirmIduffLogin(note: note);
+
   /// Conecta ou desconecta o IdUFF com as confirmações das Configurações.
   /// Os dois caminhos saem da tela atual (autenticação ou login).
   Future<void> toggleIduffBond({String? loginNote, String? logoutNote}) async {

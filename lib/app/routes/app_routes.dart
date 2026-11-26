@@ -31,6 +31,7 @@ abstract class Routes {
   static const SOS = '/sos';
   //Carteirinha Digital - Externo
   static const CARTEIRINHA_DIGITAL = '/carteirinha_digital';
+  static const CARTEIRINHA_INFO = '/carteirinha_info';
 
   //Plano de Estudos - Externo
   static const STUDY_PLAN = '/plano_estudos';
