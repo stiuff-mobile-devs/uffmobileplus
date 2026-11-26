@@ -148,16 +148,33 @@ class UserDataController extends GetxController {
     return groups;
   }
 
-  Future<String> updateQrData() async {
+  /// Busca no SACI o QR code e a validade da carteirinha e salva no aparelho.
+  /// Lança [Exception] se o SACI não devolver os dados ou se não der para
+  /// salvar; nesse caso os dados salvos antes continuam valendo.
+  Future<void> updateCarteirinhaData() async {
     String? token = await _auth.getAccessToken();
     String? iduffUsuario = await _userDataRepository.getIduff();
 
-    var textoQrCode = await _userDataRepository.getSaciData(
+    final saciData = await _userDataRepository.getSaciData(
       token,
       iduffUsuario,
       _auth,
     );
-    return await _userDataRepository.updateQrData(textoQrCode[0]);
+    // getSaciData devolve lista vazia quando o SACI falha (antes isso virava
+    // RangeError aqui).
+    final textoQrCode = saciData.isNotEmpty ? saciData[0]?.toString() : null;
+    if (textoQrCode == null || textoQrCode.isEmpty || textoQrCode == 'null') {
+      throw Exception('SACI não devolveu o QR code da carteirinha');
+    }
+    final dataValidade = saciData.length >= 2 ? saciData[1]?.toString() : null;
+
+    final saved = await _userDataRepository.updateCarteirinhaData(
+      textoQrCode,
+      dataValidade,
+    );
+    if (!saved) {
+      throw Exception('Não foi possível salvar os dados da carteirinha');
+    }
   }
 
   //Se ele não achar tem que colocar um -

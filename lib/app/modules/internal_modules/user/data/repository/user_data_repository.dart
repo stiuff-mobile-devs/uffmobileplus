@@ -38,8 +38,14 @@ class UserDataRepository {
     return await _userDataProvider.hasUserData();
   }
 
-  Future<String> updateQrData(String textoQrCodeCarteirinha) async {
-    return await _userDataProvider.updateQrData(textoQrCodeCarteirinha);
+  Future<bool> updateCarteirinhaData(
+    String textoQrCodeCarteirinha,
+    String? dataValidadeMatricula,
+  ) async {
+    return await _userDataProvider.updateCarteirinhaData(
+      textoQrCodeCarteirinha,
+      dataValidadeMatricula,
+    );
   }
 
   Future<String> updateShortcutRoutes(List<String> shortcutRoutes) async {

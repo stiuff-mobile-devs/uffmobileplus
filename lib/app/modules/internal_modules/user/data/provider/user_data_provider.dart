@@ -61,18 +61,24 @@ class UserDataProvider {
     }
   }
 
-  Future<String> updateQrData(String textoQrCodeCarteirinha) async {
+  /// Salva o QR code e a validade da carteirinha vindos do SACI. A validade
+  /// só é trocada se vier preenchida. Devolve se conseguiu salvar.
+  Future<bool> updateCarteirinhaData(
+    String textoQrCodeCarteirinha,
+    String? dataValidadeMatricula,
+  ) async {
     try {
       UserData? user = await getUserData();
-      if (user != null) {
-        user.textoQrCodeCarteirinha = textoQrCodeCarteirinha;
-        await user.save(); // Salva a alteração diretamente no HiveObject
-        return textoQrCodeCarteirinha;
+      if (user == null) return false;
+      user.textoQrCodeCarteirinha = textoQrCodeCarteirinha;
+      if (dataValidadeMatricula != null && dataValidadeMatricula.isNotEmpty) {
+        user.dataValidadeMatricula = dataValidadeMatricula;
       }
-      return "Usuario não encontrado";
+      await user.save(); // Salva a alteração diretamente no HiveObject
+      return true;
     } catch (e, s) {
-      CrashReporter.recordError(e, s, reason: 'atualizar qr code da carteirinha no hive');
-      return "Erro ao atualizar status de login no Hive: $e";
+      CrashReporter.recordError(e, s, reason: 'atualizar dados da carteirinha no hive');
+      return false;
     }
   }
 

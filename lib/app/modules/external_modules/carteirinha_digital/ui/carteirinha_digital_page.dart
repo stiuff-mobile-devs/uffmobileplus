@@ -24,7 +24,7 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
             icon: const Icon(Icons.refresh),
             tooltip: 'atualizar'.tr,
             onPressed: () {
-              controller.updateQrCodeData();
+              controller.refreshCarteirinha();
             },
           ),
         ],
@@ -254,7 +254,6 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
                                 bottom: 36,
                               ),
                               width: 180,
-                              height: 180,
                               child: qrCodeWidget(controller, context),
                             ),
                           ],
@@ -268,23 +267,40 @@ class CarteirinhaDigitalPage extends GetView<CarteirinhaDigitalController> {
     );
   }
 
-  Stack qrCodeWidget(
+  /// QR code salvo e, embaixo, o progresso enquanto atualiza no SACI (o QR
+  /// não some durante a atualização).
+  Widget qrCodeWidget(
     CarteirinhaDigitalController controller,
     BuildContext context,
   ) {
-    return Stack(
-      children: [
-        Obx(
-          () => controller.isQrCodeLoading.value
-              ? Center(child: CircularProgressIndicator())
-              : controller.qrCodeData.isEmpty
-              ? SizedBox.shrink()
-              : QrImageView(
-                  data: controller.qrCodeData,
-                  version: QrVersions.auto,
-                ),
-        ),
-      ],
-    );
+    return Obx(() {
+      final qr = controller.qrCodeData.value;
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: 180,
+            height: 180,
+            child: qr.isEmpty
+                ? const SizedBox.shrink()
+                : QrImageView(data: qr, version: QrVersions.auto),
+          ),
+          const SizedBox(height: 8),
+          // Espaço reservado para a tela não pular ao mostrar o progresso.
+          SizedBox(
+            height: 4,
+            child: controller.isRefreshing.value
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(2),
+                    child: LinearProgressIndicator(
+                      color: Colors.blue[800],
+                      backgroundColor: Colors.blue[100],
+                    ),
+                  )
+                : null,
+          ),
+        ],
+      );
+    });
   }
 }

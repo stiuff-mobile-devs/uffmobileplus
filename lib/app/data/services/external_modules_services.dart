@@ -23,12 +23,6 @@ class ExternalModulesServices extends GetxService {
   late AuthIduffService _auth;
   late final AuthGoogleService _authGoogle = AuthGoogleService();
 
-  bool isExpired = false;
-
-  void handleTimeout() {
-    isExpired = true;
-  }
-
   ExternalModulesServices() {
     initialize();
   }
@@ -104,8 +98,11 @@ class ExternalModulesServices extends GetxService {
     return _userData.textoQrCodeCarteirinha ?? "";
   }
 
-  Future<String> updateQrCodeData() async {
-    return await _userDataController.updateQrData();
+  /// Atualiza no SACI o QR code e a validade da carteirinha e relê o usuário
+  /// salvo. Lança se o SACI falhar; os dados salvos continuam valendo.
+  Future<void> refreshCarteirinhaData() async {
+    await _userDataController.updateCarteirinhaData();
+    _userData = (await _userDataRepository.getUserData()) ?? _userData;
   }
 
   Future<String?> getAccessToken() {
