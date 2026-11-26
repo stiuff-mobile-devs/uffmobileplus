@@ -24,6 +24,7 @@ import 'package:uffmobileplus/app/modules/internal_modules/dashboard/controller/
 import 'package:uffmobileplus/app/modules/internal_modules/login/controller/login_controller.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/repository/user_data_repository.dart';
 import 'package:uffmobileplus/app/ui/widgets/app_recommendation_dialog.dart';
+import 'package:uffmobileplus/app/utils/uff_bond_ids.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomePageController extends GetxController {
@@ -49,6 +50,10 @@ class HomePageController extends GetxController {
   final shortcutRoutes = <String>[].obs;
   final savedShortcuts = <DashboardShortcut>[].obs;
   final availableToAdd = <DashboardShortcut>[].obs;
+
+  /// Graduação ou pós: só eles têm Plano de estudos e Histórico (mesma regra
+  /// dos atalhos em ExternalModulesController).
+  final RxBool isStudent = false.obs;
 
   final RxBool isLoadingTodayClasses = true.obs;
   final RxList<Discipline> todayClasses = <Discipline>[].obs;
@@ -135,6 +140,10 @@ class HomePageController extends GetxController {
           _externalModulesServices.getUserName() ??
           _externalModulesServices.getUserNameGoogle() ??
           "";
+      isStudent.value = const {
+        ProfileTypes.grad,
+        ProfileTypes.pos,
+      }.contains(_externalModulesServices.getUserProfileType());
       userMatricula.value = _externalModulesServices.getUserMatricula();
       userCourse.value = _externalModulesServices.getUserCourse();
       userPhotoUrl.value =
@@ -159,6 +168,7 @@ class HomePageController extends GetxController {
         ''');
     } catch (e, s) {
       CrashReporter.recordError(e, s, reason: 'carregar dados do perfil na home');
+      isStudent.value = false;
       userName.value = '-';
       userMatricula.value = '-';
       userEmail.value = '-';
@@ -168,6 +178,11 @@ class HomePageController extends GetxController {
   }
 
   Future<void> _loadTodayClasses() async {
+    if (!isStudent.value) {
+      todayClasses.clear();
+      isLoadingTodayClasses.value = false;
+      return;
+    }
     try {
       final plan = await _studyPlanRepository.getStudyPlan(false);
       final weekday = _weekDayForToday();
@@ -190,6 +205,11 @@ class HomePageController extends GetxController {
   }
 
   Future<void> _loadTranscriptStats() async {
+    if (!isStudent.value) {
+      transcriptStats.value = null;
+      isLoadingTranscript.value = false;
+      return;
+    }
     try {
       final transcriptModel = await _transcriptRepository.getTranscript(false);
       transcriptStats.value = transcriptModel?.transcript;
@@ -490,8 +510,20 @@ class HomePageController extends GetxController {
   final sectionOrder = <HomeSection>[...defaultSectionOrder].obs;
   final hiddenSections = <HomeSection>{}.obs;
 
-  List<HomeSection> get visibleSections =>
-      sectionOrder.where((s) => !hiddenSections.contains(s)).toList();
+  /// Seções que existem para o perfil atual. Plano de estudos e Histórico
+  /// somem para quem não é aluno, sem mexer na ordem salva no aparelho.
+  bool isSectionAvailable(HomeSection section) =>
+      isStudent.value ||
+      (section != HomeSection.studyPlan && section != HomeSection.transcript);
+
+  List<HomeSection> get visibleSections => sectionOrder
+      .where((s) => isSectionAvailable(s) && !hiddenSections.contains(s))
+      .toList();
+
+  /// Seções ocultas pelo usuário que ele pode mostrar de novo.
+  List<HomeSection> get hiddenAvailableSections => sectionOrder
+      .where((s) => isSectionAvailable(s) && hiddenSections.contains(s))
+      .toList();
 
   Future<void> _loadSectionPrefs() async {
     try {
@@ -593,14 +625,16 @@ class HomePageController extends GetxController {
   void reorderVisibleSection(int oldIndex, int newIndex) {
     final visible = visibleSections;
     if (oldIndex < 0 || oldIndex >= visible.length) return;
+    final wasVisible = visible.toSet();
     final moved = visible.removeAt(oldIndex);
     visible.insert(newIndex.clamp(0, visible.length), moved);
 
-    // Preenche as posições que eram das visíveis com a nova sequência.
+    // Preenche as posições que eram das visíveis com a nova sequência. As
+    // ocultas e as indisponíveis para o perfil ficam onde estavam.
     var next = 0;
     final order = [
       for (final s in sectionOrder)
-        hiddenSections.contains(s) ? s : visible[next++],
+        wasVisible.contains(s) ? visible[next++] : s,
     ];
     sectionOrder.assignAll(order);
     _persistSectionPrefs();

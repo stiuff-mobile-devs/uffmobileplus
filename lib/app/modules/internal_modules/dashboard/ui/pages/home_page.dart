@@ -48,7 +48,7 @@ class HomePage extends GetView<HomePageController> {
         );
         final isLoading = controller.isLoading.value;
         final sections = controller.visibleSections;
-        final hiddenCount = controller.hiddenSections.length;
+        final hiddenCount = controller.hiddenAvailableSections.length;
 
         return Container(
           width: double.infinity,
@@ -478,9 +478,7 @@ class HomePage extends GetView<HomePageController> {
 
   /// Escolhe uma seção oculta para mostrar de novo, ou restaura o padrão.
   Future<void> _showHiddenSections() async {
-    final hidden = controller.sectionOrder
-        .where(controller.hiddenSections.contains)
-        .toList();
+    final hidden = controller.hiddenAvailableSections;
 
     // `choose` devolve null ao fechar a folha, então "Restaurar padrão" usa
     // um valor próprio (-1) e as seções usam o índice no enum.
