@@ -67,9 +67,15 @@ class UserDataRepository {
   Future<List<dynamic>> getSaciData(
     String? token,
     String? iduffUsuario,
-    AuthIduffService auth,
-  ) async {
-    return await _saciService.getSaciData(token, iduffUsuario, auth);
+    AuthIduffService auth, {
+    Duration? timeout,
+  }) async {
+    return await _saciService.getSaciData(
+      token,
+      iduffUsuario,
+      auth,
+      timeout: timeout,
+    );
   }
 
   Future<void> saveUserIduffModel(UserIduffModel userAuth) async {

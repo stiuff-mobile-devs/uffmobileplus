@@ -35,7 +35,15 @@ Future<bool> getStatus() async {
     }
   }
 
-Future<List<dynamic>> getSaciData(String? token, String? iduffUsuario, AuthIduffService auth) async {
+  /// QR code e validade da carteirinha: `[textoQrCode, dataValidade]`, ou
+  /// lista vazia se o SACI falhar. Com [timeout], desiste depois desse tempo
+  /// (o login usa para não ficar preso esperando o SACI).
+  Future<List<dynamic>> getSaciData(
+    String? token,
+    String? iduffUsuario,
+    AuthIduffService auth, {
+    Duration? timeout,
+  }) async {
    try{
     var uri = Uri.https(
       Secrets.carteirinhaValidationHost,
@@ -43,7 +51,9 @@ Future<List<dynamic>> getSaciData(String? token, String? iduffUsuario, AuthIduff
       {"iduff_usuario": iduffUsuario, "token": token ?? ""},
     );
 
-    http.Response response = await auth.client!.post(uri);
+    final request = auth.client!.post(uri);
+    http.Response response =
+        timeout == null ? await request : await request.timeout(timeout);
     var responseDecoded = json.decode(response.body);
     
     if (response.statusCode == 200) {
@@ -59,7 +69,14 @@ Future<List<dynamic>> getSaciData(String? token, String? iduffUsuario, AuthIduff
         return [textoQrCode, dataValidade];
       }
     }
-   }
+   } on TimeoutException catch (_) {
+      // SACI lento: quem chamou segue sem os dados.
+      debugPrint("Erro: o SACI demorou demais para responder.");
+      return [];
+    } on SocketException catch (_) {
+      debugPrint("Erro: sem conexão de rede para alcançar o SACI.");
+      return [];
+    }
     catch(e, s){
       CrashReporter.recordError(e, s, reason: 'obter dados da carteirinha no saci');
       debugPrint("Erro ao obter dados do SACI: $e");

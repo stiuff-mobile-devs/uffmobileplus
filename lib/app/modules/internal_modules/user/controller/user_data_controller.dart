@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'package:uffmobileplus/app/data/services/crash_reporter.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/login/modules/iduff/services/auth_iduff_service.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_data.dart';
 import 'package:uffmobileplus/app/modules/internal_modules/user/data/models/user_umm_model.dart';
@@ -11,17 +13,46 @@ class UserDataController extends GetxController {
   final UserDataRepository _userDataRepository = UserDataRepository();
   final AuthIduffService _auth = Get.find<AuthIduffService>();
 
+  /// Tempo máximo de espera pelo SACI durante o login.
+  static const Duration _saciLoginTimeout = Duration(seconds: 5);
+
   Future<String> saveUserData(
     UserUmmModel userUmm,
     String targetMatricula,
     ProfileTypes profileType,
   ) async {
     try {
-      List<dynamic>? saciData = await _userDataRepository.getSaciData(
-        await _auth.getAccessToken(),
-        await _userDataRepository.getIduff(),
-        _auth,
-      );
+      UserData? existingUserData = await _userDataRepository.getUserData();
+
+      String? iduff =
+          await _userDataRepository.getIduff() ??
+          userUmm.activeBond?.objects?.outerObject?[0].usuario?.iduff;
+
+      // QR code e validade vêm do SACI. Se ele falhar ou demorar, o login
+      // segue sem esses dados (a carteirinha tenta de novo ao abrir).
+      List<dynamic> saciData = const [];
+      try {
+        saciData = await _userDataRepository.getSaciData(
+          await _auth.getAccessToken(),
+          await _userDataRepository.getIduff(),
+          _auth,
+          timeout: _saciLoginTimeout,
+        );
+      } catch (e, s) {
+        CrashReporter.recordError(e, s, reason: 'buscar dados do saci no login');
+        debugPrint('Erro ao buscar dados do SACI no login: $e');
+      }
+
+      final hasSaciData = saciData.length >= 2;
+      // Sem SACI, mantém o que já estava salvo para a mesma pessoa.
+      final sameUser =
+          iduff != null && existingUserData?.iduff == iduff;
+      String? textoQrCode = hasSaciData
+          ? saciData[0]?.toString()
+          : (sameUser ? existingUserData?.textoQrCodeCarteirinha : null);
+      String? dataValidadeMatricula = hasSaciData
+          ? saciData[1]?.toString()
+          : (sameUser ? existingUserData?.dataValidadeMatricula : null);
 
       int? gradIndex = 0;
       int? posIndex = 0;
@@ -30,13 +61,6 @@ class UserDataController extends GetxController {
       String? bond;
       String? bondId;
       String? matricula = targetMatricula;
-
-      String? textoQrCode = await saciData[0];
-      String? dataValidadeMatricula = await saciData[1];
-
-      String? iduff =
-          await _userDataRepository.getIduff() ??
-          userUmm.activeBond?.objects?.outerObject?[0].usuario?.iduff;
 
       String? fotoUrl = await _userDataRepository.getPhotoUrl();
 
@@ -87,7 +111,6 @@ class UserDataController extends GetxController {
 
       List<GdiGroups>? gdiGroups = await getPersonalGdiGroups(iduff ?? "-");
       String accessToken = await _auth.getAccessToken() ?? "";
-      UserData? existingUserData = await _userDataRepository.getUserData();
 
       final userData = UserData(
         name: name,
